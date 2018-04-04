@@ -1,0 +1,1 @@
+https://leibnizhu.github.io/2018/03/07/Kerberos安全集群的Hive-HBase-Kafka-Maxwell使用/
