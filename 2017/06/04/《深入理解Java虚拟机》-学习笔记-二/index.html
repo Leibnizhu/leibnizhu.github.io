@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            《深入理解Java虚拟机》 学习笔记(二)——垃圾回收 | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="Leibniz Hu">
+    <meta name="description" content="null">
+    <meta name="keywords" content="null,Java,JVM,GC">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.gitlab.io">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="《深入理解Java虚拟机》 学习笔记(二)——垃圾回收 | Heaven&#39;s Door">
+    <meta property="og:description" content="null">
+    <meta property="og:article:tag" content="Java"> <meta property="og:article:tag" content="JVM"> <meta property="og:article:tag" content="GC"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+<link rel="stylesheet" href="/css/prism-solarizedlight.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#判断对象可回收"><span class="post-toc-number">1.</span> <span class="post-toc-text">判断对象可回收</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#引用计数法"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">引用计数法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#可达性分析算法"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">可达性分析算法</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#引用分类"><span class="post-toc-number">2.</span> <span class="post-toc-text">引用分类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#finalize-方法"><span class="post-toc-number">3.</span> <span class="post-toc-text">finalize()方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#方法区-永生代的GC"><span class="post-toc-number">4.</span> <span class="post-toc-text">方法区/永生代的GC</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#垃圾收集算法"><span class="post-toc-number">5.</span> <span class="post-toc-text">垃圾收集算法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#标记-清除算法-Mark-Sweep"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">标记-清除算法(Mark-Sweep)</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#复制算法-Copying"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">复制算法(Copying)</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#标记-整理算法-Mark-Compact"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">标记-整理算法(Mark-Compact)</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#HotSpot的算法实现"><span class="post-toc-number">6.</span> <span class="post-toc-text">HotSpot的算法实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#枚举GC-Root"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">枚举GC Root</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#安全点"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">安全点</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#安全区域"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">安全区域</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#实际的垃圾收集器"><span class="post-toc-number">7.</span> <span class="post-toc-text">实际的垃圾收集器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Serial收集器"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">Serial收集器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Serial-Old收集器"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">Serial Old收集器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ParNew收集器"><span class="post-toc-number">7.3.</span> <span class="post-toc-text">ParNew收集器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Parallel-Scavenge收集器"><span class="post-toc-number">7.4.</span> <span class="post-toc-text">Parallel Scavenge收集器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Parallel-Old收集器"><span class="post-toc-number">7.5.</span> <span class="post-toc-text">Parallel Old收集器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CMS收集器"><span class="post-toc-number">7.6.</span> <span class="post-toc-text">CMS收集器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#G1收集器"><span class="post-toc-number">7.7.</span> <span class="post-toc-text">G1收集器</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#内存分配、回收策略"><span class="post-toc-number">8.</span> <span class="post-toc-text">内存分配、回收策略</span></a></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/jvm/2.png)">
+    
+            <p class="article-headline-p">
+                《深入理解Java虚拟机》 学习笔记(二)——垃圾回收
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>6月 04, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/GC/">GC</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/JVM/">JVM</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Java/">Java</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&url=https://leibnizhu.gitlab.io//2017/06/04/《深入理解Java虚拟机》-学习笔记-二/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&url=https://leibnizhu.gitlab.io//2017/06/04/《深入理解Java虚拟机》-学习笔记-二/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.gitlab.io//2017/06/04/《深入理解Java虚拟机》-学习笔记-二/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.gitlab.io//2017/06/04/《深入理解Java虚拟机》-学习笔记-二/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&summary=null&pics=https://leibnizhu.gitlab.io/img/favicon.png&url=https://leibnizhu.gitlab.io/2017/06/04/《深入理解Java虚拟机》-学习笔记-二/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+<h2 id="判断对象可回收"><a href="#判断对象可回收" class="headerlink" title="判断对象可回收"></a>判断对象可回收</h2><p>有以下方法：</p>
+<h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>维护引用计数的Map，对象被引用时计数加1，引用失效时计数减1，简单粗暴。<br>实现简单，判断效率高。但主流JVM没有用这个方法的，因为无法解决循环引用的问题。  </p>
+<h3 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h3><p>JVM主流实现时可达性分析。<br>通过一系列GC Root的对象作为起点，开始向下搜索，搜索经过的路径为引用链，当一个对象到GC Root没有任何引用链项链，则引用不可达，可以GC掉。<br>GC Root通常包括以下几种：</p>
+<ol>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象；</li>
+<li>方法区中类静态属性引用的对象；</li>
+<li>方法区中常量引用的对象；</li>
+<li>本地方法栈中JNI（即一般说的Native方法）引用的对象；</li>
+<li>…………</li>
+</ol>
+<h2 id="引用分类"><a href="#引用分类" class="headerlink" title="引用分类"></a>引用分类</h2><p>引用分为<strong>强引用</strong>（平常用的引用，只要还存在有效，就不会被GC），<strong>软引用</strong>（SoftReference类，将要发生内存溢出前GC回收），<strong>弱引用</strong>（WeakReference类，生存到下一次GC，只被弱引用关联的对象会被回收！），<strong>虚引用</strong>（PhantomReference类，不影响实例生存时间，无法取得实例，唯一作用是被GC时收到一个系统通知）。</p>
+<h2 id="finalize-方法"><a href="#finalize-方法" class="headerlink" title="finalize()方法"></a>finalize()方法</h2><p>可达性分析中发现不可达的对象，会被标记，如果没有覆盖finalize()方法，或者其finalize()方法已经被JVM调用过，则不会执行finalize()方法。<br>否则需要执行finalize()方法，此对象放入F-Queue队列中，由JVM的低优先级Finalizer线程去执行。<br>稍后，GC会对F-Queue的对象进行第二次标记，如果对象在finalize()方法中拯救了自己（重新被引用），则将会被移出要回收的集合。<br>一般不覆盖finalize()方法，该方法设计之初是为了迎合C++语法的析构函数，应该用try-finally取代之。  </p>
+<h2 id="方法区-永生代的GC"><a href="#方法区-永生代的GC" class="headerlink" title="方法区/永生代的GC"></a>方法区/永生代的GC</h2><p>永生代也会进行GC，主要收集废弃的常量和无用的类。<br>其中无用的类的判定比较严格，要求：</p>
+<ol>
+<li>该类所有实例已被回收；</li>
+<li>加载该类的ClassLoader已被回收；</li>
+<li>该类的Class对象没有任何地方被引用，无法在任何地方通过反射访问该类的方法。</li>
+</ol>
+<p>然而满足了以上条件的类，也不一定会被回收，仅仅是可以回收。</p>
+<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><p>包括以下：</p>
+<h3 id="标记-清除算法-Mark-Sweep"><a href="#标记-清除算法-Mark-Sweep" class="headerlink" title="标记-清除算法(Mark-Sweep)"></a>标记-清除算法(Mark-Sweep)</h3><p>先标记出所有需要回收的对象，然后统一回收被标记需要回收的对象。<br><strong>缺点</strong>：标记和清除的效率都不高，且清除后产生大量不连续的内存碎片。</p>
+<h3 id="复制算法-Copying"><a href="#复制算法-Copying" class="headerlink" title="复制算法(Copying)"></a>复制算法(Copying)</h3><p>内存划分成等大小的两块，只有一块在使用，GC时将存活对象复制到另一块区域中，清除另一半。<br><strong>缺点</strong>：有一半内存浪费，复制操作效率低，不适合老年代。<br>实际使用中并不是一半一半的内存分配，因为大部分对象生命周期很短，所以划分成一块很大的<strong>Eden区</strong>和两块小的<strong>Survivor区</strong>，一般默认8:1:1的比例。每次使用一块Eden和一块Survivor区，GC时讲Eden和Survivor中存活的对象复制到另一块Survivor区中。当Survivor区不够大时，使用<strong>老年代</strong>进行<strong>分配担保</strong>，存活对象放入老年代。</p>
+<h3 id="标记-整理算法-Mark-Compact"><a href="#标记-整理算法-Mark-Compact" class="headerlink" title="标记-整理算法(Mark-Compact)"></a>标记-整理算法(Mark-Compact)</h3><p>类似标记-清除算法，标记之后存活的对象向一端移动，最后清理掉边界以外的内存，保证内存的规整。</p>
+<h2 id="HotSpot的算法实现"><a href="#HotSpot的算法实现" class="headerlink" title="HotSpot的算法实现"></a>HotSpot的算法实现</h2><p>以下是HotSpot中垃圾回收的几个关键点技术实现方法。</p>
+<h3 id="枚举GC-Root"><a href="#枚举GC-Root" class="headerlink" title="枚举GC Root"></a>枚举GC Root</h3><p>可达性分析要求在一个能保证一致性的快照中进行工作，即GC时必须停止所有线程，即Stop The World<del>（JOJO里面Dio的世界 ザ・ワールド？）</del>。<br>在HotSpot里面，通过一个叫OopMap的数据结构来维护哪些地方存放着对象引用，记录栈上本地变量与堆中对象的引用关系，方便枚举GC Root。</p>
+<h3 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h3><p>并不是所有指令都会生成/改变OopMap，这样效率太低。线程必须到达安全点（SafePoint）才会生成OopMap，然后开始GC。安全点的选定是以“有让程序长时间执行的特征”的原则进行的（如方法调用，循环跳转，异常跳转等）。<br>考虑多线程，必须所有线程都跑到安全点才能开始GC。方法有二：</p>
+<ol>
+<li><strong>抢先式中断</strong>：GC时先中断所有线程，对于还没跑到安全点的线程，让其恢复并等它跑到安全点上再停。——商业JVM几乎没有这样实现的；</li>
+<li><strong>主动式中断</strong>：GC需要中断线程时，设置一个标志，各个线程执行时，跑到安全点的时候轮询这个标志，发现标志为真的时候自己中断挂起。</li>
+</ol>
+<h3 id="安全区域"><a href="#安全区域" class="headerlink" title="安全区域"></a>安全区域</h3><p>线程执行的时候，可能很久都不会跑到安全点（比如执行了Thread.Sleep()的情况），导致GC不能马上执行。因此引入安全区域的概念（Safe Region），表示这段代码片段中引用关系不会发生变化。<br>线程执行到安全区域的时候，标识自己进入了安全区域；则发动GC的时候，可以忽略标识为安全区域的线程；而线程在离开安全区域的时候，需要检查是否已完成GC Root枚举（或者是整个GC过程），没完成的话要GC发出等待离开的信号。</p>
+<h2 id="实际的垃圾收集器"><a href="#实际的垃圾收集器" class="headerlink" title="实际的垃圾收集器"></a>实际的垃圾收集器</h2><p><img src="/img/jvm/2.png" alt=""><br>上图给出了HotSpot的7个垃圾收集器，中间有连线的标识可以搭配使用。</p>
+<h3 id="Serial收集器"><a href="#Serial收集器" class="headerlink" title="Serial收集器"></a>Serial收集器</h3><p><img src="/img/jvm/3.png" alt=""><br>收集时，暂停所有其他工作线程（Stop The World），开一个线程进行GC。对新生代采用复制算法，对老年代采取标记-整理算法。<br>JVM在client模式下默认新生代垃圾收集器还在用Serial。<br>优点：简单高效。<br>缺点：GC时的停顿时间长。   </p>
+<h3 id="Serial-Old收集器"><a href="#Serial-Old收集器" class="headerlink" title="Serial Old收集器"></a>Serial Old收集器</h3><p>Serial收集器的老年代版本，单线程，标记-整理算法。  </p>
+<h3 id="ParNew收集器"><a href="#ParNew收集器" class="headerlink" title="ParNew收集器"></a>ParNew收集器</h3><p><img src="/img/jvm/4.png" alt=""><br>Serial收集器的多线程版本，可以配合CMS收集器工作，不能配合Parallel Scavenge收集器工作。使用<code>-XX+UseParNewGC</code>指定使用之。<br>澄清垃圾收集器的两个概念：  </p>
+<ol>
+<li><strong>并行Parallel</strong>：多条垃圾回收线程并行工作，用户线程在等待；</li>
+<li><strong>并发Concurrent</strong>：垃圾收集线程和用户线程同事执行（CMS）。</li>
+</ol>
+<h3 id="Parallel-Scavenge收集器"><a href="#Parallel-Scavenge收集器" class="headerlink" title="Parallel Scavenge收集器"></a>Parallel Scavenge收集器</h3><p>新生代收集器，多线程、复制算法，与ParNew收集器的区别在于，关注点在于吞吐量（Thoughput，=运行用户代码时间/(运行用户代码时间+GC时间)），适合在后台运算而不需要提案多交互的任务。<br>用<code>-XX:MaxGCPauseMillis</code>参数指定保证GC消耗时间的最大值（毫秒），减少GC时间是以牺牲吞吐量及新生代空间来获取的。<br>用<code>-XX:GCTimeRatio</code>参数指定GC占总时间的比例，0-100，默认99，即允许1/(1+99)=1%的GC时间。<br>使用<code>-XX:UseAdaptiveSizePolicy</code>参数之后，JVM根据当前系统情况动态调整新生代大小、Eden与Survivor比例等参数以保证最佳的吞吐量和设定的最长GC时间。   </p>
+<h3 id="Parallel-Old收集器"><a href="#Parallel-Old收集器" class="headerlink" title="Parallel Old收集器"></a>Parallel Old收集器</h3><p>Parallel Scavenge收集器的老年代版本，多线程，标记-整理算法，JDK1.6开始提供。  </p>
+<h3 id="CMS收集器"><a href="#CMS收集器" class="headerlink" title="CMS收集器"></a>CMS收集器</h3><p><img src="/img/jvm/5.png" alt=""><br>老年代收集，设计目标是获取最短回收停顿时间，基于标记-清除算法设计，包括以下步骤：</p>
+<ol>
+<li><strong>初始标记</strong>：标记GC Root可以直接关联到的对象，速度很快，需要Stop The World；</li>
+<li><strong>并发标记</strong>：可达性分析枚举，耗时较长；</li>
+<li><strong>重新标记</strong>：修正并发标记期间因用户程序继续运行而导致的引用变动，需要Stop The World；</li>
+<li><strong>并发清除</strong>：耗时较长。</li>
+</ol>
+<p>CMS收集器缺点：</p>
+<ol>
+<li>对CPU资源敏感，并发阶段总吞吐量降低，CPU数量少的时候对用户程序影响大；</li>
+<li>无法处理浮动垃圾（Floating Garbage），即并发清理阶段新产生的垃圾，要等到下一次GC；因此需要预留内存空间给用户线程使用，不能等内存快满才进行收集；当<br>CMS运行期间预留的内存不够，会出现“Concurrent Mode Failure”失败，JVM会临时启用Serial Old收集器重新进行老年代垃圾收集，导致停顿时间变长。可以通过<code>-XX:CMSInitiatingOccupancyFraction</code>参数调整老年代内存占用比例触发GC的阈值。</li>
+<li>收集后产生内存碎片。</li>
+</ol>
+<h3 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h3><p><img src="/img/jvm/6.png" alt=""><br>面向服务端，全称Garbage-First，停顿时间可控、可预测，不会产生内存碎片。<br>G1收集器将整个Java堆划分成多个大小相等的独立区域（Region），跟踪各个Region里面垃圾堆积的价值（根据回收所获得的空间大小及回收耗费时间的经验值），维护优先列表，每次收集的时候，根据允许的收集时间，优先回收价值更大的Region。<br>此外每个Region维护一个Remembered Set来避免全堆扫描，引用型数据进行写操作的时候，会产生中断写操作，检查引用的对象是否处于不同的Region，如果是，则记录到被引用对象所属的Remember Set中；那么在GC时，GC Root的枚举范围加入Remembered Set，保证不进行全堆扫描也不会有遗漏。<br>G1收集器的回收步骤包括：</p>
+<ol>
+<li><strong>初始标记</strong>：与CMS一样；</li>
+<li><strong>并发标记</strong>：与CMS一样，包含Remembered Set；</li>
+<li><strong>最终标记</strong>：并发标记期间对象变化记录到Remembered Set Logs中，合并到Remembered Set；</li>
+<li><strong>筛选回收</strong>：先根据回收价值和回收成本进行排序，再根据用户期望GC停顿时间制定回收计划。</li>
+</ol>
+<h2 id="内存分配、回收策略"><a href="#内存分配、回收策略" class="headerlink" title="内存分配、回收策略"></a>内存分配、回收策略</h2><ol>
+<li><strong>优先在Eden分配</strong>：大多数情况下，对象在新生代Eden区分配，当Eden区空间不够时，发起Minor GC；</li>
+<li><strong>大对象直接进入老年代</strong>：提供<code>-XX:PretenureSizeThreshold</code>参数，大于此值的对象直接在老年代分配，避免在Eden区和Survivor区之间大量内存复制；</li>
+<li><strong>长期存活的对象进入老年代</strong>：JVM为对象定义年龄计数器，经过Minor GC依然存活且被Survivor区容纳的，移动到Survivor区，年龄加1，每经历一次Minor GC不被清理则年龄加1，增加到一定年龄则移动到老年区（默认15岁，通过<code>-XX:MaxTenuringThreshold</code>设置）；</li>
+<li><strong>动态对象年龄判定</strong>：若Survivor区中同年龄所有对象大小总和大于Survivor空间一半，则年龄大于等于该年龄的对象可以直接进入老年代；</li>
+<li><strong>空间分配担保</strong>：Minor GC之前，JVM检查老年代最大可用连续空间大于新生代所有对象总空间，成立的话Minor GC确认是安全的；否则检查老年代最大可用连续空间大于历次晋升到老年代对象的平均大小，大于的话进行Minor GC；小于的话进行Full GC。</li>
+</ol>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+    <!-- 使用 DISQUS -->
+    <div id="disqus-comment">
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.gitlab.io/2017/06/04/《深入理解Java虚拟机》-学习笔记-二/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.gitlab.io/2017/06/04/《深入理解Java虚拟机》-学习笔记-二/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+    </div>
+    <style>
+        #disqus-comment{
+            background-color: #eee;
+            padding: 2pc;
+        }
+    </style>
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/05/27/《深入理解Java虚拟机》-学习笔记-一/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/06/06/《深入理解Java虚拟机》-学习笔记-三/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">29</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-gplus.svg);">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Heaven's Door
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 使用 DISQUS js 代码 -->
+    <script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+            <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none' id='cnzz_stat_icon_1260910303'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1260910303%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+        </body>
+    
+</html>

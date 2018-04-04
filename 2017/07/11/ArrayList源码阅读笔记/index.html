@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            ArrayList源码阅读笔记（JDK8） | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="Leibniz Hu">
+    <meta name="description" content="null">
+    <meta name="keywords" content="null,Java,ArrayList,源码阅读笔记">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.gitlab.io">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="ArrayList源码阅读笔记（JDK8） | Heaven&#39;s Door">
+    <meta property="og:description" content="null">
+    <meta property="og:article:tag" content="Java"> <meta property="og:article:tag" content="ArrayList"> <meta property="og:article:tag" content="源码阅读笔记"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+<link rel="stylesheet" href="/css/prism-solarizedlight.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ArrayList源码阅读笔记"><span class="post-toc-number">1.</span> <span class="post-toc-text">ArrayList源码阅读笔记</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#继承结构"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">继承结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#成员变量"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">成员变量</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#构造方法"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">构造方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#常规方法"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">常规方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#增删改查方法"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">增删改查方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#IO方法"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">IO方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#迭代器方法"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">迭代器方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#迭代器类Itr"><span class="post-toc-number">1.7.1.</span> <span class="post-toc-text">迭代器类Itr</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#成员变量-1"><span class="post-toc-number">1.7.1.1.</span> <span class="post-toc-text">成员变量</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Iterator接口方法"><span class="post-toc-number">1.7.1.2.</span> <span class="post-toc-text">Iterator接口方法</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#其他方法"><span class="post-toc-number">1.7.1.3.</span> <span class="post-toc-text">其他方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#迭代器类ListItr"><span class="post-toc-number">1.7.2.</span> <span class="post-toc-text">迭代器类ListItr</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#构造器"><span class="post-toc-number">1.7.2.1.</span> <span class="post-toc-text">构造器</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#接口方法"><span class="post-toc-number">1.7.2.2.</span> <span class="post-toc-text">接口方法</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#subList-方法与SubList内部类"><span class="post-toc-number">1.8.</span> <span class="post-toc-text">subList()方法与SubList内部类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#成员变量-2"><span class="post-toc-number">1.8.1.</span> <span class="post-toc-text">成员变量</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#接口方法-1"><span class="post-toc-number">1.8.2.</span> <span class="post-toc-text">接口方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#迭代器方法-1"><span class="post-toc-number">1.8.3.</span> <span class="post-toc-text">迭代器方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#其他方法（检查方法）"><span class="post-toc-number">1.8.4.</span> <span class="post-toc-text">其他方法（检查方法）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#JDK8新增方法"><span class="post-toc-number">1.9.</span> <span class="post-toc-text">JDK8新增方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Spliterator接口提供的方法"><span class="post-toc-number">1.9.1.</span> <span class="post-toc-text">Spliterator接口提供的方法</span></a></li></ol></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/city.png)">
+    
+            <p class="article-headline-p">
+                ArrayList源码阅读笔记（JDK8）
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>7月 11, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/ArrayList/">ArrayList</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Java/">Java</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/源码阅读笔记/">源码阅读笔记</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=ArrayList源码阅读笔记（JDK8）&url=https://leibnizhu.gitlab.io//2017/07/11/ArrayList源码阅读笔记/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=ArrayList源码阅读笔记（JDK8）&url=https://leibnizhu.gitlab.io//2017/07/11/ArrayList源码阅读笔记/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.gitlab.io//2017/07/11/ArrayList源码阅读笔记/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.gitlab.io//2017/07/11/ArrayList源码阅读笔记/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=ArrayList源码阅读笔记（JDK8）&summary=null&pics=https://leibnizhu.gitlab.io/img/favicon.png&url=https://leibnizhu.gitlab.io/2017/07/11/ArrayList源码阅读笔记/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="ArrayList源码阅读笔记"><a href="#ArrayList源码阅读笔记" class="headerlink" title="ArrayList源码阅读笔记"></a>ArrayList源码阅读笔记</h1><h2 id="继承结构"><a href="#继承结构" class="headerlink" title="继承结构"></a>继承结构</h2><p><img src="/img/jdk/ArrayList_UML.png" alt="">  </p>
+<h2 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">transient</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> elementData<span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>存储List数据，用了transient关键字避免被持久化。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">int</span> size<span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>List长度。<br>在父类AbstractList中modCount成员变量：</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">int</span> MAX_ARRAY_SIZE <span class="token operator">=</span> Integer<span class="token punctuation">.</span>MAX_VALUE <span class="token operator">-</span> <span class="token number">8</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>有些JVM会在数组保留一些头部信息，为了防止报内存不足Error，在int最大值的基础上预留8个元素。</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">protected</span> <span class="token keyword">transient</span> <span class="token keyword">int</span> modCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>表示已从结构上修改此列表的次数。从结构上修改是指更改列表的大小，或者打乱列表，从而使正在进行的迭代产生错误的结果。此字段由iterator和listiterator方法返回的迭代器和列表迭代器实现使用。如果意外更改了此字段中的值，则迭代器（或列表迭代器）将抛出<code>ConcurrentModificationException</code>来响应next、remove、previous、set或add操作。子类是否使用此字段是可选的。如果子类希望提供快速失败迭代器（和列表迭代器），则它只需在其 add(int,e)和remove(int)方法（以及它所重写的、导致列表结构上修改的任何其他方法）中增加此字段，否则可以忽略此字段。对add(int, e)或remove(int)的单个调用向此字段添加的数量不得超过 1，否则迭代器（和列表迭代器）将抛出虚假的 <code>ConcurrentModificationException</code>。</p>
+<h2 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token function">ArrayList</span><span class="token punctuation">(</span><span class="token keyword">int</span> initialCapacity<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>initialCapacity大于0的话elementData赋值为对应长度的Object数组；为0的话赋值为EMPTY_ELEMENTDATA（空数组）；负数的情况抛<code>IllegalArgumentException</code>异常。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token function">ArrayList</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>默认构造方法，elementData赋值为DEFAULTCAPACITY_EMPTY_ELEMENTDATA（空数组）。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token function">ArrayList</span><span class="token punctuation">(</span>Collection<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">E</span><span class="token operator">></span> c<span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>c先转成数组赋值给elementData，如果长度不为0且数组不为Object数组，则通过<code>Arrays.copyOf()</code>转换为Object数组；如果长度为0则c先转成数组赋值给elementData，如果长度不为0且数组不为Object数组，则通过重新赋值为EMPTY_ELEMENTDATA（空数组）。  </p>
+<h2 id="常规方法"><a href="#常规方法" class="headerlink" title="常规方法"></a>常规方法</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">void</span> <span class="token function">trimToSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>modCount++后，调用<code>Arrays.copyOf()</code>将elementData复制到size大小的数组里并赋值给elementData。这样是因为容量常常会大于实际元素的数量。内存紧张时，可以调用该方法删除预留的位置，调整容量为元素实际数量。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">void</span> <span class="token function">ensureCapacity</span><span class="token punctuation">(</span><span class="token keyword">int</span> minCapacity<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>如果数组为空，容量预取0，否则去默认值(DEFAULT_CAPACITY = 10)；若参数大于预设的容量，则使用该参数调用私有方法<code>void ensureCapacityInternal(int minCapacity)</code>设置数组容量；后者会在当前数组长度不足时调用<code>grow()</code>进行扩容。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">grow</span><span class="token punctuation">(</span><span class="token keyword">int</span> minCapacity<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>容量为：当前容量增加一半、及minCapacity中的较大者。如果超过数组最大长度则调用<code>hugeCapacity(int minCapacity)</code>处理，抛出错误。最后调用<code>Arrays.copyOf()</code>复制旧数据到新数组并赋值给element。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//返回size属性</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//size是否为0</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">contains</span><span class="token punctuation">(</span>Object o<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//调用indexOf()是否大于等于0。</span>
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">indexOf</span><span class="token punctuation">(</span>Object o<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//下面详解</span>
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">lastIndexOf</span><span class="token punctuation">(</span>Object o<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>indexOf()查找元素索引，遍历数组逐个对比（如果o为null则直接判断<code>== null</code>，否则调用<code>o.equals()</code>进行判断），返回第一次找到的索引值，找不到则返回-1。lastIndexOf()与之类似，只是遍历的方向相反。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> Object <span class="token function">clone</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>调用<code>Arrays.copyOf()</code>进行浅拷贝，每个元素只拷贝引用。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">toArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token operator">&lt;</span>T<span class="token operator">></span> T<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">toArray</span><span class="token punctuation">(</span>T<span class="token punctuation">[</span><span class="token punctuation">]</span> a<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>前者转换为Object数组，调用<code>Arrays.copyOf()</code>方法。<br>后者转换为指定类型的数组，返回的数组容量由参数和本数组中较大值确定；如果a参数的长度小于当前size，则调用带Class参数的<code>Arrays.copyOf()</code>方法进行复制并返回；否则a的长度足够，则调用<code>System.arraycopy()</code>将elementData复制到a，并将第一个实际没有数据的设为null（a[size]）。  </p>
+<h2 id="增删改查方法"><a href="#增删改查方法" class="headerlink" title="增删改查方法"></a>增删改查方法</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">get</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>调用<code>rangeCheck(index);</code>检查下标是否越界后（越界则抛出<code>IndexOutOfBoundsException</code>异常），直接从elementData数组根据下标拿值，速度比较快。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">set</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">,</span> E element<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>调用<code>rangeCheck(index);</code>检查下标是否越界后，读取索引对应的旧值，然后改为新值，并将旧的值返回；注意用到泛型。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">add</span><span class="token punctuation">(</span>E e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">,</span> E element<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>前者调用<code>ensureCapacityInternal(size + 1)</code>确认是否需要扩容后，直接设定数组对应下标的值。<br>后者先调用<code>rangeCheckForAdd()</code>确认index参数是否越界，然后同样调用<code>ensureCapacityInternal(size+1)</code>确认是否需要扩容，将index之后的元素通过<code>System.arraycopy()</code>方法复制到index+1位置之后，最后将element赋值到下标为index处。<br>P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制的起始位置； dest:目的数组； destPos:目的数组放置的起始位置； length:复制的长度。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">addAll</span><span class="token punctuation">(</span>Collection<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">E</span><span class="token operator">></span> c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">addAll</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">,</span> Collection<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">E</span><span class="token operator">></span> c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>前者先调用<code>c.toArray()</code>将参数c转换为数组，然后进行扩容的判断，接着调用<code>System.arraycopy()</code>将数组的内容复制到elementData后面，并修改size的值，最后c的长度不为0则返回true，为零则返回false。<br>后者先判断index是否越界及是否需要扩容，然后计算需要移动的元素个数并调用<code>System.arraycopy()</code>移动index以后的元素，接着调用<code>System.arraycopy()</code>将c转换的数组复制到index后面，最后修改size的值，根据c的长度返回true/false。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">remove</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">remove</span><span class="token punctuation">(</span>Object o<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">removeRange</span><span class="token punctuation">(</span><span class="token keyword">int</span> fromIndex<span class="token punctuation">,</span> <span class="token keyword">int</span> toIndex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>前者按下标进行删除，先检查下标越界后，读取index对应的旧值，计算index下标往后的（需要移动的）元素个数，调用<code>System.arraycopy()</code>进行移动，随后将原来最后一位改为null（方便GC回收），最后将旧值返回。<br>中者基本逻辑与前者类似，只是移动数组元素的范围不一样，而且需要遍历将数组尾部多个元素（toIndex - fromIndex个）赋值为null。<br>后者删除指定对象，遍历数组，找到与o相等的元素（o为null则判断<code>==null</code>，否则调用<code>o.equals()</code>判断相等），调用<code>fastRemove()</code>删除，并返回true；如果找不到对应相等的元素，则返回false。<code>private void fastRemove(int index)</code>方法的实现与<code>E remove(int index);</code>基本一直，区别嘛，方法如其名，快就快在不需要进行越界判定，及不需要返回旧值，直接删除。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>清空List，遍历数组将每个元素赋值为null，最后将size设为0.  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">removeAll</span><span class="token punctuation">(</span>Collection<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> c<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//batchRemove(c, false);</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">retainAll</span><span class="token punctuation">(</span>Collection<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> c<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//batchRemove(c, true);</span>
+<span class="token comment" spellcheck="true">/**
+ * @param complement true时从数组保留指定集合中元素的值，为false时从数组删除指定集合中元素的值。
+ * @return 数组中重复的元素都会被删除(而不是仅删除一次或几次)，有任何删除操作都会返回true
+ */</span>
+<span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">batchRemove</span><span class="token punctuation">(</span>Collection<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> c<span class="token punctuation">,</span> <span class="token keyword">boolean</span> complement<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">final</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> elementData <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>elementData<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> r <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> w <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">boolean</span> modified <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//遍历数组，并检查这个集合是否包含对应的值，移动要保留的值到数组前面，w最后值为要保留的元素的数量</span>
+            <span class="token comment" spellcheck="true">//简单点：若保留，就将相同元素移动到前段；若删除，就将不同元素移动到前段</span>
+            <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> r <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> r<span class="token operator">++</span><span class="token punctuation">)</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>c<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>elementData<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">==</span> complement<span class="token punctuation">)</span>
+                    elementData<span class="token punctuation">[</span>w<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> elementData<span class="token punctuation">[</span>r<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//确保异常抛出前的部分可以完成期望的操作，而未被遍历的部分会被接到后面</span>
+            <span class="token comment" spellcheck="true">//r!=size表示可能出错了：c.contains(elementData[r])抛出异常</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>r <span class="token operator">!=</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                System<span class="token punctuation">.</span><span class="token function">arraycopy</span><span class="token punctuation">(</span>elementData<span class="token punctuation">,</span> r<span class="token punctuation">,</span>elementData<span class="token punctuation">,</span> w<span class="token punctuation">,</span>size <span class="token operator">-</span> r<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                w <span class="token operator">+=</span> size <span class="token operator">-</span> r<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token comment" spellcheck="true">//如果w==size：表示全部元素都保留了，所以也就没有删除操作发生，所以会返回false；反之，返回true，并更改数组</span>
+            <span class="token comment" spellcheck="true">//而w!=size的时候，即使try块抛出异常，也能正确处理异常抛出前的操作，因为w始终为要保留的前段部分的长度，数组也不会因此乱序</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>w <span class="token operator">!=</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> w<span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+                    elementData<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                modCount <span class="token operator">+=</span> size <span class="token operator">-</span> w<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//改变的次数</span>
+                size <span class="token operator">=</span> w<span class="token punctuation">;</span>   <span class="token comment" spellcheck="true">//新的大小为保留的元素的个数</span>
+                modified <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> modified<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>前两个方法调用后面的<code>batchRemove()</code>方法（具体看上面的注释），第一个方法删除c里面的元素，第二个方法保留c里面的元素，有任何删除操作都会返回true，返回false表示没有删除任一元素。不难看出<code>batchRemove()</code>方法的时间复杂度是<code>O(n^2)</code>，大致逻辑是遍历数组，根据complement条件判断要保留的元素依次复制到数组的前面，w保存要保留的最大下标，如果期间发生异常则将未处理的元素都保留，遍历后将w之后的元素设置为null等待GC。  </p>
+<h2 id="IO方法"><a href="#IO方法" class="headerlink" title="IO方法"></a>IO方法</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">writeObject</span><span class="token punctuation">(</span>java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>ObjectOutputStream s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">readObject</span><span class="token punctuation">(</span>java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>ObjectInputStream s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>前者将List序列化到输出流，先写入size，再逐个元素写入，写入过程数组被更改会抛出ConcurrentModificationException异常。<br>后者读取输入流反序列化到List，先从输入流读取一个int，判断这个int作为size的话是否需要扩容，然后从输入流中读取Object从下标0开始逐个写入到elementData数组中（就是说读取的数量小于原来size的话，读取最后的下标之后的元素不会变动）。  </p>
+<h2 id="迭代器方法"><a href="#迭代器方法" class="headerlink" title="迭代器方法"></a>迭代器方法</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> ListIterator<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">listIterator</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//new ListItr(index);开始位置为指定参数</span>
+<span class="token keyword">public</span> ListIterator<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">listIterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//return new ListItr(0);开始位置为0</span>
+<span class="token keyword">public</span> Iterator<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//return new Itr();</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>迭代器方法分别返回ListItr和Itr内部类的实例，而ListItr继承了Itr。  </p>
+<h3 id="迭代器类Itr"><a href="#迭代器类Itr" class="headerlink" title="迭代器类Itr"></a>迭代器类Itr</h3><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">class</span> <span class="token class-name">Itr</span> <span class="token keyword">implements</span> <span class="token class-name">Iterator</span><span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="成员变量-1"><a href="#成员变量-1" class="headerlink" title="成员变量"></a>成员变量</h4><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">int</span> cursor<span class="token punctuation">;</span>       <span class="token comment" spellcheck="true">//游标，下一个元素的索引，默认初始化为0</span>
+<span class="token keyword">int</span> lastRet <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//上次返回的元素的位置</span>
+<span class="token keyword">int</span> expectedModCount <span class="token operator">=</span> modCount<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//迭代过程不运行修改数组，否则就抛出异常</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h4 id="Iterator接口方法"><a href="#Iterator接口方法" class="headerlink" title="Iterator接口方法"></a>Iterator接口方法</h4><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">hasNext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>返回cursor != size;，如果游标到了size那也就是没有下一个了。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>先调用<code>checkForComodification()</code>检查是否被修改过，然后判断如果游标已经越界则抛出<code>NoSuchElementException</code>异常，否则lastRet改为游标值，游标前进，返回原来游标指向的元素。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">remove</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>lastRet &lt; 0时抛<code>IllegalStateException</code>异常，然后检查是否被修改过，随后调用<code>ArrayList.remove(int index)</code>移除元素，游标后退，lastRet重设为-1，expectedModCount赋值为新的modCount。<br>基本上ArrayList采用size来维护自已状态，而Iterator采用cursor维护自已状态。当size出现变化时，cursor并不一定能够得到同步，除非这种变化是Iterator主动导致的，比如调用remove()方法导致ArrayList列表发生变化时，迭代器会更新cursor来同步这一变化，但其他方式导致的ArrayList变化Iterator无法感知，ArrayList也不会主动通知Iterator们。Iterator为了防止状态不一致可能引发的后果经常做checkForComodification检查，以防有变。如果有变，则以异常抛出。<br>所以在循环里删除元素的话要用迭代器的remove()方法。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">forEachRemaining</span><span class="token punctuation">(</span>Consumer<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">super</span> E<span class="token operator">></span> consumer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>JDK8开始有的方法，遍历数组，分别传入调用<code>consumer.accept((E) elementData[i++]);</code>，即对每个元素执行同一方法。  </p>
+<h4 id="其他方法"><a href="#其他方法" class="headerlink" title="其他方法"></a>其他方法</h4><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">final</span> <span class="token keyword">void</span> <span class="token function">checkForComodification</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>modCount != expectedModCount则抛出ConcurrentModificationException异常。  </p>
+<h3 id="迭代器类ListItr"><a href="#迭代器类ListItr" class="headerlink" title="迭代器类ListItr"></a>迭代器类ListItr</h3><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">class</span> <span class="token class-name">ListItr</span> <span class="token keyword">extends</span> <span class="token class-name">Itr</span> <span class="token keyword">implements</span> <span class="token class-name">ListIterator</span><span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h4><pre class="line-numbers language-java"><code class="language-java"><span class="token function">ListItr</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>将游标设置为index。</p>
+<h4 id="接口方法"><a href="#接口方法" class="headerlink" title="接口方法"></a>接口方法</h4><p>接口<code>Iterator</code>的方法在Itr中实现了，该类实现了<code>ListIterator</code>接口中其他的方法。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">hasPrevious</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> cursor <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//根据游标判断是否有前一个元素</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">nextIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> cursor<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//游标即为下一个要迭代到的元素的下标</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">previousIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> cursor <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//游标减一即上一个元素（当前已迭代的）的下标</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这三个方法比较简单就不具体讲了。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">previous</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>返回上一个元素同时游标回退，与<code>next()</code>方法类似，先检查是否被修改以及是否下标越界，然后lastRet和游标减一，返回索引减一之后对应的元素。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">set</span><span class="token punctuation">(</span>E e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>用指定元素替换 next 或 previous 返回的最后一个元素。先判定lastRet不小于0，否则抛出IllegalStateException异常。lastRet初始化为-1，之后只有调用ListIterator.add(E e)和remove()之后lastRet会恢复到-1。因为修改的是下标=lastRet的元素，所以不允许为-1，也就是说，只有在最后一次调用 next 或 previous 后既没有调用 ListIterator.remove 也没有调用 ListIterator.add 时才可以进行该调用。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">add</span><span class="token punctuation">(</span>E e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>将指定的元素插入列表。在当前游标处调用<code>List.add()</code>方法插入一个元素e，然后游标前进，lastRet恢复-1，同时更新expectedModCount。<br>新元素被插入到游标前：不影响对 next 的后续调用，并且对 previous 的后续调用会返回此新元素。  </p>
+<h2 id="subList-方法与SubList内部类"><a href="#subList-方法与SubList内部类" class="headerlink" title="subList()方法与SubList内部类"></a>subList()方法与SubList内部类</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token comment" spellcheck="true">//检查下标越界后，返回SubList的实例（用fromIndex、toIndex参数构造）作为子列表。</span>
+<span class="token keyword">public</span> List<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">subList</span><span class="token punctuation">(</span><span class="token keyword">int</span> fromIndex<span class="token punctuation">,</span> <span class="token keyword">int</span> toIndex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//用于subList()方法的下标越界检查方法</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">subListRangeCheck</span><span class="token punctuation">(</span><span class="token keyword">int</span> fromIndex<span class="token punctuation">,</span> <span class="token keyword">int</span> toIndex<span class="token punctuation">,</span> <span class="token keyword">int</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//SubList类</span>
+<span class="token keyword">private</span> <span class="token keyword">class</span> <span class="token class-name">SubList</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractList</span><span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token keyword">implements</span> <span class="token class-name">RandomAccess</span>
+<span class="token comment" spellcheck="true">//注意在AbstractList.java源文件里也有一个SubList，然而并不是AbstractList的内部类，AbstractList.subList()方法会返回这个SubList的实例</span>
+<span class="token keyword">class</span> <span class="token class-name">SubList</span><span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token keyword">extends</span> <span class="token class-name">AbstractList</span><span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>SubList继承AbstractList抽象类，是List的实现类，主要用于返回ArrayList的视图，这个视图是原ArrayList对象中的一部分，确实是一部分，直接将原ArrayList对象引用到新的子视图的ArrayList，对子视图进行改变，原ArrayList对象也会随之改变。</p>
+<h3 id="成员变量-2"><a href="#成员变量-2" class="headerlink" title="成员变量"></a>成员变量</h3><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">final</span> AbstractList<span class="token operator">&lt;</span>E<span class="token operator">></span> parent<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//保存母ArrayList的引用</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">int</span> parentOffset<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//subList方法的fromIndex参数</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">int</span> offset<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//subList方法的fromIndex参数</span>
+<span class="token keyword">int</span> size<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//subList方法的参数相减：toIndex - fromIndex</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>同时，modCount赋值为母ArrayList的modCount。</p>
+<h3 id="接口方法-1"><a href="#接口方法-1" class="headerlink" title="接口方法"></a>接口方法</h3><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">set</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">,</span> E e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> E <span class="token function">get</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">,</span> E e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> E <span class="token function">remove</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">removeRange</span><span class="token punctuation">(</span><span class="token keyword">int</span> fromIndex<span class="token punctuation">,</span> <span class="token keyword">int</span> toIndex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">addAll</span><span class="token punctuation">(</span>Collection<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">E</span><span class="token operator">></span> c<span class="token punctuation">)</span> <span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">addAll</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">,</span> Collection<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">E</span><span class="token operator">></span> c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> Spliterator<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">spliterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这些方法的实现与ArrayList的实现都大同小异，差异在与下标多了偏移量parentOffset，而且最后调用parent（ArrayList）的同名方法进行处理。  </p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> List<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">subList</span><span class="token punctuation">(</span><span class="token keyword">int</span> fromIndex<span class="token punctuation">,</span> <span class="token keyword">int</span> toIndex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>返回自己的类（SubList），构造方法的offset参数为offset（母ArrayList的subList方法的fromIndex参数）。</p>
+<h3 id="迭代器方法-1"><a href="#迭代器方法-1" class="headerlink" title="迭代器方法"></a>迭代器方法</h3><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> Iterator<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">iterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> ListIterator<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">listIterator</span><span class="token punctuation">(</span><span class="token keyword">final</span> <span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>前者返回的是AbstractList的内部类ListItr，实现了ListIterator接口，具体不表。<br>后者返回ListIterator接口的一个匿名内部类，与ArrayList的ListItr的区别也是在于对ArrayList的elementData数组进行操作时，使用的下标加上offset（母ArrayList的subList方法的fromIndex参数）。  </p>
+<h3 id="其他方法（检查方法）"><a href="#其他方法（检查方法）" class="headerlink" title="其他方法（检查方法）"></a>其他方法（检查方法）</h3><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">rangeCheck</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">rangeCheckForAdd</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">private</span> String <span class="token function">outOfBoundsMsg</span><span class="token punctuation">(</span><span class="token keyword">int</span> index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">checkForComodification</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>检查下标越界、并行修改等，与ArrayList类似，具体不表。</p>
+<h2 id="JDK8新增方法"><a href="#JDK8新增方法" class="headerlink" title="JDK8新增方法"></a>JDK8新增方法</h2><pre class="line-numbers language-java"><code class="language-java"><span class="token comment" spellcheck="true">//forEach：for循环遍历elementData，每个元素分别调用action.accept(elementData[i])方法进行处理，如果处理过程中ArrayList被并行修改了，那么抛出ConcurrentModificationException异常</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">forEach</span><span class="token punctuation">(</span>Consumer<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">super</span> E<span class="token operator">></span> action<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//spliterator：返回一个内部类 static final class ArrayListSpliterator&lt;E> implements Spliterator&lt;E>的实例。</span>
+<span class="token comment" spellcheck="true">//为了并行遍历数据源中的元素，Stream.isParallel()实现调用。下面专门一小节讲Spliterator接口</span>
+<span class="token comment" spellcheck="true">//这个实现类在private int getFence()方法里面初始化了fence = ArrayList的size，expectedModCount = ArrayList的modCount</span>
+<span class="token keyword">public</span> Spliterator<span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token function">spliterator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//删除指定条件的元素。先遍历数组，将符合条件（filter.test(element) == true）的元素的下标设置到一个BitSet的对应下标元素中，即这个BitSet哪一位为true，对应下标在ArrayList的元素就符合filter规则，并使用removeCount记录满足规则的个数。</span>
+<span class="token comment" spellcheck="true">//遍历后如果有满足filter规则的元素，则遍历数组，将被删除的元素后面的元素往前移，最后将末尾无效数据设为null。</span>
+<span class="token comment" spellcheck="true">//若有删除的元素则返回true，否则返回false</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">removeIf</span><span class="token punctuation">(</span>Predicate<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">super</span> E<span class="token operator">></span> filter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//与forEach()类似，检查operator不为空，然后遍历数组，每个元素调用operator.apply((E) elementData[i])进行处理，最后判断是否发生了并发修改，并增加modCount。</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">replaceAll</span><span class="token punctuation">(</span>UnaryOperator<span class="token operator">&lt;</span>E<span class="token operator">></span> operator<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//调用Arrays.sort(T[] a, int fromIndex, int toIndex, Comparator&lt;? super T> c)进行排序，最后判断是否发生了并发修改，并增加modCount。</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">sort</span><span class="token punctuation">(</span>Comparator<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">super</span> E<span class="token operator">></span> c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="Spliterator接口提供的方法"><a href="#Spliterator接口提供的方法" class="headerlink" title="Spliterator接口提供的方法"></a>Spliterator接口提供的方法</h3><pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">boolean</span> <span class="token function">tryAdvance</span><span class="token punctuation">(</span>Consumer<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">super</span> T<span class="token operator">></span> action<span class="token punctuation">)</span><span class="token punctuation">;</span>
+Spliterator<span class="token operator">&lt;</span>T<span class="token operator">></span> <span class="token function">trySplit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">long</span> <span class="token function">estimateSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> <span class="token function">characteristics</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ol>
+<li>tryAdvance()就是顺序处理每个元素，类似Iterator，如果还有元素要处理，则返回true，否则返回false</li>
+<li>trySplit()，这就是为Spliterator专门设计的方法，区分与普通的Iterator，该方法会把当前元素划分一部分出去创建一个新的Spliterator作为返回，两个Spliterator变会并行执行，如果元素个数小到无法划分则返回null</li>
+<li>estimateSize()，该方法用于估算还剩下多少个元素需要遍历</li>
+<li>characteristics()，其实就是表示该Spliterator有哪些特性，用于可以更好控制和优化Spliterator的使用。</li>
+</ol>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+    <!-- 使用 DISQUS -->
+    <div id="disqus-comment">
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.gitlab.io/2017/07/11/ArrayList源码阅读笔记/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.gitlab.io/2017/07/11/ArrayList源码阅读笔记/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+    </div>
+    <style>
+        #disqus-comment{
+            background-color: #eee;
+            padding: 2pc;
+        }
+    </style>
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/07/09/String源码阅读笔记/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/07/29/SpringMVC中的WebSocket开发/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">29</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-gplus.svg);">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Heaven's Door
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 使用 DISQUS js 代码 -->
+    <script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+            <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none' id='cnzz_stat_icon_1260910303'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1260910303%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+        </body>
+    
+</html>

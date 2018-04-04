@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.4 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            Gitolite管理用户权限的Shell脚本 | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="Leibniz Hu">
+    <meta name="description" content="null">
+    <meta name="keywords" content="null,git,gitolite,Shell脚本,权限管理">
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.gitlab.io">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Gitolite管理用户权限的Shell脚本 | Heaven&#39;s Door">
+    <meta property="og:description" content="null">
+    <meta property="og:article:tag" content="git"> <meta property="og:article:tag" content="gitolite"> <meta property="og:article:tag" content="Shell脚本"> <meta property="og:article:tag" content="权限管理"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-image: url(/img/bg.png);
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+<link rel="stylesheet" href="/css/prism-solarizedlight.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#增加用户公钥的脚本"><span class="post-toc-number">1.</span> <span class="post-toc-text">增加用户公钥的脚本</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#删除用户公钥的脚本"><span class="post-toc-number">2.</span> <span class="post-toc-text">删除用户公钥的脚本</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#增加用户对指定代码仓库的读写权限"><span class="post-toc-number">3.</span> <span class="post-toc-text">增加用户对指定代码仓库的读写权限</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#删除用户对指定代码仓库的读写权限"><span class="post-toc-number">4.</span> <span class="post-toc-text">删除用户对指定代码仓库的读写权限</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#新增一个代码仓库，并初始化其权限"><span class="post-toc-number">5.</span> <span class="post-toc-text">新增一个代码仓库，并初始化其权限</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#重命名项目并修改对应权限配置文件"><span class="post-toc-number">6.</span> <span class="post-toc-text">重命名项目并修改对应权限配置文件</span></a></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 22 + 1);
+
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').addClass('lazy');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                Gitolite管理用户权限的Shell脚本
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>7月 20, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Shell脚本/">Shell脚本</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/git/">git</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/gitolite/">gitolite</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/权限管理/">权限管理</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=Gitolite管理用户权限的Shell脚本&url=https://leibnizhu.gitlab.io//2016/07/20/Gitolite管理用户权限的Shell脚本/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=Gitolite管理用户权限的Shell脚本&url=https://leibnizhu.gitlab.io//2016/07/20/Gitolite管理用户权限的Shell脚本/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.gitlab.io//2016/07/20/Gitolite管理用户权限的Shell脚本/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.gitlab.io//2016/07/20/Gitolite管理用户权限的Shell脚本/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=Gitolite管理用户权限的Shell脚本&summary=null&pics=https://leibnizhu.gitlab.io/img/favicon.png&url=https://leibnizhu.gitlab.io/2016/07/20/Gitolite管理用户权限的Shell脚本/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>最近给公司的git服务器从http协议升级为ssh协议的，同时增加了gitolite作为权限管理。但gitolite在增删用户公钥、增删用户对项目的权限、以及新增repository时的操作说不上繁杂但也是蛮机械的；又不想用gitlab之类重型的解决方案，所以选择了编写Shell脚本来实现。</p>
+<h1 id="增加用户公钥的脚本"><a href="#增加用户公钥的脚本" class="headerlink" title="增加用户公钥的脚本"></a>增加用户公钥的脚本</h1><pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token keyword">echo</span> <span class="token string">"增加/修改 <span class="token variable">$1</span> 的公钥 <span class="token variable">$1</span>.pub……"</span>
+<span class="token function">cd</span> /home/git/gitolite-admin
+<span class="token keyword">echo</span> <span class="token variable">$2</span> <span class="token operator">></span> keydir/<span class="token variable">$1</span>.pub
+
+<span class="token function">git</span> add <span class="token keyword">.</span>
+<span class="token function">git</span> commit -m <span class="token string">"增加/修改 <span class="token variable">$1</span> 的公钥 <span class="token variable">$1</span>.pub……"</span>
+<span class="token function">git</span> push
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="删除用户公钥的脚本"><a href="#删除用户公钥的脚本" class="headerlink" title="删除用户公钥的脚本"></a>删除用户公钥的脚本</h1><pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token keyword">echo</span> <span class="token string">"删除 <span class="token variable">$1</span> 的公钥 <span class="token variable">$1</span>.pub……"</span>
+<span class="token function">cd</span> /home/git/gitolite-admin
+<span class="token function">rm</span> keydir/<span class="token variable">$1</span>.pub
+
+<span class="token function">git</span> add <span class="token keyword">.</span>
+<span class="token function">git</span> commit -m <span class="token string">"删除 <span class="token variable">$1</span> 的公钥 <span class="token variable">$1</span>.pub……"</span>
+<span class="token function">git</span> push
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="增加用户对指定代码仓库的读写权限"><a href="#增加用户对指定代码仓库的读写权限" class="headerlink" title="增加用户对指定代码仓库的读写权限"></a>增加用户对指定代码仓库的读写权限</h1><pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token comment" spellcheck="true">#增加指定用户对指定代码仓库的读写权限</span>
+<span class="token comment" spellcheck="true">#第1个参数为用户名，对应公钥pub文件的文件名</span>
+<span class="token comment" spellcheck="true">#第2个参数为repository名，对应/home/git/repositories下的文件夹名（不包含.git后缀）</span>
+<span class="token keyword">echo</span> <span class="token string">"增加 <span class="token variable">$1</span> 对项目 <span class="token variable">$2</span> 的权限……"</span>
+<span class="token function">cd</span> /home/git/gitolite-admin
+
+isTarget<span class="token operator">=</span>0
+row<span class="token operator">=</span>0
+<span class="token comment" spellcheck="true">#找到要修改的行</span>
+<span class="token function">cat</span> conf/gitolite.conf <span class="token operator">|</span> <span class="token keyword">while</span> <span class="token function">read</span> line
+<span class="token keyword">do</span>
+    row<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">expr</span> $row + 1<span class="token variable">`</span></span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token string">"<span class="token variable">$isTarget</span>"</span> <span class="token operator">==</span> 1 <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">"<span class="token variable">$line</span>"</span>
+        <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token string">"<span class="token variable">$line</span>"</span> <span class="token operator">=</span>~ <span class="token string">"<span class="token variable">$1</span>"</span>  <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">then</span>
+            <span class="token keyword">echo</span> <span class="token string">"<span class="token variable">$1</span> 已经拥有 <span class="token variable">$2</span> 项目的读写权限"</span>
+            <span class="token keyword">exit</span> 0
+        <span class="token keyword">else</span>
+            <span class="token comment" spellcheck="true">#正式修改</span>
+            reg<span class="token operator">=</span><span class="token string">"<span class="token variable">${row}</span>s/$/&amp;<span class="token variable">$1</span> /g"</span>
+            <span class="token function">sed</span> -i <span class="token string">"<span class="token variable">${reg}</span>"</span> conf/gitolite.conf
+            <span class="token keyword">break</span>
+        <span class="token keyword">fi</span>
+        isTarget<span class="token operator">=</span>0
+    <span class="token keyword">fi</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$line</span> <span class="token operator">=</span>~ <span class="token string">"<span class="token variable">$2</span>"</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">"<span class="token variable">${line}</span>"</span>
+        isTarget<span class="token operator">=</span>1
+    <span class="token keyword">fi</span>
+<span class="token keyword">done</span>
+
+<span class="token function">git</span> add <span class="token keyword">.</span>
+<span class="token function">git</span> commit -m <span class="token string">"增加 <span class="token variable">$1</span> 对项目 <span class="token variable">$2</span> 的权限……"</span>
+<span class="token function">git</span> push
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="删除用户对指定代码仓库的读写权限"><a href="#删除用户对指定代码仓库的读写权限" class="headerlink" title="删除用户对指定代码仓库的读写权限"></a>删除用户对指定代码仓库的读写权限</h1><pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token comment" spellcheck="true">#删除指定用户对指定代码仓库的读写权限</span>
+<span class="token comment" spellcheck="true">#第1个参数为用户名，对应公钥pub文件的文件名</span>
+<span class="token comment" spellcheck="true">#第2个参数为repository名，对应/home/git/repositories下的文件夹名（不包含.git后缀）</span>
+<span class="token keyword">echo</span> <span class="token string">"删除 <span class="token variable">$1</span> 对项目 <span class="token variable">$2</span> 的权限……"</span>
+<span class="token function">cd</span> /home/git/gitolite-admin
+
+isTarget<span class="token operator">=</span>0
+row<span class="token operator">=</span>0
+<span class="token comment" spellcheck="true">#找到要修改的行</span>
+<span class="token function">cat</span> conf/gitolite1.conf <span class="token operator">|</span> <span class="token keyword">while</span> <span class="token function">read</span> line
+<span class="token keyword">do</span>
+    row<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">expr</span> $row + 1<span class="token variable">`</span></span>
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token string">"<span class="token variable">$isTarget</span>"</span> <span class="token operator">==</span> 1 <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">"<span class="token variable">$line</span>"</span>
+        <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token string">"<span class="token variable">$line</span>"</span> <span class="token operator">=</span>~ <span class="token string">"<span class="token variable">$1</span>"</span>  <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">then</span>
+            <span class="token comment" spellcheck="true">#删对应用户</span>
+            reg<span class="token operator">=</span><span class="token string">"<span class="token variable">${row}</span>s/<span class="token variable">$1</span> //g"</span>
+            <span class="token function">sed</span> -i <span class="token string">"<span class="token variable">${reg}</span>"</span> conf/gitolite1.conf
+            <span class="token keyword">break</span>
+        <span class="token keyword">else</span>
+            <span class="token keyword">echo</span> <span class="token string">"<span class="token variable">$1</span> 原来就没有 <span class="token variable">$2</span> 项目的读写权限"</span>
+            <span class="token keyword">exit</span> 0
+        <span class="token keyword">fi</span>
+        isTarget<span class="token operator">=</span>0
+    <span class="token keyword">fi</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">[</span><span class="token punctuation">[</span> <span class="token variable">$line</span> <span class="token operator">=</span>~ <span class="token string">"<span class="token variable">$2</span>"</span> <span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">then</span>
+        <span class="token keyword">echo</span> <span class="token string">"<span class="token variable">${line}</span>"</span>
+        isTarget<span class="token operator">=</span>1
+    <span class="token keyword">fi</span>
+<span class="token keyword">done</span>
+
+<span class="token function">git</span> add <span class="token keyword">.</span>
+<span class="token function">git</span> commit -m <span class="token string">"删除 <span class="token variable">$1</span> 对项目 <span class="token variable">$2</span> 的权限……"</span>
+<span class="token function">git</span> push
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="新增一个代码仓库，并初始化其权限"><a href="#新增一个代码仓库，并初始化其权限" class="headerlink" title="新增一个代码仓库，并初始化其权限"></a>新增一个代码仓库，并初始化其权限</h1><pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token comment" spellcheck="true">#新增一个代码仓库并初始化权限管理文件</span>
+<span class="token comment" spellcheck="true">#第1个参数为该项目初始分配的用户名，对应公钥pub文件的文件名</span>
+<span class="token comment" spellcheck="true">#第2个参数为repository名，对应/home/git/repositories下的文件夹名（不包含.git后缀）</span>
+<span class="token comment" spellcheck="true">#第3个参数为项目在权限配置文件中的注释</span>
+<span class="token keyword">echo</span> <span class="token string">"新增项目 <span class="token variable">$2</span> 并初始化……"</span>
+<span class="token function">cd</span> /home/git/repositories
+<span class="token keyword">if</span> <span class="token punctuation">[</span> -d <span class="token string">"<span class="token variable">$2</span>.git"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">then</span>
+    <span class="token keyword">echo</span> <span class="token string">"项目 <span class="token variable">$2</span> 已存在，请选择另一个项目名……"</span>
+    <span class="token keyword">exit</span> 0
+<span class="token keyword">fi</span>
+<span class="token keyword">echo</span> <span class="token string">"no exists"</span>
+<span class="token function">git</span> init --bare <span class="token string">"<span class="token variable">$2</span>.git"</span>
+
+<span class="token comment" spellcheck="true">#修改权限文件，增加默认管理员权限和初始化的用户权限</span>
+<span class="token keyword">echo</span>  <span class="token string">"# <span class="token variable">$3</span>"</span> <span class="token operator">>></span> /home/git/gitolite-admin/conf/gitolite1.conf
+<span class="token keyword">echo</span>  <span class="token string">"repo    <span class="token variable">$2</span>"</span> <span class="token operator">>></span> /home/git/gitolite-admin/conf/gitolite1.conf
+<span class="token keyword">echo</span>  <span class="token string">"    RW = <span class="token variable">$1</span> "</span> <span class="token operator">>></span> /home/git/gitolite-admin/conf/gitolite1.conf
+<span class="token keyword">echo</span>  <span class="token string">"    RW+ = @admin"</span> <span class="token operator">>></span> /home/git/gitolite-admin/conf/gitolite1.conf
+
+<span class="token function">git</span> add <span class="token keyword">.</span>
+<span class="token function">git</span> commit -m <span class="token string">"增加项目 <span class="token variable">$2</span> 并初始化，同时增加用户 <span class="token variable">$1</span> 对其的读写权限……"</span>
+<span class="token function">git</span> push
+
+<span class="token comment" spellcheck="true">#初始化.gitignore文件</span>
+<span class="token function">cd</span> /home/git/gittmp
+<span class="token function">git</span> clone git@172.16.99.235:<span class="token variable">$2</span>.git
+<span class="token function">cd</span> <span class="token variable">$2</span>
+<span class="token keyword">echo</span> <span class="token string">"#filter class/binary file"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"/build/"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"/target/"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"/bin/"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">""</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"# filter eclipse file"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"*.classpath"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"*.project"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"/.settings/"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">""</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"# filter IntelliJ IDEA file"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"*.iml"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"/.idea/"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">""</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"#filter temp file"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"*.tmp"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"/~<span class="token variable">$*</span>"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">".~*"</span> <span class="token operator">>></span> .gitignore
+<span class="token keyword">echo</span> <span class="token string">"*.log"</span> <span class="token operator">>></span> .gitignore
+<span class="token function">git</span> add <span class="token keyword">.</span>
+<span class="token function">git</span> commit -m <span class="token string">"初始化项目的.gitignore文件，忽略常见无用文件"</span>
+<span class="token function">git</span> push
+<span class="token keyword">echo</span> <span class="token string">"项目 <span class="token variable">$2</span> 创建成功"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="重命名项目并修改对应权限配置文件"><a href="#重命名项目并修改对应权限配置文件" class="headerlink" title="重命名项目并修改对应权限配置文件"></a>重命名项目并修改对应权限配置文件</h1><pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+<span class="token comment" spellcheck="true">#修改代码仓库的名字，同时更新权限配置文件</span>
+<span class="token comment" spellcheck="true">#第1个参数为原repository名，对应/home/git/repositories下的文件夹名（不包含.git后缀）</span>
+<span class="token comment" spellcheck="true">#第2个参数为repository名，对应/home/git/repositories下的文件夹名（不包含.git后缀）</span>
+<span class="token keyword">echo</span> <span class="token string">"重命名项目 <span class="token variable">$1</span> 为 <span class="token variable">$2</span>……"</span>
+<span class="token function">cd</span> /home/git/repositories
+<span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">!</span> -d <span class="token string">"<span class="token variable">$1</span>.git"</span> <span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">then</span>   
+    <span class="token keyword">echo</span> <span class="token string">"项目 <span class="token variable">$1</span> 不存在，请选择另一个项目名……"</span>
+        <span class="token keyword">exit</span> 0
+<span class="token keyword">fi</span>
+<span class="token comment" spellcheck="true">#更改目录名</span>
+<span class="token function">mv</span> <span class="token string">"<span class="token variable">$1</span>.git"</span> <span class="token string">"<span class="token variable">$2</span>.git"</span>
+
+<span class="token comment" spellcheck="true">#修改权限文件，增加默认管理员权限和初始化的用户权限</span>
+<span class="token function">sed</span> -i <span class="token string">"s/<span class="token variable">$1</span>$/<span class="token variable">$2</span>/g"</span> /home/git/gitolite-admin/conf/gitolite.conf
+<span class="token keyword">echo</span> <span class="token string">"新的项目URL为：git@172.30.16.235:<span class="token variable">$2</span>.git"</span>
+
+<span class="token function">cd</span> /home/git/gitolite-admin
+<span class="token function">git</span> add <span class="token keyword">.</span>   
+<span class="token function">git</span> commit -m <span class="token string">"重命名项目 <span class="token variable">$1</span> 为 <span class="token variable">$2</span>……"</span>   
+<span class="token function">git</span> push
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+    <!-- 使用 DISQUS -->
+    <div id="disqus-comment">
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.gitlab.io/2016/07/20/Gitolite管理用户权限的Shell脚本/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.gitlab.io/2016/07/20/Gitolite管理用户权限的Shell脚本/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+    </div>
+    <style>
+        #disqus-comment{
+            background-color: #eee;
+            padding: 2pc;
+        }
+    </style>
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/07/16/Bash-on-Windows开启Ubuntu-unity桌面的方法/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/07/27/Netty+Redis开发高并发应用的一些思考(一)/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">29</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-gplus.svg);">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-weibo.svg);">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-github.svg);">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Heaven's Door
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 使用 DISQUS js 代码 -->
+    <script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+<script>
+    <!-- Offer LazyLoad -->
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    <!-- Start Queue -->
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+                </main>
+            </div>
+            <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none' id='cnzz_stat_icon_1260910303'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1260910303%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+        </body>
+    
+</html>
