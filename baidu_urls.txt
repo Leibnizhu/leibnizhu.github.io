@@ -1,1 +1,1 @@
-https://leibnizhu.github.io/2018/05/15/Lucene7获取所有有效文档/
+https://leibnizhu.github.io/2018/05/15/Kettle-Java-API处理Hadoop数据/
