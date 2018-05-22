@@ -496,9 +496,9 @@
         
         <tags>
             
-            <tag> Kettle </tag>
-            
             <tag> Hadoop </tag>
+            
+            <tag> Kettle </tag>
             
         </tags>
         
@@ -725,11 +725,11 @@ sasl.mechanism.inter.broker.protocol=PLAIN
             
             <tag> HBase </tag>
             
-            <tag> Hadoop </tag>
-            
             <tag> Kerberos </tag>
             
             <tag> 大数据 </tag>
+            
+            <tag> Hadoop </tag>
             
             <tag> Sqoop </tag>
             
@@ -864,11 +864,11 @@ Valid starting       Expires              Service principal
         
         <tags>
             
-            <tag> Hadoop </tag>
-            
             <tag> Kerberos </tag>
             
             <tag> 大数据 </tag>
+            
+            <tag> Hadoop </tag>
             
         </tags>
         
@@ -905,9 +905,9 @@ Valid starting       Expires              Service principal
         
         <tags>
             
-            <tag> Hadoop </tag>
-            
             <tag> 大数据 </tag>
+            
+            <tag> Hadoop </tag>
             
             <tag> Sentry </tag>
             
@@ -5060,7 +5060,7 @@ String <span class="token function">format</span><span class="token punctuation"
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化]]></title>
       <url>/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>JVM定义了一种Java内存模型以消除各种硬件和操作系统的内存访问差异，保证Java程序的跨平台性。  </p>
 <h3 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h3><p>所有的变量存储在主内存，每个线程有自己的工作内存，保存了被这个线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都在对应工作内存进行。<br>主内存和工作内存与第一篇的内存结构不是一个层面上的概念，主内存主要对应Java堆的对象实例数据，工作内存主要对应虚拟机栈的部分区域，而且工作内存可能优先存储与寄存器和高速缓存中。</p>
 <h3 id="内存操作"><a href="#内存操作" class="headerlink" title="内存操作"></a>内存操作</h3><p>Java内存模型规定了8种内存操作：</p>
@@ -5134,7 +5134,7 @@ String <span class="token function">format</span><span class="token punctuation"
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化]]></title>
       <url>/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="类加载机制"><a href="#类加载机制" class="headerlink" title="类加载机制"></a>类加载机制</h2><p><img src="/img/jvm/8.png" alt=""><br>类从加载导卸载出内存的整个生命周期如上图所示。图中的7个阶段中，加载、验证、准备、初始化和卸载的顺序是确定的，而解析和使用阶段不一定，解析可能在初始化之后（动态绑定）。</p>
 <h3 id="类加载时机"><a href="#类加载时机" class="headerlink" title="类加载时机"></a>类加载时机</h3><p><strong>有且只有</strong>以下5种情况：</p>
 <ol>
@@ -5255,7 +5255,7 @@ String <span class="token function">format</span><span class="token punctuation"
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(三)——类文件结构]]></title>
       <url>/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="JVM多语言支持"><a href="#JVM多语言支持" class="headerlink" title="JVM多语言支持"></a>JVM多语言支持</h2><p>Java规范分为Java语言规范（The Java Language Specification）和Java虚拟机规范（The Java Virtual Machine Specification），因此JVM支持多种语言，只要该语言编译后的类文件符合JVM规范。比如我们常用的Scala、Kotlin、Clojure、Groovy等等。  </p>
 <h2 id="类文件结构"><a href="#类文件结构" class="headerlink" title="类文件结构"></a>类文件结构</h2><p>基础原则：多字节的数据，高位在前。JVM加载Class文件的时候进行动态连接。<br>Class文件结构类似C的结构体，包含无符号数（u1/u2/u4/u8表示1/2/4/8字节的无符号数）和表（由多个无符号数或表组成的结构体，class文件本身就是一个大的表），有多个同类的无符号数或者表并数量不确定的时候，一般先用一个无符号数记录数量，后面接上一系列连续的这种无符号数或者表。Class文件没有分隔符号，所以整个数据结构都是被严格规定的。<br><img src="/img/jvm/7.png" alt=""></p>
 <h3 id="魔数与Class文件版本"><a href="#魔数与Class文件版本" class="headerlink" title="魔数与Class文件版本"></a>魔数与Class文件版本</h3><p>Class文件头4个字节是固定的0xCAFEBABE（咖啡宝贝），显然与Java语言命名的历史相关。<br>紧接着4个字节存储Class文件版本号，5-6字节是子版本号，7-8字节是主版本号（比如1.7.0是0x0033）。JVM读取Class文件的时候，搞版本JDK可以兼容旧版本Class文件，就是通过这4个字节进行判定的。</p>
@@ -5450,7 +5450,7 @@ Constant pool:
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(二)——垃圾回收]]></title>
       <url>/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="判断对象可回收"><a href="#判断对象可回收" class="headerlink" title="判断对象可回收"></a>判断对象可回收</h2><p>有以下方法：</p>
 <h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>维护引用计数的Map，对象被引用时计数加1，引用失效时计数减1，简单粗暴。<br>实现简单，判断效率高。但主流JVM没有用这个方法的，因为无法解决循环引用的问题。  </p>
 <h3 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h3><p>JVM主流实现时可达性分析。<br>通过一系列GC Root的对象作为起点，开始向下搜索，搜索经过的路径为引用链，当一个对象到GC Root没有任何引用链项链，则引用不可达，可以GC掉。<br>GC Root通常包括以下几种：</p>
@@ -5537,7 +5537,7 @@ Constant pool:
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构]]></title>
       <url>/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/</url>
-      <content type="html"><![CDATA[<p>最近一个月把经典Java书籍《深入理解Java虚拟机》读了一遍，受益匪浅，接下来几篇博客里将会总结一些学习笔记，或许会跟很多现有的博文重复，但主要是为了自己总结一下。<br><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p>最近一个月把经典Java书籍《深入理解Java虚拟机》读了一遍，受益匪浅，接下来几篇博客里将会总结一些学习笔记，或许会跟很多现有的博文重复，但主要是为了自己总结一下。<br><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="JVM内存结构"><a href="#JVM内存结构" class="headerlink" title="JVM内存结构"></a>JVM内存结构</h2><p><img src="/img/jvm/1.png" alt=""><br>JVM内存结构不光是只有堆内存和栈内存，实际情况要复杂很多，主要包含以下结构。</p>
 <h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><p>每个线程都有独立的程序计数器，各线程的互不影响，用于存储正在执行的虚拟机指令地址（对于Native方法则为空undefined）.</p>
 <h3 id="JVM栈"><a href="#JVM栈" class="headerlink" title="JVM栈"></a>JVM栈</h3><p>JVM栈是线程私有的，每个方法执行的时候都会建立栈帧，栈帧包含以下内容：</p>
@@ -7090,7 +7090,7 @@ location ~ .*\.<span class="token punctuation">(</span>js<span class="token oper
     <entry>
       <title><![CDATA[Netty+Redis开发高并发应用的一些思考(二)]]></title>
       <url>/2016/09/11/Netty+Redis%E5%BC%80%E5%8F%91%E9%AB%98%E5%B9%B6%E5%8F%91%E5%BA%94%E7%94%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83(%E4%BA%8C)/</url>
-      <content type="html"><![CDATA[<p>上一篇<a href="http://leibnizhu.gitlab.io/2016/07/27/Netty-Redis%E5%BC%80%E5%8F%91%E9%AB%98%E5%B9%B6%E5%8F%91%E5%BA%94%E7%94%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/">《Netty+Redis开发高并发应用的一些思考(一)》</a>提及到Redis的优化，最近一个月的开发调测和部署又有了一些新的想法：</p>
+      <content type="html"><![CDATA[<p>上一篇<a href="http://leibnizhu.gitlab.io/2016/07/27/Netty-Redis%E5%BC%80%E5%8F%91%E9%AB%98%E5%B9%B6%E5%8F%91%E5%BA%94%E7%94%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/" target="_blank" rel="noopener">《Netty+Redis开发高并发应用的一些思考(一)》</a>提及到Redis的优化，最近一个月的开发调测和部署又有了一些新的想法：</p>
 <ol>
 <li><p>Redis尽量放在本地，减少网络IO时间；对相应时间要求高的，尽量不要用云服务商提供的Redis服务，别人的服务再好，读写速度也比不上本地的。</p>
 </li>
@@ -7512,7 +7512,7 @@ unity --reset-icons
     <entry>
       <title><![CDATA[404]]></title>
       <url>//404.html</url>
-      <content type="html"><![CDATA[<p><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><br>Gitlab文章页发生故障不能正常访问, 3秒后将自动跳转到<a href="https://leibnizhu.github.io" target="_blank" rel="noopener">Github版</a></p>
+      <content type="html"><![CDATA[<p><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><br>Gitlab文章页发生故障不能正常访问, 3秒后将自动跳转到<a href="https://leibnizhu.github.io">Github版</a></p>
 <script>
 setTimeout(function(){
     window.location.href=window.location.href.replace("leibnizhu.gitlab.io","leibnizhu.github.io")
@@ -7536,7 +7536,7 @@ setTimeout(function(){
 <blockquote>
 <p>HiFi，摄影，户外徒步，山地车（林道/AM），小攀，单片机，FPGA，路由<br>以上现在都不玩了</p>
 </blockquote>
-<h2 id="脚印"><a href="#脚印" class="headerlink" title="脚印"></a>脚印</h2><p><strong>Gmail</strong>：<a href="mailto: leibnizhu@gmail.com" target="_blank" rel="noopener">leibnizhu@gmail.com</a><br><strong>博客</strong>：<a href="leibnizhu.gitlab.io">Heaven’s Door</a><br><strong>网易云音乐</strong>：<a href="http://music.163.com/#/user/home?id=36026498" target="_blank" rel="noopener">Leibniz-Hu</a><br><strong>Telegram</strong>：<a href="https://telegram.me/leibnizhu" target="_blank" rel="noopener">leibnizhu</a><br><strong>出没于</strong>：广州<br><strong>GitHub</strong>：很少参与开源项目了<br><strong>GitLab</strong>：基本只放私有项目  </p>
+<h2 id="脚印"><a href="#脚印" class="headerlink" title="脚印"></a>脚印</h2><p><strong>Gmail</strong>：<a href="mailto: leibnizhu@gmail.com" target="_blank" rel="noopener">leibnizhu@gmail.com</a><br><strong>博客</strong>：<a href="leibnizhu.gitlab.io">Heaven’s Door</a><br><strong>网易云音乐</strong>：<a href="http://music.163.com/#/user/home?id=36026498" target="_blank" rel="noopener">Leibniz-Hu</a><br><strong>Telegram</strong>：<a href="https://telegram.me/leibnizhu" target="_blank" rel="noopener">leibnizhu·Telegram</a><br><strong>出没于</strong>：广州<br><strong>GitHub</strong>：<a href="https://github.com/Leibnizhu" target="_blank" rel="noopener">Leibnizhu·Github</a><br><strong>GitLab</strong>：基本只放私有项目  </p>
 ]]></content>
     </entry>
     
