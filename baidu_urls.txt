@@ -1,1 +1,1 @@
-https://leibnizhu.github.io/2018/05/15/Kettle-Java-API处理Hadoop数据/
+https://leibnizhu.gitlab.io/2018/07/17/Scala实用指南-读书笔记/
