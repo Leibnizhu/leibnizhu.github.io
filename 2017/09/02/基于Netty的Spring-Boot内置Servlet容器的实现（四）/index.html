@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            基于Netty的Spring Boot内置Servlet容器的实现（四） | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,Netty,Spring Boot,Servlet">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/atelier-sulphurpool-dark.min.css?vmk0B/JQkDaJg8F60f4dyg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Heaven&#39;s Door">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="M4QKeJ2Iq5t7c8y6uaMaszxNWRqlD5n3vqzq24JY-dc" />
+    <meta name="baidu-site-verification" content="NNXLFEr6nK" />
+
+    <!-- RSS -->
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="基于Netty的Spring Boot内置Servlet容器的实现（四） | Heaven&#39;s Door">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="Netty"> <meta property="og:article:tag" content="Spring Boot"> <meta property="og:article:tag" content="Servlet"> 
+
+    
+        <meta property="article:published_time" content="Sat Sep 02 2017 15:11:03 GMT+0800">
+        <meta property="article:modified_time" content="Tue Dec 05 2017 04:03:28 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html",
+    "headline": "基于Netty的Spring Boot内置Servlet容器的实现（四）",
+    "datePublished": "Sat Sep 02 2017 15:11:03 GMT+0800",
+    "dateModified": "Tue Dec 05 2017 04:03:28 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",Netty,Spring Boot,Servletnull",
+    "description": "",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+    
+    
+        <div style="display: none;">
+    <script src="//s95.cnzz.com/z_stat.php?id=1260910303&web_id=1260910303" language="JavaScript"></script>
+</div>
+    
+
+    <!-- Custom Head -->
+    
+        
+            <script>var _hmt = _hmt || [];(function() {var hm = document.createElement('script');hm.src = 'https://hm.baidu.com/hm.js?f9fd08e08bf7d91fcc3d21ec87e2250f';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hm, s);})();</script>
+        
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#基于Netty的Spring-Boot内置Servlet容器的实现（四）"><span class="post-toc-number">1.</span> <span class="post-toc-text"><a href="#&#x57FA;&#x4E8E;Netty&#x7684;Spring-Boot&#x5185;&#x7F6E;Servlet&#x5BB9;&#x5668;&#x7684;&#x5B9E;&#x73B0;&#xFF08;&#x56DB;&#xFF09;" class="headerlink" title="&#x57FA;&#x4E8E;Netty&#x7684;Spring Boot&#x5185;&#x7F6E;Servlet&#x5BB9;&#x5668;&#x7684;&#x5B9E;&#x73B0;&#xFF08;&#x56DB;&#xFF09;"></a>&#x57FA;&#x4E8E;Netty&#x7684;Spring Boot&#x5185;&#x7F6E;Servlet&#x5BB9;&#x5668;&#x7684;&#x5B9E;&#x73B0;&#xFF08;&#x56DB;&#xFF09;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Registration注册器的实现"><span class="post-toc-number">1.1.</span> <span class="post-toc-text"><a href="#Registration&#x6CE8;&#x518C;&#x5668;&#x7684;&#x5B9E;&#x73B0;" class="headerlink" title="Registration&#x6CE8;&#x518C;&#x5668;&#x7684;&#x5B9E;&#x73B0;"></a>Registration&#x6CE8;&#x518C;&#x5668;&#x7684;&#x5B9E;&#x73B0;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#设计与继承结构"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text"><a href="#&#x8BBE;&#x8BA1;&#x4E0E;&#x7EE7;&#x627F;&#x7ED3;&#x6784;" class="headerlink" title="&#x8BBE;&#x8BA1;&#x4E0E;&#x7EE7;&#x627F;&#x7ED3;&#x6784;"></a>&#x8BBE;&#x8BA1;&#x4E0E;&#x7EE7;&#x627F;&#x7ED3;&#x6784;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#代码实现"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text"><a href="#&#x4EE3;&#x7801;&#x5B9E;&#x73B0;" class="headerlink" title="&#x4EE3;&#x7801;&#x5B9E;&#x73B0;"></a>&#x4EE3;&#x7801;&#x5B9E;&#x73B0;</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#FilterChain过滤器链的实现"><span class="post-toc-number">1.2.</span> <span class="post-toc-text"><a href="#FilterChain&#x8FC7;&#x6EE4;&#x5668;&#x94FE;&#x7684;&#x5B9E;&#x73B0;" class="headerlink" title="FilterChain&#x8FC7;&#x6EE4;&#x5668;&#x94FE;&#x7684;&#x5B9E;&#x73B0;"></a>FilterChain&#x8FC7;&#x6EE4;&#x5668;&#x94FE;&#x7684;&#x5B9E;&#x73B0;</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#HttpServletRequest的实现"><span class="post-toc-number">1.3.</span> <span class="post-toc-text"><a href="#HttpServletRequest&#x7684;&#x5B9E;&#x73B0;" class="headerlink" title="HttpServletRequest&#x7684;&#x5B9E;&#x73B0;"></a>HttpServletRequest&#x7684;&#x5B9E;&#x73B0;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Cookie相关方法"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text"><a href="#Cookie&#x76F8;&#x5173;&#x65B9;&#x6CD5;" class="headerlink" title="Cookie&#x76F8;&#x5173;&#x65B9;&#x6CD5;"></a>Cookie&#x76F8;&#x5173;&#x65B9;&#x6CD5;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Header相关方法"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text"><a href="#Header&#x76F8;&#x5173;&#x65B9;&#x6CD5;" class="headerlink" title="Header&#x76F8;&#x5173;&#x65B9;&#x6CD5;"></a>Header&#x76F8;&#x5173;&#x65B9;&#x6CD5;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Session相关方法"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text"><a href="#Session&#x76F8;&#x5173;&#x65B9;&#x6CD5;" class="headerlink" title="Session&#x76F8;&#x5173;&#x65B9;&#x6CD5;"></a>Session&#x76F8;&#x5173;&#x65B9;&#x6CD5;</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#HttpServletResponse实现"><span class="post-toc-number">1.4.</span> <span class="post-toc-text"><a href="#HttpServletResponse&#x5B9E;&#x73B0;" class="headerlink" title="HttpServletResponse&#x5B9E;&#x73B0;"></a>HttpServletResponse&#x5B9E;&#x73B0;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Header相关方法-1"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text"><a href="#Header&#x76F8;&#x5173;&#x65B9;&#x6CD5;-1" class="headerlink" title="Header&#x76F8;&#x5173;&#x65B9;&#x6CD5;"></a>Header&#x76F8;&#x5173;&#x65B9;&#x6CD5;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#getNettyResponse-方法"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text"><a href="#getNettyResponse-&#x65B9;&#x6CD5;" class="headerlink" title="getNettyResponse()&#x65B9;&#x6CD5;"></a>getNettyResponse()&#x65B9;&#x6CD5;</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Session实现"><span class="post-toc-number">1.5.</span> <span class="post-toc-text"><a href="#Session&#x5B9E;&#x73B0;" class="headerlink" title="Session&#x5B9E;&#x73B0;"></a>Session&#x5B9E;&#x73B0;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#NettyHttpSession"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text"><a href="#NettyHttpSession" class="headerlink" title="NettyHttpSession"></a>NettyHttpSession</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#NettySessionManager"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text"><a href="#NettySessionManager" class="headerlink" title="NettySessionManager"></a>NettySessionManager</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#可以改进的地方"><span class="post-toc-number">1.5.3.</span> <span class="post-toc-text"><a href="#&#x53EF;&#x4EE5;&#x6539;&#x8FDB;&#x7684;&#x5730;&#x65B9;" class="headerlink" title="&#x53EF;&#x4EE5;&#x6539;&#x8FDB;&#x7684;&#x5730;&#x65B9;"></a>&#x53EF;&#x4EE5;&#x6539;&#x8FDB;&#x7684;&#x5730;&#x65B9;</span></a></li></ol></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/jinjia.png)">
+    
+            <p class="article-headline-p">
+                基于Netty的Spring Boot内置Servlet容器的实现（四）
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>9月 02, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Netty/">Netty</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Servlet/">Servlet</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Spring-Boot/">Spring Boot</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=基于Netty的Spring Boot内置Servlet容器的实现（四）&url=https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=基于Netty的Spring Boot内置Servlet容器的实现（四）&url=https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=基于Netty的Spring Boot内置Servlet容器的实现（四）&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/index.html&text=基于Netty的Spring Boot内置Servlet容器的实现（四）" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="基于Netty的Spring-Boot内置Servlet容器的实现（四）"><a href="#基于Netty的Spring-Boot内置Servlet容器的实现（四）" class="headerlink" title="基于Netty的Spring Boot内置Servlet容器的实现（四）"></a>基于Netty的Spring Boot内置Servlet容器的实现（四）</h1><h2 id="Registration注册器的实现"><a href="#Registration注册器的实现" class="headerlink" title="Registration注册器的实现"></a>Registration注册器的实现</h2><h3 id="设计与继承结构"><a href="#设计与继承结构" class="headerlink" title="设计与继承结构"></a>设计与继承结构</h3><p>在本系列第一篇提到了<code>javax.servlet.Registration</code>接口，用于实现Filter和Servlet的动态注册，这个接口相对比较简单；有两个子接口，详见下面的UML图：<br><img src="/img/springbootnetty/registration.png" alt=""><br>我们将要分别实现<code>FilterRegistration</code>和<code>ServletRegistration</code>接口，为了保持与<code>Registration</code>接口的继承关系相近，我们设计了三个类，分别是抽象类，Filter注册、Servlet注册：  </p>
+<pre><code class="java">class AbstractNettyRegistration implements Registration, Registration.Dynamic, ServletConfig, FilterConfig{}
+public class NettyFilterRegistration extends AbstractNettyRegistration implements FilterRegistration.Dynamic{}
+public class NettyServletRegistration extends AbstractNettyRegistration implements ServletRegistration.Dynamic{}
+</code></pre>
+<p>这些类构成的UML图如下：<br><img src="/img/springbootnetty/nettyregistration.png" alt="">  </p>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>在实际实现的过程中，忽略了很多用不到的方法，着重实现了加入Mapping以及获取Filter/Servlet实例的方法。<br>加入Mapping的方法由ServletContext处理（Mapping本身也是由ServletContext维护），而获取Filter/Servlet的方法使用的是类似于懒加载单例的方法，每个Registration实例维护自己的一个Filter/Servlet实例，首次获取的时候通过反射获取到实例，并将反射获取到的实例由Registration实例持有。具体实现代码如下：</p>
+<pre><code class="java">public class NettyServletRegistration extends AbstractNettyRegistration implements ServletRegistration.Dynamic {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private volatile boolean initialised;
+    private Servlet servlet;
+    private Collection&lt;String&gt; urlPatternMappings = new LinkedList&lt;&gt;();
+
+    public NettyServletRegistration(NettyContext context, String servletName, String className, Servlet servlet) {
+        super(servletName, className, context);
+        this.servlet = servlet;
+    }
+
+    public Servlet getServlet() throws ServletException {
+        if (!initialised) {
+            synchronized (this) {
+                if (!initialised) {
+                    if (null == servlet) {
+                        try {
+                            servlet = (Servlet) Class.forName(getClassName()).newInstance(); //反射获取实例
+                        } catch (Exception e) {
+                            throw new ServletException(e);
+                        }
+                    }
+                    servlet.init(this); //初始化Servlet
+                    initialised = true;
+                }
+            }
+        }
+        return servlet;
+    }
+
+    @Override
+    public Set&lt;String&gt; addMapping(String... urlPatterns) {
+        //在RequestUrlPatternMapper中会检查url Pattern是否冲突
+        NettyContext context = getNettyContext();
+        for (String urlPattern : urlPatterns) {
+            try {
+                context.addServletMapping(urlPattern, getName(), getServlet());
+            } catch (ServletException e) {
+                log.error(&quot;Throwing exception when getting Servlet in NettyServletRegistration.&quot;, e);
+            }
+        }
+        urlPatternMappings.addAll(Arrays.asList(urlPatterns));
+        return new HashSet&lt;&gt;(urlPatternMappings);
+    }
+}
+
+public class NettyFilterRegistration extends AbstractNettyRegistration implements FilterRegistration.Dynamic {
+    private volatile boolean initialised;
+    private Filter filter;
+    private Collection&lt;String&gt; urlPatternMappings = new LinkedList&lt;&gt;();
+
+    public NettyFilterRegistration(NettyContext context, String filterName, String className, Filter filter) {
+        super(filterName, className, context);
+        this.filter = filter;
+    }
+
+    public Filter getFilter() throws ServletException {
+        if (!initialised) {
+            synchronized (this) {
+                if (!initialised) {
+                    if (null == filter) {
+                        try {
+                            filter = (Filter) Class.forName(getClassName()).newInstance(); //反射获取实例
+                        } catch (Exception e) {
+                            throw new ServletException(e);
+                        }
+                    }
+                    filter.init(this); //初始化Filter
+                    initialised = true;
+                }
+            }
+        }
+        return filter;
+    }
+
+    @Override
+    public void addMappingForUrlPatterns(EnumSet&lt;DispatcherType&gt; dispatcherTypes, boolean isMatchAfter, String... urlPatterns) {
+        NettyContext context = getNettyContext();
+        for (String urlPattern : urlPatterns) {
+            context.addFilterMapping(dispatcherTypes, isMatchAfter, urlPattern);
+        }
+        urlPatternMappings.addAll(Arrays.asList(urlPatterns));
+    }
+}
+</code></pre>
+<h2 id="FilterChain过滤器链的实现"><a href="#FilterChain过滤器链的实现" class="headerlink" title="FilterChain过滤器链的实现"></a>FilterChain过滤器链的实现</h2><p>大家应该都知道过滤器链的概念，所有过滤器都在过滤器链上，当有请求进入，将依次经过每个适用的过滤器（根据过滤器的Url Pattern与请求的路径而不同），过滤器里执行<code>doFilter()</code>方法让过滤器链执行下一个过滤器，直到最后一个，则执行Servlet的<code>service()</code>方法。而过滤器链对应的接口<code>javax.servlet.FilterChain</code>里面就一个方法：  </p>
+<pre><code class="java">public interface FilterChain {
+    public void doFilter ( ServletRequest request, ServletResponse response ) throws IOException, ServletException;
+}
+</code></pre>
+<p>显然，实现<code>FilterChain</code>接口，应该要维护一个过滤器的数组或者List，而在<code>doFilter()</code>方法里面，应该判断有没有下一个过滤器，有则调用其<code>doFilter()</code>方法，无则调用当前请求对应Servlet实例的<code>service()</code>方法，可以用迭代器或者记录游标（数组或List的下标）来实现。具体代码：  </p>
+<pre><code class="java">public class NettyFilterChain implements FilterChain {
+    /**
+     * 考虑到每个请求只有一个线程处理，而且ServletContext在每次请求时都会new 一个SimpleFilterChain对象
+     * 所以这里把过滤器链的Iterator作为FilterChain的私有变量，没有线程安全问题
+     */
+    private final Iterator&lt;Filter&gt; filterIterator;
+    private final Servlet servlet;
+
+    public NettyFilterChain(Servlet servlet, Iterable&lt;Filter&gt; filters) throws ServletException {
+        this.filterIterator = checkNotNull(filters).iterator();
+        this.servlet = checkNotNull(servlet);
+    }
+
+    /**
+     * 每个Filter在处理完请求之后调用FilterChain的这个方法。
+     * 这时候应该找到下一个Filter，调用其doFilter()方法。
+     * 如果没有下一个了，应该调用servlet的service()方法了
+     */
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+        if (filterIterator.hasNext()) {
+            Filter filter = filterIterator.next();
+            filter.doFilter(request, response, this);
+        } else {
+            servlet.service(request, response);
+        }
+    }
+}
+</code></pre>
+<h2 id="HttpServletRequest的实现"><a href="#HttpServletRequest的实现" class="headerlink" title="HttpServletRequest的实现"></a>HttpServletRequest的实现</h2><p>接口<code>javax.servlet.http.HttpServletRequest</code>的方法比较多，大概可以分为Cookie相关、Header相关、各种路径相关、Session相关、请求参数相关、请求协议/地址/端口相关、Attributes相关、异步相关、multipart/form-data相关（上传文件）等等方法，以上提到的方法本文基本实现了，还有一些没实现的是暂时用不到的。</p>
+<h3 id="Cookie相关方法"><a href="#Cookie相关方法" class="headerlink" title="Cookie相关方法"></a>Cookie相关方法</h3><p>Cookie使用“懒解析”，就是用标识<code>isCookieParsed</code>记录Cookie是否被解析过，初始化Request对象的时候不解析，在获取Cookiea相关方法被调用的时候再判断是否未解析，若未解析则解析再返回，否则直接返回。<code>NettyHttpServletRequest</code>的构造方法传入了netty的<code>HttpHeaders</code>实例，可以从中获取Cookie请求头，再进行解析。具体代码如下：  </p>
+<pre><code class="java">/*====== Cookie 相关方法 开始 ======*/
+private Cookie[] cookies;
+private transient boolean isCookieParsed = false;
+
+@Override
+public Cookie[] getCookies() {
+    if (!isCookieParsed) {
+        parseCookie();
+    }
+    return cookies;
+}
+
+/**
+ * 解析request中的Cookie到本类的cookies数组中
+ *
+ * @author Leibniz
+ */
+private void parseCookie() {
+    if (isCookieParsed) {
+        return;
+    }
+
+    String cookieOriginStr = this.headers.get(&quot;Cookie&quot;);
+    if (cookieOriginStr == null) {
+        return;
+    }
+    Set&lt;io.netty.handler.codec.http.cookie.Cookie&gt; nettyCookies = ServerCookieDecoder.LAX.decode(cookieOriginStr);
+    if (nettyCookies.size() == 0) {
+        return;
+    }
+    this.cookies = new Cookie[nettyCookies.size()];
+    Iterator&lt;io.netty.handler.codec.http.cookie.Cookie&gt; itr = nettyCookies.iterator();
+    int i = 0;
+    while (itr.hasNext()) {
+        io.netty.handler.codec.http.cookie.Cookie nettyCookie = itr.next();
+        Cookie servletCookie = new Cookie(nettyCookie.name(), nettyCookie.value());
+//            servletCookie.setMaxAge(Ints.checkedCast(nettyCookie.maxAge()));
+        if(nettyCookie.domain() != null) servletCookie.setDomain(nettyCookie.domain());
+        if(nettyCookie.path() != null) servletCookie.setPath(nettyCookie.path());
+        servletCookie.setHttpOnly(nettyCookie.isHttpOnly());
+        this.cookies[i++] = servletCookie;
+    }
+
+    this.isCookieParsed = true;
+}
+
+/*====== Cookie 相关方法 结束 ======*/
+</code></pre>
+<h3 id="Header相关方法"><a href="#Header相关方法" class="headerlink" title="Header相关方法"></a>Header相关方法</h3><p>上面提到<code>NettyHttpServletRequest</code>的构造方法传入了netty的<code>HttpHeaders</code>实例，可以从中获取所有请求头，而Header相关方法的实现就靠他了：  </p>
+<pre><code class="java">/*====== Header 相关方法 开始 ======*/
+private HttpHeaders headers;
+
+@Override
+public long getDateHeader(String name) {
+    return this.headers.getTimeMillis(name);
+}
+
+@Override
+public String getHeader(String name) {
+    return this.headers.get(name);
+}
+
+@Override
+public Enumeration&lt;String&gt; getHeaders(String name) {
+    return Collections.enumeration(this.headers.getAll(name));
+}
+
+@Override
+public Enumeration&lt;String&gt; getHeaderNames() {
+    return Collections.enumeration(this.headers.names());
+}
+
+@Override
+public int getIntHeader(String name) {
+    String headerStringValue = this.headers.get(name);
+    if (headerStringValue == null) {
+        return -1;
+    }
+    return Integer.parseInt(headerStringValue);
+}
+/*====== Header 相关方法 结束 ======*/
+</code></pre>
+<h3 id="Session相关方法"><a href="#Session相关方法" class="headerlink" title="Session相关方法"></a>Session相关方法</h3><p>Session相关方法相对多一些。Session的解析分两种，首先尝试从Cookie中获取Cookie（名为JSESSIONID），如果没有，则从请求路径中找类似”;jsessionid=<strong><em>*</em></strong>“的参数作为SessionID。拿到SessionID后，再调用SessionManager的方法获取Session对象；而根据从哪里解析到的SessionID可以设置<code>isCookieSession</code>和<code>isURLSession</code>两个属性，用于<code>isRequestedSessionIdFromCookie()</code>和<code>isRequestedSessionIdFromURL()</code>方法。如果拿不到SessionID，则调用SessionManager的方法创建一个新Session。<br>至于Session和SessionManager的实现我们在下一小节再讲，值得注意的是，<code>getSession()</code>方法返回的并不是我们定义的Session类实例，而是其门面类，是出于安全的考虑；这一点参考了Tomcat的做法（Tomcat的Request、Response、Session等对象都是用门面模式）。  </p>
+<pre><code class="java">private NettyHttpSession session;
+private boolean isCookieSession;
+private boolean isURLSession;
+
+/**
+ * 先后看请求路径和Cookie中是否有sessionid
+ * 有，则从SessionManager获取session对象放入session属性
+ * 如果session对象过期，则创建一个新的并放入
+ * 无，则创建一个新Session并放入
+ */
+private void parseSession() {
+    String sessionId;
+    NettyHttpSession curSession;
+
+    //从Cookie解析SessionID
+    sessionId = getSessionIdFromCookie();
+    if(sessionId != null){
+        curSession = servletContext.getSessionManager().getSession(sessionId);
+        if (null != curSession) {
+            this.isCookieSession = true;
+            recoverySession(curSession);
+            return;
+        }
+    }
+
+    if (!this.isCookieSession) {
+        // 从请求路径解析SessionID
+        sessionId = getSessionIdFromUrl();
+        curSession = servletContext.getSessionManager().getSession(sessionId);
+        if(null != curSession){
+            this.isURLSession = true;
+            recoverySession(curSession);
+            return;
+        }
+    }
+    //Cookie和请求参数中都没拿到Session，则创建一个
+    if (this.session == null) {
+        this.session = createtSession();
+    }
+}
+
+/**
+ * @return 从URL解析到的SessionID
+ */
+private String getSessionIdFromUrl() {
+    StringBuilder u = new StringBuilder(request.uri());
+    int sessionStart = u.toString().indexOf(&quot;;&quot; + NettyHttpSession.SESSION_REQUEST_PARAMETER_NAME + &quot;=&quot;);
+    if(sessionStart == -1) {
+        return null;
+    }
+    int sessionEnd = u.toString().indexOf(&#39;;&#39;, sessionStart + 1);
+    if (sessionEnd == -1)
+        sessionEnd = u.toString().indexOf(&#39;?&#39;, sessionStart + 1);
+    if (sessionEnd == -1) // still
+        sessionEnd = u.length();
+    return u.substring(sessionStart + NettyHttpSession.SESSION_REQUEST_PARAMETER_NAME.length() + 2, sessionEnd);
+}
+
+/**
+ * @return 从Cookie解析到的SessionID
+ */
+private String getSessionIdFromCookie() {
+    Cookie[] cookies = getCookies();
+    if(cookies == null){
+        return null;
+    }
+    for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(NettyHttpSession.SESSION_COOKIE_NAME)) {
+            return cookie.getValue();
+        }
+    }
+    return null;
+}
+
+/**
+ * 恢复旧Session
+ * @param curSession 要恢复的Session对象
+ */
+private void recoverySession(NettyHttpSession curSession) {
+    this.session = curSession;
+    this.session.setNew(false);
+    this.servletContext.getSessionManager().updateAccessTime(this.session);
+}
+
+@Override
+public HttpSession getSession(boolean create) {
+    boolean valid = isRequestedSessionIdValid(); //在管理器存在，且没到期
+    //可用则直接返回
+    if (valid) {
+        return session.getSession();
+    }
+    //不可用则判断是否新建
+    if (!create) {
+        session = null; //如果过期了设为null
+        return null;
+    }
+    //不可用且允许新建则新建之
+    this.session = createtSession();
+    return this.session.getSession();
+}
+
+@Override
+public HttpSession getSession() {
+    return getSession(true);
+}
+
+@Override
+public String changeSessionId() {
+    this.session = createtSession();
+    return this.session.getId();
+}
+
+private NettyHttpSession createtSession() {
+    return servletContext.getSessionManager().createSession();
+}
+
+@Override
+public boolean isRequestedSessionIdValid() {
+    return servletContext.getSessionManager().checkValid(session);
+}
+
+@Override
+public boolean isRequestedSessionIdFromCookie() {
+    return isCookieSession;
+}
+
+@Override
+public boolean isRequestedSessionIdFromURL() {
+    return isURLSession;
+}
+
+@Override
+@Deprecated
+public boolean isRequestedSessionIdFromUrl() {
+    return isRequestedSessionIdFromURL();
+}
+
+@Override
+public String getRequestedSessionId() {
+    return session.getId();
+}
+/*====== Session 相关方法 结束 ======*/
+</code></pre>
+<h2 id="HttpServletResponse实现"><a href="#HttpServletResponse实现" class="headerlink" title="HttpServletResponse实现"></a>HttpServletResponse实现</h2><p>HttpServletResponse接口相对简单一点，方法少一点，下面列举出部分方法的实现。</p>
+<h3 id="Header相关方法-1"><a href="#Header相关方法-1" class="headerlink" title="Header相关方法"></a>Header相关方法</h3><p>这里的Header指响应头。<code>NettyHttpServletResponse</code>的构造方法里传入了netty的<code>HttpResponse</code>对象，默认的调用是传入一个200的正常HTTP响应。我们可以通过这个<code>HttpResponse</code>对象的<code>headers()</code>方法对响应头进行操作。具体代码如下：</p>
+<pre><code class="java">@Override
+public void setDateHeader(String name, long date) {
+    response.headers().set(name, date);
+}
+
+@Override
+public void addDateHeader(String name, long date) {
+    response.headers().add(name, date);
+}
+
+@Override
+public void setHeader(String name, String value) {
+    if (name == null || name.length() == 0 || value == null) {
+        return;
+    }
+    if (isCommitted()) {
+        return;
+    }
+    if (setHeaderField(name, value)) {
+        return;
+    }
+    response.headers().set(name, value);
+}
+
+private boolean setHeaderField(String name, String value) {
+    char c = name.charAt(0);//减少判断的时间，提高效率
+    if (&#39;C&#39; == c || &#39;c&#39; == c) {
+        if (HttpHeaderNames.CONTENT_TYPE.contentEqualsIgnoreCase(name)) {
+            setContentType(value);
+            return true;
+        }
+    }
+    return false;
+}
+
+@Override
+public void addHeader(String name, String value) {
+    if (name == null || name.length() == 0 || value == null) {
+        return;
+    }
+    if (isCommitted()) {
+        return;
+    }
+    if (setHeaderField(name, value)) {
+        return;
+    }
+    response.headers().add(name, value);
+}
+
+@Override
+public void setIntHeader(String name, int value) {
+    if (name == null || name.length() == 0) {
+        return;
+    }
+    if (isCommitted()) {
+        return;
+    }
+    response.headers().set(name, value);
+}
+
+@Override
+public void addIntHeader(String name, int value) {
+    if (name == null || name.length() == 0) {
+        return;
+    }
+    if (isCommitted()) {
+        return;
+    }
+    response.headers().add(name, value);
+}
+</code></pre>
+<h3 id="getNettyResponse-方法"><a href="#getNettyResponse-方法" class="headerlink" title="getNettyResponse()方法"></a>getNettyResponse()方法</h3><p>方法<code>public HttpResponse getNettyResponse()</code>是我们自己定义的，用于响应输出流在写入时做的一些基本处理，主要是请求头的处理，具体代码如下：</p>
+<pre><code class="java">/**
+ * 设置基本的请求头
+ */
+public HttpResponse getNettyResponse() {
+    if (committed) {
+        return response;
+    }
+    committed = true;
+    HttpHeaders headers = response.headers();
+    if (null != contentType) {
+        String value = null == characterEncoding ? contentType : contentType + &quot;; charset=&quot; + characterEncoding; //Content Type 响应头的内容
+        headers.set(HttpHeaderNames.CONTENT_TYPE, value);
+    }
+    CharSequence date = getFormattedDate();
+    headers.set(HttpHeaderNames.DATE, date); // 时间日期响应头
+    headers.set(HttpHeaderNames.SERVER, servletContext.getServerInfo()); //服务器信息响应头
+
+    // cookies处理
+//        long curTime = System.currentTimeMillis(); //用于根据maxAge计算Cookie的Expires
+    //先处理Session ，如果是新Session需要通过Cookie写入
+    if (request.getSession().isNew()) {
+        String sessionCookieStr = NettyHttpSession.SESSION_COOKIE_NAME + &quot;=&quot; + request.getRequestedSessionId() + &quot;; path=/; domain=&quot; + request.getServerName();
+        headers.add(HttpHeaderNames.SET_COOKIE, sessionCookieStr);
+    }
+    //其他业务或框架设置的cookie，逐条写入到响应头去
+    for (Cookie cookie : cookies) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(cookie.getName()).append(&quot;=&quot;).append(cookie.getValue())
+                .append(&quot;; max-Age=&quot;).append(cookie.getMaxAge());
+        if (cookie.getPath() != null) sb.append(&quot;; path=&quot;).append(cookie.getPath());
+        if (cookie.getDomain() != null) sb.append(&quot;; domain=&quot;).append(cookie.getDomain());
+        headers.add(HttpHeaderNames.SET_COOKIE, sb.toString());
+    }
+    return response;
+}
+</code></pre>
+<h2 id="Session实现"><a href="#Session实现" class="headerlink" title="Session实现"></a>Session实现</h2><p>Session相关的包括Session实现类<code>NettyHttpSession</code>，Sessionn门面包装类<code>NettyHttpSessionFacade</code>，以及Session管理器<code>NettySessionManager</code>。<br>门面类前面提及到了，构造的时候传入一个<code>NettyHttpSession</code>实例并持有，所有<code>HttpSession</code>接口的方法都调用<code>NettyHttpSession</code>实例的对应方法去处理。<br>Session管理器<code>NettySessionManager</code>是单例，由<code>NettyContext</code>实例持有，负责存储所有Session的映射，方便其他类根据SessionID去获取Session对象，提供创建新Session的方法，允许更新Session访问时间，同时定时清理过期的Session。<br>每个<code>NettyHttpSession</code>实例都持有<code>NettySessionManager</code>的引用，实现了<code>HttpSession</code>接口。  </p>
+<h3 id="NettyHttpSession"><a href="#NettyHttpSession" class="headerlink" title="NettyHttpSession"></a>NettyHttpSession</h3><p>实现比较简单，Attribute由对象持有的HashMap进行存储，自身保存ID、创建时间、访问时间、生命周期等信息。<br>具体代码如下（部分过时的方法、简单的getter不列出）：  </p>
+<pre><code class="java">public class NettyHttpSession implements HttpSession, Serializable {
+    public static final String SESSION_COOKIE_NAME = &quot;JSESSIONID&quot;;
+    public static final String SESSION_REQUEST_PARAMETER_NAME = &quot;jsessionid&quot;;
+    private NettySessionManager manager;
+    private long creationTime;
+    private long lastAccessedTime;
+    private int interval = NettySessionManager.SESSION_LIFE_SECONDS;
+    private String id;
+
+    NettyHttpSession(String id, NettySessionManager manager){
+        long curTime = System.currentTimeMillis();
+        this.creationTime = curTime;
+        this.lastAccessedTime = curTime;
+        this.id = id;
+        this.manager = manager;
+        this.sessionFacade = new NettyHttpSessionFacade(this);
+    }
+
+    private HttpSession sessionFacade;
+
+    public HttpSession getSession(){
+        return sessionFacade;
+    }
+
+    void updateAccessTime() {
+        lastAccessedTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void setMaxInactiveInterval(int interval) {
+        this.interval = interval;
+    }
+
+    private Map&lt;String, Object&gt; attributes = new ConcurrentHashMap&lt;&gt;();
+
+    @Override
+    public Object getAttribute(String name) {
+        return attributes.get(name);
+    }
+
+    @Override
+    public void setAttribute(String name, Object value) {
+        attributes.put(name, value);
+    }
+
+    @Override
+    public void removeAttribute(String name) {
+        attributes.remove(name);
+    }
+
+    @Override
+    public void invalidate() {
+        attributes.clear();
+        attributes = null;
+        manager.invalidate(this);
+        manager = null;
+    }
+
+    private boolean isNew = true;
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew){
+        this.isNew = isNew;
+    }
+
+    /**
+     * 是否过期
+     * @return
+     */
+    public boolean expire(){
+        return System.currentTimeMillis() - creationTime &gt;= interval * 1000;
+    }
+}
+</code></pre>
+<h3 id="NettySessionManager"><a href="#NettySessionManager" class="headerlink" title="NettySessionManager"></a>NettySessionManager</h3><p>Session管理器没有现成的接口，因为比较简单所以也没抽出接口，自己在实现的过程中根据需求写了一些public方法：  </p>
+<ul>
+<li>使用ConcurrentHashMap存储所有Session。  </li>
+<li>在构造的同时开启一个线程，每隔<code>SESSION_LIFE_CHECK_INTER</code>毫秒扫描所有Session判断是否过期需要清除（有待优化，比如等待时间按最快过期的session的过期时间，或者记录预计下次需要处理的个数，减少遍历的数量）。  </li>
+<li>SessionID是6位随机数字+时间戳翻转。  </li>
+</ul>
+<pre><code class="java">public class NettySessionManager {
+    private Logger log = LoggerFactory.getLogger(getClass());
+
+    private NettyContext servletContext;
+    private Map&lt;String, NettyHttpSession&gt; sessions = new ConcurrentHashMap&lt;&gt;();
+    static final int SESSION_LIFE_SECONDS = 60 * 30;
+    static final int SESSION_LIFE_MILLISECONDS = SESSION_LIFE_SECONDS * 1000;
+    private static final int SESSION_LIFE_CHECK_INTER = 1000 * 60;
+
+    public NettySessionManager(NettyContext servletContext){
+        this.servletContext = servletContext;
+        new Thread(new checkInvalidSessions(), &quot;Session-Check&quot;).start();
+    }
+
+    void invalidate(HttpSession session) {
+        sessions.remove(session.getId());
+    }
+
+    public void updateAccessTime(NettyHttpSession session){
+        if(session != null){
+            session.updateAccessTime();
+        }
+    }
+
+    public boolean checkValid(NettyHttpSession session) {
+        return session != null &amp;&amp; sessions.get(session.getId()) != null &amp;&amp; !session.expire();
+    }
+
+    public NettyHttpSession getSession(String id){
+        return id == null ? null : sessions.get(id);
+    }
+
+    public NettyHttpSession createSession(){
+        String id = createUniqueSessionId();
+        NettyHttpSession newSession = new NettyHttpSession(id, this);
+        sessions.put(id ,newSession);
+        return newSession;
+    }
+
+    private String createUniqueSessionId() {
+        String prefix = String.valueOf(100000 + new Random().nextInt(899999));
+        return new StringBuilder().append(System.currentTimeMillis()).reverse().append(prefix).toString();
+    }
+
+    public void setOldSession(NettyHttpSession session) {
+        if(session != null){
+            session.setNew(false);
+        }
+    }
+
+    /**
+     * 超时的Session无效化，定期执行
+     */
+    private class checkInvalidSessions implements Runnable {
+        @Override
+        public void run() {
+            log.info(&quot;Session Manager expire-checking thread has been started...&quot;);
+            while(true){
+                try {
+                    Thread.sleep(SESSION_LIFE_CHECK_INTER);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                long curTime = System.currentTimeMillis();
+                for(NettyHttpSession session : sessions.values()){
+                    if(session.expire()){
+                        log.info(&quot;Session(ID={}) is invalidated by Session Manager&quot;, session.getId());
+                        session.invalidate();
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="可以改进的地方"><a href="#可以改进的地方" class="headerlink" title="可以改进的地方"></a>可以改进的地方</h3><ul>
+<li>Session持久化，包括可选的持久化时间间隔、shutdown自动持久化、startup自动读入。</li>
+<li>Redis集中存储Session，便于服务集群使用</li>
+<li>优化解析速度</li>
+</ul>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2017/09/02/基于Netty的Spring-Boot内置Servlet容器的实现（四）/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/09/05/发布项目到Maven中央仓库/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/08/27/基于Netty的Spring-Boot内置Servlet容器的实现（三）/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">47</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-weibo">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+    
+    <!-- V2EX -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Heaven's Door
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+<script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

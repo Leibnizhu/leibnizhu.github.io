@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            基于Vert.X的高性能微信支付宝公众号通用服务 | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,vert.x,微信,支付宝">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/atelier-sulphurpool-dark.min.css?vmk0B/JQkDaJg8F60f4dyg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Heaven&#39;s Door">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="M4QKeJ2Iq5t7c8y6uaMaszxNWRqlD5n3vqzq24JY-dc" />
+    <meta name="baidu-site-verification" content="NNXLFEr6nK" />
+
+    <!-- RSS -->
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="基于Vert.X的高性能微信支付宝公众号通用服务 | Heaven&#39;s Door">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="vert.x"> <meta property="og:article:tag" content="微信"> <meta property="og:article:tag" content="支付宝"> 
+
+    
+        <meta property="article:published_time" content="Tue Jan 30 2018 14:02:10 GMT+0800">
+        <meta property="article:modified_time" content="Tue Jan 30 2018 14:38:54 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html",
+    "headline": "基于Vert.X的高性能微信支付宝公众号通用服务",
+    "datePublished": "Tue Jan 30 2018 14:02:10 GMT+0800",
+    "dateModified": "Tue Jan 30 2018 14:38:54 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",vert.x,微信,支付宝null",
+    "description": "",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+    
+    
+        <div style="display: none;">
+    <script src="//s95.cnzz.com/z_stat.php?id=1260910303&web_id=1260910303" language="JavaScript"></script>
+</div>
+    
+
+    <!-- Custom Head -->
+    
+        
+            <script>var _hmt = _hmt || [];(function() {var hm = document.createElement('script');hm.src = 'https://hm.baidu.com/hm.js?f9fd08e08bf7d91fcc3d21ec87e2250f';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hm, s);})();</script>
+        
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Alipay-Wechat-Platform"><span class="post-toc-number">1.</span> <span class="post-toc-text"><a href="#Alipay-Wechat-Platform" class="headerlink" title="Alipay-Wechat-Platform"></a>Alipay-Wechat-Platform</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#命名"><span class="post-toc-number">1.1.</span> <span class="post-toc-text"><a href="#&#x547D;&#x540D;" class="headerlink" title="&#x547D;&#x540D;"></a>&#x547D;&#x540D;</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#意义"><span class="post-toc-number">1.2.</span> <span class="post-toc-text"><a href="#&#x610F;&#x4E49;" class="headerlink" title="&#x610F;&#x4E49;"></a>&#x610F;&#x4E49;</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#技术栈"><span class="post-toc-number">1.3.</span> <span class="post-toc-text"><a href="#&#x6280;&#x672F;&#x6808;" class="headerlink" title="&#x6280;&#x672F;&#x6808;"></a>&#x6280;&#x672F;&#x6808;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#变迁"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text"><a href="#&#x53D8;&#x8FC1;" class="headerlink" title="&#x53D8;&#x8FC1;"></a>&#x53D8;&#x8FC1;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Benchmark"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text"><a href="#Benchmark" class="headerlink" title="Benchmark"></a>Benchmark</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Maven子模块"><span class="post-toc-number">1.4.</span> <span class="post-toc-text"><a href="#Maven&#x5B50;&#x6A21;&#x5757;" class="headerlink" title="Maven&#x5B50;&#x6A21;&#x5757;"></a>Maven&#x5B50;&#x6A21;&#x5757;</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#启动方式"><span class="post-toc-number">1.5.</span> <span class="post-toc-text"><a href="#&#x542F;&#x52A8;&#x65B9;&#x5F0F;" class="headerlink" title="&#x542F;&#x52A8;&#x65B9;&#x5F0F;"></a>&#x542F;&#x52A8;&#x65B9;&#x5F0F;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#增加支付宝Maven依赖"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text"><a href="#&#x589E;&#x52A0;&#x652F;&#x4ED8;&#x5B9D;Maven&#x4F9D;&#x8D56;" class="headerlink" title="&#x589E;&#x52A0;&#x652F;&#x4ED8;&#x5B9D;Maven&#x4F9D;&#x8D56;"></a>&#x589E;&#x52A0;&#x652F;&#x4ED8;&#x5B9D;Maven&#x4F9D;&#x8D56;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置文件"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text"><a href="#&#x914D;&#x7F6E;&#x6587;&#x4EF6;" class="headerlink" title="&#x914D;&#x7F6E;&#x6587;&#x4EF6;"></a>&#x914D;&#x7F6E;&#x6587;&#x4EF6;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#命令行启动"><span class="post-toc-number">1.5.3.</span> <span class="post-toc-text"><a href="#&#x547D;&#x4EE4;&#x884C;&#x542F;&#x52A8;" class="headerlink" title="&#x547D;&#x4EE4;&#x884C;&#x542F;&#x52A8;"></a>&#x547D;&#x4EE4;&#x884C;&#x542F;&#x52A8;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#调试"><span class="post-toc-number">1.5.4.</span> <span class="post-toc-text"><a href="#&#x8C03;&#x8BD5;" class="headerlink" title="&#x8C03;&#x8BD5;"></a>&#x8C03;&#x8BD5;</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#后台管理页面"><span class="post-toc-number">1.6.</span> <span class="post-toc-text"><a href="#&#x540E;&#x53F0;&#x7BA1;&#x7406;&#x9875;&#x9762;" class="headerlink" title="&#x540E;&#x53F0;&#x7BA1;&#x7406;&#x9875;&#x9762;"></a>&#x540E;&#x53F0;&#x7BA1;&#x7406;&#x9875;&#x9762;</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#API"><span class="post-toc-number">1.7.</span> <span class="post-toc-text"><a href="#API" class="headerlink" title="API"></a>API</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#微信授权"><span class="post-toc-number">1.7.1.</span> <span class="post-toc-text"><a href="#&#x5FAE;&#x4FE1;&#x6388;&#x6743;" class="headerlink" title="&#x5FAE;&#x4FE1;&#x6388;&#x6743;"></a>&#x5FAE;&#x4FE1;&#x6388;&#x6743;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支付宝授权"><span class="post-toc-number">1.7.2.</span> <span class="post-toc-text"><a href="#&#x652F;&#x4ED8;&#x5B9D;&#x6388;&#x6743;" class="headerlink" title="&#x652F;&#x4ED8;&#x5B9D;&#x6388;&#x6743;"></a>&#x652F;&#x4ED8;&#x5B9D;&#x6388;&#x6743;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#微信公众号的AccessToken与JsTicket"><span class="post-toc-number">1.7.3.</span> <span class="post-toc-text"><a href="#&#x5FAE;&#x4FE1;&#x516C;&#x4F17;&#x53F7;&#x7684;AccessToken&#x4E0E;JsTicket" class="headerlink" title="&#x5FAE;&#x4FE1;&#x516C;&#x4F17;&#x53F7;&#x7684;AccessToken&#x4E0E;JsTicket"></a>&#x5FAE;&#x4FE1;&#x516C;&#x4F17;&#x53F7;&#x7684;AccessToken&#x4E0E;JsTicket</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#AccessToken"><span class="post-toc-number">1.7.3.1.</span> <span class="post-toc-text"><a href="#AccessToken" class="headerlink" title="AccessToken"></a>AccessToken</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#JsTicket"><span class="post-toc-number">1.7.3.2.</span> <span class="post-toc-text"><a href="#JsTicket" class="headerlink" title="JsTicket"></a>JsTicket</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#微信支付"><span class="post-toc-number">1.7.4.</span> <span class="post-toc-text"><a href="#&#x5FAE;&#x4FE1;&#x652F;&#x4ED8;" class="headerlink" title="&#x5FAE;&#x4FE1;&#x652F;&#x4ED8;"></a>&#x5FAE;&#x4FE1;&#x652F;&#x4ED8;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#预处理-wx-config用"><span class="post-toc-number">1.7.4.1.</span> <span class="post-toc-text"><a href="#&#x9884;&#x5904;&#x7406;-wx-config&#x7528;" class="headerlink" title="&#x9884;&#x5904;&#x7406;(wx.config&#x7528;)"></a>&#x9884;&#x5904;&#x7406;(wx.config&#x7528;)</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#下单"><span class="post-toc-number">1.7.4.2.</span> <span class="post-toc-text"><a href="#&#x4E0B;&#x5355;" class="headerlink" title="&#x4E0B;&#x5355;"></a>&#x4E0B;&#x5355;</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#退款"><span class="post-toc-number">1.7.4.3.</span> <span class="post-toc-text"><a href="#&#x9000;&#x6B3E;" class="headerlink" title="&#x9000;&#x6B3E;"></a>&#x9000;&#x6B3E;</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支付宝支付"><span class="post-toc-number">1.7.5.</span> <span class="post-toc-text"><a href="#&#x652F;&#x4ED8;&#x5B9D;&#x652F;&#x4ED8;" class="headerlink" title="&#x652F;&#x4ED8;&#x5B9D;&#x652F;&#x4ED8;"></a>&#x652F;&#x4ED8;&#x5B9D;&#x652F;&#x4ED8;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#下单-1"><span class="post-toc-number">1.7.5.1.</span> <span class="post-toc-text"><a href="#&#x4E0B;&#x5355;-1" class="headerlink" title="&#x4E0B;&#x5355;"></a>&#x4E0B;&#x5355;</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#退款-1"><span class="post-toc-number">1.7.5.2.</span> <span class="post-toc-text"><a href="#&#x9000;&#x6B3E;-1" class="headerlink" title="&#x9000;&#x6B3E;"></a>&#x9000;&#x6B3E;</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#客服-模板-消息发送"><span class="post-toc-number">1.7.6.</span> <span class="post-toc-text"><a href="#&#x5BA2;&#x670D;-&#x6A21;&#x677F;-&#x6D88;&#x606F;&#x53D1;&#x9001;" class="headerlink" title="(&#x5BA2;&#x670D;/&#x6A21;&#x677F;)&#x6D88;&#x606F;&#x53D1;&#x9001;"></a>(&#x5BA2;&#x670D;/&#x6A21;&#x677F;)&#x6D88;&#x606F;&#x53D1;&#x9001;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#微信客服消息"><span class="post-toc-number">1.7.6.1.</span> <span class="post-toc-text"><a href="#&#x5FAE;&#x4FE1;&#x5BA2;&#x670D;&#x6D88;&#x606F;" class="headerlink" title="&#x5FAE;&#x4FE1;&#x5BA2;&#x670D;&#x6D88;&#x606F;"></a>&#x5FAE;&#x4FE1;&#x5BA2;&#x670D;&#x6D88;&#x606F;</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#微信模板消息"><span class="post-toc-number">1.7.6.2.</span> <span class="post-toc-text"><a href="#&#x5FAE;&#x4FE1;&#x6A21;&#x677F;&#x6D88;&#x606F;" class="headerlink" title="&#x5FAE;&#x4FE1;&#x6A21;&#x677F;&#x6D88;&#x606F;"></a>&#x5FAE;&#x4FE1;&#x6A21;&#x677F;&#x6D88;&#x606F;</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#支付宝客服消息"><span class="post-toc-number">1.7.6.3.</span> <span class="post-toc-text"><a href="#&#x652F;&#x4ED8;&#x5B9D;&#x5BA2;&#x670D;&#x6D88;&#x606F;" class="headerlink" title="&#x652F;&#x4ED8;&#x5B9D;&#x5BA2;&#x670D;&#x6D88;&#x606F;"></a>&#x652F;&#x4ED8;&#x5B9D;&#x5BA2;&#x670D;&#x6D88;&#x606F;</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#支付宝模板消息"><span class="post-toc-number">1.7.6.4.</span> <span class="post-toc-text"><a href="#&#x652F;&#x4ED8;&#x5B9D;&#x6A21;&#x677F;&#x6D88;&#x606F;" class="headerlink" title="&#x652F;&#x4ED8;&#x5B9D;&#x6A21;&#x677F;&#x6D88;&#x606F;"></a>&#x652F;&#x4ED8;&#x5B9D;&#x6A21;&#x677F;&#x6D88;&#x606F;</span></a></li></ol></li></ol></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/drink.jpg)">
+    
+            <p class="article-headline-p">
+                基于Vert.X的高性能微信支付宝公众号通用服务
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>1月 30, 2018</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/vert-x/">vert.x</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/微信/">微信</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/支付宝/">支付宝</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=基于Vert.X的高性能微信支付宝公众号通用服务&url=https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=基于Vert.X的高性能微信支付宝公众号通用服务&url=https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=基于Vert.X的高性能微信支付宝公众号通用服务&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/index.html&text=基于Vert.X的高性能微信支付宝公众号通用服务" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <p>去年基于<code>Vert.X</code>写了一个微信支付宝公众号通用服务，放在<code>Github</code>上，也有一段时间没维护了，现在把文档发上来记录一下吧。<br><code>Github</code>地址：<a href="https://github.com/Leibnizhu/AlipayWechatPlatform" target="_blank" rel="noopener">https://github.com/Leibnizhu/AlipayWechatPlatform</a></p>
+<h1 id="Alipay-Wechat-Platform"><a href="#Alipay-Wechat-Platform" class="headerlink" title="Alipay-Wechat-Platform"></a>Alipay-Wechat-Platform</h1><p><img src="/img/awp/logo.png" alt=""></p>
+<h2 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h2><p>原来命名是Wechat-Alipay-Platform，但这样缩写WAP、可能引起歧义，所以改成Alipay-Wechat-Platform，缩写AWP（还是有歧义，但至少不是一个领域的）。</p>
+<h2 id="意义"><a href="#意义" class="headerlink" title="意义"></a>意义</h2><p>本项目旨在减少Web项目关于微信、支付宝的重复代码，以及解决公众号的安全域名只能配置一个的问题。<br>未来还可以托管Access Token。<br>本项目部署后，将公众号安全域名配置到本项目的域名，此后多个web项目（不同域名）可以使用同一个公众号 <del>（理论上）</del> 。  </p>
+<h2 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h2><h3 id="变迁"><a href="#变迁" class="headerlink" title="变迁"></a>变迁</h3><p>原来：<code>Vue.js + Spring Boot + Druid + MySQL</code><br>现在：<code>Vue.js + Vert.X(Core+Web+JDBC) + HikariCP + MySQL(可能换成PostgreSQL)</code>  </p>
+<h3 id="Benchmark"><a href="#Benchmark" class="headerlink" title="Benchmark"></a>Benchmark</h3><p>针对支付配置获取的API进行测试。  </p>
+<ul>
+<li>测试工具：<code>Jemeter3.2 r1790748</code></li>
+<li>测试环境：<code>Manjaro 17.0.5 x86_64 Linux 4.9.53-1-MANJARO</code>,<code>OpenJDK 1.8.0_144</code></li>
+<li>硬件配置：Intel Core i7-6560U @ 4x 3.2GHz, 8G DDR3, 256G SSD  </li>
+</ul>
+<p>1) <code>Spring</code>(无Shiro过滤)测试结果：<br><img src="/img/awp/spring.png" alt=""><br>2) <code>Vert.X</code>(JWT授权+MariaDB)测试结果：<br><img src="/img/awp/vertx.png" alt=""><br>3) <code>Vert.X</code>(JWT授权+PostgreSQL)测试结果：<br><img src="/img/awp/vertx_postgres.png" alt="">  </p>
+<h2 id="Maven子模块"><a href="#Maven子模块" class="headerlink" title="Maven子模块"></a>Maven子模块</h2><ul>
+<li><code>awp-base</code>: PoJo类，工具类（通用工具、微信工具、支付宝工具）</li>
+<li><code>awp-final</code>: 最终打成Vert.X整合包，包括后台管理和服务的入口</li>
+<li><code>awp-verticle-bms</code>: 后台管理页面，需要JWT授权登录</li>
+<li><code>awp-verticle-base</code>: Verticle基础通用类，包括一个基础接口机器抽象类，以及定义EventBus常量的命名空间</li>
+<li><code>awp-verticle-db</code>: 数据库相关类</li>
+<li><code>awp-verticle-message</code>: 微信、支付宝(模板/客服/图文)消息发送服务(TODO)</li>
+<li><code>awp-verticle-oauth</code>: 微信、支付宝(TODO)授权服务</li>
+<li><code>awp-verticle-pay</code>: 微信、支付宝支付服务(TODO)</li>
+</ul>
+<h2 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h2><h3 id="增加支付宝Maven依赖"><a href="#增加支付宝Maven依赖" class="headerlink" title="增加支付宝Maven依赖"></a>增加支付宝Maven依赖</h3><p>进入项目目录，执行以下命令：</p>
+<pre><code class="bash">mvn install:install-file -Dfile=dependencies/com.alipay.api-1.0.jar -DgroupId=com.alipay -DartifactId=api -Dversion=1.0 -Dpackaging=jar
+mvn install:install-file -Dfile=dependencies/com.antgroup.zmxy.openplatform-1.0.jar -DgroupId=com.antgroup -DartifactId=zmxy.openplatform -Dversion=1.0 -Dpackaging=jar
+</code></pre>
+<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p>可以放在任何位置，任何文件名，内容参考<code>awp-final/src/main/resources/config.json</code>。  </p>
+<h3 id="命令行启动"><a href="#命令行启动" class="headerlink" title="命令行启动"></a>命令行启动</h3><pre><code class="bash">mvn clean &amp;&amp; maven package
+java -jar awp-final/target/awp-0.0.1-SNAPSHOT-fat.jar run com.turingdi.awp.MainVerticle -conf [/path/to/配置文件]
+</code></pre>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><p>从<code>awp-final</code>子模块中的<code>com.turingdi.awp.MainLauncher</code>类启动项目即可，启动参数参考命令行启动的命令（从<code>run</code>开始）。</p>
+<h2 id="后台管理页面"><a href="#后台管理页面" class="headerlink" title="后台管理页面"></a>后台管理页面</h2><p>入口地址：<code>http://localhost:8083/</code></p>
+<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="微信授权"><a href="#微信授权" class="headerlink" title="微信授权"></a>微信授权</h3><p>申请微信授权。web服务需要授权时，向用户发送重定向到该接口。  </p>
+<ul>
+<li>请求地址：<code>http://localhost:8083/oauth/wx/apply/{body}</code>  </li>
+<li>参数：body，格式为变种Base64编码的JSON，请用<a href="http://localhost:8083/static/page/sys/base64.html" target="_blank" rel="noopener">http://localhost:8083/static/page/sys/base64.html</a> 进行编码</li>
+</ul>
+<p>例如（请修改域名后，在微信打开，静默授权，授权后跳到百度首页(为了展示可以回调到任何地址)，观察地址，rs参数是图灵Base64加密后的结果）: <a href="http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~" target="_blank" rel="noopener">http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~</a></p>
+<pre><code class="json">{
+    &quot;eid&quot;:1, /*web项目使用的公众号在本项目中的用户ID*/
+    &quot;type&quot;:0,/*0=静默授权，只能获取OpenID，1=正常授权，会弹出授权确认页面，可以获取到用户信息*/
+    &quot;callback&quot;:&quot;http://dict.baidu.com&quot;/*授权成功后调用的web项目回调接口地址,请使用完整地址,回调时会使用GET方法，加上rs参数，rs参数值是turingBase64加密的授权结果(JSON)*/
+}
+</code></pre>
+<h3 id="支付宝授权"><a href="#支付宝授权" class="headerlink" title="支付宝授权"></a>支付宝授权</h3><p>申请支付宝授权。web服务需要授权时，向用户发送重定向到该接口。  </p>
+<ul>
+<li>请求地址：<code>http://localhost:8083/oauth/zfb/apply/{body}</code>  </li>
+<li>参数：body，格式为变种Base64编码的JSON，请用<a href="http://localhost:8083/static/page/sys/base64.html" target="_blank" rel="noopener">http://localhost:8083/static/page/sys/base64.html</a> 进行编码</li>
+</ul>
+<p>例如（请修改域名后打开，静默授权，授权后跳到百度首页(为了展示可以回调到任何地址)，观察地址，rs参数是图灵Base64加密后的结果）: <a href="http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~" target="_blank" rel="noopener">http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~</a></p>
+<pre><code class="json">{
+    &quot;eid&quot;:1, /*web项目使用的公众号在本项目中的用户ID*/
+    &quot;type&quot;:0,/*0=静默授权，只能获取OpenID，1=正常授权，会弹出授权确认页面，可以获取到用户信息*/
+    &quot;callback&quot;:&quot;http://dict.baidu.com&quot;/*授权成功后调用的web项目回调接口地址,请使用完整地址,回调时会使用GET方法，加上rs参数，rs参数值是turingBase64加密的授权结果(JSON)*/
+}
+</code></pre>
+<h3 id="微信公众号的AccessToken与JsTicket"><a href="#微信公众号的AccessToken与JsTicket" class="headerlink" title="微信公众号的AccessToken与JsTicket"></a>微信公众号的AccessToken与JsTicket</h3><h4 id="AccessToken"><a href="#AccessToken" class="headerlink" title="AccessToken"></a>AccessToken</h4><ul>
+<li>请求方法：POST  </li>
+<li>来源限制：与awp同网段的访问（通过请求头的<code>X-Forwarded-For</code>与<code>X-Real-IP</code>请求头判断，通过nginx反代访问的都会带上）  </li>
+<li>接口地址：<code>http://localhost:8083/tk/wx/act/{eid}</code>  </li>
+<li>请求参数：eid路径参数，用户ID  </li>
+</ul>
+<h4 id="JsTicket"><a href="#JsTicket" class="headerlink" title="JsTicket"></a>JsTicket</h4><ul>
+<li>请求方法：POST  </li>
+<li>来源限制：与awp同网段的访问（通过请求头的<code>X-Forwarded-For</code>与<code>X-Real-IP</code>请求头判断，通过nginx反代访问的都会带上）  </li>
+<li>接口地址：<code>http://localhost:8083/tk/wx/jst/{eid}</code>  </li>
+<li>请求参数：eid路径参数，用户ID  </li>
+</ul>
+<h3 id="微信支付"><a href="#微信支付" class="headerlink" title="微信支付"></a>微信支付</h3><p>微信支付相对比较麻烦，单次支付涉及到多个接口。<br>具体的应用可以参考<code>awp-verticle-admin/resources/static/page/paytest.html</code>页面的例子。<br>P.S. 支付的页面需要引入<code>https://res.wx.qq.com/open/js/jweixin-1.2.0.js</code>。  </p>
+<h4 id="预处理-wx-config用"><a href="#预处理-wx-config用" class="headerlink" title="预处理(wx.config用)"></a>预处理(wx.config用)</h4><ul>
+<li>请求方法：GET，由页面AJAX调用  </li>
+<li>来源限制：暂无  </li>
+<li>接口地址：<code>http://localhost:8083/pay/wx/pre/{eid}/{url}</code>  </li>
+<li>请求参数：eid:路径参数，用户ID; url:当前页面URL，请将完整URL进行URL编码再发送  </li>
+<li>响应格式：JSON</li>
+<li>响应内容：appId，timestamp（生成签名的时间戳），noncestr（生成签名的随机串），signture（签名），由<code>wx.config()</code>使用。  </li>
+</ul>
+<h4 id="下单"><a href="#下单" class="headerlink" title="下单"></a>下单</h4><ul>
+<li>请求方法：POST，由页面AJAX调用  </li>
+<li>来源限制：暂无  </li>
+<li>接口地址：<code>http://localhost:8083/pay/wx/order</code>  </li>
+<li>请求参数：JSON格式的字符串，包括以下参数：eid(企业用户ID),orderId(本地订单ID),openId(用户OpenID),price(价格，单位：分),name(产品名),callback(支付成功后回调接口，请填写完整URL，无需编码)  </li>
+<li>响应格式：JSON</li>
+<li>响应内容：appId,timestamp（生成签名的时间戳），noncestr（生成签名的随机串）,packages(prepay_id),paysign(签名)。供<code>WeixinJSBridge.invoke(&#39;getBrandWCPayRequest&#39;,{})</code>使用  </li>
+</ul>
+<h4 id="退款"><a href="#退款" class="headerlink" title="退款"></a>退款</h4><p>(TODO)</p>
+<h3 id="支付宝支付"><a href="#支付宝支付" class="headerlink" title="支付宝支付"></a>支付宝支付</h3><h4 id="下单-1"><a href="#下单-1" class="headerlink" title="下单"></a>下单</h4><p>需要使用支付宝支付时，由由用户调用此接口（可以是web服务返回重定向到本接口，或后台计算出接口地址，让js跳转）。  </p>
+<ul>
+<li>请求地址：<code>http://localhost:8083/pay/zfb/order/{body}</code>  </li>
+<li>参数：body，格式为变种Base64编码的JSON，请用<a href="http://localhost:8083/static/sys/page/base64.html" target="_blank" rel="noopener">http://localhost:8083/static/sys/page/base64.html</a> 进行编码。  </li>
+</ul>
+<p>例如(如: <a href="http://localhost:8083/pay/zfb/order/bYkL1CX3PB7sIf6YZGwYSCX3P3IjKBKjKBKMdEH0POIsIWJY1CdLIBNjoOkuHCyLIBN32Iu55p2cI3g3HtqsvGkhHts3P3kNTmigP3Q-ZGLBTO53HCL9TS5BvtM3oOkzTCdBZedzIBN31miMcAN-otj-Htqs1G6zTAN4KAVzo0dMHeipHY6gHCTLo0d5cY63HedLdBXu1minvOk6" target="_blank" rel="noopener">http://localhost:8083/pay/zfb/order/bYkL1CX3PB7sIf6YZGwYSCX3P3IjKBKjKBKMdEH0POIsIWJY1CdLIBNjoOkuHCyLIBN32Iu55p2cI3g3HtqsvGkhHts3P3kNTmigP3Q-ZGLBTO53HCL9TS5BvtM3oOkzTCdBZedzIBN31miMcAN-otj-Htqs1G6zTAN4KAVzo0dMHeipHY6gHCTLo0d5cY63HedLdBXu1minvOk6</a>  </p>
+<pre><code class="json">{
+    &quot;eid&quot;:1,/*web项目使用的公众号在本项目中的用户ID*/
+    &quot;orderId&quot;:&quot;1231234567&quot;,/*本地订单ID，请保持唯一性*/
+    &quot;price&quot;:1,/*价格，单位：分*/
+    &quot;name&quot;:&quot;苹果&quot;,/*产品名称*/
+    &quot;callback&quot;:&quot;http://dict.baidu.com&quot;,/*支付成功后异步回调地址，将会带上支付宝回调的所有参数*/
+    &quot;success&quot;:&quot;http://localhost:8083/static/page/sys/base64.html&quot;/*支付后前段立即跳转的地址*/
+}
+</code></pre>
+<h4 id="退款-1"><a href="#退款-1" class="headerlink" title="退款"></a>退款</h4><p>(TODO)</p>
+<h3 id="客服-模板-消息发送"><a href="#客服-模板-消息发送" class="headerlink" title="(客服/模板)消息发送"></a>(客服/模板)消息发送</h3><h4 id="微信客服消息"><a href="#微信客服消息" class="headerlink" title="微信客服消息"></a>微信客服消息</h4><ul>
+<li>请求方法：PUT  </li>
+<li>来源限制：与awp同网段的访问（通过请求头的<code>X-Forwarded-For</code>与<code>X-Real-IP</code>请求头判断，通过nginx反代访问的都会带上）  </li>
+<li>接口地址：<code>http://localhost:8083/msg/wx/kf</code>  </li>
+<li>请求参数：JSON格式，无需编码，详见<code>请求提示例</code>  </li>
+<li>响应格式：JSON</li>
+<li>响应内容：微信公众号模板消息接口返回的消息</li>
+</ul>
+<p>请求体示例：</p>
+<pre><code class="json">{
+    &quot;eid&quot;: 2,/*web项目使用的公众号在本项目中的用户ID*/
+    &quot;openId&quot;: &quot;of2333333333333333333333OBuk&quot;,/*用户OpenID*/
+    &quot;content&quot;: &quot;韩寒会画画后悔画韩红&quot;/*客服消息内容*/
+  }
+</code></pre>
+<p>响应体示例：</p>
+<pre><code class="json">{
+    &quot;errcode&quot;: 0,
+    &quot;errmsg&quot;: &quot;ok&quot;
+}
+</code></pre>
+<h4 id="微信模板消息"><a href="#微信模板消息" class="headerlink" title="微信模板消息"></a>微信模板消息</h4><ul>
+<li>请求方法：PUT  </li>
+<li>来源限制：与awp同网段的访问（通过请求头的<code>X-Forwarded-For</code>与<code>X-Real-IP</code>请求头判断，通过nginx反代访问的都会带上）  </li>
+<li>接口地址：<code>http://localhost:8083/msg/wx/tp</code>  </li>
+<li>请求参数：JSON格式，无需编码，详见<code>请求体示例</code>  </li>
+<li>响应格式：JSON</li>
+<li>响应内容：微信公众号模板消息接口返回的消息</li>
+</ul>
+<p>请求体示例：</p>
+<pre><code class="json">{
+    &quot;eid&quot;: 2,/*web项目使用的公众号在本项目中的用户ID*/
+    &quot;openId&quot;: &quot;of2333333333333333333333OBuk&quot;,/*用户OpenID*/
+    &quot;tmpId&quot;: &quot;6p233333333333333333333333333333333333333oM&quot;,/*模板ID*/
+    &quot;url&quot;: &quot;https://www.baidu.com&quot;,/*模板消息点击后跳转的地址*/
+    &quot;data&quot;: {/*按模板的字段填写具体的内容*/
+      &quot;first&quot;: &quot;航班延误&quot;,
+      &quot;keyword1&quot;: &quot;AA123&quot;,
+      &quot;keyword2&quot;: &quot;延误&quot;,
+      &quot;keyword3&quot;: &quot;北京-上海&quot;,
+      &quot;keyword4&quot;: &quot;2017-9-21&quot;,
+      &quot;remark&quot;: &quot;韩寒会画画后悔画韩红&quot;
+    }
+  }
+</code></pre>
+<p>响应体示例：</p>
+<pre><code class="json">{
+    &quot;errcode&quot;: 0,
+    &quot;errmsg&quot;: &quot;ok&quot;,
+    &quot;msgid&quot;: 439631104
+}
+</code></pre>
+<h4 id="支付宝客服消息"><a href="#支付宝客服消息" class="headerlink" title="支付宝客服消息"></a>支付宝客服消息</h4><p>(TODO)</p>
+<h4 id="支付宝模板消息"><a href="#支付宝模板消息" class="headerlink" title="支付宝模板消息"></a>支付宝模板消息</h4><ul>
+<li>请求方法：PUT  </li>
+<li>来源限制：与awp同网段的访问（通过请求头的<code>X-Forwarded-For</code>与<code>X-Real-IP</code>请求头判断，通过nginx反代访问的都会带上）  </li>
+<li>接口地址：<code>http://localhost:8083/msg/zfb/tp</code>  </li>
+<li>请求参数：JSON格式，无需编码，详见<code>请求体示例</code>  </li>
+<li>响应格式：JSON</li>
+<li>响应内容：微信公众号模板消息接口返回的消息</li>
+</ul>
+<p>与微信的类似，示例略。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2018/03/07/Sentry部署-配置与使用/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2018/01/03/解决Maxwell发送Kafka消息数据倾斜问题/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">47</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-weibo">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+    
+    <!-- V2EX -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Heaven's Door
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+<script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            SpringMVC中的WebSocket开发 | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,Java,SpringMVC,WebSocket">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/atelier-sulphurpool-dark.min.css?vmk0B/JQkDaJg8F60f4dyg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Heaven&#39;s Door">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="M4QKeJ2Iq5t7c8y6uaMaszxNWRqlD5n3vqzq24JY-dc" />
+    <meta name="baidu-site-verification" content="NNXLFEr6nK" />
+
+    <!-- RSS -->
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="SpringMVC中的WebSocket开发 | Heaven&#39;s Door">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="Java"> <meta property="og:article:tag" content="SpringMVC"> <meta property="og:article:tag" content="WebSocket"> 
+
+    
+        <meta property="article:published_time" content="Sat Jul 29 2017 15:26:32 GMT+0800">
+        <meta property="article:modified_time" content="Tue Dec 05 2017 04:03:28 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html",
+    "headline": "SpringMVC中的WebSocket开发",
+    "datePublished": "Sat Jul 29 2017 15:26:32 GMT+0800",
+    "dateModified": "Tue Dec 05 2017 04:03:28 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",Java,SpringMVC,WebSocketnull",
+    "description": "",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+    
+    
+        <div style="display: none;">
+    <script src="//s95.cnzz.com/z_stat.php?id=1260910303&web_id=1260910303" language="JavaScript"></script>
+</div>
+    
+
+    <!-- Custom Head -->
+    
+        
+            <script>var _hmt = _hmt || [];(function() {var hm = document.createElement('script');hm.src = 'https://hm.baidu.com/hm.js?f9fd08e08bf7d91fcc3d21ec87e2250f';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hm, s);})();</script>
+        
+    
+
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#SpringMVC中的WebSocket开发"><span class="post-toc-number">1.</span> <span class="post-toc-text"><a href="#SpringMVC&#x4E2D;&#x7684;WebSocket&#x5F00;&#x53D1;" class="headerlink" title="SpringMVC&#x4E2D;&#x7684;WebSocket&#x5F00;&#x53D1;"></a>SpringMVC&#x4E2D;&#x7684;WebSocket&#x5F00;&#x53D1;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#WebSocket简介"><span class="post-toc-number">1.1.</span> <span class="post-toc-text"><a href="#WebSocket&#x7B80;&#x4ECB;" class="headerlink" title="WebSocket&#x7B80;&#x4ECB;"></a>WebSocket&#x7B80;&#x4ECB;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#WebSocket背景"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text"><a href="#WebSocket&#x80CC;&#x666F;" class="headerlink" title="WebSocket&#x80CC;&#x666F;"></a>WebSocket&#x80CC;&#x666F;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支持情况"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text"><a href="#&#x652F;&#x6301;&#x60C5;&#x51B5;" class="headerlink" title="&#x652F;&#x6301;&#x60C5;&#x51B5;"></a>&#x652F;&#x6301;&#x60C5;&#x51B5;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Java-实现方法"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text"><a href="#Java-&#x5B9E;&#x73B0;&#x65B9;&#x6CD5;" class="headerlink" title="Java &#x5B9E;&#x73B0;&#x65B9;&#x6CD5;"></a>Java &#x5B9E;&#x73B0;&#x65B9;&#x6CD5;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#适用场景"><span class="post-toc-number">1.1.4.</span> <span class="post-toc-text"><a href="#&#x9002;&#x7528;&#x573A;&#x666F;" class="headerlink" title="&#x9002;&#x7528;&#x573A;&#x666F;"></a>&#x9002;&#x7528;&#x573A;&#x666F;</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Spring-MVC的WebSocket开发实战"><span class="post-toc-number">1.2.</span> <span class="post-toc-text"><a href="#Spring-MVC&#x7684;WebSocket&#x5F00;&#x53D1;&#x5B9E;&#x6218;" class="headerlink" title="Spring MVC&#x7684;WebSocket&#x5F00;&#x53D1;&#x5B9E;&#x6218;"></a>Spring MVC&#x7684;WebSocket&#x5F00;&#x53D1;&#x5B9E;&#x6218;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Nginx配置"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text"><a href="#Nginx&#x914D;&#x7F6E;" class="headerlink" title="Nginx&#x914D;&#x7F6E;"></a>Nginx&#x914D;&#x7F6E;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Maven依赖"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text"><a href="#Maven&#x4F9D;&#x8D56;" class="headerlink" title="Maven&#x4F9D;&#x8D56;"></a>Maven&#x4F9D;&#x8D56;</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#WebSocket相关的类"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text"><a href="#WebSocket&#x76F8;&#x5173;&#x7684;&#x7C7B;" class="headerlink" title="WebSocket&#x76F8;&#x5173;&#x7684;&#x7C7B;"></a>WebSocket&#x76F8;&#x5173;&#x7684;&#x7C7B;</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#实现WebSocketConfigurer"><span class="post-toc-number">1.2.3.1.</span> <span class="post-toc-text"><a href="#&#x5B9E;&#x73B0;WebSocketConfigurer" class="headerlink" title="&#x5B9E;&#x73B0;WebSocketConfigurer"></a>&#x5B9E;&#x73B0;WebSocketConfigurer</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#实现WebSocketHandler接口"><span class="post-toc-number">1.2.3.2.</span> <span class="post-toc-text"><a href="#&#x5B9E;&#x73B0;WebSocketHandler&#x63A5;&#x53E3;" class="headerlink" title="&#x5B9E;&#x73B0;WebSocketHandler&#x63A5;&#x53E3;"></a>&#x5B9E;&#x73B0;WebSocketHandler&#x63A5;&#x53E3;</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#实现HandshakeInterceptor接口"><span class="post-toc-number">1.2.3.3.</span> <span class="post-toc-text"><a href="#&#x5B9E;&#x73B0;HandshakeInterceptor&#x63A5;&#x53E3;" class="headerlink" title="&#x5B9E;&#x73B0;HandshakeInterceptor&#x63A5;&#x53E3;"></a>&#x5B9E;&#x73B0;HandshakeInterceptor&#x63A5;&#x53E3;</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#业务层的封装"><span class="post-toc-number">1.2.3.4.</span> <span class="post-toc-text"><a href="#&#x4E1A;&#x52A1;&#x5C42;&#x7684;&#x5C01;&#x88C5;" class="headerlink" title="&#x4E1A;&#x52A1;&#x5C42;&#x7684;&#x5C01;&#x88C5;"></a>&#x4E1A;&#x52A1;&#x5C42;&#x7684;&#x5C01;&#x88C5;</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#页面-amp-amp-js"><span class="post-toc-number">1.2.4.</span> <span class="post-toc-text"><a href="#&#x9875;&#x9762;-amp-amp-js" class="headerlink" title="&#x9875;&#x9762;&amp;&amp;js"></a>&#x9875;&#x9762;&amp;&amp;js</span></a></li></ol></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/snow.png)">
+    
+            <p class="article-headline-p">
+                SpringMVC中的WebSocket开发
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>7月 29, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Java/">Java</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/SpringMVC/">SpringMVC</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/WebSocket/">WebSocket</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=SpringMVC中的WebSocket开发&url=https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=SpringMVC中的WebSocket开发&url=https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=SpringMVC中的WebSocket开发&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/index.html&text=SpringMVC中的WebSocket开发" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="SpringMVC中的WebSocket开发"><a href="#SpringMVC中的WebSocket开发" class="headerlink" title="SpringMVC中的WebSocket开发"></a>SpringMVC中的WebSocket开发</h1><h2 id="WebSocket简介"><a href="#WebSocket简介" class="headerlink" title="WebSocket简介"></a>WebSocket简介</h2><h3 id="WebSocket背景"><a href="#WebSocket背景" class="headerlink" title="WebSocket背景"></a>WebSocket背景</h3><p>在WebSocket出现之前，服务器的状态更新想要通知客户端，只能由客户端发起轮询（如Ajax）， 即在特定的的时间间隔（如每1秒），由浏览器对服务器发出HTTP request，然后由服务器返回最新的数据给客服端的浏览器。这种传统的HTTP request 的模式带来很明显的缺点 – 浏览器需要不断的向服务器发出请求，然而HTTP request 的header是非常长的，里面包含的有用数据可能只是一个很小的值，这样会占用很多的带宽。<br>WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket通讯协议于2011年被IETF定为标准RFC 6455，WebSocketAPI被W3C定为标准。<br>在WebSocket API中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。WebSocket不仅允许服务器和客户端双向通信，而且互相沟通的Header是很小的-大概只有 2 Bytes。</p>
+<h3 id="支持情况"><a href="#支持情况" class="headerlink" title="支持情况"></a>支持情况</h3><ul>
+<li>Spring： Spring从4.0开始加入了spring-websocket这个模块，并能够全面支持WebSocket，它与Java WebSocket API标准（JSR-356）保持一致，同时提供了额外的服务。</li>
+<li>浏览器：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">浏览器</th>
+<th style="text-align:center">支持的版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Chrome</td>
+<td style="text-align:center">4+</td>
+</tr>
+<tr>
+<td style="text-align:center">Firefox</td>
+<td style="text-align:center">4+</td>
+</tr>
+<tr>
+<td style="text-align:center">Internet Explorer</td>
+<td style="text-align:center">10+</td>
+</tr>
+<tr>
+<td style="text-align:center">Opera</td>
+<td style="text-align:center">10+</td>
+</tr>
+<tr>
+<td style="text-align:center">Safari</td>
+<td style="text-align:center">5+</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>服务端：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">服务器</th>
+<th style="text-align:center">支持的版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">jetty</td>
+<td style="text-align:center">7.0.1+</td>
+</tr>
+<tr>
+<td style="text-align:center">tomcat</td>
+<td style="text-align:center">7.0.27+</td>
+</tr>
+<tr>
+<td style="text-align:center">Nginx</td>
+<td style="text-align:center">1.3.13+</td>
+</tr>
+<tr>
+<td style="text-align:center">resin</td>
+<td style="text-align:center">4+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Java-实现方法"><a href="#Java-实现方法" class="headerlink" title="Java 实现方法"></a>Java 实现方法</h3><p>在 Spring 端可以有以下几种方法使用 WebSocket：</p>
+<ol>
+<li>使用 Java EE7 的方式</li>
+<li>使用 Spring 提供的接口</li>
+<li>使用 STOMP 协议以及 Spring 的 MVC</li>
+</ol>
+<p>本文使用Spring提供的接口，实现起来比较简单。</p>
+<h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><p>客户端和服务器需要 <strong>高频率</strong> <strong>低延迟</strong> 交换事件的时候。基本的候选包括但不限于，金融、游戏、合作、以及其他应用。这些应用对时间延迟很敏感，还需要以高频率交换大量的消息。</p>
+<h2 id="Spring-MVC的WebSocket开发实战"><a href="#Spring-MVC的WebSocket开发实战" class="headerlink" title="Spring MVC的WebSocket开发实战"></a>Spring MVC的WebSocket开发实战</h2><h3 id="Nginx配置"><a href="#Nginx配置" class="headerlink" title="Nginx配置"></a>Nginx配置</h3><p>我们知道，WebSocket握手需要在HTTP请求头里增加<code>Upgrade</code>和<code>Connection</code>字段，以便向服务申请将连接升级为WebSocket。<br>但如果tomcat服务器使用了Nginx作为反向代理，那么默认是不会转发这两个请求头的，所以需要手动设置这两个HTTP请求头。<br>应在<code>nginx.conf</code>对应域名<code>server</code>配置里面的<code>location</code>配置中增加：  </p>
+<pre><code class="bash">proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection &quot;upgrade&quot;;
+</code></pre>
+<p>###</p>
+<h3 id="Maven依赖"><a href="#Maven依赖" class="headerlink" title="Maven依赖"></a>Maven依赖</h3><p>在pom.xml文件中增加以下依赖：</p>
+<pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-websocket&lt;/artifactId&gt;
+    &lt;version&gt;${spring-version}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h3 id="WebSocket相关的类"><a href="#WebSocket相关的类" class="headerlink" title="WebSocket相关的类"></a>WebSocket相关的类</h3><h4 id="实现WebSocketConfigurer"><a href="#实现WebSocketConfigurer" class="headerlink" title="实现WebSocketConfigurer"></a>实现WebSocketConfigurer</h4><p>对Spring WebSocket进行配置，可以通过xml配置文件的方式，也可以通过实现WebSocketConfigurer接口进行配置：</p>
+<pre><code class="java">@Configuration
+@EnableWebSocket
+public class WebSocketConfig extends WebMvcConfigurerAdapter implements WebSocketConfigurer {
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(SystemWebSocketHandler.getInstance(),&quot;/webSocketServer&quot;) //注册WebSocket处理的类的、及监听/映射路径
+                .addInterceptors(new WebSocketHandshakeInterceptor()); //注册WebSocket握手的拦截器
+
+        registry.addHandler(SystemWebSocketHandler.getInstance(), &quot;/sockjs/webSocketServer&quot;) //注册WebSocket处理的类的、及监听/映射路径
+                .addInterceptors(new WebSocketHandshakeInterceptor()) //注册WebSocket握手的拦截器
+                .withSockJS(); //设定支持SockJS
+    }
+}
+</code></pre>
+<p>我们设置了两个监听的路径，第一个是传统的WebSocket，第二个是支持SockJS的。SockJS是一个JavaScript库，提供跨浏览器JavaScript的API，创建了一个低延迟、全双工的浏览器和web服务器之间通信通道。SockJS的API的命名方式基本上也和 WebSocket 一样，并且支持自动降级到AJAX轮询（降级顺序依次为：websocket -&gt; html strea m -&gt; long polling -&gt; ajaxjsonp），因此可以很好地跨浏览器工作。<br>在配置文件里，我们设定了<code>SystemWebSocketHandler</code>类（实现<code>WebSocketHandler</code>接口，类似Controller）作为WebSocket各种事件的处理器，以及设定<code>WebSocketHandshakeInterceptor</code>类（实现<code>HandshakeInterceptor</code>接口）作为WebSocket协议握手的拦截器，这两个类时我们自己实现的，将在下文细述。</p>
+<h4 id="实现WebSocketHandler接口"><a href="#实现WebSocketHandler接口" class="headerlink" title="实现WebSocketHandler接口"></a>实现WebSocketHandler接口</h4><p>WebSocketHandler接口为WebSocket事件处理器接口，有以下方法需要实现：</p>
+<pre><code class="java">public interface WebSocketHandler {
+    //WebSocket连接建立后的回调方法
+    void afterConnectionEstablished(WebSocketSession var1) throws Exception;
+    //接收到WebSocket消息后的处理方法
+    void handleMessage(WebSocketSession var1, WebSocketMessage&lt;?&gt; var2) throws Exception;
+    //WebSocket传输发生错误时的处理方法
+    void handleTransportError(WebSocketSession var1, Throwable var2) throws Exception;
+    //WebSocket连接关闭后的回调方法
+    void afterConnectionClosed(WebSocketSession var1, CloseStatus var2) throws Exception;
+    //是否处理WebSocket分段消息
+    boolean supportsPartialMessages();
+}
+</code></pre>
+<p>对于业务逻辑而言，我们主要关注<code>afterConnectionEstablished()</code>方法（进行一些初始化工作），以及<code>handleMessage()</code>方法（处理页面发出的消息）。其余方法的实现内容相对固定，发生错误和连接关闭应该响应地关闭一些资源，至于分段消息，暂时用不到，可以直接返回<code>false</code>。<br>下面给出一个简单的实现：</p>
+<pre><code class="java">/**
+ * 实现WebSocketHandler接口,作为WebSocket各种事件的处理器
+ *
+ * @author leibniz
+ */
+public class SystemWebSocketHandler implements WebSocketHandler {
+    private static Logger LOG;
+
+    /**
+     * 维护所有已创建的WebSocket Session，key为用户ID（OpenID或管理员的名字）
+     * 考虑到一个用户可能打开多个页面（如管理员可能在手机和PC登录，且多个人用同一个账号），这里使用Guava的Multimap来缓存
+     */
+    private static Multimap&lt;String, WebSocketSession&gt; WS_SESSION_MAP;
+
+    /**
+     * 单例的对象
+     */
+    private static final SystemWebSocketHandler INSTANCE = new SystemWebSocketHandler();
+
+    public static SystemWebSocketHandler getInstance(){
+        return INSTANCE;
+    }
+
+    /**
+     * WebSocketSession中保存当前用户ID的Attribute key
+     */
+    static final String WEBSOCKET_USERID = &quot;WS_USERID&quot;;
+
+    /**
+     * 默认构造器，初始化日志对象和Session缓存Map
+     */
+    private SystemWebSocketHandler(){
+        LOG = LoggerFactory.getLogger(SystemWebSocketHandler.class);
+        WS_SESSION_MAP = HashMultimap.create();
+    }
+
+    /**
+     * 建立连接后，将用户ID和WebSocketSession对象的映射保存到WS_SESSION_MAP
+     *
+     * @param session WebSocketSession 对象
+     * @throws Exception 接口方法声明的异常
+     *
+     * @author Leibniz
+     */
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        LOG.debug(&quot;connect to the websocket success......&quot;);
+        String userId = (String) session.getAttributes().get(WEBSOCKET_USERID);
+        WS_SESSION_MAP.put(userId, session);
+    }
+
+    /**
+     * 接收到WebSocket消息后的处理方法vvvvv
+     * 暂不处理
+     *
+     * @param webSocketSession WebSocketSession对象
+     * @param webSocketMessage 页面发送的WebSocketMessage消息对象
+     * @throws Exception 接口方法声明的异常
+     * @author Leibniz
+     */
+    @Override
+    public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage&lt;?&gt; webSocketMessage) throws Exception {
+
+    }
+
+    /**
+     * WebSocket传输发生错误时，关闭WebSocketSession，并从WS_SESSION_MAP中删除
+     *
+     * @param session WebSocketSession对象
+     * @param exception 异常
+     * @throws Exception 接口方法声明的异常
+     *
+     * @author Leibniz
+     */
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        if(session.isOpen()){
+            session.close();
+        }
+        LOG.debug(&quot;websocket connection closed......&quot;);
+        for(Map.Entry&lt;String, WebSocketSession&gt; entry : WS_SESSION_MAP.entries()){
+            if(entry.getValue().equals(session)){
+                WS_SESSION_MAP.remove(entry.getKey(), session);
+            }
+        }
+    }
+
+    /**
+     * WebSocket连接关闭后，从WS_SESSION_MAP中删除对应WebSocketSession
+     *
+     * @param session  WebSocketSession对象
+     * @param closeStatus 关闭状态
+     * @throws Exception 接口方法声明的异常
+     *
+     * @author Leibniz
+     */
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+        LOG.debug(&quot;websocket connection closed......&quot;);
+        for(Map.Entry&lt;String, WebSocketSession&gt; entry : WS_SESSION_MAP.entries()){
+            if(entry.getValue().equals(session)){
+                WS_SESSION_MAP.remove(entry.getKey(), session);
+            }
+        }
+    }
+
+    /**
+     * 不支持分段消息
+     * @return false
+     */
+    @Override
+    public boolean supportsPartialMessages() {
+        return false;
+    }
+
+    /**
+     * 给所有在线用户发送消息
+     *
+     * @param message 需要发送的消息对象
+     *
+     * @author Leibniz
+     */
+    public void sendMessageToUsers(TextMessage message) {
+        for (WebSocketSession user : WS_SESSION_MAP.values()) {
+            try {
+                if (user.isOpen()) {
+                        user.sendMessage(message);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 给某个用户发送消息
+     *
+     * @param userId 用户ID（OpenID或管理员的名字）
+     * @param message 需要发送的消息对象
+     *
+     * @author Leibniz
+     */
+    public void sendMessageToUser(String userId, TextMessage message) {
+        Collection&lt;WebSocketSession&gt; users = WS_SESSION_MAP.get(userId);
+        try {
+            for(WebSocketSession user : users){
+                if (user != null &amp;&amp; user.isOpen()) {
+                    user.sendMessage(message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p>值得注意的是，使用<code>WebSocketSession.sendMessage()</code>方法可以向指定用户页面发送消息。</p>
+<h4 id="实现HandshakeInterceptor接口"><a href="#实现HandshakeInterceptor接口" class="headerlink" title="实现HandshakeInterceptor接口"></a>实现HandshakeInterceptor接口</h4><p>HandshakeInterceptor接口为WebSocket握手拦截器接口，包含以下方法：</p>
+<pre><code class="java">public interface HandshakeInterceptor {
+    //建立WebSocket连接、握手前的处理方法
+    boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map&lt;String, Object&gt; attributes) throws Exception;
+    //建立WebSocket连接、握手后的处理方法
+    void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception);
+}
+</code></pre>
+<p>在前面的WebSocket配置类里面，这个接口的实现类用于拦截WebSocket连接握手，在握手前后都可以拦截。<br>我们的应用里用到这个握手拦截器，主要是因为在WebSocketHandler接口的方法中，只能拿到WebSocketSession对象，无法直接与用户请求的HttpSession建立关联。<br>而在握手拦截器中，通过ServerHttpRequest对象可以拿到关于当前用户、当前连接的很多相关信息，包括HttpSession及其属性；同时通过attributes参数可以设置最终生成的WebSocketSession对象的属性；从而WebSocketSession和HttpSession就可以建立起关联。<br>从一个简单的实现类中就可以清晰看到这一点：</p>
+<pre><code class="java">public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
+
+    private static Logger LOG = LoggerFactory.getLogger(HandshakeInterceptor.class);
+
+    /**
+     * 建立WebSocket连接、握手前的处理方
+     * 从HttpSession读取当前用户的用户ID（OpenID或管理员的名字），写入attributes
+     *
+     * @param request Http请求对象
+     * @param response Http响应对象
+     * @param wsHandler WebSocketHandler实现类的实例，这里是SystemWebSocketHandler类
+     * @param attributes 握手生成的WebSocketSession对象的属性
+     * @return 是否成功
+     * @throws Exception 接口方法声明的异常
+     *
+     * @author Leibniz
+     */
+    @Override
+    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map&lt;String, Object&gt; attributes) throws Exception {
+        if (request instanceof ServletServerHttpRequest) {
+            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+            HttpSession session = servletRequest.getServletRequest().getSession(false);
+            if (session != null) {
+                //使用userName区分WebSocketHandler，以便定向发送消息
+                String userId = (String) session.getAttribute(RegisterLoginController.OPENID_KEY);//普通用户是OpenID
+                String adminUserId = (String) session.getAttribute(AdminUserController.USER_NAME);//管理员用户是用户名
+                if( null != adminUserId){
+                    //优先保存管理员的用户ID1
+                    attributes.put(WEBSOCKET_USERID, adminUserId);
+                } else {
+                    attributes.put(WEBSOCKET_USERID, userId);
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 建立WebSocket连接、握手后的处理方法
+     *
+     * @param request Http请求对象
+     * @param response Http响应对象
+     * @param wsHandler WebSocketHandler实现类的实例，这里是SystemWebSocketHandler类
+     * @param exception 抛出的异常
+     *
+     * @author Leibniz
+     */
+    @Override
+    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
+    }
+}
+</code></pre>
+<h4 id="业务层的封装"><a href="#业务层的封装" class="headerlink" title="业务层的封装"></a>业务层的封装</h4><p>实际的使用中，我们封装了一些类，包括WebSocket消息内容的实体类，以及发送消息的Service类（在Controller层触发了相应的事件时进行调用），以下代码仅供参考，请根据实际业务需求进行封装。</p>
+<pre><code class="java">/**
+ * WebSocket消息的统一封装
+ *
+ * @author Leibniz
+ */
+public class WebSocketMessage {
+    private ROLE role;//接受消息的角色，枚举，NORMAL=普通用户，ADMIN=客服/管理员
+    private String id;//用户ID（OpenID或管理员的名字）
+    private String event;//事件，实际上是数字，10001=客服确认借出，10002=客服确认归还，20001=用户申请租赁，20002=用户申请归还
+    private String msg;//事件消息，具体的文字描述，英文
+
+    public WebSocketMessage(ROLE role, String id, String event, String msg) {
+        this.role = role;
+        this.id = id;
+        this.event = event;
+        this.msg = msg;
+    }
+
+    @Override
+    public String toString() {
+        JSONObject json = new JSONObject();
+        json.put(&quot;role&quot;, this.role.toString());
+        json.put(&quot;id&quot;, this.id);
+        json.put(&quot;event&quot;, this.event);
+        json.put(&quot;msg&quot;, this.msg);
+        return json.toString();
+    }
+
+    enum ROLE {
+        NORMAL {
+            @Override
+            public String toString() {
+                return &quot;normal&quot;;
+            }
+        }, ADMIN {
+            @Override
+            public String toString() {
+                return &quot;admin&quot;;
+            }
+        }
+    }
+}
+
+/**
+ * 发送WebSocket消息的Service类
+ *
+ * @author Leibniz
+ */
+@Service
+public class WebSocketMessageService {
+    @Autowired
+    private AdminUserDao adminUserDao;
+    private List&lt;AdminUserEntity&gt; adminUserList;
+
+    /**
+      * 向普通用户发送客服确认借出消息
+     *
+      * @param openId 用户OpenID
+      * @author Leibniz
+      */
+    public void sendBorrowConfirm(String openId){
+        WebSocketMessage msg = new WebSocketMessage(NORMAL, openId, &quot;10001&quot;, &quot;admin_borrow_confirm&quot;);
+        SystemWebSocketHandler.getInstance().sendMessageToUser(openId, new TextMessage(msg.toString()));
+    }
+
+    /**
+     * 向普通用户发送客服确认归还消息
+     *
+     * @param openId 用户OpenID
+     * @author Leibniz
+     */
+    public void sendReturnConfirm(String openId){
+        WebSocketMessage msg = new WebSocketMessage(NORMAL, openId, &quot;10002&quot;, &quot;admin_return_confirm&quot;);
+        SystemWebSocketHandler.getInstance().sendMessageToUser(openId, new TextMessage(msg.toString()));
+    }
+
+    /**
+     * 向超级管理员及指定柜子对应的客服发送用户申请租赁的消息
+     *
+     * @param boxId 柜子ID
+     * @author Leibniz
+     */
+    public void sendBorrowApply(int boxId){
+        //检查管理员列表是否已加载
+        if(null == adminUserList){
+            adminUserList = adminUserDao.selectAllAdminUser();
+        }
+        for(AdminUserEntity adminUser : adminUserList) {
+            if(adminUser.getBoxId()== null || adminUser.getBoxId().equals(boxId)){
+                //当前遍历到的是超级管理员或指定柜子对应的客服
+                String adminName = adminUser.getUserName();
+                WebSocketMessage msg = new WebSocketMessage(ADMIN, adminName, &quot;20001&quot;, &quot;user_borrow_apply&quot;);
+                SystemWebSocketHandler.getInstance().sendMessageToUser(adminName, new TextMessage(msg.toString()));
+            }
+        }
+    }
+
+    /**
+     * 向超级管理员及指定柜子对应的客服发送用户申请归还的消息
+     *
+     * @param boxId 柜子ID
+     * @author Leibniz
+     */
+    public void sendReturnApply(Integer boxId){
+        //检查管理员列表是否已加载
+        if(null == adminUserList){
+            adminUserList = adminUserDao.selectAllAdminUser();
+        }
+        for(AdminUserEntity adminUser : adminUserList) {
+            if(adminUser.getBoxId() == null || adminUser.getBoxId().equals(boxId)) {
+                //当前遍历到的是超级管理员或指定柜子对应的客服
+                String adminName = adminUser.getUserName();
+                WebSocketMessage msg = new WebSocketMessage(ADMIN, adminName, &quot;20002&quot;, &quot;user_return_apply&quot;);
+                SystemWebSocketHandler.getInstance().sendMessageToUser(adminName, new TextMessage(msg.toString()));
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="页面-amp-amp-js"><a href="#页面-amp-amp-js" class="headerlink" title="页面&amp;&amp;js"></a>页面&amp;&amp;js</h3><p>页面需要引入SockJS，js中需要初始化WebSocket并建立链接（前面在WebSocketConfig类中配置的映射路径）。</p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;/&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;msgcount&quot;&gt;&lt;/div&gt;
+&lt;script src=&quot;../js/libs/jquery-2.0.2.min.js&quot; th:src=&quot;@{/js/libs/jquery-2.0.2.min.js}&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;../js/sockjs.min.js&quot; th:src=&quot;@{/js/sockjs.min.js}&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    if(typeof $basePath === &quot;undefined&quot;){
+        window.$basePath = &quot;/breo/&quot;;
+    }
+    var websocket;
+    //根据当前浏览器支持的WebSocket对象类型进行初始化
+    if (&#39;WebSocket&#39; in window) {
+        //浏览器内置WebSocket API
+        websocket = new WebSocket(&quot;ws://&quot;+window.location.host+$basePath+&quot;webSocketServer&quot;);
+    } else if (&#39;MozWebSocket&#39; in window) {
+        //Firefox浏览器
+        websocket = new MozWebSocket(&quot;ws://&quot;+window.location.host+$basePath+&quot;webSocketServer&quot;);
+    } else {
+        //其他浏览器，或不支持WebSocket
+        websocket = new SockJS(&quot;http://&quot;+window.location.host+$basePath+&quot;sockjs/webSocketServer&quot;);
+    }
+    //WebSocket连接打开的回调方法
+    websocket.onopen = function (evnt) {
+    };
+    //页面接收到WebSocket消息的回调方法
+    websocket.onmessage = function (evnt) {
+        var msg = JSON.parse(evnt.data);
+        console.log(msg);
+        if(msg.role === &quot;normal&quot; &amp;&amp; msg.event === &quot;10001&quot;){
+            $(&quot;#msgcount&quot;).html(&quot;&lt;font color=&#39;red&#39;&gt;&quot;+JSON.stringify(msg)+&quot;&lt;/font&gt;&quot;)
+        }
+    };
+    //WebSocket发生错误的回调方法
+    websocket.onerror = function (evnt) {
+    };
+    //WebSocket连接关闭的回调方法
+    websocket.onclose = function (evnt) {
+    }
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2017/07/29/SpringMVC中的WebSocket开发/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/07/31/LinkedList源码阅读笔记/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/07/11/ArrayList源码阅读笔记/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">47</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-weibo">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+    
+    <!-- V2EX -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Heaven's Door
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+<script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('<link rel="stylesheet" href="/css/uc.css">');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
