@@ -3,8 +3,165 @@
   
     
     <entry>
+      <title><![CDATA[《Scala实用指南》读书笔记(二)]]></title>
+      <url>/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/</url>
+      <content type="html"><![CDATA[<h1 id="第6章-函数值与闭包"><a href="#第6章-函数值与闭包" class="headerlink" title="第6章 函数值与闭包"></a>第6章 函数值与闭包</h1><ul>
+<li>柯里化: 一个有分组参数的函数,如<code>f(a:A)(b:B):C</code>,使用<code>f _</code>创建一个部分应用函数(此处类型为<code>A =&gt; (B =&gt; C)</code>),可以用于创建可复用的临时便利函数;</li>
+<li>多组参数的函数,如果有单独成组的函数参数,可以不使用小括号,直接用大括号,更直观,如<code>f(a:Int)(g:A=&gt;B)</code>可以这样调用:<code>f(1) {a =&gt; xxx(a)}</code></li>
+<li>用下划线代表函数值的参数时,如果无法判断类型,scala会报错,此时可以显式指定类型</li>
+<li>scala自动将函数名视作函数值的引用</li>
+<li>函数或代码块可能含有未绑定的变量,在调用前根据上下文绑定,形成闭包(closure);绑定的时候不会复制相应变量的值,实际上会绑定到变量本身,因此线程不安全</li>
+</ul>
+<h1 id="第7章-特质"><a href="#第7章-特质" class="headerlink" title="第7章 特质"></a>第7章 特质</h1><ul>
+<li>在trait中定义并初始化的val/var变量，将会在混入了该trait的累的内部实现；定义并<strong>未</strong>初始化的val/var变量被认为是抽象的,混入该trait的类需要实现他们</li>
+<li>类混入trait的时候,如果类没用用<code>extends</code>,则第一个<code>trait</code>用<code>extends</code>,后面的<code>trait</code>用<code>with</code>;如果类已经用<code>extends</code>了,那么所有<code>trait</code>都用<code>with</code>来混入</li>
+<li>混入了trait的类可以调用trait的方法, 其实例引用也可以多态为trait实例</li>
+<li>trait的构造器不接收任何参数</li>
+<li>选择性混入: 可以对没有混入trait的类的实例混入trait,即只有该实例混入了trait,该类其他实例没有,也是用<code>with</code>进行混入,如:  </li>
+</ul>
+<pre><code class="scala">val angle = new Cat(&quot;Angle&quot;) with Friend`
+</code></pre>
+<ul>
+<li>在trait中,使用super调用的方法会触发延迟绑定(late binding),此时并非对基类方法的调用,而是转发到混入该trait的类中,如果混入了多个这样的trait(有同样父类方法,即extends自同一个trait或抽象类),那么从右向左,混入下一个trait直到混入到类, 例如:  </li>
+</ul>
+<pre><code class="scala">abstract class Check {def check:String = &quot;Abstract check...&quot;}
+trait CreditCheck extends Check {override def check:Stirng = s&quot;Credit...${super.check}&quot;} //并非调用父类方法,而是转发到下一个trait或类
+trait MoneyCheck extends Check {override def check:Stirng = s&quot;Money...${super.check}&quot;} 
+trait HouseCheck extends Check {override def check:Stirng = s&quot;House...${super.check}&quot;}
+val app1 = new Check with MoneyCheck with CreditCheck
+println(app1.check) //根据混入的顺序,打印 Credit...Money...Abstract check...
+val app2 = new Check with CreditCheck with HouseCheck
+println(app2.check) //根据混入的顺序,打印 House...Credit...Abstract check...
+</code></pre>
+<ul>
+<li>如果基类的方法是抽象的,那么方法绑定必须推迟到某个具体的方法已知为止;同样是从右到左的顺序连接混入trait,这样可以避免方法冲突的问题</li>
+</ul>
+<h1 id="第8章-集合"><a href="#第8章-集合" class="headerlink" title="第8章 集合"></a>第8章 集合</h1><ul>
+<li>Scala对元素较少的Set进行了优化,4个元素以内的Set有专门的实现类(<code>Set0</code>,<code>Set1</code>,<code>Set2</code>,<code>Set3</code>,<code>Set4</code>),大于4个元素的使用HashSet实现</li>
+<li>Set的方法(<code>filter</code>,<code>map</code>,<code>foreach</code>这些就不说了):  <ul>
+<li><code>mkString</code>: 允许传入一个分隔符,相当于把集合所有元素用分隔符join起来返回字符串</li>
+<li><code>++</code>: 合并两个Set,或者说,并集</li>
+<li><code>&amp;</code>: 两个Set的交集</li>
+</ul>
+</li>
+<li>Map的方法:  <ul>
+<li><code>filterKeys</code>: 根据key去过滤,而<code>filter</code>方法是根据(key,value)键值对去过滤</li>
+<li><code>get</code>: 根据key拿value,注意是返回<code>Option[T]</code></li>
+<li><code>updated(K,V)</code>: 增加或更新键值对,返回新的Map,也可以用<code>X() = b</code>,等效于<code>X.updated(b)</code></li>
+</ul>
+</li>
+<li>List的<code>a :: list</code>读作<code>将a前插到list</code>,后面的list才是::方法的调用者; 而<code>list1 ::: list2</code>将list1前插到list2</li>
+<li>List的<code>forall()</code>方法判断是否所有元素都满足条件, <code>exists()</code>方法判断是否有任意元素满足条件. 其实分别相当于:</li>
+</ul>
+<pre><code class="scala">list.forall(f) 等效于 (true /: list) {_ &amp;&amp; f(_)}
+list.exists(f) 等效于 (false /: list) {_ || f(_)}
+</code></pre>
+<ul>
+<li>如果方法名以 <code>:</code> 结尾, 那么调用时的主语是操作符后面的实例, 即<code>a (操作符): b</code>等效于<code>b.操作符:(a)</code>;同时scala不允许字母作为操作符的名称,除非用下划线对操作符增加前缀,如<code>jump_:()</code></li>
+<li><code>+ - ! ~</code>作一元操作符时,也是调用的主语在操作符后面,分别映射到<code>unary_+(),unary_-(),unary_!(),unary_~()</code>等方法的调用,即<code>-a</code>调用<code>a.unary_-()</code>等</li>
+<li>for表达式:<code>for([parrten &lt;- generator; definition*&gt;]+;filter;) [yield] expression</code>,可以加过滤条件,而yield也是可选的,有yield的时候返回一个值列表,没有yield的时候返回Unit</li>
+</ul>
+<h1 id="第9章-模式匹配和正则表达式"><a href="#第9章-模式匹配和正则表达式" class="headerlink" title="第9章 模式匹配和正则表达式"></a>第9章 模式匹配和正则表达式</h1><ul>
+<li>匹配List的时候,可以只获取感兴趣的元素,剩下的用<code>_*</code>省略, 如:  </li>
+</ul>
+<pre><code class="scala">list match {
+  case List(head,&quot;test&quot;, _*) =&gt; f(head) //后面的直接忽略
+  case List(&quot;test&quot;, others @ _*) =&gt; f(others) //后面的tail要引用
+  case &quot;haha&quot;::&quot;two&quot;::tail =&gt; f(tail) //这样其实也行
+}
+</code></pre>
+<ul>
+<li>scala的模式匹配case子句无需break</li>
+<li>scala约定模式变量名以小写字母开头(scala假设他是模式变量),常量为大写字母(会在作用域范围查找变量)</li>
+<li>不遵守以上规则的时候, 比如需要用模式匹配以外的变量, 可以显式指定作用域(如<code>this.max</code>),或用反引号 <code>` </code> 包住变量名(如<code>`max` </code>)</li>
+<li>case类用于创建轻量级值对象,经常用于模式匹配；如果主构造器无参数，调用时又没加括号，那么传递的是case类的伴生对象（混合了Function0特质，可以视为函数）</li>
+<li>可使用自定义的提取器进行模式匹配，提取器在伴生对象中有<code>unapply()</code>方法,接受我们想要匹配的值,返回Boolean(传入的值是否可以匹配),例如:  </li>
+</ul>
+<pre><code class="scala">object Symbol {
+  def unapply(s:String):Boolean = s == &quot;TEST&quot;
+}
+input match {
+  case Symbol() =&gt; println(s&quot;matched, ${input}&quot;) //即匹配 TEST
+  case _ =&gt; println(s&quot;Invalid input: ${input}&quot;)
+}
+</code></pre>
+<ul>
+<li>提取器还可以返回Boolean型以外的结果,即解析的结果,通过修改<code>unapply()</code>的返回类型实现(返回<code>Option[T]</code>,<code>T</code>即解析成功的结果类型), 例如:  </li>
+</ul>
+<pre><code class="scala">object Splitor {
+  def unapply(s:String):Option[(String,String)] = if(!s.contains(&quot;:&quot;)) None else {
+    val splited = s.split(&quot;:&quot;)
+    Some((splited(0), splited(1)))
+  }
+}
+input match {
+  case Splitor(a,b) =&gt; println(s&quot;matched, ${a} and ${b}&quot;) //即匹配 ***:***
+  case _ =&gt; println(s&quot;Invalid input: ${input}&quot;)
+}
+</code></pre>
+<ul>
+<li>使用提取器的时候还可以应用其他提取器进行模式匹配,如</li>
+</ul>
+<pre><code class="scala">input match {
+  case Splitor(a @ Symbol(),b) =&gt; println(s&quot;matched, ${a} and ${b}&quot;) //即匹配 TEST:***
+  case _ =&gt; println(s&quot;Invalid input: ${input}&quot;)
+}
+</code></pre>
+<ul>
+<li>正则表达式: <code>&quot;regex&quot;.r</code>(可以用原始字符串<code>&quot;&quot;&quot;regex&quot;&quot;&quot;.r</code>), 实际上是<code>String</code>隐式转换成<code>StringOps</code>再调用其<code>r</code>方法获取<code>Regex</code>类实例</li>
+<li>正则表达式的方法:  <ul>
+<li><code>findFirstIn(source)</code>: 获取正则表达式第一个匹配项</li>
+<li><code>findAllIn(source)</code>: 获取正则表达式的所有匹配项</li>
+<li><code>replaceFirstIn(source, replacement)</code>: 替换第一个匹配项</li>
+<li><code>replaceAllIn(source, replacement)</code>: 替换所有匹配项</li>
+</ul>
+</li>
+<li>scala的正则表达式是提取器,返回值是匹配项(括号的分组)拼接成的元组</li>
+<li>下划线的作用:  <ul>
+<li>包引入的通配符</li>
+<li>元组索引的前缀</li>
+<li>函数值的隐式参数</li>
+<li>用默认值初始化变量</li>
+<li>在函数名中混合操作符和:</li>
+<li>在模式匹配中作为通配符</li>
+<li>处理异常时在catch代码块和case一起用(类似模式匹配了)</li>
+<li>作为分解操作的一部分,如<code>max(arg: _*)</code>可以接受列表或数组参数,自动拆解成离散的值传递给可变长度参数</li>
+<li>部分应用一个函数,如<code>val square = Math.pow(_:Int, 2)</code>部分应用了pow函数,返回一个新的单参数函数</li>
+</ul>
+</li>
+</ul>
+<h1 id="第10章-处理异常"><a href="#第10章-处理异常" class="headerlink" title="第10章 处理异常"></a>第10章 处理异常</h1><ul>
+<li>Java处理多个异常时,会检查多个异常的处理顺序,子类必须在前面,否则编译会出错(<code>exception ***.*** has already been caught</code>),但scala对此不会警告,要自己注意(在catch块中使用case匹配的顺序)</li>
+<li>这本书竟然没有讲到<code>Try</code>类,吐槽一下</li>
+</ul>
+<h1 id="第11章-递归"><a href="#第11章-递归" class="headerlink" title="第11章 递归"></a>第11章 递归</h1><ul>
+<li>尾递归优化(Tail Recursive Optimization): 不是尾递归的时候,递归调用在字节码对应<code>invokespecial</code>指令,表明是递归调用,会产生新一层栈;如果写成尾递归, 递归调用时在字节码对应<code>goto</code>指令,表明使用了迭代而非方法调用,放弃了当前的上下文</li>
+<li><code>@scala.annotation.tailrec</code>注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质</li>
+<li>蹦床调用(trampoline call): 两个函数互相调用(f调用g,g调用f)构成递归, 对于蹦床调用即使是尾递归<code>@tailrec</code>注解也会报错(scala不能识别跨方法的递归);此时可以用<code>TailRec</code>类解决:  <ul>
+<li>蹦床调用的函数返回<code>TailRec[T]</code>,其中<code>T</code>是真正的返回值类型</li>
+<li>蹦床调用的函数内部,需要结束递归时返回<code>done(结果: T)</code>,需要递归调用其他函数时返回<code>tailcall(其他函数())</code>;这两者都只是简单包装参数,以供后续调用或延迟执行</li>
+<li>外部调用这些函数时, 对返回值<code>TailRec[T]</code>调用<code>result</code>方法可以获取最终递归结果;真正发生计算是调用<code>result</code>方法的时候</li>
+</ul>
+</li>
+</ul>
+<h1 id="第12章-惰性求值和并行集合"><a href="#第12章-惰性求值和并行集合" class="headerlink" title="第12章 惰性求值和并行集合"></a>第12章 惰性求值和并行集合</h1><ul>
+<li>使用关键字<code>lazy</code>修饰变量,scala会推迟绑定变量和他的值,直到该值第一次被使用(才会去绑定)</li>
+</ul>
+<p>(未完待续)</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> scala </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[《Scala实用指南》读书笔记(一)]]></title>
-      <url>/2018/07/17/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</url>
+      <url>/2018/07/17/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%B8%80)/</url>
       <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>好久没写博客了,在<code>Kafka</code>源码的海洋里挣扎ing,休息的时候还刷<code>Leetcode</code>玩儿,很多东西匆匆丢到<code>OneNote</code>里了.<br>最近看了品神翻译的《Scala实用指南》,这本书应该主要是面向刚入Scala大门的Javaer的,前面讲Scala基础,后期还讲了下Akka和Scala具体的应用.<br>我虽然写scala也有一段时间了,再看这本书还是觉得受益匪浅,有很多地方以前没有注意到的.<br>那么本文就把一些细节写写,仅仅是枚举一下记录一下,并不全面.<br>P.S. 看书勘误找品神, 找到错误了发红包诶,我就领了一个冰可乐(等值)红包.<br><img src="/img/hepin.png" alt="">  </p>
 <h1 id="第2章-体验Scala"><a href="#第2章-体验Scala" class="headerlink" title="第2章 体验Scala"></a>第2章 体验Scala</h1><ul>
 <li>scala的REPL中, <code>Ctrl+A</code>调到行首,<code>Ctrl+E</code>调到行尾</li>
@@ -1638,9 +1795,9 @@ protected void parseParameters() {
         
         <tags>
             
-            <tag> 源码阅读笔记 </tag>
-            
             <tag> Tomcat </tag>
+            
+            <tag> 源码阅读笔记 </tag>
             
         </tags>
         
@@ -4975,7 +5132,7 @@ int characteristics();
     
     <entry>
       <title><![CDATA[String源码阅读笔记（JDK8）]]></title>
-      <url>/2017/07/09/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0(%E4%B8%80)/</url>
+      <url>/2017/07/09/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</url>
       <content type="html"><![CDATA[<h1 id="String源码阅读笔记"><a href="#String源码阅读笔记" class="headerlink" title="String源码阅读笔记"></a>String源码阅读笔记</h1><h2 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h2><p>value，存放String数据，不可变。</p>
 <pre><code class="java">private final char value[];
 </code></pre>
