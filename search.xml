@@ -5,38 +5,7 @@
     <entry>
       <title><![CDATA[《Scala实用指南》读书笔记(二)]]></title>
       <url>/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/</url>
-      <content type="html"><![CDATA[<h1 id="第6章-函数值与闭包"><a href="#第6章-函数值与闭包" class="headerlink" title="第6章 函数值与闭包"></a>第6章 函数值与闭包</h1><ul>
-<li>柯里化: 一个有分组参数的函数,如<code>f(a:A)(b:B):C</code>,使用<code>f _</code>创建一个部分应用函数(此处类型为<code>A =&gt; (B =&gt; C)</code>),可以用于创建可复用的临时便利函数;</li>
-<li>多组参数的函数,如果有单独成组的函数参数,可以不使用小括号,直接用大括号,更直观,如<code>f(a:Int)(g:A=&gt;B)</code>可以这样调用:<code>f(1) {a =&gt; xxx(a)}</code></li>
-<li>用下划线代表函数值的参数时,如果无法判断类型,scala会报错,此时可以显式指定类型</li>
-<li>scala自动将函数名视作函数值的引用</li>
-<li>函数或代码块可能含有未绑定的变量,在调用前根据上下文绑定,形成闭包(closure);绑定的时候不会复制相应变量的值,实际上会绑定到变量本身,因此线程不安全</li>
-</ul>
-<h1 id="第7章-特质"><a href="#第7章-特质" class="headerlink" title="第7章 特质"></a>第7章 特质</h1><ul>
-<li>在trait中定义并初始化的val/var变量，将会在混入了该trait的累的内部实现；定义并<strong>未</strong>初始化的val/var变量被认为是抽象的,混入该trait的类需要实现他们</li>
-<li>类混入trait的时候,如果类没用用<code>extends</code>,则第一个<code>trait</code>用<code>extends</code>,后面的<code>trait</code>用<code>with</code>;如果类已经用<code>extends</code>了,那么所有<code>trait</code>都用<code>with</code>来混入</li>
-<li>混入了trait的类可以调用trait的方法, 其实例引用也可以多态为trait实例</li>
-<li>trait的构造器不接收任何参数</li>
-<li>选择性混入: 可以对没有混入trait的类的实例混入trait,即只有该实例混入了trait,该类其他实例没有,也是用<code>with</code>进行混入,如:  </li>
-</ul>
-<pre><code class="scala">val angle = new Cat(&quot;Angle&quot;) with Friend`
-</code></pre>
-<ul>
-<li>在trait中,使用super调用的方法会触发延迟绑定(late binding),此时并非对基类方法的调用,而是转发到混入该trait的类中,如果混入了多个这样的trait(有同样父类方法,即extends自同一个trait或抽象类),那么从右向左,混入下一个trait直到混入到类, 例如:  </li>
-</ul>
-<pre><code class="scala">abstract class Check {def check:String = &quot;Abstract check...&quot;}
-trait CreditCheck extends Check {override def check:Stirng = s&quot;Credit...${super.check}&quot;} //并非调用父类方法,而是转发到下一个trait或类
-trait MoneyCheck extends Check {override def check:Stirng = s&quot;Money...${super.check}&quot;} 
-trait HouseCheck extends Check {override def check:Stirng = s&quot;House...${super.check}&quot;}
-val app1 = new Check with MoneyCheck with CreditCheck
-println(app1.check) //根据混入的顺序,打印 Credit...Money...Abstract check...
-val app2 = new Check with CreditCheck with HouseCheck
-println(app2.check) //根据混入的顺序,打印 House...Credit...Abstract check...
-</code></pre>
-<ul>
-<li>如果基类的方法是抽象的,那么方法绑定必须推迟到某个具体的方法已知为止;同样是从右到左的顺序连接混入trait,这样可以避免方法冲突的问题</li>
-</ul>
-<h1 id="第8章-集合"><a href="#第8章-集合" class="headerlink" title="第8章 集合"></a>第8章 集合</h1><ul>
+      <content type="html"><![CDATA[<h1 id="第8章-集合"><a href="#第8章-集合" class="headerlink" title="第8章 集合"></a>第8章 集合</h1><ul>
 <li>Scala对元素较少的Set进行了优化,4个元素以内的Set有专门的实现类(<code>Set0</code>,<code>Set1</code>,<code>Set2</code>,<code>Set3</code>,<code>Set4</code>),大于4个元素的使用HashSet实现</li>
 <li>Set的方法(<code>filter</code>,<code>map</code>,<code>foreach</code>这些就不说了):  <ul>
 <li><code>mkString</code>: 允许传入一个分隔符,相当于把集合所有元素用分隔符join起来返回字符串</li>
@@ -146,8 +115,97 @@ input match {
 </ul>
 <h1 id="第12章-惰性求值和并行集合"><a href="#第12章-惰性求值和并行集合" class="headerlink" title="第12章 惰性求值和并行集合"></a>第12章 惰性求值和并行集合</h1><ul>
 <li>使用关键字<code>lazy</code>修饰变量,scala会推迟绑定变量和他的值,直到该值第一次被使用(才会去绑定)</li>
+<li>如果变量绑定的计算有副作用,那么多个变量的绑定顺序机会对绑定的值有影响,此时就不能随便用惰性求值(<code>lazy</code>)了,否则不可交换计算的结果将会得不可知</li>
+<li>前面介绍的集合都是<code>严格集合</code>,所有计算都是严格(立刻)执行的; 通过集合的<code>view()</code>方法可以获得一个严格集合的<code>惰性视图</code>, 惰性集合会推迟计算,当且晋档请求了非惰性/非视图的结果时(比如<code>head</code>,<code>last</code>等等)前面的操作才会进行</li>
+<li>但集合的惰性视图不一定比严格集合性能好,要看具体情况,比如一个集合进行一些操作之后,获取head,那么惰性视图要进行操作的次数就少一些;如果在多次filter后要拿last,那么惰性视图就要把每个元素执行filter计算一遍, 而严格集合每次filter后要计算的结果都小一些,这样计算量反而会少一点.</li>
+<li><code>Stream</code>仅按需生成值,有天然的惰性.拥有<code>#::</code>方法连接(惰性,需要的时候才会连接)现有的Stream和新的值,通过递归定义可以得到一个<code>Stream</code>, 如:  </li>
 </ul>
-<p>(未完待续)</p>
+<pre><code class="scala">//第一个元素是start,下一个是前一个加1
+def gen(start:Int): Stream[Int] = start #:: gen(start + 1) 
+println(gen(10)) //Stream(10, ?)
+</code></pre>
+<ul>
+<li>调用<code>Stream.force()</code>方法可以强制求值, <code>toList()</code>方法也类似;如果在无限流上调用的话会抛OutOfMemoryError</li>
+<li>对于无限流,可以使用<code>take(Int)</code>方法获取前N个值组成的Stream,也可以使用<code>takeWhile()</code>方法按条件生成值(参数的函数值返回false时终止生成新值)</li>
+<li>Stream会记住(memoize)已经生成的值,即按需生成新的值后,会先缓存再返回. 比如执行<code>stream.take(3).force</code>计算了3个值,再执行<code>stream.take(4).force</code>只计算第4个值,前3个值从缓存读取</li>
+<li>对很多顺序集合,scala都有对应的并行版本, 如<code>ParArray</code>,<code>ParHashMap</code>,<code>ParHashSet</code>等等; 可以用<code>par()</code>和<code>seq()</code>方法在顺序集合及其并行版本之间转换</li>
+<li>不适合使用并行集合的情况:  <ul>
+<li>创建和调度线程的开销不应该大于执行这些任务所需要的时间, 对于慢型任务而言并行集合可能有所裨益,但对于小心集合的快速任务并不适合; </li>
+<li>此外,在集合上的操作如果修改全局状态(线程不安全的修改),那么整体计算结果不可知; </li>
+<li>如果操作不满足结合律也不要使用并行集合,因为并行集合的执行顺序是不确定的</li>
+</ul>
+</li>
+</ul>
+<h1 id="第13章-使用Actor编程"><a href="#第13章-使用Actor编程" class="headerlink" title="第13章 使用Actor编程"></a>第13章 使用Actor编程</h1><ul>
+<li>Actor帮助我们将共享的可变性转换成隔离的可变性(isolated mutability),如果一个任务可以有意义地分成几个子任务,分而治之,那么可以使用Actor模型来解决这个任务</li>
+<li><code>AtomicLog</code>之类的类,虽然原子性保证了单个值的线程安全性,但并不能保证跨多个值的原子性,这些值可能同时发生变化</li>
+<li>一个Actor是一个对象,由一个消息队列支撑,任意给定的时间,一个Actor只会处理一条消息; <code>Akka</code>提供<code>Actor</code>模型, 创建一个Actor只要继承<code>Actor</code>特质并实现<code>receive()</code>方法, <code>receive()</code>方法主题是模式匹配, 匹配发生在一个隐式消息对象上</li>
+<li>Actor托管在ActorSystem中,管理了线程池(只要系统保持活跃,这个线程池就会一直保持活跃),消息队列,和Actor生命周期,使用<code>actorOf()</code>工厂方法创建Actor, 用<code>!()</code>方法(<code>tell()</code>)发送消息:  </li>
+</ul>
+<pre><code class="scala">val system = ActorSystem(&quot;sample&quot;) //创建ActorSystem
+val depp = system.actorOf(Props[XxxActor]) //通过actorOd工厂方法创建Actor
+depp ! &quot;Hello&quot; //往Actor发送消息
+val terminateFuture = system.terminate() //退出ActorSystem线程
+Await.ready(terminateFuture, Duration.Inf)
+</code></pre>
+<ul>
+<li>Actor一些细节:  <ul>
+<li>Actor在不同线程中进行,而不是调用主线程</li>
+<li>每个Actor一次只处理一条消息,多个Actor并发运行处理多条消息</li>
+<li>Actor是异步的,不会阻塞调用者(调用者不等待Actor回复)</li>
+<li>线程和Actor不绑定(没什么线程亲和力),每次处理消息<strong>可能</strong>使用线程池中不同的线程</li>
+</ul>
+</li>
+<li>Actor中保存的任何字段都是自动线程安全的,可变但没有共享可变性;可以在Actor类中选择性地存储状态,比如用于存储状态的字段,等等</li>
+<li>若希望从Actor得到响应,Akka提供了询问模式,但消息可能永远不会到达,因此强制使用超时时间;询问模式下, 使用<code>?()</code>方法(<code>ask()</code>)发送消息, 返回一个<code>Future</code>,需要用这个Future实例等待响应(可以用<code>Await.result()</code>方法), 例如:  </li>
+</ul>
+<pre><code class="scala">//Actor类
+class MyActor extends Actor {
+  def recieve:Receive = {
+    case msg =&gt; sender ! s&quot;Got message ${msg}&quot;
+  }
+}
+
+val system = ActorSystem(&quot;sample&quot;) //创建ActorSystem
+val depp = system.actorOf(Props[MyActor]) //通过actorOd工厂方法创建Actor
+implicit val timeout = Timeout(2.seconds) //通过隐式参数定义超时, ?方法要用到
+val askFuture = depp ? &quot;heihei&quot; //询问模式,发出消息
+val result = Await.result(askFuture, timeout.duration) //等待响应结果,这里也需要一个超时的参数
+println(s&quot;Response result : ${result}&quot;)
+val terminateFuture = system.terminate() //退出ActorSystem线程
+Await.ready(terminateFuture, Duration.Inf)
+</code></pre>
+<ul>
+<li>Akka提供<code>RoundRobinPool</code>路由器,会将发送到这个路由器的所有消息均匀地路由到支撑他的多个Actor,使用方法:  </li>
+</ul>
+<pre><code class="scala">val system = ActorSystem(&quot;sample&quot;) //创建ActorSystem
+val router:ActorRef = system.actorOf(RoundRobinPool(100).props(Props[MyActor]))
+</code></pre>
+<ul>
+<li>Actor中想访问ActorSystem可以使用<code>context()</code>方法</li>
+<li>使用建议:  <ul>
+<li>更多地依赖无状态的而非有状态的Actor</li>
+<li>要保证recieve()方法中的处理速度非常狂,尤其是接收Actor具有状态时,改变状态的长时间运行任务将会降低并发性,要避免</li>
+<li>确保在Actor之间传递的消息是不可变对象</li>
+<li>避免使用ask()</li>
+</ul>
+</li>
+</ul>
+<h1 id="第14章-和Java进行互操作"><a href="#第14章-和Java进行互操作" class="headerlink" title="第14章 和Java进行互操作"></a>第14章 和Java进行互操作</h1><ul>
+<li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号<code>` </code>括起来</li>
+<li>没有方法实现的trait在字节码层面是简单的接口;如果想在scala中创建接口,只能创建没有方法实现的trait</li>
+<li>有方法实现的trait, 2.11及更早版本的scala会编译成一个接口(名为:<code>trait名</code>)和一个实现该接口的抽象类(名为:<code>trait名$class</code>), 2.12开始,只包含方法实现而不包含字段的trait会编译成带有默认方法的接口</li>
+<li>scala将单例对象和伴生对象编译成一个单例类,在字节码层面只有static方法</li>
+<li>单例对象(假设名为Single)编译后产生两个类, 一个<code>Single$</code>类存放具体的静态方法,一个<code>Single</code>类负责转发方法的调用,在Java中可以直接通过<code>Single</code>调用其方法</li>
+<li>伴生对象(假设类名为Buddy)编译后产生两个类,一个<code>Buddy$</code>类存放伴生对象的静态方法,一个<code>Buddy</code>类存放对应类的方法等;</li>
+<li>在Java中使用类本身的方法可以直接调用;而伴生对象,包含一个<code>MODULE$</code>的属性保存着该类的静态单例对象,可以通过它去访问其方法,如<code>Buddy$.MODULE$.method()</code></li>
+<li>scala没有throws子句,抛出异常时无需在方法签名中显示声明,如果在Java中扩展类覆写方法时抛出异常就会报错; 可以在scala方法签名中增加<code>@throw</code>注解解决该问题,如:  </li>
+</ul>
+<pre><code class="scala">abstract class Bird {
+  @throws(classOf[NoFlyException]) def fly(): Unit
+}
+</code></pre>
+<p>(结束)</p>
 ]]></content>
       
         
@@ -162,7 +220,7 @@ input match {
     <entry>
       <title><![CDATA[《Scala实用指南》读书笔记(一)]]></title>
       <url>/2018/07/17/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%B8%80)/</url>
-      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>好久没写博客了,在<code>Kafka</code>源码的海洋里挣扎ing,休息的时候还刷<code>Leetcode</code>玩儿,很多东西匆匆丢到<code>OneNote</code>里了.<br>最近看了品神翻译的《Scala实用指南》,这本书应该主要是面向刚入Scala大门的Javaer的,前面讲Scala基础,后期还讲了下Akka和Scala具体的应用.<br>我虽然写scala也有一段时间了,再看这本书还是觉得受益匪浅,有很多地方以前没有注意到的.<br>那么本文就把一些细节写写,仅仅是枚举一下记录一下,并不全面.<br>P.S. 看书勘误找品神, 找到错误了发红包诶,我就领了一个冰可乐(等值)红包.<br><img src="/img/hepin.png" alt="">  </p>
+      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>好久没写博客了,在<code>Kafka</code>源码的海洋里挣扎ing,休息的时候还刷<code>Leetcode</code>玩儿,很多东西匆匆丢到<code>OneNote</code>里了.<br>最近花了一周时间看了品神翻译的《Scala实用指南》, 这本书应该主要是面向刚入Scala大门的Javaer的,前面讲Scala基础,后期还讲了下Akka和Scala具体的应用.<br>我虽然写scala也有一段时间了,再看这本书还是觉得受益匪浅,有很多地方以前没有注意到的.<br>那么本文就把一些细节写写,仅仅是枚举一下记录一下,并不全面.<br>P.S. 看书勘误找品神, 找到错误了发红包诶,我就领了一个冰可乐(等值)红包.<br><img src="/img/hepin.png" alt="">  </p>
 <h1 id="第2章-体验Scala"><a href="#第2章-体验Scala" class="headerlink" title="第2章 体验Scala"></a>第2章 体验Scala</h1><ul>
 <li>scala的REPL中, <code>Ctrl+A</code>调到行首,<code>Ctrl+E</code>调到行尾</li>
 <li><code>scala &lt;scala源文件&gt;</code>命令可以在单独的JVM中运行scala代码,而实际上是自动合成Main类调用main()方法</li>
@@ -297,6 +355,37 @@ import MyInterpolator._
 val name = &quot;Leibniz&quot;
 println(my&quot;&quot;&quot;My name is ${name}&quot;&quot;&quot;) //调用我们自定义的插值器,返回 My name is #Leibniz#
 </code></pre>
+<h1 id="第6章-函数值与闭包"><a href="#第6章-函数值与闭包" class="headerlink" title="第6章 函数值与闭包"></a>第6章 函数值与闭包</h1><ul>
+<li>柯里化: 一个有分组参数的函数,如<code>f(a:A)(b:B):C</code>,使用<code>f _</code>创建一个部分应用函数(此处类型为<code>A =&gt; (B =&gt; C)</code>),可以用于创建可复用的临时便利函数;</li>
+<li>多组参数的函数,如果有单独成组的函数参数,可以不使用小括号,直接用大括号,更直观,如<code>f(a:Int)(g:A=&gt;B)</code>可以这样调用:<code>f(1) {a =&gt; xxx(a)}</code></li>
+<li>用下划线代表函数值的参数时,如果无法判断类型,scala会报错,此时可以显式指定类型</li>
+<li>scala自动将函数名视作函数值的引用</li>
+<li>函数或代码块可能含有未绑定的变量,在调用前根据上下文绑定,形成闭包(closure);绑定的时候不会复制相应变量的值,实际上会绑定到变量本身,因此线程不安全</li>
+</ul>
+<h1 id="第7章-特质"><a href="#第7章-特质" class="headerlink" title="第7章 特质"></a>第7章 特质</h1><ul>
+<li>在trait中定义并初始化的val/var变量，将会在混入了该trait的累的内部实现；定义并<strong>未</strong>初始化的val/var变量被认为是抽象的,混入该trait的类需要实现他们</li>
+<li>类混入trait的时候,如果类没用用<code>extends</code>,则第一个<code>trait</code>用<code>extends</code>,后面的<code>trait</code>用<code>with</code>;如果类已经用<code>extends</code>了,那么所有<code>trait</code>都用<code>with</code>来混入</li>
+<li>混入了trait的类可以调用trait的方法, 其实例引用也可以多态为trait实例</li>
+<li>trait的构造器不接收任何参数</li>
+<li>选择性混入: 可以对没有混入trait的类的实例混入trait,即只有该实例混入了trait,该类其他实例没有,也是用<code>with</code>进行混入,如:  </li>
+</ul>
+<pre><code class="scala">val angle = new Cat(&quot;Angle&quot;) with Friend`
+</code></pre>
+<ul>
+<li>在trait中,使用super调用的方法会触发延迟绑定(late binding),此时并非对基类方法的调用,而是转发到混入该trait的类中,如果混入了多个这样的trait(有同样父类方法,即extends自同一个trait或抽象类),那么从右向左,混入下一个trait直到混入到类, 例如:  </li>
+</ul>
+<pre><code class="scala">abstract class Check {def check:String = &quot;Abstract check...&quot;}
+trait CreditCheck extends Check {override def check:Stirng = s&quot;Credit...${super.check}&quot;} //并非调用父类方法,而是转发到下一个trait或类
+trait MoneyCheck extends Check {override def check:Stirng = s&quot;Money...${super.check}&quot;} 
+trait HouseCheck extends Check {override def check:Stirng = s&quot;House...${super.check}&quot;}
+val app1 = new Check with MoneyCheck with CreditCheck
+println(app1.check) //根据混入的顺序,打印 Credit...Money...Abstract check...
+val app2 = new Check with CreditCheck with HouseCheck
+println(app2.check) //根据混入的顺序,打印 House...Credit...Abstract check...
+</code></pre>
+<ul>
+<li>如果基类的方法是抽象的,那么方法绑定必须推迟到某个具体的方法已知为止;同样是从右到左的顺序连接混入trait,这样可以避免方法冲突的问题</li>
+</ul>
 ]]></content>
       
         
@@ -5366,7 +5455,7 @@ int lastIndexOf(char[] source, int sourceOffset, int sourceCount, char[] target,
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化]]></title>
       <url>/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>JVM定义了一种Java内存模型以消除各种硬件和操作系统的内存访问差异，保证Java程序的跨平台性。  </p>
 <h3 id="主内存和工作内存"><a href="#主内存和工作内存" class="headerlink" title="主内存和工作内存"></a>主内存和工作内存</h3><p>所有的变量存储在主内存，每个线程有自己的工作内存，保存了被这个线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都在对应工作内存进行。<br>主内存和工作内存与第一篇的内存结构不是一个层面上的概念，主内存主要对应Java堆的对象实例数据，工作内存主要对应虚拟机栈的部分区域，而且工作内存可能优先存储与寄存器和高速缓存中。</p>
 <h3 id="内存操作"><a href="#内存操作" class="headerlink" title="内存操作"></a>内存操作</h3><p>Java内存模型规定了8种内存操作：</p>
@@ -5440,7 +5529,7 @@ int lastIndexOf(char[] source, int sourceOffset, int sourceCount, char[] target,
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化]]></title>
       <url>/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="类加载机制"><a href="#类加载机制" class="headerlink" title="类加载机制"></a>类加载机制</h2><p><img src="/img/jvm/8.png" alt=""><br>类从加载导卸载出内存的整个生命周期如上图所示。图中的7个阶段中，加载、验证、准备、初始化和卸载的顺序是确定的，而解析和使用阶段不一定，解析可能在初始化之后（动态绑定）。</p>
 <h3 id="类加载时机"><a href="#类加载时机" class="headerlink" title="类加载时机"></a>类加载时机</h3><p><strong>有且只有</strong>以下5种情况：</p>
 <ol>
@@ -5561,7 +5650,7 @@ public int test(List&lt;String&gt;);
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(三)——类文件结构]]></title>
       <url>/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="JVM多语言支持"><a href="#JVM多语言支持" class="headerlink" title="JVM多语言支持"></a>JVM多语言支持</h2><p>Java规范分为Java语言规范（The Java Language Specification）和Java虚拟机规范（The Java Virtual Machine Specification），因此JVM支持多种语言，只要该语言编译后的类文件符合JVM规范。比如我们常用的Scala、Kotlin、Clojure、Groovy等等。  </p>
 <h2 id="类文件结构"><a href="#类文件结构" class="headerlink" title="类文件结构"></a>类文件结构</h2><p>基础原则：多字节的数据，高位在前。JVM加载Class文件的时候进行动态连接。<br>Class文件结构类似C的结构体，包含无符号数（u1/u2/u4/u8表示1/2/4/8字节的无符号数）和表（由多个无符号数或表组成的结构体，class文件本身就是一个大的表），有多个同类的无符号数或者表并数量不确定的时候，一般先用一个无符号数记录数量，后面接上一系列连续的这种无符号数或者表。Class文件没有分隔符号，所以整个数据结构都是被严格规定的。<br><img src="/img/jvm/7.png" alt=""></p>
 <h3 id="魔数与Class文件版本"><a href="#魔数与Class文件版本" class="headerlink" title="魔数与Class文件版本"></a>魔数与Class文件版本</h3><p>Class文件头4个字节是固定的0xCAFEBABE（咖啡宝贝），显然与Java语言命名的历史相关。<br>紧接着4个字节存储Class文件版本号，5-6字节是子版本号，7-8字节是主版本号（比如1.7.0是0x0033）。JVM读取Class文件的时候，搞版本JDK可以兼容旧版本Class文件，就是通过这4个字节进行判定的。</p>
@@ -5756,7 +5845,7 @@ Constant pool:
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(二)——垃圾回收]]></title>
       <url>/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/</url>
-      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="判断对象可回收"><a href="#判断对象可回收" class="headerlink" title="判断对象可回收"></a>判断对象可回收</h2><p>有以下方法：</p>
 <h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>维护引用计数的Map，对象被引用时计数加1，引用失效时计数减1，简单粗暴。<br>实现简单，判断效率高。但主流JVM没有用这个方法的，因为无法解决循环引用的问题。  </p>
 <h3 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h3><p>JVM主流实现时可达性分析。<br>通过一系列GC Root的对象作为起点，开始向下搜索，搜索经过的路径为引用链，当一个对象到GC Root没有任何引用链项链，则引用不可达，可以GC掉。<br>GC Root通常包括以下几种：</p>
@@ -5843,7 +5932,7 @@ Constant pool:
     <entry>
       <title><![CDATA[《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构]]></title>
       <url>/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/</url>
-      <content type="html"><![CDATA[<p>最近一个月把经典Java书籍《深入理解Java虚拟机》读了一遍，受益匪浅，接下来几篇博客里将会总结一些学习笔记，或许会跟很多现有的博文重复，但主要是为了自己总结一下。<br><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/" target="_blank" rel="noopener">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
+      <content type="html"><![CDATA[<p>最近一个月把经典Java书籍《深入理解Java虚拟机》读了一遍，受益匪浅，接下来几篇博客里将会总结一些学习笔记，或许会跟很多现有的博文重复，但主要是为了自己总结一下。<br><strong>JVM笔记系列索引</strong><br><a href="http://leibnizhu.gitlab.io/2017/05/27/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%80/">《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/04/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%8C/">《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</a><br><a href="http://leibnizhu.gitlab.io/2017/06/06/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%B8%89/">《深入理解Java虚拟机》 学习笔记(三)——类文件结构</a><br><a href="http://leibnizhu.gitlab.io/2017/06/09/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E5%9B%9B/">《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</a><br><a href="http://leibnizhu.gitlab.io/2017/06/20/%E3%80%8A%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%8B-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E4%BA%94/">《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</a></p>
 <h2 id="JVM内存结构"><a href="#JVM内存结构" class="headerlink" title="JVM内存结构"></a>JVM内存结构</h2><p><img src="/img/jvm/1.png" alt=""><br>JVM内存结构不光是只有堆内存和栈内存，实际情况要复杂很多，主要包含以下结构。</p>
 <h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><p>每个线程都有独立的程序计数器，各线程的互不影响，用于存储正在执行的虚拟机指令地址（对于Native方法则为空undefined）.</p>
 <h3 id="JVM栈"><a href="#JVM栈" class="headerlink" title="JVM栈"></a>JVM栈</h3><p>JVM栈是线程私有的，每个方法执行的时候都会建立栈帧，栈帧包含以下内容：</p>
@@ -7381,9 +7470,9 @@ location ~ .*\.(js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> Nginx </tag>
+            
+            <tag> 并发 </tag>
             
             <tag> 负载均衡 </tag>
             
@@ -7396,7 +7485,7 @@ location ~ .*\.(js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid
     <entry>
       <title><![CDATA[Netty+Redis开发高并发应用的一些思考(二)]]></title>
       <url>/2016/09/11/Netty+Redis%E5%BC%80%E5%8F%91%E9%AB%98%E5%B9%B6%E5%8F%91%E5%BA%94%E7%94%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83(%E4%BA%8C)/</url>
-      <content type="html"><![CDATA[<p>上一篇<a href="http://leibnizhu.gitlab.io/2016/07/27/Netty-Redis%E5%BC%80%E5%8F%91%E9%AB%98%E5%B9%B6%E5%8F%91%E5%BA%94%E7%94%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/" target="_blank" rel="noopener">《Netty+Redis开发高并发应用的一些思考(一)》</a>提及到Redis的优化，最近一个月的开发调测和部署又有了一些新的想法：</p>
+      <content type="html"><![CDATA[<p>上一篇<a href="http://leibnizhu.gitlab.io/2016/07/27/Netty-Redis%E5%BC%80%E5%8F%91%E9%AB%98%E5%B9%B6%E5%8F%91%E5%BA%94%E7%94%A8%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/">《Netty+Redis开发高并发应用的一些思考(一)》</a>提及到Redis的优化，最近一个月的开发调测和部署又有了一些新的想法：</p>
 <ol>
 <li><p>Redis尽量放在本地，减少网络IO时间；对相应时间要求高的，尽量不要用云服务商提供的Redis服务，别人的服务再好，读写速度也比不上本地的。</p>
 </li>
@@ -7418,9 +7507,9 @@ location ~ .*\.(js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid
         
         <tags>
             
-            <tag> Redis </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> Redis </tag>
             
         </tags>
         
@@ -7548,9 +7637,9 @@ public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception 
         
         <tags>
             
-            <tag> Redis </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> Redis </tag>
             
             <tag> Netty </tag>
             
@@ -7818,7 +7907,7 @@ sudo sed -i &#39;s$&lt;listen&gt;.*&lt;/listen&gt;$&lt;listen&gt;tcp:host=localh
     <entry>
       <title><![CDATA[404]]></title>
       <url>//404.html</url>
-      <content type="html"><![CDATA[<p><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><br>Gitlab文章页发生故障不能正常访问, 3秒后将自动跳转到<a href="https://leibnizhu.github.io">Github版</a></p>
+      <content type="html"><![CDATA[<p><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><br>Gitlab文章页发生故障不能正常访问, 3秒后将自动跳转到<a href="https://leibnizhu.github.io" target="_blank" rel="noopener">Github版</a></p>
 <script>
 setTimeout(function(){
     window.location.href=window.location.href.replace("leibnizhu.gitlab.io","leibnizhu.github.io")
