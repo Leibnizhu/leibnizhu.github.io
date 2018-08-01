@@ -3,6 +3,78 @@
   
     
     <entry>
+      <title><![CDATA[Scala项目发布的小坑]]></title>
+      <url>/2018/08/01/Scala%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E7%9A%84%E5%B0%8F%E5%9D%91/</url>
+      <content type="html"><![CDATA[<p>之前写了一篇文章 <a href="https://leibnizhu.github.io/2017/09/05/发布项目到Maven中央仓库/">发布项目到Maven中央仓库</a>, 最近发布一个scala项目的时候, 用原来的配置, deploy到仓库后,提示找不到javadoc.<br>折腾了一番, 结论:  </p>
+<ol>
+<li><em>*</em>-javadoc.jar肯定是要有的, 否则Nexus校验不通过</li>
+<li>用maven的javadoc插件默认查找<code>src/main/java</code>下面的源码进行文档构建, scala项目里这个目录当然是不存在的</li>
+<li>可以通过<code>&lt;sourceDictionary&gt;</code>配置让javadoc插件去<code>src/main/scala</code>目录去找源码, 但是显然没有java文件给他找,也是构建不出文档的</li>
+<li>所以要用maven的scala插件进行scaladoc构建文档并打包(默认jar包文件名跟javadoc兼容), 命令是<code>mvn scala:doc-jar</code></li>
+<li>为了和gpg签名,以及最后的deploy到远程maven仓库配合, 只要修改scala插件的配置即可</li>
+</ol>
+<p>最后配置如下:<br><strong>注</strong>: 主要增加了<code>doc-jar</code>的<code>goal</code>, 其实在profile或直接在build中配置均可  </p>
+<pre><code class="xml">  &lt;build&gt;
+      &lt;plugins&gt;
+        &lt;!--scala编译,scala-doc等--&gt;
+          &lt;plugin&gt;
+              &lt;groupId&gt;net.alchim31.maven&lt;/groupId&gt;
+              &lt;artifactId&gt;scala-maven-plugin&lt;/artifactId&gt;
+              &lt;version&gt;3.2.2&lt;/version&gt;
+              &lt;configuration&gt;
+                  &lt;recompileMode&gt;incremental&lt;/recompileMode&gt;
+                  &lt;args&gt;
+                      &lt;arg&gt;-target:jvm-1.8&lt;/arg&gt;
+                  &lt;/args&gt;
+                  &lt;javacArgs&gt;
+                      &lt;javacArg&gt;-source&lt;/javacArg&gt;
+                      &lt;javacArg&gt;1.8&lt;/javacArg&gt;
+                      &lt;javacArg&gt;-target&lt;/javacArg&gt;
+                      &lt;javacArg&gt;1.8&lt;/javacArg&gt;
+                  &lt;/javacArgs&gt;
+                  &lt;jvmArgs&gt;
+                      &lt;jvmArg&gt;-Xms1024m&lt;/jvmArg&gt;
+                      &lt;jvmArg&gt;-Xmx1024m&lt;/jvmArg&gt;
+                  &lt;/jvmArgs&gt;
+              &lt;/configuration&gt;
+              &lt;executions&gt;
+                  &lt;execution&gt;
+                      &lt;id&gt;scala-compile-first&lt;/id&gt;
+                      &lt;phase&gt;process-resources&lt;/phase&gt;
+                      &lt;goals&gt;
+                          &lt;goal&gt;add-source&lt;/goal&gt;
+                          &lt;goal&gt;compile&lt;/goal&gt;
+                          &lt;goal&gt;doc-jar&lt;/goal&gt; &lt;!--scaladoc打jar包--&gt;
+                      &lt;/goals&gt;
+                  &lt;/execution&gt;
+                  &lt;execution&gt;
+                      &lt;id&gt;scala-test-compile&lt;/id&gt;
+                      &lt;phase&gt;process-test-resources&lt;/phase&gt;
+                      &lt;goals&gt;
+                          &lt;goal&gt;add-source&lt;/goal&gt;
+                          &lt;goal&gt;testCompile&lt;/goal&gt;
+                      &lt;/goals&gt;
+                  &lt;/execution&gt;
+              &lt;/executions&gt;
+          &lt;/plugin&gt;
+          &lt;!-- 以前的配置 --&gt;
+      &lt;/plugins&gt;
+  &lt;/build&gt;
+</code></pre>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Scala </tag>
+            
+            <tag> Maven </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[《Scala实用指南》读书笔记(二)]]></title>
       <url>/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/</url>
       <content type="html"><![CDATA[<h1 id="第8章-集合"><a href="#第8章-集合" class="headerlink" title="第8章 集合"></a>第8章 集合</h1><ul>
@@ -1884,9 +1956,9 @@ protected void parseParameters() {
         
         <tags>
             
-            <tag> Tomcat </tag>
-            
             <tag> 源码阅读笔记 </tag>
+            
+            <tag> Tomcat </tag>
             
         </tags>
         
@@ -2226,27 +2298,6 @@ gpg:           未改变：1
 
         &lt;plugin&gt;
             &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
-            &lt;configuration&gt;
-                &lt;warName&gt;spring-boot-starter-netty&lt;/warName&gt;
-                &lt;failOnMissingWebXml&gt;false&lt;/failOnMissingWebXml&gt;
-            &lt;/configuration&gt;
-        &lt;/plugin&gt;
-
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-clean-plugin&lt;/artifactId&gt;
-            &lt;version&gt;${clean-plugin.version}&lt;/version&gt;
-        &lt;/plugin&gt;
-
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-resources-plugin&lt;/artifactId&gt;
-            &lt;version&gt;${resources-plugin.version}&lt;/version&gt;
-        &lt;/plugin&gt;
-
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
             &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
             &lt;version&gt;${surefire-plugin.version}&lt;/version&gt;
             &lt;configuration&gt;
@@ -2254,38 +2305,6 @@ gpg:           未改变：1
             &lt;/configuration&gt;
         &lt;/plugin&gt;
 
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-source-plugin&lt;/artifactId&gt;
-            &lt;executions&gt;
-                &lt;execution&gt;
-                    &lt;id&gt;attach-sources&lt;/id&gt;
-                    &lt;goals&gt;
-                        &lt;goal&gt;jar&lt;/goal&gt;
-                    &lt;/goals&gt;
-                &lt;/execution&gt;
-            &lt;/executions&gt;
-        &lt;/plugin&gt;
-
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-javadoc-plugin&lt;/artifactId&gt;
-            &lt;version&gt;2.10.3&lt;/version&gt;
-            &lt;executions&gt;
-                &lt;execution&gt;
-                    &lt;id&gt;attach-javadocs&lt;/id&gt;
-                    &lt;phase&gt;install&lt;/phase&gt;
-                    &lt;goals&gt;
-                        &lt;goal&gt;jar&lt;/goal&gt;
-                    &lt;/goals&gt;
-                &lt;/execution&gt;
-            &lt;/executions&gt;
-            &lt;configuration&gt;
-                &lt;encoding&gt;UTF-8&lt;/encoding&gt;
-                &lt;charset&gt;UTF-8&lt;/charset&gt;
-                &lt;additionalparam&gt;-Xdoclint:none&lt;/additionalparam&gt;
-            &lt;/configuration&gt;
-        &lt;/plugin&gt;
     &lt;/plugins&gt;
 &lt;/build&gt;
 </code></pre>
@@ -7470,9 +7489,9 @@ location ~ .*\.(js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid
         
         <tags>
             
-            <tag> Nginx </tag>
-            
             <tag> 并发 </tag>
+            
+            <tag> Nginx </tag>
             
             <tag> 负载均衡 </tag>
             
@@ -7507,9 +7526,9 @@ location ~ .*\.(js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> Redis </tag>
+            
+            <tag> 并发 </tag>
             
         </tags>
         
@@ -7637,9 +7656,9 @@ public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception 
         
         <tags>
             
-            <tag> 并发 </tag>
-            
             <tag> Redis </tag>
+            
+            <tag> 并发 </tag>
             
             <tag> Netty </tag>
             

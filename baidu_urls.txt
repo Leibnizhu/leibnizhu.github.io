@@ -1,1 +1,1 @@
-https://leibnizhu.github.io/2018/07/18/Scala实用指南-读书笔记(二)/
+https://leibnizhu.github.io/2018/08/01/Scala项目发布的小坑/
