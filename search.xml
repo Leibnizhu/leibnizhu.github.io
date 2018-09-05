@@ -1956,9 +1956,9 @@ protected void parseParameters() {
         
         <tags>
             
-            <tag> Tomcat </tag>
-            
             <tag> 源码阅读笔记 </tag>
+            
+            <tag> Tomcat </tag>
             
         </tags>
         
@@ -1968,7 +1968,7 @@ protected void parseParameters() {
       <title><![CDATA[最近对Java服务框架的思考]]></title>
       <url>/2017/10/11/%E6%9C%80%E8%BF%91%E5%AF%B9Java%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E7%9A%84%E6%80%9D%E8%80%83/</url>
       <content type="html"><![CDATA[<p>简单说几句，关于最近对Java服务框架的思考。<br>最早我是用<code>springMVC + Spring</code>的，因为太臃肿，配置麻烦，很快切换到<code>SpringBoot</code>。<br>用上<code>SpringBoot</code>后，觉得内置<code>Tomcat/Jetty</code>性能可能不够好，于是自己写了个<a href="https://github.com/Leibnizhu/spring-boot-starter-netty" target="_blank" rel="noopener">基于Netty的内置Servlet容器</a>，然而简单测试后发现性能与内置的<code>Tomcat/Jetty</code>相差不大（也有可能是因为测试用例太简单了，没有把<code>Netty NIO</code>在业务阻塞线程时的优势体现出来）。<br>期间还考虑过直接用<code>Netty</code>原生API来写一个分发请求的简单框架，看了一些别人类似功能的项目，后来不了了之。<br>结合这两点，盯上了<code>Play Framework</code>，这个在许久前就有关注过，但没深入了解，看了官方文档之后，发现这就是我想要的！开发起来很方便嘛，但是<code>Session</code>的实现有点………………建议用<code>scala</code>写，我个人是没问题，但不好带人一起写。<br>后来在Telegram某群组里被安利了<code>Vert.X</code>，看了官方文档，还有详细的官方Demo，以及各种安利文章，发现这玩意真好用诶，跟<code>Node.Js</code>有点像诶，也不用跟用<code>Netty</code>原生API一样战战兢兢了，配套解决方案也不少，逼格也有，多语言支持（虽然对我而言用处不大），决定就是你了！<br>所以最终结论就是：<code>Vert.X</code>大法好，退<code>Spring</code>保平安～</p>
-<p>P.S. 在<a href="https://github.com/Leibnizhu/VertxLearn" target="_blank" rel="noopener">Github</a>写了一些简单的<code>Vert.X</code>学习例子，另外准备用<code>Vert.X</code>写一个微信/支付宝的微服务。</p>
+<p>P.S. 在<a href="https://github.com/Leibnizhu/VertxLearn" target="_blank" rel="noopener">Github</a>写了一些简单的<code>Vert.X</code>学习例子，另外准备用<code>Vert.X</code>写一个微信/支付宝的微服务(2018-08-02更新:2017年年底已经写了,忘了更新这篇文章, 请参阅<a href="https://leibnizhu.gitlab.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/" target="_blank" rel="noopener">基于Vert.X的高性能微信支付宝公众号通用服务</a>)。</p>
 ]]></content>
       
         
@@ -5607,7 +5607,7 @@ public int test(List&lt;String&gt;);
 }
 </code></pre>
 <h2 id="运行期优化"><a href="#运行期优化" class="headerlink" title="运行期优化"></a>运行期优化</h2><h3 id="解释器与编译器"><a href="#解释器与编译器" class="headerlink" title="解释器与编译器"></a>解释器与编译器</h3><p>许多主流商用JVM包括HotSpot采用解释器与编译器并存的结构，启动的时候使用解释器，保证启动速度，随着运行时间推移，编译器发挥作用，编译为本地代码，提高执行效率。在JVM中这种模式被称为混合模式，可以用<code>-Xint</code>强制JVM运行于解释模式，或用<code>-Xcomp</code>强制JVM运行于编译模式。HotSpot包含两个及时编译器Client Compiler和Server Compiler，一般简称为C1和C2。</p>
-<h3 id="热点探测"><a href="#热点探测" class="headerlink" title="热点探测"></a>热点探测</h3><p>运行过程中被即时编译器编译的<strong>热点代码</strong>包括被多次调用的<strong>方法</strong>或#<strong>循环体</strong>，对于后者编译器还是会以整个方法作为编译对象。<br>判断方法或循环体是否热点代码的行为被称为<strong>热点探测</strong>，目前主要的热点探测方法有两种：</p>
+<h3 id="热点探测"><a href="#热点探测" class="headerlink" title="热点探测"></a>热点探测</h3><p>运行过程中被即时编译器编译的<strong>热点代码</strong>包括被多次调用的 <strong>方法</strong> 或 <strong>循环体</strong>，对于后者编译器还是会以整个方法作为编译对象。<br>判断方法或循环体是否热点代码的行为被称为<strong>热点探测</strong>，目前主要的热点探测方法有两种：</p>
 <ol>
 <li><strong>基于采样的热点探测</strong>。JVM周期性的检查各个线程的栈顶，如果发现某些方法经常出现在栈顶，那么就是热点方法。缺点是容易收到线程阻塞或其他外界因素影响，优点是简单高效；</li>
 <li><strong>基于计数器的热点探测</strong>。为每个方法甚至代码块建立计数器，统计执行次数，超过一定阈值就认为是热点方法。缺点是不能获取导方法的调用关系，优点是精确且严谨。</li>
@@ -5642,7 +5642,7 @@ public int test(List&lt;String&gt;);
 <h4 id="复写传播"><a href="#复写传播" class="headerlink" title="复写传播"></a>复写传播</h4><p>复写传播（Copy Propagation）指的是去掉重复的变量。</p>
 <h4 id="无用代码消除"><a href="#无用代码消除" class="headerlink" title="无用代码消除"></a>无用代码消除</h4><p>无用代码消除（Dead Code Elimination），无用代码指的是永远不会izhixing的代码，或者完全没有意义的代码。</p>
 <h4 id="公共子表达式消除"><a href="#公共子表达式消除" class="headerlink" title="公共子表达式消除"></a>公共子表达式消除</h4><p>Common Subexpression Elimination定义：一个表达式E已经计算过，且计算后到现在E的变量全部没有变化，那么E这次出现成为了公共子表达式，无需重复计算，直接用前面计算结果替换即可。如果消除优化仅限于程序基本块内，则成为局部公共子表达式消除，如果覆盖范围涵盖多个基本块，则成为全局公共子表达式消除。</p>
-<h4 id="数组边界检查消除"><a href="#数组边界检查消除" class="headerlink" title="数组边界检查消除"></a>数组边界检查消除</h4><p>Java访问数组元素时，会对下标进行上下界范围检查，不满足上下界时会抛出ArrayIndexOutOfBoundsException异常。<br>编译器根据数据流分析确定数组长度，并判断小表有无月结；在循环中进行数组访问时，也是可以通过数据流分析判定循环变量的取值是否越界，如果能保证循环体中不越界的话循环体中访问数组的语句可以消除边界检查。<br>还有一种思路时隐式异常处理，将空指针检查和除数为零检查消除，注册一个Segment Fault信号的异常处理器，放在异常处理里面，在这个异常处理器里面再转换为对应的异常并抛出。<br>还有一些其他的消除操作，比如自动装箱消除、安全点消除、消除反射等等。</p>
+<h4 id="数组边界检查消除"><a href="#数组边界检查消除" class="headerlink" title="数组边界检查消除"></a>数组边界检查消除</h4><p>Java访问数组元素时，会对下标进行上下界范围检查，不满足上下界时会抛出ArrayIndexOutOfBoundsException异常。<br>编译器根据数据流分析确定数组长度，并判断下标有无越界；在循环中进行数组访问时，也是可以通过数据流分析判定循环变量的取值是否越界，如果能保证循环体中不越界的话循环体中访问数组的语句可以消除边界检查。<br>还有一种思路时隐式异常处理，将空指针检查和除数为零检查消除，注册一个Segment Fault信号的异常处理器，放在异常处理里面，在这个异常处理器里面再转换为对应的异常并抛出。<br>还有一些其他的消除操作，比如自动装箱消除、安全点消除、消除反射等等。</p>
 <h4 id="逃逸分析"><a href="#逃逸分析" class="headerlink" title="逃逸分析"></a>逃逸分析</h4><p>逃逸分析不能直接优化代码，而是为其他优化手段提供优化的依据。逃逸分析指的是分析对象动态作用域：一个对象在方法中被定义后，被外部方法引用，则称为<strong>方法逃逸</strong>，被外部线程引用访问到的话，被称为<strong>线程逃逸</strong>。如果能证明一个对象不会逃逸到方法或线程外，则可以进行以下优化：</p>
 <ol>
 <li><strong>栈上分配</strong>（Stack Allocation）：若确认对象没有方法逃逸，可以将其在栈上分配内存，则其占用内存会随着栈帧出栈而被销毁，减少GC压力，而一般应用中不逃逸的局部对象占很大比例；</li>

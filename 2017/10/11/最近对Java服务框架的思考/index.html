@@ -244,7 +244,7 @@
 
     
         <meta property="article:published_time" content="Wed Oct 11 2017 14:19:12 GMT+0800">
-        <meta property="article:modified_time" content="Fri Aug 03 2018 20:56:31 GMT+0800">
+        <meta property="article:modified_time" content="Wed Sep 05 2018 15:33:02 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -267,7 +267,7 @@
     "mainEntityOfPage": "https://leibnizhu.github.io/2017/10/11/最近对Java服务框架的思考/index.html",
     "headline": "最近对Java服务框架的思考",
     "datePublished": "Wed Oct 11 2017 14:19:12 GMT+0800",
-    "dateModified": "Fri Aug 03 2018 20:56:31 GMT+0800",
+    "dateModified": "Wed Sep 05 2018 15:33:02 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Leibniz Hu",
@@ -498,7 +498,7 @@
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
         <p>简单说几句，关于最近对Java服务框架的思考。<br>最早我是用<code>springMVC + Spring</code>的，因为太臃肿，配置麻烦，很快切换到<code>SpringBoot</code>。<br>用上<code>SpringBoot</code>后，觉得内置<code>Tomcat/Jetty</code>性能可能不够好，于是自己写了个<a href="https://github.com/Leibnizhu/spring-boot-starter-netty" target="_blank" rel="noopener">基于Netty的内置Servlet容器</a>，然而简单测试后发现性能与内置的<code>Tomcat/Jetty</code>相差不大（也有可能是因为测试用例太简单了，没有把<code>Netty NIO</code>在业务阻塞线程时的优势体现出来）。<br>期间还考虑过直接用<code>Netty</code>原生API来写一个分发请求的简单框架，看了一些别人类似功能的项目，后来不了了之。<br>结合这两点，盯上了<code>Play Framework</code>，这个在许久前就有关注过，但没深入了解，看了官方文档之后，发现这就是我想要的！开发起来很方便嘛，但是<code>Session</code>的实现有点………………建议用<code>scala</code>写，我个人是没问题，但不好带人一起写。<br>后来在Telegram某群组里被安利了<code>Vert.X</code>，看了官方文档，还有详细的官方Demo，以及各种安利文章，发现这玩意真好用诶，跟<code>Node.Js</code>有点像诶，也不用跟用<code>Netty</code>原生API一样战战兢兢了，配套解决方案也不少，逼格也有，多语言支持（虽然对我而言用处不大），决定就是你了！<br>所以最终结论就是：<code>Vert.X</code>大法好，退<code>Spring</code>保平安～</p>
-<p>P.S. 在<a href="https://github.com/Leibnizhu/VertxLearn" target="_blank" rel="noopener">Github</a>写了一些简单的<code>Vert.X</code>学习例子，另外准备用<code>Vert.X</code>写一个微信/支付宝的微服务。</p>
+<p>P.S. 在<a href="https://github.com/Leibnizhu/VertxLearn" target="_blank" rel="noopener">Github</a>写了一些简单的<code>Vert.X</code>学习例子，另外准备用<code>Vert.X</code>写一个微信/支付宝的微服务(2018-08-02更新:2017年年底已经写了,忘了更新这篇文章, 请参阅<a href="https://leibnizhu.gitlab.io/2018/01/30/基于Vert-X的高性能微信支付宝公众号通用服务/" target="_blank" rel="noopener">基于Vert.X的高性能微信支付宝公众号通用服务</a>)。</p>
 
         
     
