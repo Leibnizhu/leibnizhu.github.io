@@ -1268,10 +1268,6 @@ sasl.mechanism.inter.broker.protocol=PLAIN
             
             <tag> Kerberos </tag>
             
-            <tag> 大数据 </tag>
-            
-            <tag> Hadoop </tag>
-            
             <tag> Sqoop </tag>
             
             <tag> Hive </tag>
@@ -1279,6 +1275,10 @@ sasl.mechanism.inter.broker.protocol=PLAIN
             <tag> Kafka </tag>
             
             <tag> Maxwell </tag>
+            
+            <tag> 大数据 </tag>
+            
+            <tag> Hadoop </tag>
             
         </tags>
         
@@ -7730,11 +7730,11 @@ public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception 
         
         <tags>
             
+            <tag> Netty </tag>
+            
             <tag> Redis </tag>
             
             <tag> 并发 </tag>
-            
-            <tag> Netty </tag>
             
         </tags>
         
