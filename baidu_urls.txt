@@ -1,1 +1,1 @@
-https://leibnizhu.github.io/2018/08/01/Scala项目发布的小坑/
+https://leibnizhu.gitlab.io/2020/01/15/Spark写Mongodb的小坑/
