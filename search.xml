@@ -61,7 +61,7 @@ structFieldList += StructField(&quot;_id&quot;, idDataType, true, Metadata.empty
 StructType(structFieldList);
 </code></pre>
 <p>写入数据的处理：</p>
-<pre><code class="scala">GenericRow(new Object[]{&quot;5e1db87e5d080f6e7eb7b067&quot;}) //这是一个Row里面的一个字段值
+<pre><code class="scala">GenericRow(Array(&quot;5e1db87e5d080f6e7eb7b067&quot;)) //这是一个Row里面的一个字段值
 </code></pre>
 ]]></content>
       
@@ -7730,11 +7730,11 @@ public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception 
         
         <tags>
             
-            <tag> Netty </tag>
-            
             <tag> Redis </tag>
             
             <tag> 并发 </tag>
+            
+            <tag> Netty </tag>
             
         </tags>
         
