@@ -244,7 +244,7 @@
 
     
         <meta property="article:published_time" content="Sun Jun 20 2021 13:17:54 GMT+0800">
-        <meta property="article:modified_time" content="Sun Jun 20 2021 17:54:27 GMT+0800">
+        <meta property="article:modified_time" content="Sun Jun 20 2021 18:26:05 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -267,7 +267,7 @@
     "mainEntityOfPage": "https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html",
     "headline": "修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException",
     "datePublished": "Sun Jun 20 2021 13:17:54 GMT+0800",
-    "dateModified": "Sun Jun 20 2021 17:54:27 GMT+0800",
+    "dateModified": "Sun Jun 20 2021 18:26:05 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Leibniz Hu",
@@ -639,6 +639,340 @@ static BytesArray searchRequest(QueryBuilder query) &#123;
 <p>因此首先排除了通过修改 <code>JacksonJsonGenerator</code> 调用者来Patch的方向，还是需要从 <code>JacksonJsonGenerator</code> 内部入手。</p>
 <p>如果用<code>javassist</code>修改<code>JacksonJsonGenerator</code>，参考上一小节的内容，其实只要改俩成员变量的类型，再改改静态代码块即可。但真的如此吗？并不。写同名类能这样做到是因为会整个类重新编译，<code>JacksonJsonGenerator</code>中大量delegate的方法在编译时是用 <code>Jackson 2.3+</code> 的类进行连接的；然而<code>javassist</code>修改成员变量的时候真的只是修改了成员变量本身，如果只改了这里，对应的delegate方法在运行时会找不到成员变量。</p>
 <p>如果是在静态代码块和构造方法新增 <code>Jackson 2.3+</code> 对应的类，并给 <code>writeRaw</code> 方法增加try-catch，在catch中使用 <code>Jackson 2.3+</code> 对应的类进行json序列化呢？也不行。因为序列化是输出到<code>OutputStream</code>（构造方法传入的那个），是有状态的，同时给<code>jackson 1.8.8</code>和<code>jackson 2.3+</code>持有并写入，恐怕会大乱（实测的确如此，不确定是不是没处理好<code>flush</code>，但至少这个方案太危险）。</p>
+<p>还有一个方案是替换 <code>JacksonJsonGenerator</code> 的 <code>generator</code> 成员变量，可以做一个 <code>org.codehaus.jackson.JsonGenerator</code> 与  <code>Jackson 2.3+</code> 的 <code>com.fasterxml.jackson.core.JsonGenerator</code> 之间的Adaptor来替换之。</p>
+<p>首先是Adaptor：</p>
+<pre><code class="java">package xxx.yyy.zzz;
+
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.*;
+import org.elasticsearch.hadoop.serialization.EsHadoopSerializationException;
+import org.elasticsearch.hadoop.util.StringUtils;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Deque;
+import java.util.LinkedList;
+
+public class JacksonJsonGeneratorAdaptor extends org.codehaus.jackson.JsonGenerator &#123;
+
+    private static final boolean HAS_UTF_8;
+    private static final JsonFactory JSON_FACTORY;
+    private final JsonGenerator generator;
+    private final OutputStream out;
+    private final Deque&lt;String&gt; currentPath = new LinkedList&lt;&gt;();
+    private String currentPathCached;
+    private String currentName;
+    protected ObjectCodec _objectCodec;
+
+    static &#123;
+        boolean hasMethod = false;
+        try &#123;
+            JsonGenerator.class.getMethod(&quot;writeUTF8String&quot;, byte[].class, int.class, int.class);
+            hasMethod = true;
+        &#125; catch (NoSuchMethodException ignored) &#123;
+        &#125;
+        HAS_UTF_8 = hasMethod;
+        if (!HAS_UTF_8) &#123;
+            LogFactory.getLog(JacksonJsonGeneratorAdaptor.class).warn(&quot;Old Jackson version (pre-1.7) detected; consider upgrading to improve performance&quot;);
+        &#125;
+
+        JSON_FACTORY = new JsonFactory();
+        JSON_FACTORY.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, true);
+    &#125;
+
+    public JacksonJsonGeneratorAdaptor(OutputStream out) &#123;
+        try &#123;
+            this.out = out;
+            // use dedicated method to lower Jackson requirement
+            this.generator = JSON_FACTORY.createGenerator(out, JsonEncoding.UTF8);
+        &#125; catch (IOException ex) &#123;
+            throw new EsHadoopSerializationException(ex);
+        &#125;
+    &#125;
+
+    //省略大量delegate方法，只列出不是简单delegate的
+
+    @Override
+    public void writeStartObject() throws IOException &#123;
+        generator.writeStartObject();
+        if (currentName != null) &#123;
+            currentPath.addLast(currentName);
+            currentName = null;
+            currentPathCached = null;
+        &#125;
+    &#125;
+
+    @Override
+    public void writeEndObject() throws IOException &#123;
+        generator.writeEndObject();
+        currentName = currentPath.pollLast();
+        currentPathCached = null;
+    &#125;
+
+    @Override
+    public void writeFieldName(String name) throws IOException &#123;
+        generator.writeFieldName(name);
+        currentName = name;
+    &#125;
+
+    @Override
+    public void writeUTF8String(byte[] text, int offset, int len) throws IOException &#123;
+        if (HAS_UTF_8) &#123;
+            generator.writeUTF8String(text, offset, len);
+        &#125; else &#123;
+            generator.writeString(new String(text, offset, len, StringUtils.UTF_8));
+        &#125;
+    &#125;
+
+    @Override
+    public void writeBinary(Base64Variant var1, byte[] data, int offset, int len) throws IOException &#123;
+        generator.writeBinary(data, offset, len);
+    &#125;
+
+    @Override
+    public void writeBinary(byte[] data) throws IOException &#123;
+        writeBinary(Base64Variants.getDefaultVariant(), data, 0, data.length);
+    &#125;
+
+    @Override
+    public void copyCurrentEvent(JsonParser jp) throws IOException &#123;
+        JsonToken t = jp.getCurrentToken();
+        if (t == null) &#123;
+            throw new JsonGenerationException(&quot;No current event to copy&quot;);
+        &#125;
+
+        switch(t) &#123;
+            case START_OBJECT:
+                this.writeStartObject();
+                break;
+            case END_OBJECT:
+                this.writeEndObject();
+                break;
+            case START_ARRAY:
+                this.writeStartArray();
+                break;
+            case END_ARRAY:
+                this.writeEndArray();
+                break;
+            case FIELD_NAME:
+                this.writeFieldName(jp.getCurrentName());
+                break;
+            case VALUE_STRING:
+                if (jp.hasTextCharacters()) &#123;
+                    this.writeString(jp.getTextCharacters(), jp.getTextOffset(), jp.getTextLength());
+                &#125; else &#123;
+                    this.writeString(jp.getText());
+                &#125;
+                break;
+            case VALUE_NUMBER_INT:
+                switch(jp.getNumberType()) &#123;
+                    case INT:
+                        this.writeNumber(jp.getIntValue());
+                        return;
+                    case BIG_INTEGER:
+                        this.writeNumber(jp.getBigIntegerValue());
+                        return;
+                    default:
+                        this.writeNumber(jp.getLongValue());
+                        return;
+                &#125;
+            case VALUE_NUMBER_FLOAT:
+                switch(jp.getNumberType()) &#123;
+                    case BIG_DECIMAL:
+                        this.writeNumber(jp.getDecimalValue());
+                        return;
+                    case FLOAT:
+                        this.writeNumber(jp.getFloatValue());
+                        return;
+                    default:
+                        this.writeNumber(jp.getDoubleValue());
+                        return;
+                &#125;
+            case VALUE_TRUE:
+                this.writeBoolean(true);
+                break;
+            case VALUE_FALSE:
+                this.writeBoolean(false);
+                break;
+            case VALUE_NULL:
+                this.writeNull();
+                break;
+            case VALUE_EMBEDDED_OBJECT:
+                this.writeObject(jp.getEmbeddedObject());
+                break;
+            default:
+                throw new RuntimeException(&quot;Internal error: should never end up through this code path&quot;);
+        &#125;
+
+    &#125;
+
+    @Override
+    public void copyCurrentStructure(JsonParser jp) throws IOException &#123;
+        JsonToken t = jp.getCurrentToken();
+        if (t == JsonToken.FIELD_NAME) &#123;
+            this.writeFieldName(jp.getCurrentName());
+            t = jp.nextToken();
+        &#125;
+
+        switch(t) &#123;
+            case START_OBJECT:
+                this.writeStartObject();
+
+                while(jp.nextToken() != JsonToken.END_OBJECT) &#123;
+                    this.copyCurrentStructure(jp);
+                &#125;
+
+                this.writeEndObject();
+                break;
+            case START_ARRAY:
+                this.writeStartArray();
+
+                while(jp.nextToken() != JsonToken.END_ARRAY) &#123;
+                    this.copyCurrentStructure(jp);
+                &#125;
+
+                this.writeEndArray();
+                break;
+            default:
+                this.copyCurrentEvent(jp);
+        &#125;
+    &#125;
+
+    @Override
+    public void close() &#123;
+        try &#123;
+            generator.close();
+        &#125; catch (IOException ex) &#123;
+            throw new EsHadoopSerializationException(ex);
+        &#125;
+    &#125;
+
+    @Override
+    public Object getOutputTarget() &#123;
+        //return generator.getOutputTarget();
+        return out;
+    &#125;
+
+    @Override
+    public org.codehaus.jackson.JsonGenerator enable(Feature feature) &#123;
+        switch (feature) &#123;
+            case AUTO_CLOSE_TARGET:
+                generator.enable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
+                break;
+            case AUTO_CLOSE_JSON_CONTENT:
+                generator.enable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
+                break;
+            case QUOTE_FIELD_NAMES:
+                generator.enable(JsonGenerator.Feature.QUOTE_FIELD_NAMES);
+                break;
+            case QUOTE_NON_NUMERIC_NUMBERS:
+                generator.enable(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS);
+                break;
+            case WRITE_NUMBERS_AS_STRINGS:
+                generator.enable(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS);
+                break;
+            case FLUSH_PASSED_TO_STREAM:
+                generator.enable(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM);
+                break;
+            case ESCAPE_NON_ASCII:
+                generator.enable(JsonGenerator.Feature.ESCAPE_NON_ASCII);
+                break;
+        &#125;
+        return this;
+    &#125;
+
+    @Override
+    public org.codehaus.jackson.JsonGenerator disable(Feature feature) &#123;
+        switch (feature) &#123;
+            case AUTO_CLOSE_TARGET:
+                generator.disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
+                break;
+            case AUTO_CLOSE_JSON_CONTENT:
+                generator.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
+                break;
+            case QUOTE_FIELD_NAMES:
+                generator.disable(JsonGenerator.Feature.QUOTE_FIELD_NAMES);
+                break;
+            case QUOTE_NON_NUMERIC_NUMBERS:
+                generator.disable(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS);
+                break;
+            case WRITE_NUMBERS_AS_STRINGS:
+                generator.disable(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS);
+                break;
+            case FLUSH_PASSED_TO_STREAM:
+                generator.disable(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM);
+                break;
+            case ESCAPE_NON_ASCII:
+                generator.disable(JsonGenerator.Feature.ESCAPE_NON_ASCII);
+                break;
+        &#125;
+        return this;
+    &#125;
+
+    @Override
+    public boolean isEnabled(Feature feature) &#123;
+        switch (feature) &#123;
+            case AUTO_CLOSE_TARGET:
+                return generator.isEnabled(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
+            case AUTO_CLOSE_JSON_CONTENT:
+                return generator.isEnabled(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT);
+            case QUOTE_FIELD_NAMES:
+                return generator.isEnabled(JsonGenerator.Feature.QUOTE_FIELD_NAMES);
+            case QUOTE_NON_NUMERIC_NUMBERS:
+                return generator.isEnabled(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS);
+            case WRITE_NUMBERS_AS_STRINGS:
+                return generator.isEnabled(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS);
+            case FLUSH_PASSED_TO_STREAM:
+                return generator.isEnabled(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM);
+            case ESCAPE_NON_ASCII:
+                return generator.isEnabled(JsonGenerator.Feature.ESCAPE_NON_ASCII);
+        &#125;
+        return false;
+    &#125;
+
+    @Override
+    public org.codehaus.jackson.JsonGenerator setCodec(ObjectCodec objectCodec) &#123;
+        this._objectCodec = objectCodec;
+        return this;
+    &#125;
+
+    @Override
+    public ObjectCodec getCodec() &#123;
+        return this._objectCodec;
+    &#125;
+&#125;
+</code></pre>
+<p>然后通过<code>javassist</code> 修改<code>JacksonJsonGenerator</code> 的 <code>generator</code> 成员变量实际取值：</p>
+<pre><code class="java">ClassPool pool = ClassPool.getDefault();
+try &#123;
+    CtClass cc = pool.get(&quot;org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator&quot;); //这里必须用类全限定名
+
+    //这里自己造了一个无参构造器给原构造器调用，否则 JacksonJsonGenerator 的 currentPath 一直是null（字段有初始化值但还是null），原因未知，可能是setBody影响了原构造器的行为
+    cc.addConstructor(CtNewConstructor.make(&quot;JacksonJsonGenerator()&#123;this.currentPath = new java.util.LinkedList();&#125;&quot;, cc));
+    //构造函数将 generator 替换成我们的 Adaptor
+    CtConstructor jacksonJsonGeneratorConstructor = cc.getDeclaredConstructor(new CtClass[]&#123;pool.get(OutputStream.class.getName())&#125;);
+    jacksonJsonGeneratorConstructor.setBody(&quot;&#123;\n&quot; +
+            &quot;        this();\n&quot; + //调用无参构造器，这里用 $0() 是不行的，必须this();
+            &quot;        try &#123;\n&quot; +
+            &quot;            $0.out = $1;\n&quot; +
+            &quot;            $0.generator = new xxx.yyy.zzz.JacksonJsonGeneratorAdaptor($1);\n&quot; +
+            &quot;        &#125; catch (java.io.IOException ex) &#123;\n&quot; +
+            &quot;            throw new org.elasticsearch.hadoop.serialization.EsHadoopSerializationException(ex);\n&quot; +
+            &quot;        &#125;\n&quot; +
+            &quot;    &#125;&quot;);
+
+    cc.toClass().getConstructor(OutputStream.class).newInstance(System.out);
+    log.info(&quot;完成对 JacksonJsonGenerator 进行静态代码块和构造方法的pack&quot;);
+&#125; catch (Exception e) &#123;
+    log.error(&quot;给 JacksonJsonGenerator 进行静态代码块和构造方法的pack失败:&quot; + e.getMessage(), e);
+&#125;
+</code></pre>
+<p>完事儿。</p>
 
         
     
