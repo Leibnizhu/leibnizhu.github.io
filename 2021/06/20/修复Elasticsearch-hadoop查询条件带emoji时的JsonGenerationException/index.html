@@ -43,7 +43,7 @@
     
     <title>
         
-            标签: Elasticsearch | 
+            修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException | 
         
         Heaven&#39;s Door
     </title>
@@ -54,7 +54,7 @@
 
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="">
-    <meta name="keywords" content="null">
+    <meta name="keywords" content="null,大数据,Spark,Elasticsearch,ES,emoji">
     <meta name="theme-color" content="#0097A7">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
@@ -81,6 +81,9 @@
         <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
         
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tranquil-heart.min.css?qOHJ61Zsis2Yg84f7EV9Dg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
             
         
 
@@ -217,7 +220,7 @@
     <!-- WebAPP Icons -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Heaven&#39;s Door">
-    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/tags/Elasticsearch/">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/">
     <meta name="msapplication-navbutton-color" content="#0097A7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
@@ -232,13 +235,16 @@
     
 
     <!-- The Open Graph protocol -->
-    <meta property="og:url" content="https://leibnizhu.github.io/tags/Elasticsearch/">
+    <meta property="og:url" content="https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="标签: Elasticsearch | Heaven&#39;s Door">
+    <meta property="og:title" content="修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException | Heaven&#39;s Door">
     <meta property="og:image" content="/img/favicon.png">
     <meta property="og:description" content="">
-    
+    <meta property="og:article:tag" content="大数据"> <meta property="og:article:tag" content="Spark"> <meta property="og:article:tag" content="Elasticsearch"> <meta property="og:article:tag" content="ES"> <meta property="og:article:tag" content="emoji"> 
 
+    
+        <meta property="article:published_time" content="Sun Jun 20 2021 13:17:54 GMT+0800">
+        <meta property="article:modified_time" content="Sun Jun 20 2021 17:54:27 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -246,13 +252,43 @@
 
     <!-- Add canonical link for SEO -->
     
-        <link rel="canonical" href="https://leibnizhu.github.io/tags/Elasticsearch/index.html" />
+        <link rel="canonical" href="https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html" />
     
 
     <!-- Structured-data for SEO -->
     
         
 
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html",
+    "headline": "修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException",
+    "datePublished": "Sun Jun 20 2021 13:17:54 GMT+0800",
+    "dateModified": "Sun Jun 20 2021 17:54:27 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",大数据,Spark,Elasticsearch,ES,emojinull",
+    "description": "",
+}
+</script>
 
 
     
@@ -294,149 +330,383 @@
                         </button>
                     
 
-                    <!-- Index Module -->
-<div class="material-index mdl-grid">
-    
-    <div class="locate-thumbnail-symbol"></div>
+                    <!-- Post TOC -->
 
-    <!-- Pin on top -->
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%95%85%E9%9A%9C%E8%83%8C%E6%99%AF"><span class="post-toc-number">1.</span> <span class="post-toc-text">故障背景</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%95%85%E9%9A%9C%E6%A0%B9%E6%BA%90%E5%88%86%E6%9E%90"><span class="post-toc-number">2.</span> <span class="post-toc-text">故障根源分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="post-toc-number">3.</span> <span class="post-toc-text">解决方案</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%90%8C%E5%90%8D%E7%B1%BB%E7%9A%84Patch"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">同名类的Patch</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Javassist-Patch"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">Javassist Patch</span></a></li></ol></li></ol>
+    </ul>
     
 
-    <!-- Normal Post -->
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
     
         
             <!-- Random Thumbnail -->
             <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
+            <script type="text/ls-javascript" id="post-thumbnail-script">
+    var randomNum = Math.floor(Math.random() * 22 + 1);
 
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/">修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            故障背景
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.gif" width="44px" height="44px" alt="Leibniz Hu's avatar">
-            </div>
-            <div>
-                <strong>Leibniz Hu</strong>
-                <span>6月 20, 2021</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-        
-            
-                <!-- Paradox Thumbnail -->
-                <div class="post_entry-module mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2021/06/19/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/">修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            故障背景
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2021/06/19/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/" target="_self">阅读全文</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/avatar.gif" width="44px" height="44px" alt="Leibniz Hu's avatar">
-            </div>
-            <div>
-                <strong>Leibniz Hu</strong>
-                <span>6月 19, 2021</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-          
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-            
-            
-        
-    
-
-    
-
-    
-        <script type="text/ls-javascript" id="thumbnail-script">
-    var randomNum;
-
-    var locatePost = $('.locate-thumbnail-symbol').next();
-    for(var i = 0; i < 10; i++) {
-        randomNum = Math.floor(Math.random() * 22 + 1);
-
-        locatePost.children('.post_thumbnail-random').attr('id', 'random_thumbnail-'+randomNum);
-        locatePost.children('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
+    $('.post_thumbnail-random').attr('data-original', '/img/random/material-' + randomNum + '.png');
     $('.post_thumbnail-random').addClass('lazy');
-
-        locatePost = locatePost.next();
-    }
 </script>
 
+        
+    
+            <p class="article-headline-p">
+                修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>6月 20, 2021</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-none-link" href="/tags/ES/" rel="tag">ES</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/Elasticsearch/" rel="tag">Elasticsearch</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/Spark/" rel="tag">Spark</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/emoji/" rel="tag">emoji</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException&url=https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException&url=https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/index.html&text=修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
     
 </div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h2 id="故障背景"><a href="#故障背景" class="headerlink" title="故障背景"></a>故障背景</h2><p>通过 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html">ES-Hadoop</a> （亦可参考 <a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch-hadoop">Github</a> ） 查询ES时，若查询条件包含emoji，会在json序列化的时候抛出异常（在最新的 <code>7.13.2</code> 版本仍存在）：</p>
+<pre><code class="shell">Caused by: org.codehaus.jackson.JsonGenerationException: Incomplete surrogate pair: first char 0xde97, second 0x22
+    at org.codehaus.jackson.impl.JsonGeneratorBase._reportError(JsonGeneratorBase.java:480)
+    at org.codehaus.jackson.impl.Utf8Generator._decodeSurrogate(Utf8Generator.java:1708)
+    at org.codehaus.jackson.impl.Utf8Generator._outputSurrogates(Utf8Generator.java:1663)
+    at org.codehaus.jackson.impl.Utf8Generator._outputRawMultiByteChar(Utf8Generator.java:1649)
+    at org.codehaus.jackson.impl.Utf8Generator.writeRaw(Utf8Generator.java:757)
+    at org.codehaus.jackson.impl.Utf8Generator.writeRaw(Utf8Generator.java:697)
+    at org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator.writeRaw(JacksonJsonGenerator.java:252)
+    ... 21 more
+</code></pre>
+<h2 id="故障根源分析"><a href="#故障根源分析" class="headerlink" title="故障根源分析"></a>故障根源分析</h2><p>根据报错的调用栈，直接原因出在 <code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate</code> 方法中，其源码：</p>
+<pre><code class="java">protected final int _decodeSurrogate(int surr1, int surr2) throws IOException &#123;
+    if (surr2 &lt; 56320 || surr2 &gt; 57343) &#123;
+        String msg = &quot;Incomplete surrogate pair: first char 0x&quot; + Integer.toHexString(surr1) + &quot;, second 0x&quot; + Integer.toHexString(surr2);
+        this._reportError(msg);
+    &#125;
+
+    int c = 65536 + (surr1 - &#39;\ud800&#39; &lt;&lt; 10) + (surr2 - &#39;\udc00&#39;);
+    return c;
+&#125;
+</code></pre>
+<p>是判断第二个字符在指定范围（<code>[56320, 57343]</code> 区间）外就报这个错误。</p>
+<p>同时注意，这里用的是 <code>org.codehaus</code> 的 <code>jackson-core-asl</code> 依赖包，<a target="_blank" rel="noopener" href="https://github.com/FasterXML/jackson-docs/wiki/Presentation-Jackson-2.0">众所周知</a> ，<code>Jackson</code> 自2.x版本开始就迁移到 <code>com.fasterxml</code> 下了，这个 <code>org.codehaus</code> 的 <code>jackson-core-asl</code> 是1.x版本的（Es-Spark通过打包时改第三方包名的方法将Jackson 打进其jar包中，具体参见 <a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch-hadoop/blob/master/thirdparty/build.gradle">build.gradle文件的relocate操作</a> ，实际版本为 <a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch-hadoop/blob/master/gradle.properties">1.8.8</a> ）。</p>
+<p>针对这个报错，可以查到是一个已经 <a target="_blank" rel="noopener" href="https://github.com/FasterXML/jackson-core/issues/115">在2.3.0修复的bug</a> ，是旧版本不完全支持UTF-8的 <code>surrogate pair</code> （这里又是一个兼容性的大坑，可以参见 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/UTF-16#Code_points_from_U+010000_to_U+10FFFF">维基百科</a> 的介绍）导致的。</p>
+<p>综上所述，Es-Spark 在执行查询的时候，<code>org.elasticsearch.hadoop.rest.RestClient#searchRequest</code> 方法构建了 <code>org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator</code> 实例，并将 <code>QueryBuilder</code> 写入到 <code>JacksonJsonGenerator</code> 中序列化成查询json，在这一步中由于使用了 Jackson 1.x 版本对UTF8的emoji支持不好，导致抛出 <code>JsonGenerationException</code> 异常、中断查询。</p>
+<pre><code class="java">//RestClient 某查询方法
+xxx queryXxx(......) &#123;
+    //......
+    Response response = execute(POST, uri.toString(), searchRequest(query));
+    //......
+&#125;
+
+static BytesArray searchRequest(QueryBuilder query) &#123;
+    FastByteArrayOutputStream out = new FastByteArrayOutputStream(256);
+    JacksonJsonGenerator generator = new JacksonJsonGenerator(out); //注意此处
+    try &#123;
+        generator.writeBeginObject();
+        generator.writeFieldName(&quot;query&quot;);
+        generator.writeBeginObject();
+        query.toJson(generator);
+        generator.writeEndObject();
+        generator.writeEndObject();
+    &#125; finally &#123;
+        generator.close();
+    &#125;
+    return out.bytes();
+&#125;
+</code></pre>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>故障分析到这里，似乎只要升级 <code>jackson-core</code> 版本就可以了……<br>然而上面提到，在 <code>jackson-core 2.3.0</code> 才修复了这个问题，而 Es-Spark 使用的是内置的1.x 版本，前面也有提到 <code>jackson-core</code> 自2.x开始迁移到 <code>com.fasterxml</code> 。具体到代码，Es-spark 的 <code>JacksonJsonGenerator</code> 是这样使用 <code>jackson</code> 的：</p>
+<pre><code class="java">package org.elasticsearch.hadoop.serialization.json;
+
+import org.codehaus.jackson.JsonEncoding;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.elasticsearch.hadoop.serialization.Generator;
+
+public class JacksonJsonGenerator implements Generator &#123;
+    //省略部分字段
+    private static final JsonFactory JSON_FACTORY;
+    private final JsonGenerator generator;
+    private final OutputStream out;
+
+    static &#123;
+        //省略部分代码
+        JSON_FACTORY = new JsonFactory();
+        JSON_FACTORY.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, true);
+    &#125;
+
+    //RestClient 就是调用这个构造方法
+    public JacksonJsonGenerator(OutputStream out) &#123;
+        try &#123;
+            this.out = out;
+            // use dedicated method to lower Jackson requirement
+            this.generator = JSON_FACTORY.createJsonGenerator(out, JsonEncoding.UTF8);
+        &#125; catch (IOException ex) &#123;
+            throw new EsHadoopSerializationException(ex);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>也就是说，直接升级依赖版本是不行的，maven的GAV都变了，类名也变了，必须改代码。</p>
+<h3 id="同名类的Patch"><a href="#同名类的Patch" class="headerlink" title="同名类的Patch"></a>同名类的Patch</h3><p>可以看到，虽说 <code>Jackson</code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 <code>JSON_FACTORY</code> 和 <code>generator</code> 这个两个属性替换为 <code>Jackson 2.3+</code> 版本的类、并微调静态代码块和构造方法里面的代码即可：</p>
+<pre><code class="java">package org.elasticsearch.hadoop.serialization.json;
+
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonFactory;
+import org.elasticsearch.hadoop.serialization.Generator;
+
+public class JacksonJsonGenerator implements Generator &#123;
+    //省略部分字段
+    private static final JsonFactory JSON_FACTORY;
+    private final JsonGenerator generator;
+    private final OutputStream out;
+
+    static &#123;
+        //省略部分代码
+        JSON_FACTORY = new JsonFactory();
+        JSON_FACTORY.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, true);
+    &#125;
+
+    public JacksonJsonGenerator(OutputStream out) &#123;
+        try &#123;
+            this.out = out;
+            // use dedicated method to lower Jackson requirement
+            this.generator = JSON_FACTORY.createJsonGenerator(out, JsonEncoding.UTF8);
+        &#125; catch (IOException ex) &#123;
+            throw new EsHadoopSerializationException(ex);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<h3 id="Javassist-Patch"><a href="#Javassist-Patch" class="headerlink" title="Javassist Patch"></a>Javassist Patch</h3><p>与上一篇博客一样，为了可维护性，最后还是选择使用 <code>Javassist</code> 进行Patch。但受限于 <code>Javassist</code> 的机制，这个Patch起来有点麻烦。<br>首先，阅读 <code>JacksonJsonGenerator</code> 源码，它其实相当于是在 Es-spark 的 <code>Generator</code> 接口与 <code>jackson 1.8.8</code> 的 <code>JsonGenerator</code> 之间做了Adaptor；因此可以考虑写一个 <code>Generator</code> 接口与 <code>jackson 2.3+</code> 之间的Adaptor给原调用者使用。<br>但阅读 Es-spark 的其他代码可以发现，虽然它定义了 <code>Generator</code> 接口，但调用时都是直接面向 <code>JacksonJsonGenerator</code> 实现类，如上面给出过的 <code>RestClient#searchRequest</code> 的代码：</p>
+<pre><code class="java">//RestClient 某查询方法
+static BytesArray searchRequest(QueryBuilder query) &#123;
+    //......
+    JacksonJsonGenerator generator = new JacksonJsonGenerator(out); //注意此处
+    //......
+&#125;
+</code></pre>
+<p>因此首先排除了通过修改 <code>JacksonJsonGenerator</code> 调用者来Patch的方向，还是需要从 <code>JacksonJsonGenerator</code> 内部入手。</p>
+<p>如果用<code>javassist</code>修改<code>JacksonJsonGenerator</code>，参考上一小节的内容，其实只要改俩成员变量的类型，再改改静态代码块即可。但真的如此吗？并不。写同名类能这样做到是因为会整个类重新编译，<code>JacksonJsonGenerator</code>中大量delegate的方法在编译时是用 <code>Jackson 2.3+</code> 的类进行连接的；然而<code>javassist</code>修改成员变量的时候真的只是修改了成员变量本身，如果只改了这里，对应的delegate方法在运行时会找不到成员变量。</p>
+<p>如果是在静态代码块和构造方法新增 <code>Jackson 2.3+</code> 对应的类，并给 <code>writeRaw</code> 方法增加try-catch，在catch中使用 <code>Jackson 2.3+</code> 对应的类进行json序列化呢？也不行。因为序列化是输出到<code>OutputStream</code>（构造方法传入的那个），是有状态的，同时给<code>jackson 1.8.8</code>和<code>jackson 2.3+</code>持有并写入，恐怕会大乱（实测的确如此，不确定是不是没处理好<code>flush</code>，但至少这个方案太危险）。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2021/06/19/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
 
 
                     
@@ -612,6 +882,14 @@ It will not impact the appearance and can give developers a lot of support :)
                     
 
                     
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
 
                     <!--Footer-->
 <footer class="mdl-mini-footer" id="bottom">
@@ -763,6 +1041,10 @@ It will not impact the appearance and can give developers a lot of support :)
 <!-- Import prettify js  -->
 
     
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
 
 
 
@@ -775,6 +1057,11 @@ It will not impact the appearance and can give developers a lot of support :)
     });
 
     
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
         
     
     

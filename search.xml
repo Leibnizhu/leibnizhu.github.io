@@ -3,6 +3,152 @@
   
     
     <entry>
+      <title><![CDATA[修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException]]></title>
+      <url>/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</url>
+      <content type="html"><![CDATA[<h2 id="故障背景"><a href="#故障背景" class="headerlink" title="故障背景"></a>故障背景</h2><p>通过 <a href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html">ES-Hadoop</a> （亦可参考 <a href="https://github.com/elastic/elasticsearch-hadoop">Github</a> ） 查询ES时，若查询条件包含emoji，会在json序列化的时候抛出异常（在最新的 <code>7.13.2</code> 版本仍存在）：</p>
+<pre><code class="shell">Caused by: org.codehaus.jackson.JsonGenerationException: Incomplete surrogate pair: first char 0xde97, second 0x22
+    at org.codehaus.jackson.impl.JsonGeneratorBase._reportError(JsonGeneratorBase.java:480)
+    at org.codehaus.jackson.impl.Utf8Generator._decodeSurrogate(Utf8Generator.java:1708)
+    at org.codehaus.jackson.impl.Utf8Generator._outputSurrogates(Utf8Generator.java:1663)
+    at org.codehaus.jackson.impl.Utf8Generator._outputRawMultiByteChar(Utf8Generator.java:1649)
+    at org.codehaus.jackson.impl.Utf8Generator.writeRaw(Utf8Generator.java:757)
+    at org.codehaus.jackson.impl.Utf8Generator.writeRaw(Utf8Generator.java:697)
+    at org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator.writeRaw(JacksonJsonGenerator.java:252)
+    ... 21 more
+</code></pre>
+<h2 id="故障根源分析"><a href="#故障根源分析" class="headerlink" title="故障根源分析"></a>故障根源分析</h2><p>根据报错的调用栈，直接原因出在 <code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate</code> 方法中，其源码：</p>
+<pre><code class="java">protected final int _decodeSurrogate(int surr1, int surr2) throws IOException &#123;
+    if (surr2 &lt; 56320 || surr2 &gt; 57343) &#123;
+        String msg = &quot;Incomplete surrogate pair: first char 0x&quot; + Integer.toHexString(surr1) + &quot;, second 0x&quot; + Integer.toHexString(surr2);
+        this._reportError(msg);
+    &#125;
+
+    int c = 65536 + (surr1 - &#39;\ud800&#39; &lt;&lt; 10) + (surr2 - &#39;\udc00&#39;);
+    return c;
+&#125;
+</code></pre>
+<p>是判断第二个字符在指定范围（<code>[56320, 57343]</code> 区间）外就报这个错误。</p>
+<p>同时注意，这里用的是 <code>org.codehaus</code> 的 <code>jackson-core-asl</code> 依赖包，<a href="https://github.com/FasterXML/jackson-docs/wiki/Presentation-Jackson-2.0">众所周知</a> ，<code>Jackson</code> 自2.x版本开始就迁移到 <code>com.fasterxml</code> 下了，这个 <code>org.codehaus</code> 的 <code>jackson-core-asl</code> 是1.x版本的（Es-Spark通过打包时改第三方包名的方法将Jackson 打进其jar包中，具体参见 <a href="https://github.com/elastic/elasticsearch-hadoop/blob/master/thirdparty/build.gradle">build.gradle文件的relocate操作</a> ，实际版本为 <a href="https://github.com/elastic/elasticsearch-hadoop/blob/master/gradle.properties">1.8.8</a> ）。</p>
+<p>针对这个报错，可以查到是一个已经 <a href="https://github.com/FasterXML/jackson-core/issues/115">在2.3.0修复的bug</a> ，是旧版本不完全支持UTF-8的 <code>surrogate pair</code> （这里又是一个兼容性的大坑，可以参见 <a href="https://en.wikipedia.org/wiki/UTF-16#Code_points_from_U+010000_to_U+10FFFF">维基百科</a> 的介绍）导致的。</p>
+<p>综上所述，Es-Spark 在执行查询的时候，<code>org.elasticsearch.hadoop.rest.RestClient#searchRequest</code> 方法构建了 <code>org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator</code> 实例，并将 <code>QueryBuilder</code> 写入到 <code>JacksonJsonGenerator</code> 中序列化成查询json，在这一步中由于使用了 Jackson 1.x 版本对UTF8的emoji支持不好，导致抛出 <code>JsonGenerationException</code> 异常、中断查询。</p>
+<pre><code class="java">//RestClient 某查询方法
+xxx queryXxx(......) &#123;
+    //......
+    Response response = execute(POST, uri.toString(), searchRequest(query));
+    //......
+&#125;
+
+static BytesArray searchRequest(QueryBuilder query) &#123;
+    FastByteArrayOutputStream out = new FastByteArrayOutputStream(256);
+    JacksonJsonGenerator generator = new JacksonJsonGenerator(out); //注意此处
+    try &#123;
+        generator.writeBeginObject();
+        generator.writeFieldName(&quot;query&quot;);
+        generator.writeBeginObject();
+        query.toJson(generator);
+        generator.writeEndObject();
+        generator.writeEndObject();
+    &#125; finally &#123;
+        generator.close();
+    &#125;
+    return out.bytes();
+&#125;
+</code></pre>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>故障分析到这里，似乎只要升级 <code>jackson-core</code> 版本就可以了……<br>然而上面提到，在 <code>jackson-core 2.3.0</code> 才修复了这个问题，而 Es-Spark 使用的是内置的1.x 版本，前面也有提到 <code>jackson-core</code> 自2.x开始迁移到 <code>com.fasterxml</code> 。具体到代码，Es-spark 的 <code>JacksonJsonGenerator</code> 是这样使用 <code>jackson</code> 的：</p>
+<pre><code class="java">package org.elasticsearch.hadoop.serialization.json;
+
+import org.codehaus.jackson.JsonEncoding;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.elasticsearch.hadoop.serialization.Generator;
+
+public class JacksonJsonGenerator implements Generator &#123;
+    //省略部分字段
+    private static final JsonFactory JSON_FACTORY;
+    private final JsonGenerator generator;
+    private final OutputStream out;
+
+    static &#123;
+        //省略部分代码
+        JSON_FACTORY = new JsonFactory();
+        JSON_FACTORY.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, true);
+    &#125;
+
+    //RestClient 就是调用这个构造方法
+    public JacksonJsonGenerator(OutputStream out) &#123;
+        try &#123;
+            this.out = out;
+            // use dedicated method to lower Jackson requirement
+            this.generator = JSON_FACTORY.createJsonGenerator(out, JsonEncoding.UTF8);
+        &#125; catch (IOException ex) &#123;
+            throw new EsHadoopSerializationException(ex);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>也就是说，直接升级依赖版本是不行的，maven的GAV都变了，类名也变了，必须改代码。</p>
+<h3 id="同名类的Patch"><a href="#同名类的Patch" class="headerlink" title="同名类的Patch"></a>同名类的Patch</h3><p>可以看到，虽说 <code>Jackson</code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 <code>JSON_FACTORY</code> 和 <code>generator</code> 这个两个属性替换为 <code>Jackson 2.3+</code> 版本的类、并微调静态代码块和构造方法里面的代码即可：</p>
+<pre><code class="java">package org.elasticsearch.hadoop.serialization.json;
+
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonFactory;
+import org.elasticsearch.hadoop.serialization.Generator;
+
+public class JacksonJsonGenerator implements Generator &#123;
+    //省略部分字段
+    private static final JsonFactory JSON_FACTORY;
+    private final JsonGenerator generator;
+    private final OutputStream out;
+
+    static &#123;
+        //省略部分代码
+        JSON_FACTORY = new JsonFactory();
+        JSON_FACTORY.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, true);
+    &#125;
+
+    public JacksonJsonGenerator(OutputStream out) &#123;
+        try &#123;
+            this.out = out;
+            // use dedicated method to lower Jackson requirement
+            this.generator = JSON_FACTORY.createJsonGenerator(out, JsonEncoding.UTF8);
+        &#125; catch (IOException ex) &#123;
+            throw new EsHadoopSerializationException(ex);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<h3 id="Javassist-Patch"><a href="#Javassist-Patch" class="headerlink" title="Javassist Patch"></a>Javassist Patch</h3><p>与上一篇博客一样，为了可维护性，最后还是选择使用 <code>Javassist</code> 进行Patch。但受限于 <code>Javassist</code> 的机制，这个Patch起来有点麻烦。<br>首先，阅读 <code>JacksonJsonGenerator</code> 源码，它其实相当于是在 Es-spark 的 <code>Generator</code> 接口与 <code>jackson 1.8.8</code> 的 <code>JsonGenerator</code> 之间做了Adaptor；因此可以考虑写一个 <code>Generator</code> 接口与 <code>jackson 2.3+</code> 之间的Adaptor给原调用者使用。<br>但阅读 Es-spark 的其他代码可以发现，虽然它定义了 <code>Generator</code> 接口，但调用时都是直接面向 <code>JacksonJsonGenerator</code> 实现类，如上面给出过的 <code>RestClient#searchRequest</code> 的代码：</p>
+<pre><code class="java">//RestClient 某查询方法
+static BytesArray searchRequest(QueryBuilder query) &#123;
+    //......
+    JacksonJsonGenerator generator = new JacksonJsonGenerator(out); //注意此处
+    //......
+&#125;
+</code></pre>
+<p>因此首先排除了通过修改 <code>JacksonJsonGenerator</code> 调用者来Patch的方向，还是需要从 <code>JacksonJsonGenerator</code> 内部入手。</p>
+<p>如果用<code>javassist</code>修改<code>JacksonJsonGenerator</code>，参考上一小节的内容，其实只要改俩成员变量的类型，再改改静态代码块即可。但真的如此吗？并不。写同名类能这样做到是因为会整个类重新编译，<code>JacksonJsonGenerator</code>中大量delegate的方法在编译时是用 <code>Jackson 2.3+</code> 的类进行连接的；然而<code>javassist</code>修改成员变量的时候真的只是修改了成员变量本身，如果只改了这里，对应的delegate方法在运行时会找不到成员变量。</p>
+<p>如果是在静态代码块和构造方法新增 <code>Jackson 2.3+</code> 对应的类，并给 <code>writeRaw</code> 方法增加try-catch，在catch中使用 <code>Jackson 2.3+</code> 对应的类进行json序列化呢？也不行。因为序列化是输出到<code>OutputStream</code>（构造方法传入的那个），是有状态的，同时给<code>jackson 1.8.8</code>和<code>jackson 2.3+</code>持有并写入，恐怕会大乱（实测的确如此，不确定是不是没处理好<code>flush</code>，但至少这个方案太危险）。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> 大数据 </tag>
+            
+            <tag> Spark </tag>
+            
+            <tag> Elasticsearch </tag>
+            
+            <tag> ES </tag>
+            
+            <tag> emoji </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException]]></title>
       <url>/2021/06/19/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</url>
       <content type="html"><![CDATA[<h2 id="故障背景"><a href="#故障背景" class="headerlink" title="故障背景"></a>故障背景</h2><p>众所周知，<code>Elasticsearch</code>（下文简称<code>&quot;ES&quot;</code>）的数值类型字段是支持一些特殊格式的。比如，<code>integer</code> 类型的字段取值可以是浮点数的字符串，如 <code>&quot;2.0&quot;</code>；<code>long</code> 类型的字段取值可以是科学计数法的字符串，如 <code>&quot;2E3&quot;</code>，诸如此类的一些。不同于时间类型的字段可以 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html">通过 <code>mapping</code> 的 <code>format</code> 属性配置取值格式</a> ，数值字段的取值没有格式的配置、上面举例的取值都是可以直接索引文档的。</p>
@@ -40,7 +186,7 @@ protected Integer parseInteger(String value) &#123;
     return Integer.parseInt(value);
 &#125;
 </code></pre>
-<p>可以看到字段取值直接调用 <code>Integer.parseInt</code> 方法解析，且没捕获异常；更重要的是，这个 <code>NumberFormatException</code> 异常会打断读取的流程：出现一条有问题的数据时，会影响整个任务的执行，所以有必要进行调整。</p>
+<p>可以看到字段取值直接调用 <code>Integer.parseInt</code> 方法解析，且没捕获异常。<br>不知道这样设计是处于什么考虑，但这个 <code>NumberFormatException</code> 异常会打断读取的流程：出现一条有问题的数据时，会影响整个查询任务的执行，在 Es-spark 使用于离线批处理的场景，是不恰当的，所以有必要进行调整。</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="自定义-ValueReader"><a href="#自定义-ValueReader" class="headerlink" title="自定义 ValueReader"></a>自定义 ValueReader</h3><p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 <code>org.elasticsearch.hadoop.serialization.builder.ValueReader</code> 接口，并通过 <code>es.ser.reader.value.class</code> 配置项（常量<code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS</code>）配置自定义的 <code>ValueReader</code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 <a href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html">官方文档</a> 中也印证了这一点。</p>
 <p>这样实际处理下来，基本是要拷贝 <code>JdkValueReader</code> 源码进行修改作为自定义的 <code>ValueReader</code> 实现；显然，这样就不能随 ES-spark 升级而自动升级对应实现，同时，在代码中，自定义的修改也和原 <code>JdkValueReader</code> 的实现混杂在一起，给升级带来困难；因此考虑使用 <code>Javassist</code> 进行patch。</p>
 <h3 id="Javassist-Patch"><a href="#Javassist-Patch" class="headerlink" title="Javassist Patch"></a>Javassist Patch</h3><p><code>Javassist</code> 入门和介绍的文章在网上已经很多了，在此不再赘述。<br>列举一下patch过程中遇到的一些坑，或者说，<code>Javassist</code> 的一些使用注意事项：</p>
@@ -356,7 +502,7 @@ StructType(structFieldList);
       <url>/2018/08/01/Scala%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E7%9A%84%E5%B0%8F%E5%9D%91/</url>
       <content type="html"><![CDATA[<p>之前写了一篇文章 <a href="https://leibnizhu.github.io/2017/09/05/发布项目到Maven中央仓库/">发布项目到Maven中央仓库</a>, 最近发布一个scala项目的时候, 用原来的配置, deploy到仓库后,提示找不到javadoc.<br>折腾了一番, 结论:  </p>
 <ol>
-<li><em>*</em>-javadoc.jar肯定是要有的, 否则Nexus校验不通过</li>
+<li>***-javadoc.jar肯定是要有的, 否则Nexus校验不通过</li>
 <li>用maven的javadoc插件默认查找<code>src/main/java</code>下面的源码进行文档构建, scala项目里这个目录当然是不存在的</li>
 <li>可以通过<code>&lt;sourceDictionary&gt;</code>配置让javadoc插件去<code>src/main/scala</code>目录去找源码, 但是显然没有java文件给他找,也是构建不出文档的</li>
 <li>所以要用maven的scala插件进行scaladoc构建文档并打包(默认jar包文件名跟javadoc兼容), 命令是<code>mvn scala:doc-jar</code></li>
@@ -463,7 +609,7 @@ list.exists(f) 等效于 (false /: list) &#123;_ || f(_)&#125;
 <ul>
 <li>scala的模式匹配case子句无需break</li>
 <li>scala约定模式变量名以小写字母开头(scala假设他是模式变量),常量为大写字母(会在作用域范围查找变量)</li>
-<li>不遵守以上规则的时候, 比如需要用模式匹配以外的变量, 可以显式指定作用域(如<code>this.max</code>),或用反引号 <code>` </code> 包住变量名(如<code>`max` </code>)</li>
+<li>不遵守以上规则的时候, 比如需要用模式匹配以外的变量, 可以显式指定作用域(如<code>this.max</code>),或用反引号 <code>`</code> 包住变量名(如<code>`max`</code>)</li>
 <li>case类用于创建轻量级值对象,经常用于模式匹配；如果主构造器无参数，调用时又没加括号，那么传递的是case类的伴生对象（混合了Function0特质，可以视为函数）</li>
 <li>可使用自定义的提取器进行模式匹配，提取器在伴生对象中有<code>unapply()</code>方法,接受我们想要匹配的值,返回Boolean(传入的值是否可以匹配),例如:  </li>
 </ul>
@@ -526,7 +672,7 @@ input match &#123;
 </ul>
 <h1 id="第11章-递归"><a href="#第11章-递归" class="headerlink" title="第11章 递归"></a>第11章 递归</h1><ul>
 <li>尾递归优化(Tail Recursive Optimization): 不是尾递归的时候,递归调用在字节码对应<code>invokespecial</code>指令,表明是递归调用,会产生新一层栈;如果写成尾递归, 递归调用时在字节码对应<code>goto</code>指令,表明使用了迭代而非方法调用,放弃了当前的上下文</li>
-<li><code>@scala.annotation.tailrec</code>注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质</li>
+<li><a href="mailto:`@scala.annotation.tailrec">`@scala.annotation.tailrec</a>`注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质</li>
 <li>蹦床调用(trampoline call): 两个函数互相调用(f调用g,g调用f)构成递归, 对于蹦床调用即使是尾递归<code>@tailrec</code>注解也会报错(scala不能识别跨方法的递归);此时可以用<code>TailRec</code>类解决:  <ul>
 <li>蹦床调用的函数返回<code>TailRec[T]</code>,其中<code>T</code>是真正的返回值类型</li>
 <li>蹦床调用的函数内部,需要结束递归时返回<code>done(结果: T)</code>,需要递归调用其他函数时返回<code>tailcall(其他函数())</code>;这两者都只是简单包装参数,以供后续调用或延迟执行</li>
@@ -613,7 +759,7 @@ val router:ActorRef = system.actorOf(RoundRobinPool(100).props(Props[MyActor]))
 </li>
 </ul>
 <h1 id="第14章-和Java进行互操作"><a href="#第14章-和Java进行互操作" class="headerlink" title="第14章 和Java进行互操作"></a>第14章 和Java进行互操作</h1><ul>
-<li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号<code>` </code>括起来</li>
+<li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号<code>`</code>括起来</li>
 <li>没有方法实现的trait在字节码层面是简单的接口;如果想在scala中创建接口,只能创建没有方法实现的trait</li>
 <li>有方法实现的trait, 2.11及更早版本的scala会编译成一个接口(名为:<code>trait名</code>)和一个实现该接口的抽象类(名为:<code>trait名$class</code>), 2.12开始,只包含方法实现而不包含字段的trait会编译成带有默认方法的接口</li>
 <li>scala将单例对象和伴生对象编译成一个单例类,在字节码层面只有static方法</li>
@@ -701,7 +847,7 @@ val router:ActorRef = system.actorOf(RoundRobinPool(100).props(Props[MyActor]))
 <li>scala中可以通过<code>private[类名/包名/this]</code>和<code>protected[类名/包名/this]</code>实现细粒度的权限控制,具体不表了…</li>
 </ul>
 <h1 id="第4章-处理对象"><a href="#第4章-处理对象" class="headerlink" title="第4章 处理对象"></a>第4章 处理对象</h1><ul>
-<li>定义类的时候,<code>class A(var a:Int, val b:Int)</code>被称作主构造器(primary constructor),其中可变的参数a自动生成getter和setter,不可变的参数b自动生成getter方法,但这些getter setter方法不符合JavaBean标准,没有get/set前缀,可以通过在期望产生符合JavaBean规范的字段加上<code>@scala.reflect.BeanProperty</code>注解来解决这个问题</li>
+<li>定义类的时候,<code>class A(var a:Int, val b:Int)</code>被称作主构造器(primary constructor),其中可变的参数a自动生成getter和setter,不可变的参数b自动生成getter方法,但这些getter setter方法不符合JavaBean标准,没有get/set前缀,可以通过在期望产生符合JavaBean规范的字段加上<a href="mailto:`@scala.reflect.BeanProperty">`@scala.reflect.BeanProperty</a>`注解来解决这个问题</li>
 <li>scala中val修饰的属性编译后为<code>private final</code></li>
 <li>类中单独的代码会作为主构造器的一部分</li>
 <li>还可以定义辅助构造器:<code>def this(...)</code>,辅助构造器的第一行必须调用主构造器或者其他辅助构造器</li>
@@ -1563,7 +1709,7 @@ sasl.mechanism.inter.broker.protocol=PLAIN
       <title><![CDATA[Kerberos部署,配置与基础使用]]></title>
       <url>/2018/03/07/Kerberos%E9%83%A8%E7%BD%B2-%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</url>
       <content type="html"><![CDATA[<p>下文以本地测试集群为例, 4节点(cdh1-4), cdh1为NameNode, cdh2-4为DataNode.  </p>
-<h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><p>Kerberos principal用于在kerberos加密系统中标记一个唯一的身份。<br>kerberos为kerberos principal分配tickets使其可以访问由kerberos加密的hadoop服务。<br>对于hadoop，principals的格式为username/fully.qualified.domain.name@YOUR-REALM.COM.<br>keytab是包含principals和加密principal key的文件。<br>keytab文件对于每个host是唯一的，因为key中包含hostname。keytab文件用于不需要人工交互和保存纯文本密码，实现到kerberos上验证一个主机上的principal。<br>因为服务器上可以访问keytab文件即可以以principal的身份通过kerberos的认证，所以，keytab文件应该被妥善保存，应该只有少数的用户可以访问。  </p>
+<h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><p>Kerberos principal用于在kerberos加密系统中标记一个唯一的身份。<br>kerberos为kerberos principal分配tickets使其可以访问由kerberos加密的hadoop服务。<br>对于hadoop，principals的格式为<a href="mailto:username/fully.qualified.domain.name@YOUR-REALM.COM">username/fully.qualified.domain.name@YOUR-REALM.COM</a>.<br>keytab是包含principals和加密principal key的文件。<br>keytab文件对于每个host是唯一的，因为key中包含hostname。keytab文件用于不需要人工交互和保存纯文本密码，实现到kerberos上验证一个主机上的principal。<br>因为服务器上可以访问keytab文件即可以以principal的身份通过kerberos的认证，所以，keytab文件应该被妥善保存，应该只有少数的用户可以访问。  </p>
 <h1 id="KDC服务安装及配置"><a href="#KDC服务安装及配置" class="headerlink" title="KDC服务安装及配置"></a>KDC服务安装及配置</h1><h2 id="安装KDC服务"><a href="#安装KDC服务" class="headerlink" title="安装KDC服务"></a>安装KDC服务</h2><p>选择NameNode节点(cdh1)安装KDC服务, 执行:  </p>
 <pre><code class="bash">yum -y install krb5-server krb5-libs krb5-auth-dialog krb5-workstation openldap-clients
 </code></pre>
@@ -1771,7 +1917,7 @@ java -jar awp-final/target/awp-0.0.1-SNAPSHOT-fat.jar run com.turingdi.awp.MainV
 <li>请求地址：<code>http://localhost:8083/oauth/wx/apply/&#123;body&#125;</code>  </li>
 <li>参数：body，格式为变种Base64编码的JSON，请用<a href="http://localhost:8083/static/page/sys/base64.html">http://localhost:8083/static/page/sys/base64.html</a> 进行编码</li>
 </ul>
-<p>例如（请修改域名后，在微信打开，静默授权，授权后跳到百度首页(为了展示可以回调到任何地址)，观察地址，rs参数是图灵Base64加密后的结果）: <a href="http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~">http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~</a></p>
+<p>例如（请修改域名后，在微信打开，静默授权，授权后跳到百度首页(为了展示可以回调到任何地址)，观察地址，rs参数是图灵Base64加密后的结果）: <a href="http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~">http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~</a>~</p>
 <pre><code class="json">&#123;
     &quot;eid&quot;:1, /*web项目使用的公众号在本项目中的用户ID*/
     &quot;type&quot;:0,/*0=静默授权，只能获取OpenID，1=正常授权，会弹出授权确认页面，可以获取到用户信息*/
@@ -1783,7 +1929,7 @@ java -jar awp-final/target/awp-0.0.1-SNAPSHOT-fat.jar run com.turingdi.awp.MainV
 <li>请求地址：<code>http://localhost:8083/oauth/zfb/apply/&#123;body&#125;</code>  </li>
 <li>参数：body，格式为变种Base64编码的JSON，请用<a href="http://localhost:8083/static/page/sys/base64.html">http://localhost:8083/static/page/sys/base64.html</a> 进行编码</li>
 </ul>
-<p>例如（请修改域名后打开，静默授权，授权后跳到百度首页(为了展示可以回调到任何地址)，观察地址，rs参数是图灵Base64加密后的结果）: <a href="http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~">http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~~</a></p>
+<p>例如（请修改域名后打开，静默授权，授权后跳到百度首页(为了展示可以回调到任何地址)，观察地址，rs参数是图灵Base64加密后的结果）: <a href="http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~">http://localhost:8083/oauth/wx/apply/bgNVIODVIfwpZOI2dADsO3DVIOD3TmLgZSI2KOgxIODVIOkBHCjsHfqB1YI2IfhMTmD2oY60T0cuHfqpZm8uHt6nIVp6OV~</a>~</p>
 <pre><code class="json">&#123;
     &quot;eid&quot;:1, /*web项目使用的公众号在本项目中的用户ID*/
     &quot;type&quot;:0,/*0=静默授权，只能获取OpenID，1=正常授权，会弹出授权确认页面，可以获取到用户信息*/
@@ -1931,6 +2077,7 @@ producer_partition_by option.
 <pre><code class="bash">nohup /opt/maxwell-1.11.0/bin/maxwell --user=&#39;maxwell&#39; --password=&#39;***&#39; --host=&#39;***&#39; 
 --exclude_dbs=&#39;/^(mysql|maxwell|test)/&#39; --producer=kafka --kafka.bootstrap.servers=*** 
 --kafka_partition_hash=murmur3 --producer_partition_by=primary_key &gt;&gt; /root/maxwell.log &amp;
+
 </code></pre>
 <p>用此命令重新启动<code>Maxwell</code>之后，观察Offset的变化，隔一段时间之后，各分区Offset的增量基本一致，问题解决！</p>
 ]]></content>
@@ -2493,6 +2640,7 @@ NettyServletBenchmark.plaintext  thrpt  200  6508.938 ± 189.498  ops/s
 <pre><code class="bash">gpg --keyserver hkp://pool.sks-keyservers.net：11371 --send-keys 刚才的公钥ID
 gpg --keyserver hkp://pgp.mit.edu:11371 --send-keys 刚才的公钥ID
 gpg --keyserver hkp://keyserver.ubuntu.com:11371 --send-keys 刚才的公钥ID
+
 </code></pre>
 <p>然后验证是否发布成功（也是任选一句，对应上面输入的服务器）：</p>
 <pre><code class="bash">gpg --keyserver hkp://pool.sks-keyservers.net：11371 --recv-keys 刚才的公钥ID
@@ -2906,7 +3054,7 @@ public int getIntHeader(String name) &#123;
 &#125;
 /*====== Header 相关方法 结束 ======*/
 </code></pre>
-<h3 id="Session相关方法"><a href="#Session相关方法" class="headerlink" title="Session相关方法"></a>Session相关方法</h3><p>Session相关方法相对多一些。Session的解析分两种，首先尝试从Cookie中获取Cookie（名为JSESSIONID），如果没有，则从请求路径中找类似”;jsessionid=<strong><em>*</em></strong>“的参数作为SessionID。拿到SessionID后，再调用SessionManager的方法获取Session对象；而根据从哪里解析到的SessionID可以设置<code>isCookieSession</code>和<code>isURLSession</code>两个属性，用于<code>isRequestedSessionIdFromCookie()</code>和<code>isRequestedSessionIdFromURL()</code>方法。如果拿不到SessionID，则调用SessionManager的方法创建一个新Session。<br>至于Session和SessionManager的实现我们在下一小节再讲，值得注意的是，<code>getSession()</code>方法返回的并不是我们定义的Session类实例，而是其门面类，是出于安全的考虑；这一点参考了Tomcat的做法（Tomcat的Request、Response、Session等对象都是用门面模式）。  </p>
+<h3 id="Session相关方法"><a href="#Session相关方法" class="headerlink" title="Session相关方法"></a>Session相关方法</h3><p>Session相关方法相对多一些。Session的解析分两种，首先尝试从Cookie中获取Cookie（名为JSESSIONID），如果没有，则从请求路径中找类似”;jsessionid=<strong>***</strong>“的参数作为SessionID。拿到SessionID后，再调用SessionManager的方法获取Session对象；而根据从哪里解析到的SessionID可以设置<code>isCookieSession</code>和<code>isURLSession</code>两个属性，用于<code>isRequestedSessionIdFromCookie()</code>和<code>isRequestedSessionIdFromURL()</code>方法。如果拿不到SessionID，则调用SessionManager的方法创建一个新Session。<br>至于Session和SessionManager的实现我们在下一小节再讲，值得注意的是，<code>getSession()</code>方法返回的并不是我们定义的Session类实例，而是其门面类，是出于安全的考虑；这一点参考了Tomcat的做法（Tomcat的Request、Response、Session等对象都是用门面模式）。  </p>
 <pre><code class="java">private NettyHttpSession session;
 private boolean isCookieSession;
 private boolean isURLSession;
@@ -4294,6 +4442,7 @@ public class TestWebApp &#123;
         &#125;
     &#125;
 &#125;
+
 </code></pre>
 <h3 id="实现EmbeddedServletContainerFactory接口"><a href="#实现EmbeddedServletContainerFactory接口" class="headerlink" title="实现EmbeddedServletContainerFactory接口"></a>实现EmbeddedServletContainerFactory接口</h3><p>直接启动，提示缺少<code>EmbeddedServletContainerFactory</code>Bean：</p>
 <pre><code class="java">org.springframework.context.ApplicationContextException: Unable to start embedded container; nested exception is org.springframework.context.ApplicationContextException: Unable to start EmbeddedWebApplicationContext due to missing EmbeddedServletContainerFactory bean.
@@ -4389,6 +4538,7 @@ org.springframework.context.ApplicationContextException: Unable to start embedde
     at org.springframework.boot.SpringApplication.run(SpringApplication.java:1151) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]
     at io.gitlab.leibnizhu.sbnetty.TestWebApp.main(TestWebApp.java:102) [test-classes/:na]
 Caused by: java.lang.NullPointerException: null
+
 </code></pre>
 <p>因为SpringBoot在启动的时候，<code>SpringApplication</code>会调用<code>refresh(context)</code>方法进行初始化动作，而我们的context传入了null，当然报空指针异常了。<br>我们将在下一篇文章再讨论怎么实现这个。</p>
 ]]></content>
@@ -4467,6 +4617,8 @@ void transfer(Entry[] newTable) &#123;
     &#125;
 &#125;
 </code></pre>
+</blockquote>
+<blockquote>
 <p>其中，map初始化为一个长度为2的数组，loadFactor=0.75，threshold=2*0.75=1，也就是说当put第二个key的时候，map就需要进行resize。  </p>
 <p>通过设置断点让线程1和线程2同时debug到transfer方法(3.3小节代码块)的首行。注意此时两个线程已经成功添加数据。放开thread1的断点至transfer方法的“Entry next = e.next;” 这一行；然后放开线程2的的断点，让线程2进行resize。结果如下图。<br><img src="/img/hashmap/3.png" alt=""><br>注意，Thread1的 e 指向了key(3)，而next指向了key(7)，其在线程二rehash后，指向了线程二重组后的链表。</p>
 <p>线程一被调度回来执行，先是执行 newTalbe[i] = e， 然后是e = next，导致了e指向了key(7)，而下一次循环的next = e.next导致了next指向了key(3)。<br><img src="/img/hashmap/4.png" alt=""><br><img src="/img/hashmap/5.png" alt=""><br>e.next = newTable[i] 导致 key(3).next 指向了 key(7)。注意：此时的key(7).next 已经指向了key(3)， 环形链表就这样出现了。<br><img src="/img/hashmap/6.png" alt=""><br>于是，当我们用线程一调用map.get(11)时，悲剧就出现了——Infinite Loop。</p>
@@ -6369,7 +6521,7 @@ vboxmanage clonehd CentOS05-disk1.vmdk CentOS05-disk1.vdi --format VDI
 <p>Storage Controller Name (0):            IDE<br>Storage Controller Type (0):            PIIX4<br>Storage Controller Instance Number (0): 0<br>Storage Controller Max Port Count (0):  2<br>Storage Controller Port Count (0):      2<br>Storage Controller Bootable (0):        on<br>IDE (0, 0): /home/turing/VirtualBox VMs/CentOS03/CentOS03-disk1.vdmk (UUID: 2e2d32dc-e66b-42c2-8c9c-4cbb7abb6182)<br>IDE (1, 0): Empty</p>
 </blockquote>
 <p>修改虚拟机挂载的磁盘：</p>
-<pre><code class="bash">VBoxManage storageattach CentOS05 --storagectl &#39;IDE&#39; --port 0 --device 0 --type hdd --medium CentOS05-disk1.vdi
+<pre><code class="bash">VBoxManage storageattach CentOS05 --storagectl &#39;IDE&#39; --port 0 --device 0 --type hdd --medium CentOS05-disk1.vdi 
 </code></pre>
 <p>参数说明：</p>
 <blockquote>
@@ -6888,7 +7040,7 @@ resp.headers().set(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot
       <title><![CDATA[HashMap源码阅读笔记]]></title>
       <url>/2016/12/24/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</url>
       <content type="html"><![CDATA[<h1 id="put方法："><a href="#put方法：" class="headerlink" title="put方法："></a>put方法：</h1><p>put方法调用私有方法</p>
-<pre><code class="java">putVal(hash(key),key,value,false,true);
+<pre><code class="java">putVal(hash(key),key,value,false,true); 
 </code></pre>
 <h2 id="先去计算hash。"><a href="#先去计算hash。" class="headerlink" title="先去计算hash。"></a>先去计算hash。</h2><p>key非空的时候返回：</p>
 <pre><code class="java">h=key.hashCode())^(h&gt;&gt;&gt;16)
@@ -7027,7 +7179,7 @@ HtmlPage page1 = webClient.getPage(request);
 </code></pre>
 <p>依然不行。</p>
 <h2 id="查看源码"><a href="#查看源码" class="headerlink" title="查看源码"></a>查看源码</h2><p>查看了HtmlUnit源码（在此不贴出来了），发现我们调用其方法处理Header，所处理的只不过是一个额外的Map，不管增加和删除都是在这个Map里面处理的，最后的Header是这个额外的Map和预定义的一些Header结合在一起。但是在源码中也没有发现Proxy-Connection字段的处理（如判断当前使用代理，则用Proxy-Connection字段取代Connection字段等逻辑）。</p>
-<p>仔细观察，其实HtmlUnit底层是调用了JDK的<strong>sun.net.www.protocol.http.HttpURLConnection</strong> 进行访问的，我们再看HttpURLConnection的源码，发现有两处：</p>
+<p>仔细观察，其实HtmlUnit底层是调用了JDK的<strong>sun.net.<a href="http://www.protocol.http.HttpURLConnection">www.protocol.http.HttpURLConnection</a></strong> 进行访问的，我们再看HttpURLConnection的源码，发现有两处：</p>
 <pre><code class="java">private void writeRequests() throws IOException &#123;
     …………
     if(this.http.usingProxy &amp;&amp; this.tunnelState() != HttpURLConnection.TunnelState.TUNNELING) &#123;
@@ -7047,7 +7199,7 @@ HtmlPage page1 = webClient.getPage(request);
 &#125;
 </code></pre>
 <p>原来是在这里面处理的！！！！</p>
-<h2 id="编译rt-jar"><a href="#编译rt-jar" class="headerlink" title="编译rt.jar"></a>编译rt.jar</h2><p><strong>sun.net.www.protocol.http.HttpURLConnection</strong> 是在JRE的rt.jar中的核心类，不能随便修改。<br>所以我们提取出HttpURLConnection，反编译，注释掉Proxy-Connection相关语句，重新编译，替换rt.jar中的响应class文件：<br><img src="/img/proxyconnection/1.png" alt=""><br>重新测试，发现发出的请求还是带有Proxy-Connection字段！！！！</p>
+<h2 id="编译rt-jar"><a href="#编译rt-jar" class="headerlink" title="编译rt.jar"></a>编译rt.jar</h2><p><strong>sun.net.<a href="http://www.protocol.http.HttpURLConnection">www.protocol.http.HttpURLConnection</a></strong> 是在JRE的rt.jar中的核心类，不能随便修改。<br>所以我们提取出HttpURLConnection，反编译，注释掉Proxy-Connection相关语句，重新编译，替换rt.jar中的响应class文件：<br><img src="/img/proxyconnection/1.png" alt=""><br>重新测试，发现发出的请求还是带有Proxy-Connection字段！！！！</p>
 <h1 id="Python验证"><a href="#Python验证" class="headerlink" title="Python验证"></a>Python验证</h1><p>从另一个角度来验证：对于HtmlUnit使用会返回403的代理，在Python的Requests中使用，并在HTTP请求头加上Proxy-Connection字段。Python代码比较简单，执行时输入需要验证的IP和端口就行：</p>
 <pre><code class="python">#coding:utf-8                                                                                                                     
 import requests
@@ -7063,7 +7215,7 @@ proxies=&#123;
 r = requests.get(&#39;http://www.***.com/test/index.htm&#39;,proxies=proxies,headers=header)
 r.encoding=&#39;utf-8&#39;
 print r.text
-~
+~                                   
 </code></pre>
 <p>果然，控制台输出“Access not allowed!”。将“headers=header”去掉之后就能正常输出页面内容。<br>因此可以确认是Proxy-Connection字段导致的问题。</p>
 <h1 id="目前结论"><a href="#目前结论" class="headerlink" title="目前结论"></a>目前结论</h1><ol>
@@ -7681,7 +7833,7 @@ taskset -c 5 redis-server redis.conf
 <li>模块化的结构。过滤器包括gzipping, byte ranges, chunked responses, 以及 SSI-filter 。在SSI过滤器中，到同一个proxy或FastCGI的多个子请求并发处理；</li>
 <li>SSL 和 TLS SNI 支持。</li>
 </ul>
-<h2 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h2><p>Nginx<strong>专为性能优化而开发</strong>，性能是其最重要的考量, 实现上非常注重效率 。它支持内核Poll模型，能经受高负载的考验, 有报告表明能支持高达50,000个并发连接数。<br>Nginx作为负载均衡服务器: Nginx 既可以在<strong>内部直接支持 Rails 和 PHP 程序</strong>对外进行服务, 也可以<strong>支持作为 HTTP代理服务器</strong>对外进行服务。<br>Nginx<strong>具有很高的稳定性</strong>。其它HTTP服务器，当遇到访问的峰值，或者有人恶意发起慢速连接时，也很可能会导致服务器物理内存耗尽频繁交换，失去响应，只能重启服务器。例如当前apache一旦上到200个以上进程，web响应速度就明显非常缓慢了。而Nginx采取了分阶段资源分配技术，使得它的CPU与内存占用率非常低。<br>nginx官方表示保持10,000个没有活动的连接，它只占2.5M内存，就稳定性而言, nginx比lighthttpd更胜一筹。<br>Nginx<strong>支持热部署</strong>。它的启动特别容易, 并且几乎可以做到7<em>24不间断运行，即使运行数个月也不需要重新启动。你还能够在不间断服务的情况下，对软件版本进行进行升级。<br>Nginx采用C进行编写, 不论是<em>*系统资源开销还是CPU使用效率</em></em>都比 Perlbal 要好很多。</p>
+<h2 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h2><p>Nginx<strong>专为性能优化而开发</strong>，性能是其最重要的考量, 实现上非常注重效率 。它支持内核Poll模型，能经受高负载的考验, 有报告表明能支持高达50,000个并发连接数。<br>Nginx作为负载均衡服务器: Nginx 既可以在<strong>内部直接支持 Rails 和 PHP 程序</strong>对外进行服务, 也可以<strong>支持作为 HTTP代理服务器</strong>对外进行服务。<br>Nginx<strong>具有很高的稳定性</strong>。其它HTTP服务器，当遇到访问的峰值，或者有人恶意发起慢速连接时，也很可能会导致服务器物理内存耗尽频繁交换，失去响应，只能重启服务器。例如当前apache一旦上到200个以上进程，web响应速度就明显非常缓慢了。而Nginx采取了分阶段资源分配技术，使得它的CPU与内存占用率非常低。<br>nginx官方表示保持10,000个没有活动的连接，它只占2.5M内存，就稳定性而言, nginx比lighthttpd更胜一筹。<br>Nginx<strong>支持热部署</strong>。它的启动特别容易, 并且几乎可以做到7*24不间断运行，即使运行数个月也不需要重新启动。你还能够在不间断服务的情况下，对软件版本进行进行升级。<br>Nginx采用C进行编写, 不论是<strong>系统资源开销还是CPU使用效率</strong>都比 Perlbal 要好很多。</p>
 <h1 id="Nginx安装"><a href="#Nginx安装" class="headerlink" title="Nginx安装"></a>Nginx安装</h1><h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p>到官网下载最新的稳定版：<br><a href="http://nginx.org/en/download.html">nginx: download</a></p>
 <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>准备gcc等编译环境：</p>
 <pre><code class="bash">sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev make build-essential gcc
@@ -7824,7 +7976,7 @@ proxy_pass http://cm:8080;
   server 127.0.0.1:8085 backup;
 &#125;
 </code></pre>
-<p>每台服务器为一行，填写IP和端口，并在weight中填入负载均衡的权重（正整数，默认为1），注意分号。以上例子将该负载均衡配置命名为”rtb”。IP和端口后面填backup的表示备用服务器，当其他非backup的服务器均忙或宕机时，会分发请求到backup服务器上。<br>然后在location中，配置<strong>proxy_pass <a href="http://[负载均衡名">http://[负载均衡名</a>];</strong> 即可，即该server和location定义的域名规则和访问路径规则匹配到的请求将按weight分发到以上几台服务器/服务中。</p>
+<p>每台服务器为一行，填写IP和端口，并在weight中填入负载均衡的权重（正整数，默认为1），注意分号。以上例子将该负载均衡配置命名为”rtb”。IP和端口后面填backup的表示备用服务器，当其他非backup的服务器均忙或宕机时，会分发请求到backup服务器上。<br>然后在location中，配置<strong>proxy_pass http://[负载均衡名];</strong> 即可，即该server和location定义的域名规则和访问路径规则匹配到的请求将按weight分发到以上几台服务器/服务中。</p>
 <h2 id="动静分离"><a href="#动静分离" class="headerlink" title="动静分离"></a>动静分离</h2><p>tomcat是一个比较全面的web容器，对静态网页的处理，应该是比较费资源的，特别是每次都要从磁盘读取静态页面，然后返回。这中间会消耗Tomcat的资源，可能会使那些动态页面解析性能影响。  </p>
 <pre><code class="bash">//静态资源    
 location ~ .*\.(js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid|doc|ppt|pdf|xls|mp3|wma)$ &#123; //静态资源到nginx服务器下static获取

@@ -543,7 +543,7 @@ list.exists(f) 等效于 (false /: list) &#123;_ || f(_)&#125;
 <ul>
 <li>scala的模式匹配case子句无需break</li>
 <li>scala约定模式变量名以小写字母开头(scala假设他是模式变量),常量为大写字母(会在作用域范围查找变量)</li>
-<li>不遵守以上规则的时候, 比如需要用模式匹配以外的变量, 可以显式指定作用域(如<code>this.max</code>),或用反引号 <code>` </code> 包住变量名(如<code>`max` </code>)</li>
+<li>不遵守以上规则的时候, 比如需要用模式匹配以外的变量, 可以显式指定作用域(如<code>this.max</code>),或用反引号 <code>`</code> 包住变量名(如<code>`max`</code>)</li>
 <li>case类用于创建轻量级值对象,经常用于模式匹配；如果主构造器无参数，调用时又没加括号，那么传递的是case类的伴生对象（混合了Function0特质，可以视为函数）</li>
 <li>可使用自定义的提取器进行模式匹配，提取器在伴生对象中有<code>unapply()</code>方法,接受我们想要匹配的值,返回Boolean(传入的值是否可以匹配),例如:  </li>
 </ul>
@@ -606,7 +606,7 @@ input match &#123;
 </ul>
 <h1 id="第11章-递归"><a href="#第11章-递归" class="headerlink" title="第11章 递归"></a>第11章 递归</h1><ul>
 <li>尾递归优化(Tail Recursive Optimization): 不是尾递归的时候,递归调用在字节码对应<code>invokespecial</code>指令,表明是递归调用,会产生新一层栈;如果写成尾递归, 递归调用时在字节码对应<code>goto</code>指令,表明使用了迭代而非方法调用,放弃了当前的上下文</li>
-<li><code>@scala.annotation.tailrec</code>注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质</li>
+<li><a href="mailto:`@scala.annotation.tailrec">`@scala.annotation.tailrec</a>`注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质</li>
 <li>蹦床调用(trampoline call): 两个函数互相调用(f调用g,g调用f)构成递归, 对于蹦床调用即使是尾递归<code>@tailrec</code>注解也会报错(scala不能识别跨方法的递归);此时可以用<code>TailRec</code>类解决:  <ul>
 <li>蹦床调用的函数返回<code>TailRec[T]</code>,其中<code>T</code>是真正的返回值类型</li>
 <li>蹦床调用的函数内部,需要结束递归时返回<code>done(结果: T)</code>,需要递归调用其他函数时返回<code>tailcall(其他函数())</code>;这两者都只是简单包装参数,以供后续调用或延迟执行</li>
@@ -693,7 +693,7 @@ val router:ActorRef = system.actorOf(RoundRobinPool(100).props(Props[MyActor]))
 </li>
 </ul>
 <h1 id="第14章-和Java进行互操作"><a href="#第14章-和Java进行互操作" class="headerlink" title="第14章 和Java进行互操作"></a>第14章 和Java进行互操作</h1><ul>
-<li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号<code>` </code>括起来</li>
+<li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号<code>`</code>括起来</li>
 <li>没有方法实现的trait在字节码层面是简单的接口;如果想在scala中创建接口,只能创建没有方法实现的trait</li>
 <li>有方法实现的trait, 2.11及更早版本的scala会编译成一个接口(名为:<code>trait名</code>)和一个实现该接口的抽象类(名为:<code>trait名$class</code>), 2.12开始,只包含方法实现而不包含字段的trait会编译成带有默认方法的接口</li>
 <li>scala将单例对象和伴生对象编译成一个单例类,在字节码层面只有static方法</li>
@@ -862,7 +862,7 @@ val router:ActorRef = system.actorOf(RoundRobinPool(100).props(Props[MyActor]))
             </a>
             <ul class="dropdown-menu">
             <li>
-                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
             </ul>
         </li>
         
@@ -899,7 +899,7 @@ val router:ActorRef = system.actorOf(RoundRobinPool(100).props(Props[MyActor]))
         <li>
             <a href="/archives">
                 文章总数
-                <span class="sidebar-badge">53</span>
+                <span class="sidebar-badge">54</span>
             </a>
         </li>
         

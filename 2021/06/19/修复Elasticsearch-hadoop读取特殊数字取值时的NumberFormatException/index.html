@@ -244,7 +244,7 @@
 
     
         <meta property="article:published_time" content="Sat Jun 19 2021 23:40:50 GMT+0800">
-        <meta property="article:modified_time" content="Sun Jun 20 2021 09:48:56 GMT+0800">
+        <meta property="article:modified_time" content="Sun Jun 20 2021 17:20:50 GMT+0800">
     
 
     <!-- The Twitter Card protocol -->
@@ -267,7 +267,7 @@
     "mainEntityOfPage": "https://leibnizhu.github.io/2021/06/19/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/index.html",
     "headline": "修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException",
     "datePublished": "Sat Jun 19 2021 23:40:50 GMT+0800",
-    "dateModified": "Sun Jun 20 2021 09:48:56 GMT+0800",
+    "dateModified": "Sun Jun 20 2021 17:20:50 GMT+0800",
     "author": {
         "@type": "Person",
         "name": "Leibniz Hu",
@@ -550,7 +550,7 @@ protected Integer parseInteger(String value) &#123;
     return Integer.parseInt(value);
 &#125;
 </code></pre>
-<p>可以看到字段取值直接调用 <code>Integer.parseInt</code> 方法解析，且没捕获异常；更重要的是，这个 <code>NumberFormatException</code> 异常会打断读取的流程：出现一条有问题的数据时，会影响整个任务的执行，所以有必要进行调整。</p>
+<p>可以看到字段取值直接调用 <code>Integer.parseInt</code> 方法解析，且没捕获异常。<br>不知道这样设计是处于什么考虑，但这个 <code>NumberFormatException</code> 异常会打断读取的流程：出现一条有问题的数据时，会影响整个查询任务的执行，在 Es-spark 使用于离线批处理的场景，是不恰当的，所以有必要进行调整。</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="自定义-ValueReader"><a href="#自定义-ValueReader" class="headerlink" title="自定义 ValueReader"></a>自定义 ValueReader</h3><p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 <code>org.elasticsearch.hadoop.serialization.builder.ValueReader</code> 接口，并通过 <code>es.ser.reader.value.class</code> 配置项（常量<code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS</code>）配置自定义的 <code>ValueReader</code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html">官方文档</a> 中也印证了这一点。</p>
 <p>这样实际处理下来，基本是要拷贝 <code>JdkValueReader</code> 源码进行修改作为自定义的 <code>ValueReader</code> 实现；显然，这样就不能随 ES-spark 升级而自动升级对应实现，同时，在代码中，自定义的修改也和原 <code>JdkValueReader</code> 的实现混杂在一起，给升级带来困难；因此考虑使用 <code>Javassist</code> 进行patch。</p>
 <h3 id="Javassist-Patch"><a href="#Javassist-Patch" class="headerlink" title="Javassist Patch"></a>Javassist Patch</h3><p><code>Javassist</code> 入门和介绍的文章在网上已经很多了，在此不再赘述。<br>列举一下patch过程中遇到的一些坑，或者说，<code>Javassist</code> 的一些使用注意事项：</p>
@@ -634,6 +634,14 @@ try &#123;
             <!-- Post Prev & Next Nav -->
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
+    
+        <a href="/2021/06/20/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
     
 
     <!-- Section Spacer -->
@@ -733,7 +741,7 @@ try &#123;
             </a>
             <ul class="dropdown-menu">
             <li>
-                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
             </ul>
         </li>
         
@@ -770,7 +778,7 @@ try &#123;
         <li>
             <a href="/archives">
                 文章总数
-                <span class="sidebar-badge">53</span>
+                <span class="sidebar-badge">54</span>
             </a>
         </li>
         
