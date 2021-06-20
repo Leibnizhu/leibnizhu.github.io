@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            LinkedList源码阅读笔记（JDK8） | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,源码阅读笔记,Java,LinkedList">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tranquil-heart.min.css?qOHJ61Zsis2Yg84f7EV9Dg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Heaven&#39;s Door">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="M4QKeJ2Iq5t7c8y6uaMaszxNWRqlD5n3vqzq24JY-dc" />
+    <meta name="baidu-site-verification" content="NNXLFEr6nK" />
+
+    <!-- RSS -->
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="LinkedList源码阅读笔记（JDK8） | Heaven&#39;s Door">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="源码阅读笔记"> <meta property="og:article:tag" content="Java"> <meta property="og:article:tag" content="LinkedList"> 
+
+    
+        <meta property="article:published_time" content="Mon Jul 31 2017 14:35:06 GMT+0800">
+        <meta property="article:modified_time" content="Tue Dec 05 2017 04:03:28 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html",
+    "headline": "LinkedList源码阅读笔记（JDK8）",
+    "datePublished": "Mon Jul 31 2017 14:35:06 GMT+0800",
+    "dateModified": "Tue Dec 05 2017 04:03:28 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",源码阅读笔记,Java,LinkedListnull",
+    "description": "",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+    
+    
+        <div style="display: none;">
+    <script src="//s95.cnzz.com/z_stat.php?id=1278880560&web_id=1278880560" language="JavaScript"></script>
+</div>
+    
+
+    <!-- Custom Head -->
+    
+        
+            <script>var _hmt = _hmt || [];(function() {var hm = document.createElement('script');hm.src = 'https://hm.baidu.com/hm.js?f9fd08e08bf7d91fcc3d21ec87e2250f';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hm, s);})();</script>
+        
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0"><span class="post-toc-number">1.</span> <span class="post-toc-text">LinkedList源码阅读笔记</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%A7%E6%89%BF%E7%BB%93%E6%9E%84"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">继承结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">成员变量</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">构造方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%86%85%E9%83%A8%E7%B1%BBNode"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">内部类Node</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%B4%E6%8A%A4%E9%93%BE%E8%A1%A8%E7%9A%84%E5%9F%BA%E7%A1%80%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">维护链表的基础方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B8%B8%E8%A7%84%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">常规方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%B4%E6%8A%A4%E5%A4%B4%E9%83%A8%E5%B0%BE%E9%83%A8%E7%9A%84%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">维护头部尾部的方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8E%A5%E5%8F%A3%E5%B8%B8%E8%A7%84%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">接口常规增删改查方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%A2%9E"><span class="post-toc-number">1.5.2.1.</span> <span class="post-toc-text">增</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%88%A0"><span class="post-toc-number">1.5.2.2.</span> <span class="post-toc-text">删</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%94%B9"><span class="post-toc-number">1.5.2.3.</span> <span class="post-toc-text">改</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%97%A7%E7%9A%84%E6%9F%A5%E6%89%BE%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.2.4.</span> <span class="post-toc-text">旧的查找方法</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#JDK5-%E5%BC%80%E5%A7%8B%E5%BC%95%E5%85%A5%E7%9A%84%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.2.5.</span> <span class="post-toc-text">JDK5 开始引入的方法</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#JDK6-%E5%BC%80%E5%A7%8B%E5%BC%95%E5%85%A5%E7%9A%84%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.2.6.</span> <span class="post-toc-text">JDK6 开始引入的方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BE%B9%E7%95%8C%E6%A3%80%E6%9F%A5%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.3.</span> <span class="post-toc-text">边界检查方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%B6%E4%BB%96%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.4.</span> <span class="post-toc-text">其他方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#JDK8-%E5%BC%80%E5%A7%8B%E5%BC%95%E5%85%A5%E7%9A%84%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.5.5.</span> <span class="post-toc-text">JDK8 开始引入的方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%BF%AD%E4%BB%A3%E5%99%A8"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">迭代器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%8E%B7%E5%8F%96%E8%BF%AD%E4%BB%A3%E5%99%A8%E7%9A%84%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.6.1.</span> <span class="post-toc-text">获取迭代器的方法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BF%AD%E4%BB%A3%E5%99%A8ListItr"><span class="post-toc-number">1.6.2.</span> <span class="post-toc-text">迭代器ListItr</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BF%AD%E4%BB%A3%E5%99%A8DescendingIterator"><span class="post-toc-number">1.6.3.</span> <span class="post-toc-text">迭代器DescendingIterator</span></a></li></ol></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/night.png)">
+    
+            <p class="article-headline-p">
+                LinkedList源码阅读笔记（JDK8）
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>7月 31, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-none-link" href="/tags/Java/" rel="tag">Java</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/LinkedList/" rel="tag">LinkedList</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" rel="tag">源码阅读笔记</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=LinkedList源码阅读笔记（JDK8）&url=https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=LinkedList源码阅读笔记（JDK8）&url=https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=LinkedList源码阅读笔记（JDK8）&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html&text=LinkedList源码阅读笔记（JDK8）" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="LinkedList源码阅读笔记"><a href="#LinkedList源码阅读笔记" class="headerlink" title="LinkedList源码阅读笔记"></a>LinkedList源码阅读笔记</h1><h2 id="继承结构"><a href="#继承结构" class="headerlink" title="继承结构"></a>继承结构</h2><p><img src="/img/jdk/LinkedList_UML.png" alt="">  </p>
+<h2 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h2><pre><code class="java">//记录长度
+transient int size = 0;
+//第一个元素的指针
+transient Node&lt;E&gt; first;
+//最后一个元素的指针（为了增加从尾部开始的速度，及支持一些增删改查尾部元素的方法）
+transient Node&lt;E&gt; last;
+</code></pre>
+<p>以上成员变量都用了transient关键字避免被持久化。  </p>
+<p>从继承结构来看，<code>LinkedList</code>继承了<code>AbstractSequentialList</code>，而<code>AbstractSequentialList</code>继承了<code>AbstractList</code>，因此<code>LinkedList</code>也继承了<code>protected transient int modCount</code>变量，具体作用与<code>ArayList</code>中一样，不再赘述。</p>
+<h2 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h2><pre><code class="java">public LinkedList()
+</code></pre>
+<p>默认构造方法，实现为空方法。  </p>
+<pre><code class="java">public LinkedList(Collection&lt;? extends E&gt; c)
+</code></pre>
+<p>调用<code>addAll()</code>方法将参数c中的所有元素增加到当前实例中，完成构造。</p>
+<h2 id="内部类Node"><a href="#内部类Node" class="headerlink" title="内部类Node"></a>内部类Node</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>在<code>LinkedList</code>中，使用<code>Node</code>内部类存储List的每个元素，其结构比较简单:</p>
+<ul>
+<li><code>item</code>存储具体的List元素引用</li>
+<li><code>next</code>和<code>prev</code>分别存储后一个和上一个元素的引用，由此构成链表。  </li>
+</ul>
+<pre><code class="java">private static class Node&lt;E&gt; &#123;
+    E item;
+    Node&lt;E&gt; next;
+    Node&lt;E&gt; prev;
+
+    Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) &#123;
+        this.item = element;
+        this.next = next;
+        this.prev = prev;
+    &#125;
+&#125;
+</code></pre>
+<h3 id="维护链表的基础方法"><a href="#维护链表的基础方法" class="headerlink" title="维护链表的基础方法"></a>维护链表的基础方法</h3><pre><code class="java">/**
+ * 将元素插入到链表头部
+ * prev=LinkedList.next, next=null
+ * 然后更新first，原来first的prev引用更新为新元素
+ */
+private void linkFirst(E e);
+
+/**
+ * 将元素插入到链表尾部
+ * prev=null, next=LinkedList.first
+ * 然后更新last，原来last的next引用更新为新元素
+ */
+void linkLast(E e);
+
+/**
+ * 插入到指定元素前面
+ * 设置新元素的前后引用
+ * 然后对应修改succ的前一项为新元素，以及原来succ的前一项的后者为新元素
+ * 如果succ原来的前一项为null，那么新的LinkedList.first就是新元素
+ * 我觉得可以直接进来就判断nullsucc原来的前一项时调用linkFirst()进行处理
+ */
+void linkBefore(E e, Node&lt;E&gt; succ);
+
+/**
+ * 将链表头部元素从链表中移除并返回
+ * 主要任务是将LinkedList.first指向原来first的next所引用的元素
+ * 同时将原来first的item以及next设为null
+ * item设为null是为了原来first元素的GC回收，而next设为null是方便新的first在未来被回收
+ * 最后size--，modCount++，维护边界条件并返回
+ */
+private E unlinkFirst(Node&lt;E&gt; f);
+
+/**
+ * 类似unlinkLast()，将链表尾部元素从链表中移除并返回，不再赘述
+ */
+private E unlinkLast(Node&lt;E&gt; l)；
+
+/**
+ * 将任一位置的元素从链表中移除并返回
+ * 代码实现上类似于unlinkFirst()与unlinkLast()的结合
+ */
+E unlink(Node&lt;E&gt; x)
+</code></pre>
+<h2 id="常规方法"><a href="#常规方法" class="headerlink" title="常规方法"></a>常规方法</h2><h3 id="维护头部尾部的方法"><a href="#维护头部尾部的方法" class="headerlink" title="维护头部尾部的方法"></a>维护头部尾部的方法</h3><pre><code class="java">//first为空则抛NoSuchElementException异常，否则返回first.item
+public E getFirst();
+//last为空则抛NoSuchElementException异常，否则返回last.item
+public E getLast();
+
+//first为空则抛异常，否则调用unlinkFirst()删除
+public E removeFirst();
+//last为空则抛异常，否则调用unlinkLast()删除
+public E removeLast();
+
+//调用linkFirst()进行处理，允许e为null
+public void addFirst(E e);
+//调用linkLast()进行处理，允许e为null
+public void addLast(E e);
+</code></pre>
+<h3 id="接口常规增删改查方法"><a href="#接口常规增删改查方法" class="headerlink" title="接口常规增删改查方法"></a>接口常规增删改查方法</h3><h4 id="增"><a href="#增" class="headerlink" title="增"></a>增</h4><pre><code class="java">public boolean add(E e); //调用linkLast()进行处理，并返回true
+public void add(int index, E element);
+</code></pre>
+<p>指定下标插入元素的方法<code>add()</code>先对<code>index</code>进行下标越界检查，然后如果<code>index==size</code>，即插入到List最后面，那么直接调用<code>linkLast()</code>执行插入就可以；否则调用<code>linkBefore()</code>插入到指定下标的元素前面，即新的元素拥有<code>index</code>的下标（符合<code>add()</code>方法对<code>index</code>参数的定义）。  </p>
+<pre><code class="java">public boolean addAll(Collection&lt;? extends E&gt; c); //调用addAll(size, c)
+public boolean addAll(int index, Collection&lt;? extends E&gt; c);
+</code></pre>
+<p>批量增加方法<code>addAll()</code>将参数<code>c</code>里面的元素全部逐个加到当前List中。先检查下标是否越界，然后将Collection转为Object数组，若数组长度为0则返回false。index为要插入的第一个元素所在的下标，如果不是size（最后一个元素之后），则需要读取对应插入处原来的元素及其上一个元素。</p>
+<pre><code class="java">Node&lt;E&gt; pred, succ; //插入新元素的前后元素引用
+if (index == size) &#123;
+    succ = null;
+    pred = last;
+&#125; else &#123;
+    succ = node(index);
+    pred = succ.prev;
+&#125;
+</code></pre>
+<p>随后遍历Object数组，逐个生成<code>Node</code>对象，并将上一个元素的next指向当前元素。遍历完后，维护插入新元素的前/后元素的后/前引用，如果succ为null则<code>LinkedList.last</code>赋值为<code>pred</code>，同时维护<code>size</code>，更新<code>modCount</code>。  </p>
+<h4 id="删"><a href="#删" class="headerlink" title="删"></a>删</h4><pre><code class="java">public boolean remove(Object o);
+</code></pre>
+<p>删除元素的方法<code>remove()</code>类似<code>indexOf()</code>，从<code>first</code>开始遍历List，逐个元素判断是否与参数<code>o</code>相同（判断方法与<code>indexOf()</code>一样），找到后调用<code>unlink()</code>进行删除并返回true。如果没找到相同的元素则返回false。  </p>
+<pre><code class="java">public E remove(int index);
+</code></pre>
+<p>该方法删除指定下标的元素。检查下标没有越界后，调用<code>unlink(node(index))</code>删除指定元素（其中<code>node()</code>是查找指定下标的元素，详见 <em>查</em> 部分）。  </p>
+<pre><code class="java">public void clear();
+</code></pre>
+<p>清空整个List，从<code>first</code>开始，遍历整个List，把每个<code>Node</code>的<code>item next prev</code>都置为null（方便GC），以及<code>LinkedList</code>的<code>first last</code>也置为null，<code>size</code>归零。  </p>
+<h4 id="改"><a href="#改" class="headerlink" title="改"></a>改</h4><pre><code class="java">public E set(int index, E element);
+</code></pre>
+<p>将下标为<code>index</code>的元素设置为<code>element</code>，并将旧值返回。该方法在检查<code>index</code>是否越界后，先调用<code>node()</code>方法查找到指定下标的<code>Node</code>元素，直接修改<code>Node</code>实例的<code>item</code>属性为新值，并返回旧值（而不是新建一个<code>Node</code>，这样既减少操作，也减少多余的对象，从而减轻GC负担）。  </p>
+<h4 id="旧的查找方法"><a href="#旧的查找方法" class="headerlink" title="旧的查找方法"></a>旧的查找方法</h4><pre><code class="java">public boolean contains(Object o);
+public int indexOf(Object o);
+public int lastIndexOf(Object o);
+</code></pre>
+<p>方法<code>contains()</code>判断当前List是否包含指定元素，返回<code>indexOf(o) != -1</code>。<br>方法<code>indexOf()</code>从<code>first</code>开始通过<code>next</code>引用遍历List，逐个元素判断是否与参数<code>o</code>相同（o为null则用<code>item==null</code>进行判断，o非null则调用<code>o.equals(item)</code>进行判断），与ArrayList的实现类似。<br>方法<code>lastIndexOf()</code>的实现与<code>indexOf()</code>类似，只是查找的起点改成<code>last</code>，且遍历的方向相反。  </p>
+<pre><code class="java">public int size(); //返回size属性
+</code></pre>
+<pre><code class="java">Node&lt;E&gt; node(int index);
+public E get(int index);
+</code></pre>
+<p>前者<code>node()</code>方法是通过遍历从链表中查找到指定下标的元素，其中有个优化，如果查找的下标大于<code>size</code>的一半则从<code>last</code>引用开始找，否则从<code>first</code>引用开始找。<br>后者<code>get()</code>方法在检查<code>index</code>参数没有越界后，调用前者进行查找。  </p>
+<h4 id="JDK5-开始引入的方法"><a href="#JDK5-开始引入的方法" class="headerlink" title="JDK5 开始引入的方法"></a><em>JDK5</em> 开始引入的方法</h4><pre><code class="java">//获取但不移除该List的头部，first为null时返回null
+public E peek();
+//获取但不移除该List的头部，调用getFirst()，first为null时抛NoSuchElementException异常
+public E element();
+
+//获取并移除该List的头部，first为null时返回null，否则调用unlinkFirst()处理
+public E poll();
+//获取并移除该List的头部，调用removeFirst()，first为null时抛NoSuchElementException异常
+public E remove();
+
+//将指定元素添加到该List的尾部，调用add()方法处理
+public boolean offer(E e);
+</code></pre>
+<h4 id="JDK6-开始引入的方法"><a href="#JDK6-开始引入的方法" class="headerlink" title="JDK6 开始引入的方法"></a><em>JDK6</em> 开始引入的方法</h4><pre><code class="java">//在该List的开头插入指定的元素，调用addFirst()方法，后者又调用linkFirst()处理，返回true
+public boolean offerFirst(E e);
+// 在该List末尾插入指定的元素，调用addLast()方法，后者又调用linkLast()处理，返回true。实际实现与offer()一致
+public boolean offerLast(E e);
+
+// 获取但不移除该List的第一个元素；如果该List为空，则返回 null。实现与peek()一样
+public E peekFirst();
+//获取但不移除该List的最后一个元素；如果该List为空，则返回 null。实现与peek()类似
+public E peekLast();
+
+//获取并移除该List的第一个元素；如果该List为空，则返回 null；实现与poll()一样
+public E pollFirst();
+//获取并移除该List的最后一个元素；如果该List为空，则返回 null；否则调用unlinkLast()进行处理
+public E pollLast();
+
+//将元素推入该List所表示的堆栈。实际调用addFirst()进行处理
+public void push(E e);
+//从该List所表示的堆栈处弹出一个元素。实际调用removeFirst()进行处理
+public E pop();
+
+//从该List中移除第一次出现的指定元素（从头部到尾部遍历列表时）。调用remove(o)进行处理
+public boolean removeFirstOccurrence(Object o);
+//从该List中移除最后一次出现的指定元素。从last开始向前遍历，找到与o相同的元素;
+//再调用unlink()进行删除处理，返回true；遍历完后还找不到对应元素则返回false。
+public boolean removeLastOccurrence(Object o);
+</code></pre>
+<p>可以看到 <em>JDK6</em> 新增的这些方法实际上是对 <em>JDK5</em> 新增的方法的扩展，从默认的操作（可能是针对头部或尾部）扩展到对头部和尾部的操作。  </p>
+<h3 id="边界检查方法"><a href="#边界检查方法" class="headerlink" title="边界检查方法"></a>边界检查方法</h3><pre><code class="java">//是否合法的元素下标
+private boolean isElementIndex(int index);
+//对迭代器和add()方法而言是否合法下标（允许等于size）
+private boolean isPositionIndex(int index);
+
+//生成报错信息字符串
+private String outOfBoundsMsg(int index);
+
+//检查是否合法的元素下标，不合法则抛IndexOutOfBoundsException异常
+private void checkElementIndex(int index);
+//检查对迭代器和add()方法而言是否合法下标，不合法则抛出IndexOutOfBoundsException异常
+private void checkPositionIndex(int index);
+</code></pre>
+<h3 id="其他方法"><a href="#其他方法" class="headerlink" title="其他方法"></a>其他方法</h3><pre><code class="java">//先调用父类的clone方法复制（其实是Object的本地方法），
+//然后遍历原List，逐个add到克隆后的新List中并返回
+public Object clone();
+
+//List转数组
+//根据size新建一个Object数组，遍历List，逐个Node的item属性加到Object数组中
+public Object[] toArray();
+//如果a的长度小于size，需要调用java.lang.reflect.Array.newInstance(方法新建一个size长度的T[]数组
+//然后遍历List，将每个Node元素的item属性复制到数组中
+//最后将下标为size的元素置为null（标识数组结束， 数组长度大于size才有这个操作）并返回
+public &lt;T&gt; T[] toArray(T[] a);
+
+//序列化方法
+//写入到输出流，先写入size，然后遍历List逐个Node元素的item属性写入输出流
+private void writeObject(java.io.ObjectOutputStream s);
+//读取输入流构造List，先读入一个int作为size，
+//然后从输入流读取size次，每次读取的对象强转为E类型，并调用linkLast()加入到L链表尾部
+private void readObject(java.io.ObjectInputStream s);
+</code></pre>
+<h3 id="JDK8-开始引入的方法"><a href="#JDK8-开始引入的方法" class="headerlink" title="JDK8 开始引入的方法"></a><em>JDK8</em> 开始引入的方法</h3><pre><code class="java">//spliterator：返回一个内部类static final class LLSpliterator&lt;E&gt; implements Spliterator&lt;E&gt; 的实例。
+//为了并行遍历数据源中的元素，Stream.isParallel()实现调用。
+//关于Spliterator接口在ArrayList源码的笔记里有介绍，在此不再赘述
+//这个实现类在final int getEst()est = LinkedList的size，expectedModCount = LinkedList的modCount
+public Spliterator&lt;E&gt; spliterator();
+</code></pre>
+<h2 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h2><h3 id="获取迭代器的方法"><a href="#获取迭代器的方法" class="headerlink" title="获取迭代器的方法"></a>获取迭代器的方法</h3><pre><code class="java">//返回此列表中的元素的列表迭代器（按适当顺序），从列表中指定位置开始。
+//检查下标越界后，返回LinkedList的内部类ListItr的实例
+public ListIterator&lt;E&gt; listIterator(int index);
+//返回以逆向顺序在此双端队列的元素上进行迭代的迭代器。
+//返回的是LinkedList的内部类DescendingIterator的实例
+public Iterator&lt;E&gt; descendingIterator();
+
+//返回父类AbstractList的内部类ListItr实例
+public Iterator&lt;E&gt; AbstractSequentialList.iterator();
+</code></pre>
+<h3 id="迭代器ListItr"><a href="#迭代器ListItr" class="headerlink" title="迭代器ListItr"></a>迭代器ListItr</h3><p>包含以下成员变量：</p>
+<pre><code class="java">//next()，previous()，remove()，set()，add()等方法返回的Node元素记录
+private Node&lt;E&gt; lastReturned;
+//当前游标指向的Node元素
+private Node&lt;E&gt; next;
+//当前游标的下标值
+private int nextIndex;
+//记录应有的modCount，迭代器对链表进行修改后会更新modCount，
+//而迭代器以外对链表的操作不会更新这个属性，
+//因此外部操作后再进行迭代器的操作会抛出ConcurrentModificationException异常
+private int expectedModCount = modCount;
+</code></pre>
+<p>其余<code>ListIterator</code>接口方法的具体实现在此不表，与<code>ArrayList</code>的<code>ListItr</code>的实现类似，只是在一些修改链表的方法里需要对应修改前后元素的引用而已，此外上一个下一个的迭代效率也较高（直接读取Node元素的prev/next引用）。</p>
+<h3 id="迭代器DescendingIterator"><a href="#迭代器DescendingIterator" class="headerlink" title="迭代器DescendingIterator"></a>迭代器DescendingIterator</h3><p>该迭代器是为了实现<code>java.util.Deque</code>接口的<code>Iterator&lt;E&gt; descendingIterator()</code>方法。<br>具体实现还是用前面介绍的<code>LinkedList</code>的内部类<code>ListItr</code>。由于是反向的迭代器，因此用私有变量</p>
+<pre><code class="java">private final ListItr itr = new ListItr(size());
+</code></pre>
+<p>实现从链表尾部开始迭代。<br>从尾部迭代到头部的迭代方式（反向迭代）从其他几个方法的具体实现也可以看出来，比较简单，只贴出代码就算了：</p>
+<pre><code class="java">public boolean hasNext() &#123;
+    return itr.hasPrevious();
+&#125;
+public E next() &#123;
+    return itr.previous();
+&#125;
+public void remove() &#123;
+    itr.remove();
+&#125;
+</code></pre>
+<p>可以看出并没有去重写 <em>JDK8</em> 的</p>
+<pre><code class="java">default void forEachRemaining(Consumer&lt;? super E&gt; action)
+</code></pre>
+<p>方法。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2017/07/31/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/08/01/HashMap%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%80%A7%E8%AE%A8%E8%AE%BA/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/07/29/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">53</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-weibo">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+    
+    <!-- V2EX -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;2016&nbsp;-<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Heaven's Door
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+<script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('
+<link rel="stylesheet" href="/css/uc.css">
+');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

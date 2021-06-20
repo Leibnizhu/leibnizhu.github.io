@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            《Scala实用指南》读书笔记(二) | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,scala">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tranquil-heart.min.css?qOHJ61Zsis2Yg84f7EV9Dg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Heaven&#39;s Door">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="M4QKeJ2Iq5t7c8y6uaMaszxNWRqlD5n3vqzq24JY-dc" />
+    <meta name="baidu-site-verification" content="NNXLFEr6nK" />
+
+    <!-- RSS -->
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="《Scala实用指南》读书笔记(二) | Heaven&#39;s Door">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="scala"> 
+
+    
+        <meta property="article:published_time" content="Wed Jul 18 2018 16:54:47 GMT+0800">
+        <meta property="article:modified_time" content="Fri Jul 20 2018 14:22:44 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html",
+    "headline": "《Scala实用指南》读书笔记(二)",
+    "datePublished": "Wed Jul 18 2018 16:54:47 GMT+0800",
+    "dateModified": "Fri Jul 20 2018 14:22:44 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",scalanull",
+    "description": "",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+    
+    
+        <div style="display: none;">
+    <script src="//s95.cnzz.com/z_stat.php?id=1278880560&web_id=1278880560" language="JavaScript"></script>
+</div>
+    
+
+    <!-- Custom Head -->
+    
+        
+            <script>var _hmt = _hmt || [];(function() {var hm = document.createElement('script');hm.src = 'https://hm.baidu.com/hm.js?f9fd08e08bf7d91fcc3d21ec87e2250f';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hm, s);})();</script>
+        
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC8%E7%AB%A0-%E9%9B%86%E5%90%88"><span class="post-toc-number">1.</span> <span class="post-toc-text">第8章 集合</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC9%E7%AB%A0-%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%E5%92%8C%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="post-toc-number">2.</span> <span class="post-toc-text">第9章 模式匹配和正则表达式</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC10%E7%AB%A0-%E5%A4%84%E7%90%86%E5%BC%82%E5%B8%B8"><span class="post-toc-number">3.</span> <span class="post-toc-text">第10章 处理异常</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC11%E7%AB%A0-%E9%80%92%E5%BD%92"><span class="post-toc-number">4.</span> <span class="post-toc-text">第11章 递归</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC12%E7%AB%A0-%E6%83%B0%E6%80%A7%E6%B1%82%E5%80%BC%E5%92%8C%E5%B9%B6%E8%A1%8C%E9%9B%86%E5%90%88"><span class="post-toc-number">5.</span> <span class="post-toc-text">第12章 惰性求值和并行集合</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC13%E7%AB%A0-%E4%BD%BF%E7%94%A8Actor%E7%BC%96%E7%A8%8B"><span class="post-toc-number">6.</span> <span class="post-toc-text">第13章 使用Actor编程</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E7%AC%AC14%E7%AB%A0-%E5%92%8CJava%E8%BF%9B%E8%A1%8C%E4%BA%92%E6%93%8D%E4%BD%9C"><span class="post-toc-number">7.</span> <span class="post-toc-text">第14章 和Java进行互操作</span></a></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/nightstreet.jpg)">
+    
+            <p class="article-headline-p">
+                《Scala实用指南》读书笔记(二)
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>7月 18, 2018</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-none-link" href="/tags/scala/" rel="tag">scala</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=《Scala实用指南》读书笔记(二)&url=https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=《Scala实用指南》读书笔记(二)&url=https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=《Scala实用指南》读书笔记(二)&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/index.html&text=《Scala实用指南》读书笔记(二)" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="第8章-集合"><a href="#第8章-集合" class="headerlink" title="第8章 集合"></a>第8章 集合</h1><ul>
+<li>Scala对元素较少的Set进行了优化,4个元素以内的Set有专门的实现类(<code>Set0</code>,<code>Set1</code>,<code>Set2</code>,<code>Set3</code>,<code>Set4</code>),大于4个元素的使用HashSet实现</li>
+<li>Set的方法(<code>filter</code>,<code>map</code>,<code>foreach</code>这些就不说了):  <ul>
+<li><code>mkString</code>: 允许传入一个分隔符,相当于把集合所有元素用分隔符join起来返回字符串</li>
+<li><code>++</code>: 合并两个Set,或者说,并集</li>
+<li><code>&amp;</code>: 两个Set的交集</li>
+</ul>
+</li>
+<li>Map的方法:  <ul>
+<li><code>filterKeys</code>: 根据key去过滤,而<code>filter</code>方法是根据(key,value)键值对去过滤</li>
+<li><code>get</code>: 根据key拿value,注意是返回<code>Option[T]</code></li>
+<li><code>updated(K,V)</code>: 增加或更新键值对,返回新的Map,也可以用<code>X() = b</code>,等效于<code>X.updated(b)</code></li>
+</ul>
+</li>
+<li>List的<code>a :: list</code>读作<code>将a前插到list</code>,后面的list才是::方法的调用者; 而<code>list1 ::: list2</code>将list1前插到list2</li>
+<li>List的<code>forall()</code>方法判断是否所有元素都满足条件, <code>exists()</code>方法判断是否有任意元素满足条件. 其实分别相当于:</li>
+</ul>
+<pre><code class="scala">list.forall(f) 等效于 (true /: list) &#123;_ &amp;&amp; f(_)&#125;
+list.exists(f) 等效于 (false /: list) &#123;_ || f(_)&#125;
+</code></pre>
+<ul>
+<li>如果方法名以 <code>:</code> 结尾, 那么调用时的主语是操作符后面的实例, 即<code>a (操作符): b</code>等效于<code>b.操作符:(a)</code>;同时scala不允许字母作为操作符的名称,除非用下划线对操作符增加前缀,如<code>jump_:()</code></li>
+<li><code>+ - ! ~</code>作一元操作符时,也是调用的主语在操作符后面,分别映射到<code>unary_+(),unary_-(),unary_!(),unary_~()</code>等方法的调用,即<code>-a</code>调用<code>a.unary_-()</code>等</li>
+<li>for表达式:<code>for([parrten &lt;- generator; definition*&gt;]+;filter;) [yield] expression</code>,可以加过滤条件,而yield也是可选的,有yield的时候返回一个值列表,没有yield的时候返回Unit</li>
+</ul>
+<h1 id="第9章-模式匹配和正则表达式"><a href="#第9章-模式匹配和正则表达式" class="headerlink" title="第9章 模式匹配和正则表达式"></a>第9章 模式匹配和正则表达式</h1><ul>
+<li>匹配List的时候,可以只获取感兴趣的元素,剩下的用<code>_*</code>省略, 如:  </li>
+</ul>
+<pre><code class="scala">list match &#123;
+  case List(head,&quot;test&quot;, _*) =&gt; f(head) //后面的直接忽略
+  case List(&quot;test&quot;, others @ _*) =&gt; f(others) //后面的tail要引用
+  case &quot;haha&quot;::&quot;two&quot;::tail =&gt; f(tail) //这样其实也行
+&#125;
+</code></pre>
+<ul>
+<li>scala的模式匹配case子句无需break</li>
+<li>scala约定模式变量名以小写字母开头(scala假设他是模式变量),常量为大写字母(会在作用域范围查找变量)</li>
+<li>不遵守以上规则的时候, 比如需要用模式匹配以外的变量, 可以显式指定作用域(如<code>this.max</code>),或用反引号 <code>` </code> 包住变量名(如<code>`max` </code>)</li>
+<li>case类用于创建轻量级值对象,经常用于模式匹配；如果主构造器无参数，调用时又没加括号，那么传递的是case类的伴生对象（混合了Function0特质，可以视为函数）</li>
+<li>可使用自定义的提取器进行模式匹配，提取器在伴生对象中有<code>unapply()</code>方法,接受我们想要匹配的值,返回Boolean(传入的值是否可以匹配),例如:  </li>
+</ul>
+<pre><code class="scala">object Symbol &#123;
+  def unapply(s:String):Boolean = s == &quot;TEST&quot;
+&#125;
+input match &#123;
+  case Symbol() =&gt; println(s&quot;matched, $&#123;input&#125;&quot;) //即匹配 TEST
+  case _ =&gt; println(s&quot;Invalid input: $&#123;input&#125;&quot;)
+&#125;
+</code></pre>
+<ul>
+<li>提取器还可以返回Boolean型以外的结果,即解析的结果,通过修改<code>unapply()</code>的返回类型实现(返回<code>Option[T]</code>,<code>T</code>即解析成功的结果类型), 例如:  </li>
+</ul>
+<pre><code class="scala">object Splitor &#123;
+  def unapply(s:String):Option[(String,String)] = if(!s.contains(&quot;:&quot;)) None else &#123;
+    val splited = s.split(&quot;:&quot;)
+    Some((splited(0), splited(1)))
+  &#125;
+&#125;
+input match &#123;
+  case Splitor(a,b) =&gt; println(s&quot;matched, $&#123;a&#125; and $&#123;b&#125;&quot;) //即匹配 ***:***
+  case _ =&gt; println(s&quot;Invalid input: $&#123;input&#125;&quot;)
+&#125;
+</code></pre>
+<ul>
+<li>使用提取器的时候还可以应用其他提取器进行模式匹配,如</li>
+</ul>
+<pre><code class="scala">input match &#123;
+  case Splitor(a @ Symbol(),b) =&gt; println(s&quot;matched, $&#123;a&#125; and $&#123;b&#125;&quot;) //即匹配 TEST:***
+  case _ =&gt; println(s&quot;Invalid input: $&#123;input&#125;&quot;)
+&#125;
+</code></pre>
+<ul>
+<li>正则表达式: <code>&quot;regex&quot;.r</code>(可以用原始字符串<code>&quot;&quot;&quot;regex&quot;&quot;&quot;.r</code>), 实际上是<code>String</code>隐式转换成<code>StringOps</code>再调用其<code>r</code>方法获取<code>Regex</code>类实例</li>
+<li>正则表达式的方法:  <ul>
+<li><code>findFirstIn(source)</code>: 获取正则表达式第一个匹配项</li>
+<li><code>findAllIn(source)</code>: 获取正则表达式的所有匹配项</li>
+<li><code>replaceFirstIn(source, replacement)</code>: 替换第一个匹配项</li>
+<li><code>replaceAllIn(source, replacement)</code>: 替换所有匹配项</li>
+</ul>
+</li>
+<li>scala的正则表达式是提取器,返回值是匹配项(括号的分组)拼接成的元组</li>
+<li>下划线的作用:  <ul>
+<li>包引入的通配符</li>
+<li>元组索引的前缀</li>
+<li>函数值的隐式参数</li>
+<li>用默认值初始化变量</li>
+<li>在函数名中混合操作符和:</li>
+<li>在模式匹配中作为通配符</li>
+<li>处理异常时在catch代码块和case一起用(类似模式匹配了)</li>
+<li>作为分解操作的一部分,如<code>max(arg: _*)</code>可以接受列表或数组参数,自动拆解成离散的值传递给可变长度参数</li>
+<li>部分应用一个函数,如<code>val square = Math.pow(_:Int, 2)</code>部分应用了pow函数,返回一个新的单参数函数</li>
+</ul>
+</li>
+</ul>
+<h1 id="第10章-处理异常"><a href="#第10章-处理异常" class="headerlink" title="第10章 处理异常"></a>第10章 处理异常</h1><ul>
+<li>Java处理多个异常时,会检查多个异常的处理顺序,子类必须在前面,否则编译会出错(<code>exception ***.*** has already been caught</code>),但scala对此不会警告,要自己注意(在catch块中使用case匹配的顺序)</li>
+<li>这本书竟然没有讲到<code>Try</code>类,吐槽一下</li>
+</ul>
+<h1 id="第11章-递归"><a href="#第11章-递归" class="headerlink" title="第11章 递归"></a>第11章 递归</h1><ul>
+<li>尾递归优化(Tail Recursive Optimization): 不是尾递归的时候,递归调用在字节码对应<code>invokespecial</code>指令,表明是递归调用,会产生新一层栈;如果写成尾递归, 递归调用时在字节码对应<code>goto</code>指令,表明使用了迭代而非方法调用,放弃了当前的上下文</li>
+<li><code>@scala.annotation.tailrec</code>注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质</li>
+<li>蹦床调用(trampoline call): 两个函数互相调用(f调用g,g调用f)构成递归, 对于蹦床调用即使是尾递归<code>@tailrec</code>注解也会报错(scala不能识别跨方法的递归);此时可以用<code>TailRec</code>类解决:  <ul>
+<li>蹦床调用的函数返回<code>TailRec[T]</code>,其中<code>T</code>是真正的返回值类型</li>
+<li>蹦床调用的函数内部,需要结束递归时返回<code>done(结果: T)</code>,需要递归调用其他函数时返回<code>tailcall(其他函数())</code>;这两者都只是简单包装参数,以供后续调用或延迟执行</li>
+<li>外部调用这些函数时, 对返回值<code>TailRec[T]</code>调用<code>result</code>方法可以获取最终递归结果;真正发生计算是调用<code>result</code>方法的时候</li>
+</ul>
+</li>
+</ul>
+<h1 id="第12章-惰性求值和并行集合"><a href="#第12章-惰性求值和并行集合" class="headerlink" title="第12章 惰性求值和并行集合"></a>第12章 惰性求值和并行集合</h1><ul>
+<li>使用关键字<code>lazy</code>修饰变量,scala会推迟绑定变量和他的值,直到该值第一次被使用(才会去绑定)</li>
+<li>如果变量绑定的计算有副作用,那么多个变量的绑定顺序机会对绑定的值有影响,此时就不能随便用惰性求值(<code>lazy</code>)了,否则不可交换计算的结果将会得不可知</li>
+<li>前面介绍的集合都是<code>严格集合</code>,所有计算都是严格(立刻)执行的; 通过集合的<code>view()</code>方法可以获得一个严格集合的<code>惰性视图</code>, 惰性集合会推迟计算,当且晋档请求了非惰性/非视图的结果时(比如<code>head</code>,<code>last</code>等等)前面的操作才会进行</li>
+<li>但集合的惰性视图不一定比严格集合性能好,要看具体情况,比如一个集合进行一些操作之后,获取head,那么惰性视图要进行操作的次数就少一些;如果在多次filter后要拿last,那么惰性视图就要把每个元素执行filter计算一遍, 而严格集合每次filter后要计算的结果都小一些,这样计算量反而会少一点.</li>
+<li><code>Stream</code>仅按需生成值,有天然的惰性.拥有<code>#::</code>方法连接(惰性,需要的时候才会连接)现有的Stream和新的值,通过递归定义可以得到一个<code>Stream</code>, 如:  </li>
+</ul>
+<pre><code class="scala">//第一个元素是start,下一个是前一个加1
+def gen(start:Int): Stream[Int] = start #:: gen(start + 1) 
+println(gen(10)) //Stream(10, ?)
+</code></pre>
+<ul>
+<li>调用<code>Stream.force()</code>方法可以强制求值, <code>toList()</code>方法也类似;如果在无限流上调用的话会抛OutOfMemoryError</li>
+<li>对于无限流,可以使用<code>take(Int)</code>方法获取前N个值组成的Stream,也可以使用<code>takeWhile()</code>方法按条件生成值(参数的函数值返回false时终止生成新值)</li>
+<li>Stream会记住(memoize)已经生成的值,即按需生成新的值后,会先缓存再返回. 比如执行<code>stream.take(3).force</code>计算了3个值,再执行<code>stream.take(4).force</code>只计算第4个值,前3个值从缓存读取</li>
+<li>对很多顺序集合,scala都有对应的并行版本, 如<code>ParArray</code>,<code>ParHashMap</code>,<code>ParHashSet</code>等等; 可以用<code>par()</code>和<code>seq()</code>方法在顺序集合及其并行版本之间转换</li>
+<li>不适合使用并行集合的情况:  <ul>
+<li>创建和调度线程的开销不应该大于执行这些任务所需要的时间, 对于慢型任务而言并行集合可能有所裨益,但对于小心集合的快速任务并不适合; </li>
+<li>此外,在集合上的操作如果修改全局状态(线程不安全的修改),那么整体计算结果不可知; </li>
+<li>如果操作不满足结合律也不要使用并行集合,因为并行集合的执行顺序是不确定的</li>
+</ul>
+</li>
+</ul>
+<h1 id="第13章-使用Actor编程"><a href="#第13章-使用Actor编程" class="headerlink" title="第13章 使用Actor编程"></a>第13章 使用Actor编程</h1><ul>
+<li>Actor帮助我们将共享的可变性转换成隔离的可变性(isolated mutability),如果一个任务可以有意义地分成几个子任务,分而治之,那么可以使用Actor模型来解决这个任务</li>
+<li><code>AtomicLog</code>之类的类,虽然原子性保证了单个值的线程安全性,但并不能保证跨多个值的原子性,这些值可能同时发生变化</li>
+<li>一个Actor是一个对象,由一个消息队列支撑,任意给定的时间,一个Actor只会处理一条消息; <code>Akka</code>提供<code>Actor</code>模型, 创建一个Actor只要继承<code>Actor</code>特质并实现<code>receive()</code>方法, <code>receive()</code>方法主题是模式匹配, 匹配发生在一个隐式消息对象上</li>
+<li>Actor托管在ActorSystem中,管理了线程池(只要系统保持活跃,这个线程池就会一直保持活跃),消息队列,和Actor生命周期,使用<code>actorOf()</code>工厂方法创建Actor, 用<code>!()</code>方法(<code>tell()</code>)发送消息:  </li>
+</ul>
+<pre><code class="scala">val system = ActorSystem(&quot;sample&quot;) //创建ActorSystem
+val depp = system.actorOf(Props[XxxActor]) //通过actorOd工厂方法创建Actor
+depp ! &quot;Hello&quot; //往Actor发送消息
+val terminateFuture = system.terminate() //退出ActorSystem线程
+Await.ready(terminateFuture, Duration.Inf)
+</code></pre>
+<ul>
+<li>Actor一些细节:  <ul>
+<li>Actor在不同线程中进行,而不是调用主线程</li>
+<li>每个Actor一次只处理一条消息,多个Actor并发运行处理多条消息</li>
+<li>Actor是异步的,不会阻塞调用者(调用者不等待Actor回复)</li>
+<li>线程和Actor不绑定(没什么线程亲和力),每次处理消息<strong>可能</strong>使用线程池中不同的线程</li>
+</ul>
+</li>
+<li>Actor中保存的任何字段都是自动线程安全的,可变但没有共享可变性;可以在Actor类中选择性地存储状态,比如用于存储状态的字段,等等</li>
+<li>若希望从Actor得到响应,Akka提供了询问模式,但消息可能永远不会到达,因此强制使用超时时间;询问模式下, 使用<code>?()</code>方法(<code>ask()</code>)发送消息, 返回一个<code>Future</code>,需要用这个Future实例等待响应(可以用<code>Await.result()</code>方法), 例如:  </li>
+</ul>
+<pre><code class="scala">//Actor类
+class MyActor extends Actor &#123;
+  def recieve:Receive = &#123;
+    case msg =&gt; sender ! s&quot;Got message $&#123;msg&#125;&quot;
+  &#125;
+&#125;
+
+val system = ActorSystem(&quot;sample&quot;) //创建ActorSystem
+val depp = system.actorOf(Props[MyActor]) //通过actorOd工厂方法创建Actor
+implicit val timeout = Timeout(2.seconds) //通过隐式参数定义超时, ?方法要用到
+val askFuture = depp ? &quot;heihei&quot; //询问模式,发出消息
+val result = Await.result(askFuture, timeout.duration) //等待响应结果,这里也需要一个超时的参数
+println(s&quot;Response result : $&#123;result&#125;&quot;)
+val terminateFuture = system.terminate() //退出ActorSystem线程
+Await.ready(terminateFuture, Duration.Inf)
+</code></pre>
+<ul>
+<li>Akka提供<code>RoundRobinPool</code>路由器,会将发送到这个路由器的所有消息均匀地路由到支撑他的多个Actor,使用方法:  </li>
+</ul>
+<pre><code class="scala">val system = ActorSystem(&quot;sample&quot;) //创建ActorSystem
+val router:ActorRef = system.actorOf(RoundRobinPool(100).props(Props[MyActor]))
+</code></pre>
+<ul>
+<li>Actor中想访问ActorSystem可以使用<code>context()</code>方法</li>
+<li>使用建议:  <ul>
+<li>更多地依赖无状态的而非有状态的Actor</li>
+<li>要保证recieve()方法中的处理速度非常狂,尤其是接收Actor具有状态时,改变状态的长时间运行任务将会降低并发性,要避免</li>
+<li>确保在Actor之间传递的消息是不可变对象</li>
+<li>避免使用ask()</li>
+</ul>
+</li>
+</ul>
+<h1 id="第14章-和Java进行互操作"><a href="#第14章-和Java进行互操作" class="headerlink" title="第14章 和Java进行互操作"></a>第14章 和Java进行互操作</h1><ul>
+<li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号<code>` </code>括起来</li>
+<li>没有方法实现的trait在字节码层面是简单的接口;如果想在scala中创建接口,只能创建没有方法实现的trait</li>
+<li>有方法实现的trait, 2.11及更早版本的scala会编译成一个接口(名为:<code>trait名</code>)和一个实现该接口的抽象类(名为:<code>trait名$class</code>), 2.12开始,只包含方法实现而不包含字段的trait会编译成带有默认方法的接口</li>
+<li>scala将单例对象和伴生对象编译成一个单例类,在字节码层面只有static方法</li>
+<li>单例对象(假设名为Single)编译后产生两个类, 一个<code>Single$</code>类存放具体的静态方法,一个<code>Single</code>类负责转发方法的调用,在Java中可以直接通过<code>Single</code>调用其方法</li>
+<li>伴生对象(假设类名为Buddy)编译后产生两个类,一个<code>Buddy$</code>类存放伴生对象的静态方法,一个<code>Buddy</code>类存放对应类的方法等;</li>
+<li>在Java中使用类本身的方法可以直接调用;而伴生对象,包含一个<code>MODULE$</code>的属性保存着该类的静态单例对象,可以通过它去访问其方法,如<code>Buddy$.MODULE$.method()</code></li>
+<li>scala没有throws子句,抛出异常时无需在方法签名中显示声明,如果在Java中扩展类覆写方法时抛出异常就会报错; 可以在scala方法签名中增加<code>@throw</code>注解解决该问题,如:  </li>
+</ul>
+<pre><code class="scala">abstract class Bird &#123;
+  @throws(classOf[NoFlyException]) def fly(): Unit
+&#125;
+</code></pre>
+<p>(结束)</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2018/07/18/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%BA%8C)/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2018/08/01/Scala%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E7%9A%84%E5%B0%8F%E5%9D%91/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2018/07/17/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0(%E4%B8%80)/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">53</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-weibo">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+    
+    <!-- V2EX -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;2016&nbsp;-<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Heaven's Door
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+<script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('
+<link rel="stylesheet" href="/css/uc.css">
+');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

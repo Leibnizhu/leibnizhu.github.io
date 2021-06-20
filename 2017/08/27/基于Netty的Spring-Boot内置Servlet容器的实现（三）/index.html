@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            基于Netty的Spring Boot内置Servlet容器的实现（三） | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,Netty,Spring Boot,Servlet">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tranquil-heart.min.css?qOHJ61Zsis2Yg84f7EV9Dg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Heaven&#39;s Door">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="M4QKeJ2Iq5t7c8y6uaMaszxNWRqlD5n3vqzq24JY-dc" />
+    <meta name="baidu-site-verification" content="NNXLFEr6nK" />
+
+    <!-- RSS -->
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="基于Netty的Spring Boot内置Servlet容器的实现（三） | Heaven&#39;s Door">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="Netty"> <meta property="og:article:tag" content="Spring Boot"> <meta property="og:article:tag" content="Servlet"> 
+
+    
+        <meta property="article:published_time" content="Sun Aug 27 2017 08:52:03 GMT+0800">
+        <meta property="article:modified_time" content="Tue Dec 05 2017 04:03:28 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html",
+    "headline": "基于Netty的Spring Boot内置Servlet容器的实现（三）",
+    "datePublished": "Sun Aug 27 2017 08:52:03 GMT+0800",
+    "dateModified": "Tue Dec 05 2017 04:03:28 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",Netty,Spring Boot,Servletnull",
+    "description": "",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+    
+    
+        <div style="display: none;">
+    <script src="//s95.cnzz.com/z_stat.php?id=1278880560&web_id=1278880560" language="JavaScript"></script>
+</div>
+    
+
+    <!-- Custom Head -->
+    
+        
+            <script>var _hmt = _hmt || [];(function() {var hm = document.createElement('script');hm.src = 'https://hm.baidu.com/hm.js?f9fd08e08bf7d91fcc3d21ec87e2250f';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hm, s);})();</script>
+        
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">基于Netty的Spring Boot内置Servlet容器的实现（三）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#EmbeddedServletContainer%E5%AE%9E%E7%8E%B0"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">EmbeddedServletContainer实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Spring-Boot%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B%E4%B8%8EEmbeddedServletContainer"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">Spring Boot启动过程与EmbeddedServletContainer</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#NettyContainer"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">NettyContainer</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95"><span class="post-toc-number">1.1.2.1.</span> <span class="post-toc-text">构造方法</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#start"><span class="post-toc-number">1.1.2.2.</span> <span class="post-toc-text">start()</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#stop"><span class="post-toc-number">1.1.2.3.</span> <span class="post-toc-text">stop()</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Netty%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Netty服务设计</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">设计思路</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89Netty%E7%9A%84Handler%E5%A4%84%E7%90%86%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">自定义Netty的Handler处理请求响应</span></a></li></ol></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/yuyuko2.png)">
+    
+            <p class="article-headline-p">
+                基于Netty的Spring Boot内置Servlet容器的实现（三）
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>8月 27, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-none-link" href="/tags/Netty/" rel="tag">Netty</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/Servlet/" rel="tag">Servlet</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/Spring-Boot/" rel="tag">Spring Boot</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=基于Netty的Spring Boot内置Servlet容器的实现（三）&url=https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=基于Netty的Spring Boot内置Servlet容器的实现（三）&url=https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=基于Netty的Spring Boot内置Servlet容器的实现（三）&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/index.html&text=基于Netty的Spring Boot内置Servlet容器的实现（三）" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="基于Netty的Spring-Boot内置Servlet容器的实现（三）"><a href="#基于Netty的Spring-Boot内置Servlet容器的实现（三）" class="headerlink" title="基于Netty的Spring Boot内置Servlet容器的实现（三）"></a>基于Netty的Spring Boot内置Servlet容器的实现（三）</h1><h2 id="EmbeddedServletContainer实现"><a href="#EmbeddedServletContainer实现" class="headerlink" title="EmbeddedServletContainer实现"></a>EmbeddedServletContainer实现</h2><h3 id="Spring-Boot启动过程与EmbeddedServletContainer"><a href="#Spring-Boot启动过程与EmbeddedServletContainer" class="headerlink" title="Spring Boot启动过程与EmbeddedServletContainer"></a>Spring Boot启动过程与EmbeddedServletContainer</h3><p>一般来说，Spring Boot的应用如果使用内置Servlet容器单独运行，我们都会在main()方法中调用</p>
+<pre><code class="java">SpringApplication.run(Object source, String... args);
+</code></pre>
+<p>方法。通过<code>source</code>参数构造一个<code>SpringApplication</code>对象再调用其</p>
+<pre><code class="java">public ConfigurableApplicationContext run(String... args);
+</code></pre>
+<p>方法，这个方法先通过<code>createApplicationContext()</code>创建一个<code>AnnotationConfigEmbeddedWebApplicationContext</code>对象，随后会调用到</p>
+<pre><code class="java">protected void refresh(ApplicationContext applicationContext);
+</code></pre>
+<p>方法，这个方法会调用到<code>AbstractApplicationContext</code>的<code>refresh()</code>方法。而通过下面的UML图可以看到，<code>AnnotationConfigEmbeddedWebApplicationContext</code>是<code>AbstractApplicationContext</code>的子类。<br><img src="/img/springbootnetty/EmbeddedWebApplicationContext.png" alt=""><br>实际上，这里使用了模板设计模式，<code>refresh()</code>的具体流程由父类<code>AbstractApplicationContext</code>定义，具体的一些操作由子类去实现，在子类调用<code>refresh()</code>方法的时候，调用的是子类实现的操作方法，如：  </p>
+<pre><code class="java">protected void onRefresh() throws BeansException
+</code></pre>
+<p>方法。这个方法在<code>AnnotationConfigEmbeddedWebApplicationContext</code>的父类<code>EmbeddedWebApplicationContext</code>中有实现：</p>
+<pre><code class="java">protected void onRefresh() &#123;
+    super.onRefresh();
+
+    try &#123;
+        this.createEmbeddedServletContainer();
+    &#125; catch (Throwable var2) &#123;
+        throw new ApplicationContextException(&quot;Unable to start embedded container&quot;, var2);
+    &#125;
+&#125;
+
+private void createEmbeddedServletContainer() &#123;
+   EmbeddedServletContainer localContainer = this.embeddedServletContainer;
+   ServletContext localServletContext = this.getServletContext();
+   if (localContainer == null &amp;&amp; localServletContext == null) &#123;
+       EmbeddedServletContainerFactory containerFactory = this.getEmbeddedServletContainerFactory();
+       this.embeddedServletContainer = containerFactory.getEmbeddedServletContainer(new ServletContextInitializer[]&#123;this.getSelfInitializer()&#125;);
+   &#125; else if (localServletContext != null) &#123;
+       try &#123;
+           this.getSelfInitializer().onStartup(localServletContext);
+       &#125; catch (ServletException var4) &#123;
+           throw new ApplicationContextException(&quot;Cannot initialize servlet context&quot;, var4);
+       &#125;
+   &#125;
+   this.initPropertySources();
+&#125;
+</code></pre>
+<p>检查embeddedServletContainer私有变量是否为空，为空的话获取<code>EmbeddedServletContainerFactory</code>工厂类（就是我们写的<code>EmbeddedNettyFactory</code>），获取到<code>EmbeddedServletContainer</code>实例并赋值给<code>this.embeddedServletContainer</code>。<br>在模板方法<code>AbstractApplicationContext.refresh()</code>中，调用<code>onRefresh()</code>后，会继续调用<code>finishRefresh()</code>，通过上面的分析我们知道实际调用的是<code>EmbeddedWebApplicationContext.finishRefresh()</code>：  </p>
+<pre><code class="java">protected void finishRefresh() &#123;
+    super.finishRefresh();
+    EmbeddedServletContainer localContainer = this.startEmbeddedServletContainer();
+    if (localContainer != null) &#123;
+        this.publishEvent(new EmbeddedServletContainerInitializedEvent(this, localContainer));
+    &#125;
+&#125;
+
+private EmbeddedServletContainer startEmbeddedServletContainer() &#123;
+    EmbeddedServletContainer localContainer = this.embeddedServletContainer;
+    if (localContainer != null) &#123;
+        localContainer.start();
+    &#125;
+    return localContainer;
+&#125;
+</code></pre>
+<p>可以看到他调用了私有方法<code>startEmbeddedServletContainer()</code>启动容器，在这个方法里面，获取<code>this.embeddedServletContainer</code>（就是我们本文要实现的<code>NettyContainer</code>）然后执行其<code>start()</code>方法，以启动内置Servlet容器。<br>因此我们应该在<code>EmbeddedServletContainer</code>实现类的<code>start()</code>对Netty服务器进行初始化。  </p>
+<h3 id="NettyContainer"><a href="#NettyContainer" class="headerlink" title="NettyContainer"></a>NettyContainer</h3><p>自己编写的内置Servlet容器需要实现<code>EmbeddedServletContainer</code>接口，具体包括以下三个方法：</p>
+<pre><code class="java">public interface EmbeddedServletContainer &#123;
+  void start() throws EmbeddedServletContainerException; //Spring Boot启动时调用
+  void stop() throws EmbeddedServletContainerException; //Spring Boot关闭时调用
+  int getPort(); //获取端口
+&#125;
+</code></pre>
+<p>这几个方法的用途比较清晰明确了，接下来就是实现。</p>
+<h4 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h4><p>首先在之前写的<code>EmbeddedNettyFactory</code>工厂类里面，需要调用将要写的<code>EmbeddedNettyFactory</code>的构造方法，并将必要的参数传入其构造方法，比如端口号、以及已经i初始化完毕的ServletContext实例。<br>构造方法：  </p>
+<pre><code class="java">private final InetSocketAddress address; //监听端口地址
+private final NettyContext context; //Context
+
+public NettyContainer(InetSocketAddress address, NettyContext context) &#123;
+  this.address = address;
+  this.context = context;
+&#125;
+</code></pre>
+<p>在<code>EmbeddedNettyFactory</code>中修改为：</p>
+<pre><code class="java">public EmbeddedServletContainer getEmbeddedServletContainer(ServletContextInitializer... initializers) &#123;
+  /*…………………………*/
+  //return null;
+  return new NettyContainer(address, context); //初始化容器并返回
+&#125;
+
+@Override
+public int getPort() &#123;
+    return address.getPort();
+&#125;
+</code></pre>
+<h4 id="start"><a href="#start" class="headerlink" title="start()"></a>start()</h4><p>通过以上的分析，我们知道<code>EmbeddedServletContainer</code>的<code>start()</code>是由<code>AbstractApplicationContext.refresh()</code>模板方法负责调用启动的，我们应该在这个方法里面初始化Netty服务器。Netty的启动大家应该比较清楚了，无非就是设置两个<code>EventLoopGroup</code>用于处理请求的获取与读写，并设置<code>Pipeline</code>上的<code>Handler</code>，最后绑定端口，启动服务。以下是具体实现的代码：  </p>
+<pre><code class="java">@Override
+public void start() throws EmbeddedServletContainerException &#123;
+    servletContext.setInitialised(false);
+
+    ServerBootstrap sb = new ServerBootstrap();
+    //根据不同系统初始化对应的EventLoopGroup
+    if (&quot;Linux&quot;.equals(StandardSystemProperty.OS_NAME.value())) &#123;
+        bossGroup = new EpollEventLoopGroup(1);
+        workerGroup = new EpollEventLoopGroup();//不带参数，线程数传入0,实际解析为 Math.max(1, SystemPropertyUtil.getInt(&quot;io.netty.eventLoopThreads&quot;, Runtime.getRuntime().availableProcessors() * 2));
+        sb.channel(EpollServerSocketChannel.class)
+                .group(bossGroup, workerGroup)
+                .option(EpollChannelOption.TCP_CORK, true);
+    &#125; else &#123;
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
+        sb.channel(NioServerSocketChannel.class)
+                .group(bossGroup, workerGroup);
+    &#125;
+    sb.option(ChannelOption.TCP_NODELAY, true)
+            .option(ChannelOption.SO_REUSEADDR, true)
+            .option(ChannelOption.SO_BACKLOG, 100);
+    log.info(&quot;Bootstrap configuration: &quot; + sb.toString());
+
+    servletExecutor = new DefaultEventExecutorGroup(50);
+    sb.childHandler(new ChannelInitializer&lt;SocketChannel&gt;() &#123;
+        @Override
+        protected void initChannel(SocketChannel ch) throws Exception &#123;
+            ChannelPipeline p = ch.pipeline();
+            p.addLast(&quot;codec&quot;, new HttpServerCodec(4096, 8192, 8192, false)); //HTTP编码解码Handler
+            p.addLast(&quot;servletInput&quot;, new ServletContentHandler(servletContext)); //处理请求，读入数据，生成Request和Response对象
+            p.addLast(checkNotNull(servletExecutor), &quot;filterChain&quot;, new RequestDispatcherHandler(servletContext)); //获取请求分发器，让对应的Servlet处理请求，同时处理404情况
+        &#125;
+    &#125;);
+
+    servletContext.setInitialised(true);
+
+    ChannelFuture future = sb.bind(address).awaitUninterruptibly();
+    Throwable cause = future.cause();
+    if (null != cause) &#123;
+        throw new EmbeddedServletContainerException(&quot;Could not start Netty server&quot;, cause);
+    &#125;
+    log.info(servletContext.getServerInfo() + &quot; started on port: &quot; + getPort());
+&#125;
+</code></pre>
+<p>这里有两个<code>Handler</code>类是我们实现的——<code>ServletContentHandler</code>和<code>RequestDispatcherHandler</code>，我们将在后面讲解。</p>
+<h4 id="stop"><a href="#stop" class="headerlink" title="stop()"></a>stop()</h4><p>在<code>stop()</code>方法里应该关闭在<code>start()</code>方法中开启的资源，以便Spring Boot关闭，防止资源/内存泄漏：  </p>
+<pre><code class="java">@Override
+public void stop() throws EmbeddedServletContainerException &#123;
+    try &#123;
+        if (null != bossGroup) &#123;
+            bossGroup.shutdownGracefully().await();
+        &#125;
+        if (null != workerGroup) &#123;
+            workerGroup.shutdownGracefully().await();
+        &#125;
+        if (null != servletExecutor) &#123;
+            servletExecutor.shutdownGracefully().await();
+        &#125;
+    &#125; catch (InterruptedException e) &#123;
+        throw new EmbeddedServletContainerException(&quot;Container stop interrupted&quot;, e);
+    &#125;
+&#125;
+</code></pre>
+<h2 id="Netty服务设计"><a href="#Netty服务设计" class="headerlink" title="Netty服务设计"></a>Netty服务设计</h2><h3 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h3><p>看过Tomcat之类Servlet容器的源码的话，应该对Servleti容器设计有一点概念。  </p>
+<ol>
+<li>首先我们需要通过Socket，处理HTTP连接，获取请求的数据，这一块可通过netty的API进行。  </li>
+<li>然后对接收到的数据进行解析封装成<code>HttpServletRequest</code>和<code>HttpServletResponse</code>对象，这一块需要netty自带的http解码编码器，并自定义Handler来i实现。  </li>
+<li>而<code>HttpServletRequest</code>本身也需要一些处理，比如Cookie、Session、Attributes（懒解析），需要自行实现。  </li>
+<li>接着需要对请求路径进行匹配，找到对应处理的Servlet， 这一部分前面已经实现了（2017-08-26似乎还有点Bug需要解决）。  </li>
+<li>接下来就是调用对应Servlet的<code>service()</code>方法，等待返回（在容器启动的时候需要对有on-startup的Servlet进行<code>init()</code>方法的调用）。  </li>
+<li>Servlet返回后，包装响应，处理异常和HTTP错误。  </li>
+<li>HTTP编码响应返回。</li>
+<li>容器关闭的时候，调用所有已注册的Servlet的<code>destroy()</code>方法，并关闭打开的资源。    </li>
+</ol>
+<h3 id="自定义Netty的Handler处理请求响应"><a href="#自定义Netty的Handler处理请求响应" class="headerlink" title="自定义Netty的Handler处理请求响应"></a>自定义Netty的Handler处理请求响应</h3><p>根据前面的分析，我们的netty服务需要三个Handler，其中HTTP解码编码的有现成的<code>HttpServerCodec</code>，另外两个则需要我们自己实现。<br>首先是对请求进行封装的Handler， 功能：</p>
+<ul>
+<li>channel激活时， 开启一个新的输入流</li>
+<li>有信息/请求进入时，封装请求和响应对象，执行读操作</li>
+<li>channel恢复时，关闭输入流，等待下一次连接到来</li>
+</ul>
+<pre><code class="java">@Override
+public void channelActive(ChannelHandlerContext ctx) throws Exception &#123;
+    inputStream = new HttpRequestInputStream(ctx.channel());
+&#125;
+
+@Override
+public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception &#123;
+    if (msg instanceof HttpRequest) &#123;
+        HttpRequest request = (HttpRequest) msg;
+        HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, false);
+        HttpUtil.setKeepAlive(response, HttpUtil.isKeepAlive(request));
+        NettyHttpServletResponse servletResponse = new NettyHttpServletResponse(ctx, servletContext, response);
+        NettyHttpServletRequest servletRequest = new NettyHttpServletRequest(ctx, servletContext, request, servletResponse, inputStream);
+        if (HttpUtil.is100ContinueExpected(request)) &#123; //请求头包含Expect: 100-continue
+            ctx.write(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE), ctx.voidPromise());
+        &#125;
+        ctx.fireChannelRead(servletRequest);
+    &#125;
+    if (msg instanceof HttpContent) &#123;
+        inputStream.addContent((HttpContent) msg);
+    &#125;
+&#125;
+
+@Override
+public void channelInactive(ChannelHandlerContext ctx) throws Exception &#123;
+    inputStream.close();
+&#125;
+</code></pre>
+<p>然后是一个处理URL匹配分发请求的Handler，完成以下功能：</p>
+<ul>
+<li>读入请求数据时，对请求URI获取分发器</li>
+<li>找不到返回404错误.</li>
+<li>找到则调用FilterChain进行业务逻辑</li>
+<li>最后关闭输出流</li>
+</ul>
+<pre><code class="java">@Override
+public void channelReadComplete(ChannelHandlerContext ctx) throws Exception &#123;
+    ctx.flush();
+&#125;
+
+@Override
+protected void channelRead0(ChannelHandlerContext ctx, NettyHttpServletRequest request) throws Exception &#123;
+    HttpServletResponse servletResponse = (HttpServletResponse) request.getServletResponse();
+    try &#123;
+        NettyRequestDispatcher dispatcher = (NettyRequestDispatcher) context.getRequestDispatcher(request.getRequestURI());
+        if (dispatcher == null) &#123;
+            servletResponse.sendError(404);
+            return;
+        &#125;
+        dispatcher.dispatch(request, servletResponse);
+    &#125; finally &#123;
+        if (!request.isAsyncStarted()) &#123;
+            servletResponse.getOutputStream().close();
+        &#125;
+    &#125;
+&#125;
+
+@Override
+public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception &#123;
+    logger.error(&quot;Unexpected exception caught during request&quot;, cause);
+    ctx.close();
+&#125;
+</code></pre>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/09/02/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E5%9B%9B%EF%BC%89/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">53</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-weibo">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+    
+    <!-- V2EX -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;2016&nbsp;-<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Heaven's Door
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+<script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('
+<link rel="stylesheet" href="/css/uc.css">
+');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>

@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html style="display: none;" lang="zh">
+    <head>
+    <meta charset="utf-8">
+    <!--
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.5.2 -->
+    <script>
+        window.materialVersion = "1.5.2"
+        // Delete localstorage with these tags
+        window.oldVersion = [
+            'codestartv1',
+            '1.3.4',
+            '1.4.0',
+            '1.4.0b1',
+            '1.5.0'
+        ]
+    </script>
+
+    <!-- dns prefetch -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Meta & Info -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- Title -->
+    
+    <title>
+        
+            基于Netty的Spring Boot内置Servlet容器的实现（二） | 
+        
+        Heaven&#39;s Door
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" href="/img/favicon.png">
+
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="description" itemprop="description" content="">
+    <meta name="keywords" content="null,Netty,Spring Boot,Servlet,Servlet Context">
+    <meta name="theme-color" content="#0097A7">
+
+    <!-- Disable Fucking Bloody Baidu Tranformation -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import lsloader -->
+    <script>(function(){window.lsloader={jsRunSequence:[],jsnamemap:{},cssnamemap:{}};lsloader.removeLS=function(a){try{localStorage.removeItem(a)}catch(b){}};lsloader.setLS=function(a,c){try{localStorage.setItem(a,c)}catch(b){}};lsloader.getLS=function(a){var c="";try{c=localStorage.getItem(a)}catch(b){c=""}return c};versionString="/*"+(window.materialVersion||"unknownVersion")+"*/";lsloader.clean=function(){try{var b=[];for(var a=0;a<localStorage.length;a++){b.push(localStorage.key(a))}b.forEach(function(e){var f=lsloader.getLS(e);if(window.oldVersion){var d=window.oldVersion.reduce(function(g,h){return g||f.indexOf("/*"+h+"*/")!==-1},false);if(d){lsloader.removeLS(e)}}})}catch(c){}};lsloader.clean();lsloader.load=function(f,a,b,d){if(typeof b==="boolean"){d=b;b=undefined}d=d||false;b=b||function(){};var e;e=this.getLS(f);if(e&&e.indexOf(versionString)===-1){this.removeLS(f);this.requestResource(f,a,b,d);return}if(e){var c=e.split(versionString)[0];if(c!=a){console.log("reload:"+a);this.removeLS(f);this.requestResource(f,a,b,d);return}e=e.split(versionString)[1];if(d){this.jsRunSequence.push({name:f,code:e});this.runjs(a,f,e)}else{document.getElementById(f).appendChild(document.createTextNode(e));b()}}else{this.requestResource(f,a,b,d)}};lsloader.requestResource=function(b,e,a,c){var d=this;if(c){this.iojs(e,b,function(h,f,g){d.setLS(f,h+versionString+g);d.runjs(h,f,g)})}else{this.iocss(e,b,function(f){document.getElementById(b).appendChild(document.createTextNode(f));d.setLS(b,e+versionString+f)},a)}};lsloader.iojs=function(d,b,g){var a=this;a.jsRunSequence.push({name:b,code:""});try{var f=new XMLHttpRequest();f.open("get",d,true);f.onreadystatechange=function(){if(f.readyState==4){if((f.status>=200&&f.status<300)||f.status==304){if(f.response!=""){g(d,b,f.response);return}}a.jsfallback(d,b)}};f.send(null)}catch(c){a.jsfallback(d,b)}};lsloader.iocss=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.iofonts=function(f,c,h,a){var b=this;try{var g=new XMLHttpRequest();g.open("get",f,true);g.onreadystatechange=function(){if(g.readyState==4){if((g.status>=200&&g.status<300)||g.status==304){if(g.response!=""){h(g.response);a();return}}b.cssfallback(f,c,a)}};g.send(null)}catch(d){b.cssfallback(f,c,a)}};lsloader.runjs=function(f,c,e){if(!!c&&!!e){for(var b in this.jsRunSequence){if(this.jsRunSequence[b].name==c){this.jsRunSequence[b].code=e}}}if(!!this.jsRunSequence[0]&&!!this.jsRunSequence[0].code&&this.jsRunSequence[0].status!="failed"){var a=document.createElement("script");a.appendChild(document.createTextNode(this.jsRunSequence[0].code));a.type="text/javascript";document.getElementsByTagName("head")[0].appendChild(a);this.jsRunSequence.shift();if(this.jsRunSequence.length>0){this.runjs()}}else{if(!!this.jsRunSequence[0]&&this.jsRunSequence[0].status=="failed"){var d=this;var a=document.createElement("script");a.src=this.jsRunSequence[0].path;a.type="text/javascript";this.jsRunSequence[0].status="loading";a.onload=function(){d.jsRunSequence.shift();if(d.jsRunSequence.length>0){d.runjs()}};document.body.appendChild(a)}}};lsloader.tagLoad=function(b,a){this.jsRunSequence.push({name:a,code:"",path:b,status:"failed"});this.runjs()};lsloader.jsfallback=function(c,b){if(!!this.jsnamemap[b]){return}else{this.jsnamemap[b]=b}for(var a in this.jsRunSequence){if(this.jsRunSequence[a].name==b){this.jsRunSequence[a].code="";this.jsRunSequence[a].status="failed";this.jsRunSequence[a].path=c}}this.runjs()};lsloader.cssfallback=function(e,c,b){if(!!this.cssnamemap[c]){return}else{this.cssnamemap[c]=1}var d=document.createElement("link");d.type="text/css";d.href=e;d.rel="stylesheet";d.onload=d.onerror=b;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(d,a)};lsloader.runInlineScript=function(c,b){var a=document.getElementById(b).innerText;this.jsRunSequence.push({name:c,code:a});this.runjs()}})();</script>
+
+    <!-- Import queue -->
+    <script>function Queue(){this.dataStore=[];this.offer=b;this.poll=d;this.execNext=a;this.debug=false;this.startDebug=c;function b(e){if(this.debug){console.log("Offered a Queued Function.")}if(typeof e==="function"){this.dataStore.push(e)}else{console.log("You must offer a function.")}}function d(){if(this.debug){console.log("Polled a Queued Function.")}return this.dataStore.shift()}function a(){var e=this.poll();if(e!==undefined){if(this.debug){console.log("Run a Queued Function.")}e()}}function c(){this.debug=true}}var queue=new Queue();</script>
+
+    <!-- Import CSS -->
+    
+        <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+        <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+        
+            
+                <style id="prettify_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_css","/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+                <style id="prettify_theme"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("prettify_theme","/css/prettify/tranquil-heart.min.css?qOHJ61Zsis2Yg84f7EV9Dg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+            
+        
+
+    
+
+    
+
+    <!-- Config CSS -->
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    overflow-x: hidden !important;
+  }
+  
+  code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+<!-- Import Font -->
+<!-- Import Roboto -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+
+<!-- Import Material Icons -->
+
+
+    <style id="material_icons"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_icons","/css/material-icons.css?pqhB/Rd/ab0H2+kZp0RDmw==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
+
+
+
+
+    <!-- Import jQuery -->
+    
+        <script>lsloader.load("jq_js","/js/jquery.min.js?qcusAULNeBksqffqUM2+Ig==", true)</script>
+    
+
+    <!-- WebAPP Icons -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Heaven&#39;s Door">
+    <meta name="msapplication-starturl" content="https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
+    <meta name="msapplication-navbutton-color" content="#0097A7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Heaven&#39;s Door">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Site Verification -->
+    <meta name="google-site-verification" content="M4QKeJ2Iq5t7c8y6uaMaszxNWRqlD5n3vqzq24JY-dc" />
+    <meta name="baidu-site-verification" content="NNXLFEr6nK" />
+
+    <!-- RSS -->
+    
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="基于Netty的Spring Boot内置Servlet容器的实现（二） | Heaven&#39;s Door">
+    <meta property="og:image" content="/img/favicon.png">
+    <meta property="og:description" content="">
+    <meta property="og:article:tag" content="Netty"> <meta property="og:article:tag" content="Spring Boot"> <meta property="og:article:tag" content="Servlet"> <meta property="og:article:tag" content="Servlet Context"> 
+
+    
+        <meta property="article:published_time" content="Thu Aug 24 2017 17:43:37 GMT+0800">
+        <meta property="article:modified_time" content="Tue Dec 05 2017 04:03:28 GMT+0800">
+    
+
+    <!-- The Twitter Card protocol -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Add canonical link for SEO -->
+    
+        <link rel="canonical" href="https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html" />
+    
+
+    <!-- Structured-data for SEO -->
+    
+        
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html",
+    "headline": "基于Netty的Spring Boot内置Servlet容器的实现（二）",
+    "datePublished": "Thu Aug 24 2017 17:43:37 GMT+0800",
+    "dateModified": "Tue Dec 05 2017 04:03:28 GMT+0800",
+    "author": {
+        "@type": "Person",
+        "name": "Leibniz Hu",
+        "image": {
+            "@type": "ImageObject",
+            "url": "/img/avatar.gif"
+        },
+        "description": "That cold black cloud is comin' down, Feels like I'm knockin' on heaven's door…"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Heaven&#39;s Door",
+        "logo": {
+            "@type":"ImageObject",
+            "url": "/img/favicon.png"
+        }
+    },
+    "keywords": ",Netty,Spring Boot,Servlet,Servlet Contextnull",
+    "description": "",
+}
+</script>
+
+
+    
+
+    <!-- Analytics -->
+    
+    
+    
+        <div style="display: none;">
+    <script src="//s95.cnzz.com/z_stat.php?id=1278880560&web_id=1278880560" language="JavaScript"></script>
+</div>
+    
+
+    <!-- Custom Head -->
+    
+        
+            <script>var _hmt = _hmt || [];(function() {var hm = document.createElement('script');hm.src = 'https://hm.baidu.com/hm.js?f9fd08e08bf7d91fcc3d21ec87e2250f';var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(hm, s);})();</script>
+        
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+
+    <!-- Left aligned menu below button -->
+    
+    
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn" style="max-height:80vh; overflow-y:scroll;">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">基于Netty的Spring Boot内置Servlet容器的实现（二）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9E%E7%8E%B0Servlet-Context%E6%8E%A5%E5%8F%A3"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">实现Servlet Context接口</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Servlet-Context%E6%8E%A5%E5%8F%A3%E7%AE%80%E4%BB%8B"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">Servlet Context接口简介</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">实现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#URL-Pattrn%E5%8C%B9%E9%85%8D%E6%9F%A5%E6%89%BE"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">URL Pattrn匹配查找</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">再次启动</span></a></li></ol></li></ol>
+    </ul>
+    
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(/img/thumbnail/sanae.png)">
+    
+            <p class="article-headline-p">
+                基于Netty的Spring Boot内置Servlet容器的实现（二）
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/avatar.gif" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>Leibniz Hu</strong>
+        <span>8月 24, 2017</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-none-link" href="/tags/Netty/" rel="tag">Netty</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/Servlet/" rel="tag">Servlet</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/Servlet-Context/" rel="tag">Servlet Context</a></li><li class="mdl-menu__item"><a class="post_tag-none-link" href="/tags/Spring-Boot/" rel="tag">Spring Boot</a>
+    </ul>
+    
+
+    <!-- Share -->
+    
+        <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=基于Netty的Spring Boot内置Servlet容器的实现（二）&url=https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html&pic=https://leibnizhu.github.io/img/favicon.png&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=基于Netty的Spring Boot内置Servlet容器的实现（二）&url=https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html&via=Leibniz Hu" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+        <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=Heaven&#39;s Door&title=基于Netty的Spring Boot内置Servlet容器的实现（二）&summary=null&pics=https://leibnizhu.github.io/img/favicon.png&url=https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 QQ
+            </li>
+        </a>
+    
+
+    <!-- Share Telegram -->
+    
+        <a class="post_share-link" href="https://telegram.me/share/url?url=https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html&text=基于Netty的Spring Boot内置Servlet容器的实现（二）" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Telegram
+            </li>
+        </a>
+    
+</ul>
+
+    
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="基于Netty的Spring-Boot内置Servlet容器的实现（二）"><a href="#基于Netty的Spring-Boot内置Servlet容器的实现（二）" class="headerlink" title="基于Netty的Spring Boot内置Servlet容器的实现（二）"></a>基于Netty的Spring Boot内置Servlet容器的实现（二）</h1><h2 id="实现Servlet-Context接口"><a href="#实现Servlet-Context接口" class="headerlink" title="实现Servlet Context接口"></a>实现Servlet Context接口</h2><h3 id="Servlet-Context接口简介"><a href="#Servlet-Context接口简介" class="headerlink" title="Servlet Context接口简介"></a>Servlet Context接口简介</h3><p>接口<code>ServletContext</code>定义了一系列方法用于与相应的servlet容器通信，比如：获得文件的MIME类型，分派请求，或者是向日志文件写日志等。每一个web-app只能有一个<code>ServletContext</code>，webapp可以是一个放置有web application 文件的文件夹，也可以是一个.war的文件。<code>ServletContext</code>对象包含在<code>ServletConfig</code>对象之中，<code>ServletConfig</code>对象在servlet初始化时提供servlet对象。<br>接口<code>ServletContext</code>定义的方法比较多，大致可以分为：添加和配置Servlet、添加和配置Filter、添加和配置Listener、添加Servlet、Filter和Listener的注解处理需求、初始化参数、Context属性、资源获取等几大类方法。<br>具体可以参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://tomcat.apache.org/tomcat-8.0-doc/servletapi/index.html">Tomcat的JavaDoc</a></li>
+<li><a target="_blank" rel="noopener" href="https://waylau.gitbooks.io/servlet-3-1-specification/docs/Servlet%20Context/4.1%20Introduction%20to%20the%20ServletContext%20Interface.html">中文翻译的文档 ServletContext 接口介绍</a></li>
+</ul>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>实现的思想：</p>
+<ul>
+<li>不处理的：InitParameter相关的方法、Listener相关方法——目前用不到</li>
+<li>以后处理的：Session Cookie相关的方法等待实现</li>
+<li>Context的Attributes用<code>Hashtable</code>实现，主要是考虑到相关的方法需要返回<code>Enumeration</code>类型，用<code>Hashtable</code>有现成方法可以返回。</li>
+<li>Filter的注册用<code>HashMap</code>存储FilterName及对应<code>Registration</code>的映射关系，暂时还没处理Filter的URL Pattern（所有注册的Filter对所有请求都会过滤，暂时可以满足需求）</li>
+<li>Servlet的注册也是用<code>HashMap</code>存储ServletName及对应<code>Registration</code>的映射关系，以及URL Pattern和ServletName的映射关系（相当与<code>web.xml</code>里的配置）</li>
+</ul>
+<p>这里列出主要的方法，一些没具体实现，或者比较简单的方法就省略了（部分代码参考了Tomcat 8.0.45的源码）：  </p>
+<pre><code class="java">package io.gitlab.leibnizhu.sbnetty.core;
+
+/**
+ * ServletContext实现
+ */
+public class NettyContext implements ServletContext &#123;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final String contextPath; //保证不以“/”结尾
+    private final ClassLoader classLoader;
+    private final String serverInfo;
+    private volatile boolean initialized; //记录是否初始化完毕
+    private RequestUrlPatternMapper servletUrlPatternMapper;
+
+    private final Map&lt;String, NettyServletRegistration&gt; servlets = new HashMap&lt;&gt;(); //getServletRegistration()等方法要用，key是ServletName
+    private final Map&lt;String, NettyFilterRegistration&gt; filters = new HashMap&lt;&gt;(); //getFilterRegistration()等方法要用，Key是FilterName
+    private final Map&lt;String, String&gt; servletMappings = new HashMap&lt;&gt;(); //保存请求路径urlPattern与Servlet名的映射,urlPattern是不带contextPath的
+    private final Hashtable&lt;String, Object&gt; attributes = new Hashtable&lt;&gt;();
+
+    /**
+     * 默认构造方法
+     *
+     * @param contextPath contextPath
+     * @param classLoader classLoader
+     * @param serverInfo  服务器信息，写在响应的server响应头字段
+     */
+    public NettyContext(String contextPath, ClassLoader classLoader, String serverInfo) &#123;
+        if(contextPath.endsWith(&quot;/&quot;))&#123;
+            contextPath = contextPath.substring(0, contextPath.length() -1);
+        &#125;
+        this.contextPath = contextPath;
+        this.classLoader = classLoader;
+        this.serverInfo = serverInfo;
+        servletUrlPatternMapper = new RequestUrlPatternMapper(servletMappings, contextPath);
+    &#125;
+
+    private void checkNotInitialised() &#123;
+        checkState(!isInitialised(), &quot;This method can not be called before the context has been initialised&quot;);
+    &#125;
+
+    public void addServletMapping(String urlPattern, String name, Servlet servlet) &#123;
+        checkNotInitialised();
+        servletMappings.put(urlPattern, checkNotNull(name));
+        servletUrlPatternMapper.addWrapper(urlPattern, servlet, name);
+    &#125;
+
+    public void addFilterMapping(EnumSet&lt;DispatcherType&gt; dispatcherTypes, boolean isMatchAfter, String urlPattern) &#123;
+        checkNotInitialised();
+        //TODO 过滤器的urlPatter解析
+    &#125;
+
+    @Override
+    public String getMimeType(String file) &#123;
+        return MimeTypeUtil.getMimeTypeByFileName(file);
+    &#125;
+
+    @Override
+    public Set&lt;String&gt; getResourcePaths(String path) &#123;
+        Set&lt;String&gt; thePaths = new HashSet&lt;&gt;();
+        if (!path.endsWith(&quot;/&quot;)) &#123;
+            path += &quot;/&quot;;
+        &#125;
+        String basePath = getRealPath(path);
+        if (basePath == null) &#123;
+            return thePaths;
+        &#125;
+        File theBaseDir = new File(basePath);
+        if (!theBaseDir.exists() || !theBaseDir.isDirectory()) &#123;
+            return thePaths;
+        &#125;
+        String theFiles[] = theBaseDir.list();
+        if (theFiles == null) &#123;
+            return thePaths;
+        &#125;
+        for (String filename : theFiles) &#123;
+            File testFile = new File(basePath + File.separator + filename);
+            if (testFile.isFile())
+                thePaths.add(path + filename);
+            else if (testFile.isDirectory())
+                thePaths.add(path + filename + &quot;/&quot;);
+        &#125;
+        return thePaths;
+    &#125;
+
+    @Override
+    public URL getResource(String path) throws MalformedURLException &#123;
+        if (!path.startsWith(&quot;/&quot;))
+            throw new MalformedURLException(&quot;Path &#39;&quot; + path + &quot;&#39; does not start with &#39;/&#39;&quot;);
+        URL url = new URL(getClassLoader().getResource(&quot;&quot;), path.substring(1));
+        try &#123;
+            url.openStream();
+        &#125; catch (Throwable t) &#123;
+            log.error(&quot;Throwing exception when getting InputStream of &quot; + path, t);
+            url = null;
+        &#125;
+        return url;
+    &#125;
+
+    @Override
+    public InputStream getResourceAsStream(String path) &#123;
+        try &#123;
+            return getResource(path).openStream();
+        &#125; catch (IOException e) &#123;
+            log.error(e.getMessage(), e);
+            return null;
+        &#125;
+    &#125;
+
+    @Override
+    public RequestDispatcher getRequestDispatcher(String path) &#123;
+        String servletName = servletUrlPatternMapper.getServletNameByRequestURI(path);
+        Servlet servlet;
+        try &#123;
+            servlet = null == servletName ? null : servlets.get(servletName).getServlet();
+            if (servlet == null) &#123;
+                return null;
+            &#125;
+            //TODO 过滤器的urlPatter解析
+            List&lt;Filter&gt; allNeedFilters = new ArrayList&lt;&gt;();
+            for (NettyFilterRegistration registration : this.filters.values()) &#123;
+                allNeedFilters.add(registration.getFilter());
+            &#125;
+            FilterChain filterChain = new SimpleFilterChain(servlet, allNeedFilters);
+            return new NettyRequestDispatcher(this, filterChain);
+        &#125; catch (ServletException e) &#123;
+            log.error(&quot;Throwing exception when getting Filter from NettyFilterRegistration of path &quot; + path, e);
+            return null;
+        &#125;
+    &#125;
+
+    @Override
+    public String getRealPath(String path) &#123;
+        if (!path.startsWith(&quot;/&quot;))
+            return null;
+        try &#123;
+            File f = new File(getResource(path).toURI());
+            return f.getAbsolutePath();
+        &#125; catch (Throwable t) &#123;
+            log.error(&quot;Throwing exception when getting real path of &quot; + path, t);
+            return null;
+        &#125;
+    &#125;
+
+    @Override
+    public String getServerInfo() &#123;
+        return serverInfo;
+    &#125;
+
+    // InitParameter相关的方法不实现（返回空/空集合）基本用不到
+
+    @Override
+    public Object getAttribute(String name) &#123;
+        return attributes.get(name);
+    &#125;
+
+    @Override
+    public Enumeration&lt;String&gt; getAttributeNames() &#123;
+        return attributes.keys();
+    &#125;
+
+    @Override
+    public void setAttribute(String name, Object object) &#123;
+         attributes.put(name, object);
+    &#125;
+
+    @Override
+    public void removeAttribute(String name) &#123;
+        attributes.remove(name);
+    &#125;
+
+    @Override
+    public ServletRegistration.Dynamic addServlet(String servletName, String className) &#123;
+        return addServlet(servletName, className, null);
+    &#125;
+
+    @Override
+    public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) &#123;
+        return addServlet(servletName, servlet.getClass().getName(), servlet);
+    &#125;
+
+    @Override
+    public ServletRegistration.Dynamic addServlet(String servletName, Class&lt;? extends Servlet&gt; servletClass) &#123;
+        return addServlet(servletName, servletClass.getName());
+    &#125;
+
+    private ServletRegistration.Dynamic addServlet(String servletName, String className, Servlet servlet) &#123;
+        NettyServletRegistration servletRegistration = new NettyServletRegistration(this, servletName, className, servlet);
+        servlets.put(servletName, servletRegistration);
+        return servletRegistration;
+    &#125;
+
+    @Override
+    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className) &#123;
+        return addFilter(filterName, className, null);
+    &#125;
+
+    @Override
+    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter) &#123;
+        return addFilter(filterName, filter.getClass().getName(), filter);
+    &#125;
+
+    private javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className, Filter filter) &#123;
+        NettyFilterRegistration filterRegistration = new NettyFilterRegistration(this, filterName, className, filter);
+        filters.put(filterName, filterRegistration);
+        return filterRegistration;
+    &#125;
+
+    @Override
+    public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Class&lt;? extends Filter&gt; filterClass) &#123;
+        return addFilter(filterName, filterClass.getName());
+    &#125;
+
+    @Override
+    public &lt;T extends Filter&gt; T createFilter(Class&lt;T&gt; c) throws ServletException &#123;
+        try &#123;
+            return c.newInstance();
+        &#125; catch (InstantiationException | IllegalAccessException e) &#123;
+            e.printStackTrace();
+            return null;
+        &#125;
+    &#125;
+
+    @Override
+    public javax.servlet.FilterRegistration getFilterRegistration(String filterName) &#123;
+        return filters.get(filterName);
+    &#125;
+
+    @Override
+    public Map&lt;String, ? extends FilterRegistration&gt; getFilterRegistrations() &#123;
+        return ImmutableMap.copyOf(filters);
+    &#125;
+    //TODO Session Cookie相关的方法等待实现
+
+    //TODO 暂不支持Listener，现在很少用了吧
+&#125;
+</code></pre>
+<h3 id="URL-Pattrn匹配查找"><a href="#URL-Pattrn匹配查找" class="headerlink" title="URL Pattrn匹配查找"></a>URL Pattrn匹配查找</h3><p>参考Tomcat源码，设计了一个<code>RequestUrlPatternMapper</code>类用于保存，计算URL-pattern与请求路径的匹配关系。在<code>NettyContext</code>的<code>public RequestDispatcher getRequestDispatcher(String path)</code>方法中可以看到对其的调用，传入请求的路径，返回对应处理的Servlet名称。此外在<code>NettyContext</code>的<code>public void addServletMapping(String urlPattern, String name, Servlet servlet)</code>方法中也调用该类，增加新的Servlet映射。<br>增加映射的时候，先后判断：</p>
+<ol>
+<li>路径匹配</li>
+<li>扩展名匹配</li>
+<li>默认匹配</li>
+<li>精确匹配</li>
+</ol>
+<p>用<code>MappedWrapper</code>类包装起新的Servlet，根据对应的匹配策略，放加入到<code>ContextVersion</code>实例的<code>wildcardWrappers</code>、<code>extensionWrappers</code>、<code>defaultWrapper</code>、<code>exactWrappers</code>中进行保存。<br>在查询匹配的时候，处理完请求路径后，根据URL Pattern的定义，先后根据以下匹配方法进行匹配：</p>
+<ol>
+<li>精确匹配</li>
+<li>路径匹配</li>
+<li>后缀名匹配</li>
+<li>Welcome资源匹配</li>
+<li>默认Servlet匹配</li>
+</ol>
+<p>使用<code>MappingData</code>类实例对查询结果进行保存，每一级匹配如果已经找到对应的Servlet，那么下一级的匹配将不会进行，直接返回，此时<code>MappingData</code>对象里保存的就是最终匹配到的结果。<br>具体的匹配中，精确匹配直接对Map进行查找即可，后缀名匹配类似，根据当前请求的后缀名进行精确匹配；而路径匹配，则是将路径进行降序排序，匹配的时候依次匹配，就能匹配到最长的那一个。<br>下面贴上主要的实现代码：  </p>
+<pre><code class="java">package io.gitlab.leibnizhu.sbnetty.utils;
+
+/**
+ * 保存，计算URL-pattern与请求路径的匹配关系
+ *
+ * @author Leibniz.Hu
+ * Created on 2017-08-25 11:32.
+ */
+public class RequestUrlPatternMapper &#123;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private UrlPatternContext urlPatternContext;
+    private String contextPath;
+
+    public RequestUrlPatternMapper(String contextPath) &#123;
+        this.urlPatternContext = new UrlPatternContext();
+        this.contextPath = contextPath;
+    &#125;
+
+    /**
+     * 增加映射关系
+     *
+     * @param urlPattern  urlPattern
+     * @param servlet     servlet对象
+     * @param servletName servletName
+     * @author Leibniz
+     */
+    public void addServlet(String urlPattern, Servlet servlet, String servletName) throws ServletException &#123;
+        if (urlPattern.endsWith(&quot;/*&quot;)) &#123;
+            // 路径匹配
+            String pattern = urlPattern.substring(0, urlPattern.length() - 1);
+            for (MappedServlet ms : urlPatternContext.wildcardServlets) &#123;
+                if (ms.pattern.equals(pattern)) &#123;
+                    throw new ServletException(&quot;URL Pattern(&#39;&quot; + urlPattern + &quot;&#39;) already exists!&quot;);
+                &#125;
+            &#125;
+            MappedServlet newServlet = new MappedServlet(pattern, servlet, servletName);
+            urlPatternContext.wildcardServlets.add(newServlet);
+            urlPatternContext.wildcardServlets.sort((o1, o2) -&gt; o2.pattern.compareTo(o1.pattern));
+            log.debug(&quot;Curretn Wildcard URL Pattern List = &quot; + Arrays.toString(urlPatternContext.wildcardServlets.toArray()));
+        &#125; else if (urlPattern.startsWith(&quot;*.&quot;)) &#123;
+            // 扩展名匹配
+            String pattern = urlPattern.substring(2);
+            if (urlPatternContext.extensionServlets.get(pattern) != null) &#123;
+                throw new ServletException(&quot;URL Pattern(&#39;&quot; + urlPattern + &quot;&#39;) already exists!&quot;);
+            &#125;
+            MappedServlet newServlet = new MappedServlet(pattern, servlet, servletName);
+            urlPatternContext.extensionServlets.put(pattern, newServlet);
+            log.debug(&quot;Curretn Extension URL Pattern List = &quot; + Arrays.toString(urlPatternContext.extensionServlets.keySet().toArray()));
+        &#125; else if (urlPattern.equals(&quot;/&quot;)) &#123;
+            // Default资源匹配
+            if (urlPatternContext.defaultServlet != null) &#123;
+                throw new ServletException(&quot;URL Pattern(&#39;&quot; + urlPattern + &quot;&#39;) already exists!&quot;);
+            &#125;
+            urlPatternContext.defaultServlet = new MappedServlet(&quot;&quot;, servlet, servletName);
+        &#125; else &#123;
+            // 精确匹配
+            String pattern;
+            if (urlPattern.length() == 0) &#123;
+                pattern = &quot;/&quot;;
+            &#125; else &#123;
+                pattern = urlPattern;
+            &#125;
+            if (urlPatternContext.exactServlets.get(pattern) != null) &#123;
+                throw new ServletException(&quot;URL Pattern(&#39;&quot; + urlPattern + &quot;&#39;) already exists!&quot;);
+            &#125;
+            MappedServlet newServlet = new MappedServlet(pattern, servlet, servletName);
+            urlPatternContext.exactServlets.put(pattern, newServlet);
+            log.debug(&quot;Curretn Exact URL Pattern List = &quot; + Arrays.toString(urlPatternContext.exactServlets.keySet().toArray()));
+        &#125;
+    &#125;
+
+    /**
+     * 删除映射关系
+     *
+     * @param urlPattern
+     */
+    public void removeServlet(String urlPattern) &#123;
+        if (urlPattern.endsWith(&quot;/*&quot;)) &#123;
+            //路径匹配
+            String pattern = urlPattern.substring(0, urlPattern.length() - 2);
+            urlPatternContext.wildcardServlets.removeIf(mappedServlet -&gt; mappedServlet.pattern.equals(pattern));
+        &#125; else if (urlPattern.startsWith(&quot;*.&quot;)) &#123;
+            // 扩展名匹配
+            String pattern = urlPattern.substring(2);
+            urlPatternContext.extensionServlets.remove(pattern);
+        &#125; else if (urlPattern.equals(&quot;/&quot;)) &#123;
+            // Default资源匹配
+            urlPatternContext.defaultServlet = null;
+        &#125; else &#123;
+            // 精确匹配
+            String pattern;
+            if (urlPattern.length() == 0) &#123;
+                pattern = &quot;/&quot;;
+            &#125; else &#123;
+                pattern = urlPattern;
+            &#125;
+            urlPatternContext.exactServlets.remove(pattern);
+        &#125;
+    &#125;
+
+    public String getServletNameByRequestURI(String absoluteUri) &#123;
+        MappingData mappingData = new MappingData();
+        try &#123;
+            matchRequestPath(absoluteUri, mappingData);
+        &#125; catch (IOException e) &#123;
+            log.error(&quot;Throwing exception when getting Servlet Name by request URI, maybe cause by lacking of buffer size.&quot;, e);
+        &#125;
+        return mappingData.servletName;
+    &#125;
+
+    /**
+     * Wrapper mapping.
+     *
+     * @throws IOException buffer大小不足
+     */
+    private void matchRequestPath(String absolutePath, MappingData mappingData) throws IOException &#123;
+        // 处理ContextPath，获取访问的相对URI
+        boolean noServletPath = absolutePath.equals(contextPath) || absolutePath.equals(contextPath + &quot;/&quot;);
+        if (!absolutePath.startsWith(contextPath)) &#123;
+            return;
+        &#125;
+        String path = noServletPath ? &quot;/&quot; : absolutePath.substring(contextPath.length());
+        //去掉查询字符串
+        int queryInx = path.indexOf(&#39;?&#39;);
+        if(queryInx &gt; -1)&#123;
+            path = path.substring(0, queryInx);
+        &#125;
+
+        // 优先进行精确匹配
+        internalMapExactWrapper(urlPatternContext.exactServlets, path, mappingData);
+
+        // 然后进行路径匹配
+        if (mappingData.servlet == null) &#123;
+            internalMapWildcardWrapper(urlPatternContext.wildcardServlets, path, mappingData);
+            //TODO 暂不考虑JSP的处理
+        &#125;
+
+        if (mappingData.servlet == null &amp;&amp; noServletPath) &#123;
+            // 路径为空时，重定向到“/”
+            mappingData.servlet = urlPatternContext.defaultServlet.object;
+            mappingData.servletName = urlPatternContext.defaultServlet.servletName;
+            return;
+        &#125;
+
+        // 后缀名匹配
+        if (mappingData.servlet == null) &#123;
+            internalMapExtensionWrapper(urlPatternContext.extensionServlets, path, mappingData);
+        &#125;
+
+        //TODO 暂不考虑Welcome资源
+
+        // Default Servlet
+        if (mappingData.servlet == null) &#123;
+            if (urlPatternContext.defaultServlet != null) &#123;
+                mappingData.servlet = urlPatternContext.defaultServlet.object;
+                mappingData.servletName = urlPatternContext.defaultServlet.servletName;
+            &#125;
+            //TODO 暂不考虑请求静态目录资源
+            if (path.charAt(path.length() - 1) != &#39;/&#39;) &#123;
+            &#125;
+        &#125;
+    &#125;
+
+
+    /**
+     * 精确匹配
+     */
+    private void internalMapExactWrapper(Map&lt;String, MappedServlet&gt; servlets, String path, MappingData mappingData) &#123;
+        MappedServlet servlet = servlets.get(path);
+        if (servlet != null) &#123;
+            mappingData.servlet = servlet.object;
+            mappingData.servletName = servlet.servletName;
+        &#125;
+    &#125;
+
+    /**
+     * 路径匹配
+     */
+    private void internalMapWildcardWrapper(List&lt;MappedServlet&gt; servlets, String path, MappingData mappingData) &#123;
+        if (!path.endsWith(&quot;/&quot;)) &#123;
+            path = path + &quot;/&quot;;
+        &#125;
+        MappedServlet result = null;
+        for (MappedServlet ms : servlets) &#123;
+            if (path.startsWith(ms.pattern)) &#123;
+                result = ms;
+                break;
+            &#125;
+        &#125;
+        if (result != null) &#123;
+            mappingData.servlet = result.object;
+            mappingData.servletName = result.servletName;
+        &#125;
+    &#125;
+
+    /**
+     * 后缀名匹配
+     */
+    private void internalMapExtensionWrapper(Map&lt;String, MappedServlet&gt; servlets, String path, MappingData mappingData) &#123;
+        int dotInx = path.lastIndexOf(&#39;.&#39;);
+        path = path.substring(dotInx + 1);
+        MappedServlet servlet = servlets.get(path);
+        if (servlet != null) &#123;
+            mappingData.servlet = servlet.object;
+            mappingData.servletName = servlet.servletName;
+        &#125;
+    &#125;
+
+    /*
+     * 以下是用到的内部类
+     */
+
+    private class UrlPatternContext &#123;
+        MappedServlet defaultServlet = null; //默认Servlet
+        Map&lt;String, MappedServlet&gt; exactServlets = new HashMap&lt;&gt;(); //精确匹配
+        List&lt;MappedServlet&gt; wildcardServlets = new LinkedList&lt;&gt;(); //路径匹配
+        Map&lt;String, MappedServlet&gt; extensionServlets = new HashMap&lt;&gt;(); //扩展名匹配
+    &#125;
+
+    private class MappedServlet extends MapElement&lt;Servlet&gt; &#123;
+        @Override
+        public String toString() &#123;
+            return pattern;
+        &#125;
+
+        String servletName;
+
+        MappedServlet(String name, Servlet servlet, String servletName) &#123;
+            super(name, servlet);
+            this.servletName = servletName;
+        &#125;
+    &#125;
+
+    private class MapElement&lt;T&gt; &#123;
+        final String pattern;
+        final T object;
+
+        MapElement(String pattern, T object) &#123;
+            this.pattern = pattern;
+            this.object = object;
+        &#125;
+    &#125;
+&#125;
+
+public class MappingData &#123;
+    Servlet servlet = null;
+    String servletName;
+    String redirectPath ;
+    public void recycle() &#123;
+        servlet = null;
+        servletName = null;
+        redirectPath = null;
+    &#125;
+&#125;
+</code></pre>
+<h2 id="再次启动"><a href="#再次启动" class="headerlink" title="再次启动"></a>再次启动</h2><p>现在ServletContext有了，再次启动，不再报错了。  </p>
+<pre><code class="java">::: Using Embedded Netty Servlet Container (version:)  :::      ＼(^O^)／      Spring-Boot 1.5.2.RELEASE
+2017-08-25 22:08:33.019  INFO 17565 --- [           main] io.gitlab.leibnizhu.sbnetty.TestWebApp   : Starting TestWebApp on XPS13 with PID 17565
+………………
+………………
+………………
+2017-08-25 22:08:35.760  INFO 17565 --- [           main] io.gitlab.leibnizhu.sbnetty.TestWebApp   : Started TestWebApp in 3.383 seconds (JVM running for 4.012)
+2017-08-25 22:08:35.761  INFO 17565 --- [       Thread-2] ationConfigEmbeddedWebApplicationContext : Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@4a07d605: startup date [Fri Aug 25 22:08:33 CST 2017]; root of context hierarchy
+2017-08-25 22:08:35.763  INFO 17565 --- [       Thread-2] o.s.j.e.a.AnnotationMBeanExporter        : Unregistering JMX-exposed beans on shutdown
+Disconnected from the target VM, address: &#39;127.0.0.1:46101&#39;, transport: &#39;socket&#39;
+</code></pre>
+<p>可是…………好像有点不对劲……<br>启动之后过一会儿就自动关了。<br>原因很简单，在<code>EmbeddedNettyFactory</code>类里面，我们还没返回真正的<code>EmbeddedServletContainer</code>实现类，而只是返回null，所以Spring没有Servlet容器可用，也就只能关闭啦。<br>我们将在下一篇文章里讨论如何实现<code>EmbeddedServletContainer</code>——与netty结合最紧密的地方。</p>
+
+        
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+    <!-- 使用 DISQUS -->
+<div id="disqus-comment">
+    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_config = function () {
+        this.page.url = 'https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://leibnizhu.github.io/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%BA%8C%EF%BC%89/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+</script>
+<script type="text/ls-javascript" id="disqus-thread-script">
+    queue.offer(function() {
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document;
+                var s = d.createElement('script');
+                s.src = '//leibnizhu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', + new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        });
+</script>
+
+</div>
+<style>
+    #disqus-comment{
+        background-color: #eee;
+        padding: 2pc;
+    }
+</style>
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2017/08/27/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%89%EF%BC%89/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2017/08/24/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring%20Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%80%EF%BC%89/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/avatar.gif" alt="Leibniz Hu's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        leibnizhu@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="mail:leibnizhu@gmail.com" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2021/06/">六月 2021<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/04/">四月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/08/">八月 2018<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/07/">七月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/05/">五月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/03/">三月 2018<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2018/01/">一月 2018<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/12/">十二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/11/">十一月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/10/">十月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/09/">九月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/08/">八月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/07/">七月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/06/">六月 2017<span class="sidebar_archives-count">4</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/05/">五月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/04/">四月 2017<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2017/01/">一月 2017<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">6</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/08/">八月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/07/">七月 2016<span class="sidebar_archives-count">4</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+        <li>
+            <a href="/about" title="关于我">
+                
+                    <i class="material-icons sidebar-material-icons">person</i>
+                
+                关于我
+            </a>
+        </li>
+        
+    
+        <li>
+            <a href="/tags" title="标签">
+                
+                    <i class="material-icons sidebar-material-icons">bookmark</i>
+                
+                标签
+            </a>
+        </li>
+        
+    
+
+    <!-- Article Number  -->
+    
+        <li>
+            <a href="/archives">
+                文章总数
+                <span class="sidebar-badge">53</span>
+            </a>
+        </li>
+        
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div id="back-to-top" class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+
+    <!-- Facebook -->
+    
+
+    <!-- Google + -->
+    
+        <a href="https://plus.google.com/+LeibnizHu/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-gplus">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+        <a href="http://www.weibo.com/u/1745588682" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-weibo">
+                <span class="visuallyhidden">Weibo</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+        <a href="https://github.com/Leibnizhu" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn footer-sns-github">
+                <span class="visuallyhidden">Github</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+    
+    <!-- V2EX -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;2016&nbsp;-<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>Heaven's Door
+            
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import JS File -->
+
+    <script>lsloader.load("lazyload_js","/js/lazyload.min.js?1BcfzuNXqV+ntF6gq+5X3Q==", true)</script>
+
+
+
+    <script>lsloader.load("js_js","/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
+
+
+
+    <script>lsloader.load("np_js","/js/nprogress.js?pl3Qhb9lvqR1FlyLUna1Yw==", true)</script>
+
+
+<script type="text/ls-javascript" id="NProgress-script">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+   <!-- 使用 DISQUS js 代码 -->
+<script id="dsq-count-scr" src="//leibnizhu.disqus.com/count.js" async></script>
+
+
+
+
+
+<!-- UC Browser Compatible -->
+<script>
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('ucbrowser')>0) {
+		document.write('
+<link rel="stylesheet" href="/css/uc.css">
+');
+	   alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+	}
+</script>
+
+<!-- Import prettify js  -->
+
+    
+        
+            <script>lsloader.load("prettify_js","/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", true)</script>
+        
+    
+
+
+
+<!-- Window Load -->
+<!-- add class for prettify -->
+<script type="text/ls-javascript" id="window-load">
+    $(window).on('load', function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+
+    
+        
+            $(function() {
+                $('pre').addClass('prettyprint linenums').attr('style', 'overflow:auto;');
+                prettyPrint();
+                })
+        
+    
+    
+</script>
+
+<!-- MathJax Load-->
+
+
+<!-- Bing Background -->
+
+
+<script type="text/ls-javascript" id="lazy-load">
+    // Offer LazyLoad
+    queue.offer(function(){
+        $('.lazy').lazyload({
+            effect : 'show'
+        });
+    });
+
+    // Start Queue
+    $(document).ready(function(){
+        setInterval(function(){
+            queue.execNext();
+        },200);
+    });
+</script>
+
+<!-- Custom Footer -->
+
+
+
+<script>
+    (function(){
+        var scriptList = document.querySelectorAll('script[type="text/ls-javascript"]')
+
+        for (var i = 0; i < scriptList.length; ++i) {
+            var item = scriptList[i];
+            lsloader.runInlineScript(item.id,item.id);
+        }
+    })()
+console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
+</script>
+
+                </main>
+            </div>
+        </body>
+    
+</html>
