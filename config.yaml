@@ -192,21 +192,26 @@ menu:
         - identifier: home
           name: Home
           url: https://leibnizhu.github.io
+          weight: -100
           params:
               icon: home
+              newTab: false
         - identifier: github
           name: GitHub
           url: https://github.com/leibnizhu
+          weight: -80
           params:
               icon: brand-github
         - identifier: email
           name: Email
           url: mailto:leibnizhu@gmail.com
+          weight: -60
           params:
               icon: brand-gmail
         - identifier: Running
           name: Running
           url: https://leibnizhu.github.io/running
+          weight: -40
           params:
               icon: run
 
