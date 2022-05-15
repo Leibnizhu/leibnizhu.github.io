@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>主从复制 on Heaven's Door</title><link>https://leibnizhu.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</link><description>Recent content in 主从复制 on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 26 Nov 2016 14:01:02 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/index.xml" rel="self" type="application/rss+xml"/><item><title>Redis性能调优——Pipeline、主从复制、Lua脚本等</title><link>https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/</link><pubDate>Sat, 26 Nov 2016 14:01:02 +0000</pubDate><guid>https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/</guid><description>&lt;p>这篇也是组内分享的文档，整理了之前两篇Netty+Redis的文章，加入了一些Redis调优相关的命令和内容。&lt;/p>
+&lt;h1 id="redis性能瓶颈">Redis性能瓶颈&lt;/h1>
+&lt;h2 id="tcp连接">TCP连接&lt;/h2>
+&lt;p>Redis协议基于TCP/IP协议，受限于TCP连接建立的速度（三次握手等），及网络中数据传输的速度。&lt;/p>
+&lt;h2 id="数据包大小">数据包大小&lt;/h2>
+&lt;p>Redis官方的一项测试显示，对于1k~10k以下的数据，Redis的吞吐量变化并不明显，吞吐量曲线在1k~10k左右出现拐点，如下图。&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/1.png"
+width="662"
+height="461"
+srcset="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/1_huae3739b158ac574ede9203810d0e3c4f_14804_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/1_huae3739b158ac574ede9203810d0e3c4f_14804_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="344px"
+>&lt;/p>
+&lt;h2 id="单线程">单线程&lt;/h2>
+&lt;p>Redis服务器为C语言编写，使用异步非阻塞IO，目前坚持使用单线程（可能出于线程锁的效率考虑）。对于高并发访问+多核CPU场景而言，并不能充分使用CPU资源，可能发生某核心占用率很高，其他核心空闲，但Redis请求阻塞在队列中的情况。&lt;br>
+搭建Redis集群可以解决该问题，但集群节点间访问引起的网络IO延时又带来新的问题。&lt;/p>
+&lt;h1 id="redis性能监控测试">Redis性能监控/测试&lt;/h1>
+&lt;h2 id="info命令">info命令&lt;/h2>
+&lt;p>redis-cli中输入info可以显示当前Redis服务器的全部状态信息。这些信息按照内容被分成了很多部分，可以用额外的参数来单独获取，如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:left">参数名&lt;/th>
+&lt;th style="text-align:left">说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:left">server&lt;/td>
+&lt;td style="text-align:left">获取 server 信息，包括 version, OS, port 等信息&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">clients&lt;/td>
+&lt;td style="text-align:left">获取 clients 信息，如客户端连接数等&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">memory&lt;/td>
+&lt;td style="text-align:left">获取 server 的内存信息，包括当前内存消耗、内存使用峰值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">persistence&lt;/td>
+&lt;td style="text-align:left">获取 server 的持久化配置信息&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">stats&lt;/td>
+&lt;td style="text-align:left">获取 server 的一些基本统计信息，如处理过的连接数量等&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">replication&lt;/td>
+&lt;td style="text-align:left">获取 server 的主从配置信息&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">cpu&lt;/td>
+&lt;td style="text-align:left">获取 server 的 CPU 使用信息&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">keyspace&lt;/td>
+&lt;td style="text-align:left">获取 server 中各个 DB 的 key 的数量&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">cluster&lt;/td>
+&lt;td style="text-align:left">获取集群节点信息，仅在开启集群后可见&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">commandstats&lt;/td>
+&lt;td style="text-align:left">获取每种命令的统计信息，非常有用&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="slowlog命令">slowlog命令&lt;/h2>
+&lt;p>redis.conf中配置：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> slowlog-log-slower-than &lt;span style="color:#f99b15">10000&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> slowlog-max-len &lt;span style="color:#f99b15">128&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>意为：如果一条命令的响应时间超过了 10000us (即 10ms) ，那么将会作为 &amp;ldquo;slow command&amp;rdquo; 被记录，并且将只保留最新的128条记录。&lt;br>
+在redis-cli中使用slowlog get N可以显示最新产生的N条慢操作：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/2.png"
+width="278"
+height="91"
+srcset="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/2_hue73097dbe905c3b1c2195a46cef04135_3972_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/2_hue73097dbe905c3b1c2195a46cef04135_3972_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="305"
+data-flex-basis="733px"
+>&lt;br>
+每条语句有四个描述字段，分别表示慢日志序号（最新的记录被展示在最前面）、这条记录被记录时的时间戳、这条命令的响应时间（单位：us 微秒）、这条命令的内容。&lt;br>
+可以根据slowlog的记录优化对应的语句。&lt;/p>
+&lt;h2 id="bigkeys命令">bigkeys命令&lt;/h2>
+&lt;p>使用方法：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>redis-cli -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; --bigkeys
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这条命令会从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告，如下图：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/3.png"
+width="673"
+height="646"
+srcset="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/3_hub089a628b13afa38bffb2e2c4121c535_64570_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/3_hub089a628b13afa38bffb2e2c4121c535_64570_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="104"
+data-flex-basis="250px"
+>&lt;/p>
+&lt;h2 id="latency命令">latency命令&lt;/h2>
+&lt;p>使用方法：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>redis-cli -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; --latency-history
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>redis-cli -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; --latency
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>区别仅在于：前者每隔15秒生成一条记录（这15秒内的测试结果），后者持续更新测试结果，如下图：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/4.png"
+width="652"
+height="133"
+srcset="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/4_hu8eb1b28e9fc83dee92cfb5f4d9720d49_15842_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/4_hu8eb1b28e9fc83dee92cfb5f4d9720d49_15842_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="490"
+data-flex-basis="1176px"
+>&lt;/p>
+&lt;h2 id="redis-benchmark测试">redis-benchmark测试&lt;/h2>
+&lt;p>使用方法：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>redis-benchmark -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; -c &amp;lt;并发数&amp;gt; -n &amp;lt;请求次数&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>执行后，redis-benchmark会对各个命令分别进行测试，测试结果较长，在此截取部分如下：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/5.png"
+width="348"
+height="214"
+srcset="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/5_hu3a941fce91b3a5aed7470d18b62238b8_6920_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/5_hu3a941fce91b3a5aed7470d18b62238b8_6920_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="390px"
+>&lt;/p>
+&lt;h2 id="第三方统计分析工具redis-stat">第三方统计分析工具redis-stat&lt;/h2>
+&lt;p>redis-stat采用ruby开发，利用redis-cli info 提供的原始数据，给用户提供基于文本列表或web图表方式展现的各种关键数据。
+redis-stat 开源网址: &lt;a class="link" href="https://github.com/junegunn/redis-stat" target="_blank" rel="noopener"
+>https://github.com/junegunn/redis-stat&lt;/a>&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/6.png"
+width="687"
+height="366"
+srcset="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/6_hu80e03b156dadeb75c088820daa26894d_25906_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/6_hu80e03b156dadeb75c088820daa26894d_25906_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="187"
+data-flex-basis="450px"
+>&lt;/p>
+&lt;h1 id="redis性能调优">Redis性能调优&lt;/h1>
+&lt;h2 id="使用pipeline">使用Pipeline&lt;/h2>
+&lt;p>对于Redis读写，有很大一部分的耗时是在网络IO上，尤其是Redis(集群)与应用不在一台服务器上时；此时，对于一些连续的操作，尽量使用pipeline批处理。若批量的命令使用到的key要求在执行过程中不被其他请求修改，则需要用redis事务，效率还是比pipeline低。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>Jedis jedis &lt;span style="color:#5bc4bf">=&lt;/span> RedisUtils&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getSingleJedis&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//获取Jedis连接
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>Pipeline pl &lt;span style="color:#5bc4bf">=&lt;/span> jedis&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">pipelined&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>&lt;span style="color:#776e71">//获取Pipeline
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>Response&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> resp1 &lt;span style="color:#5bc4bf">=&lt;/span> pl&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">get&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#ef6155">“&lt;/span>key1&lt;span style="color:#ef6155">”&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//Pipeline压入命令并保存Response引用
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>Response&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> resp2 &lt;span style="color:#5bc4bf">=&lt;/span> pl&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">get&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#ef6155">“&lt;/span>key2&lt;span style="color:#ef6155">”&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pl&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">sync&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>&lt;span style="color:#776e71">//Pipeline执行批处理
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>System&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">out&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">println&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#ef6155">“&lt;/span>key1&lt;span style="color:#ef6155">’&lt;/span>s value &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#ef6155">”&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> resp1&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">get&lt;/span>&lt;span style="color:#5bc4bf">());&lt;/span>&lt;span style="color:#776e71">//从Response获取执行结果
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>System&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">out&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">println&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#ef6155">“&lt;/span>key2&lt;span style="color:#ef6155">’&lt;/span>s value &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#ef6155">”&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> resp2&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">get&lt;/span>&lt;span style="color:#5bc4bf">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>RedisUtils&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">close&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>pl&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//关闭Pipeline
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>RedisUtils&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">close&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>jedis&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//关闭Jedis连接
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>要注意的是Pipeline一次传输的key或数据也不宜过多，参考本文1.2小节。&lt;/p>
+&lt;h2 id="使用lua脚本">使用Lua脚本&lt;/h2>
+&lt;p>灵活利用Lua脚本，可减少Redis的网络IO。Redis支持在服务器上运行Lua脚本完成一些简单运算。Redis尽管对Lua脚本有很多限制，但的确能提高效率，对于一些Redis原生API不能满足的批量操作，比如读取多个key再进行简单计算，如果将这些key的值分别读取到本地，再进行计算，会发生多次网络IO，那么可以用上面的pipeline，而效率更高的方法是将这些计算写成Lua脚本。&lt;br>
+我们的RTB目前使用Lua脚本的流程如下：&lt;/p>
+&lt;ol>
+&lt;li>配置一个监听Servlet上下文初始化的Listener（com.turingdi.rtb.service. PropertiesLoadListener），执行读取配置文件、Redis连接等初始化操作；&lt;/li>
+&lt;li>/该Listener初始化Redis时，将指定的多个Lua脚本文件读入内存（com.turingdi.rtb.utils.RedisUtils的loadScripts()）；&lt;/li>
+&lt;li>使用Redis的SCRIPTLOAD命令，将Lua脚本加载到Redis服务器，返回一个SHA码，保存到RedisUtils类中；&lt;/li>
+&lt;li>竞价过程中需要调用Lua脚本时，调用Redis的EVALSHA命令，使用初始化时拿到的SHA进行Lua脚本调用，返回计算结果。&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-lua" data-lang="lua">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">--计算QPS，QPS这个key只保留1s，不存在的时候设置为1并设置生命周期为1，存在的时候直接加1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">local&lt;/span> isExist &lt;span style="color:#5bc4bf">=&lt;/span> redis.call(&lt;span style="color:#48b685">&amp;#39;EXISTS&amp;#39;&lt;/span>, &lt;span style="color:#48b685">&amp;#39;QPS&amp;#39;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">if&lt;/span> isExist &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#f99b15">0&lt;/span> &lt;span style="color:#815ba4">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> redis.call(&lt;span style="color:#48b685">&amp;#39;INCR&amp;#39;&lt;/span>, &lt;span style="color:#48b685">&amp;#39;QPS&amp;#39;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> redis.call(&lt;span style="color:#48b685">&amp;#39;EXPIRE&amp;#39;&lt;/span>, &lt;span style="color:#48b685">&amp;#39;QPS&amp;#39;&lt;/span>, &lt;span style="color:#48b685">&amp;#39;1&amp;#39;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> redis.call(&lt;span style="color:#48b685">&amp;#39;INCR&amp;#39;&lt;/span>, &lt;span style="color:#48b685">&amp;#39;QPS&amp;#39;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">end&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">--处理请求数和响应数的统计&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>redis.call(&lt;span style="color:#48b685">&amp;#39;INCR&amp;#39;&lt;/span>, KEYS[&lt;span style="color:#f99b15">1&lt;/span>])
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">if&lt;/span> ARGV[&lt;span style="color:#f99b15">1&lt;/span>] &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#48b685">&amp;#39;1&amp;#39;&lt;/span> &lt;span style="color:#815ba4">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> redis.call(&lt;span style="color:#48b685">&amp;#39;INCR&amp;#39;&lt;/span>, KEYS[&lt;span style="color:#f99b15">2&lt;/span>])
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">end&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>本文不对Lua脚本进行详细阐述，有需要的可以参照以下网页/文档：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="http://redisdoc.com/script/index.html" target="_blank" rel="noopener"
+>http://redisdoc.com/script/index.html&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.oschina.net/translate/intro-to-lua-for-redis-programmers" target="_blank" rel="noopener"
+>https://www.oschina.net/translate/intro-to-lua-for-redis-programmers&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://origin.redisbook.com/feature/scripting.html" target="_blank" rel="noopener"
+>http://origin.redisbook.com/feature/scripting.html&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://wiki.jikexueyuan.com/project/redis/lua.html" target="_blank" rel="noopener"
+>http://wiki.jikexueyuan.com/project/redis/lua.html&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="使用本地的redis">使用本地的Redis&lt;/h2>
+&lt;p>Redis尽量放在本地，减少网络IO时间；对相应时间要求高的，尽量不要用云服务商提供的Redis服务，读写速度比不上本地的。&lt;/p>
+&lt;h2 id="主从复制读写分离">主从复制/读写分离&lt;/h2>
+&lt;p>Redis放在本地，在服务器集群环境下就有数据同步的问题。之前尝试过很多方案，Redis自己的Ruby集群、Twitter的Twemproxy等等，都不适合RTB使用——这些集群更多地考虑可用性和数据分片、扩容性，但对一些多键操作支持很差，而且也有各种缺陷（如使用Redis自带的Ruby集群，至少3主3从，可以建好3主3从的集群之后，手动移动Slot到同一台主机，删除其他主机，变成1主3从，但这个集群一旦关闭就无法启动）。&lt;br>
+考虑到RTB使用的Redis读多写少，所以最后使用的方案是Redis自带的主从复制，集群的不同的服务器之间只需要一台主机作为Redis主机，其他服务器的Redis服务设置slaveof属性，作为其从机。此外，可以将从机的只读属性设为no，但往Slave写入的数据会在下一次同步的时候被Master的数据所覆盖——这样做的目的在于写入一些临时缓存变量。&lt;br>
+redis.conf配置如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> slaveof &amp;lt;Master IP&amp;gt; &amp;lt;Master端口&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> slave-read-only no
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>只有一台服务器的情况下，如果是多核服务器（16核及以上），由于Redis是单线程的，只能利用一个CPU内核，只开一个Redis服务实例可能压力很大（可以从CPU占用看出来），此时也可以使用上面提到的主从复制功能，在同一台服务器上开启多个Redis实例分担查询压力，提高并发性能。&lt;br>
+Linux系统中，可以使用：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>taskset -cp &lt;span style="color:#5bc4bf">[&lt;/span>CPU核心号码，从0开始&lt;span style="color:#5bc4bf">]&lt;/span> &lt;span style="color:#5bc4bf">[&lt;/span>要执行的命令&lt;span style="color:#5bc4bf">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>来指定要执行的命令在哪些CPU内核上运行，在多核服务器上，可以合理利用此命令来分配CPU资源，如指定多个Redis和Netty分别运行在多个内核上，并指定哪个Netty服务使用哪个Redis服务（需要自己编写Netty服务，读取配置文件，使用不同端口的Redis服务），避免资源浪费和拥挤。&lt;br>
+目前RTB在一台服务器上部署了一个Master节点（端口6660）和5个Slave节点（端口6661-6665），即只有一个对外可写入的Redis服务，其他Redis服务只能读，保证了读的性能。启动的脚本如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>kill -9 &lt;span style="color:#815ba4">$(&lt;/span>ps -ef | grep redis-server | grep -v grep | awk &lt;span style="color:#48b685">&amp;#39;{print $2}&amp;#39;&lt;/span>&lt;span style="color:#815ba4">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /usr/local/redis/6660
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>taskset -c &lt;span style="color:#f99b15">0&lt;/span> redis-server redis.conf
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /usr/local/redis/6661
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>taskset -c &lt;span style="color:#f99b15">1&lt;/span> redis-server redis.conf
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>…………
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /usr/local/redis/6665
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>taskset -c &lt;span style="color:#f99b15">5&lt;/span> redis-server redis.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="计算缓存">计算缓存&lt;/h2>
+&lt;p>Redis指令的优化及自定义计算缓存。利用SLOWLOG我们可以找到执行比较慢的命令，从而进行优化。&lt;br>
+比如RTB系统在测试一段时间之后，通过SLOWLOG命令得知耗时较长的都是用户人群标签的并集操作，而这个操作与请求的具体内容有关。所以后来设定了一个计算缓存，通过EXPIRE命令设置缓存的生命周期（随着时间推移，人群标签的计算结果是不一样的，需要定时更新），每次新的请求在计算这一步时，先查询缓存中是否存在计算结果，存在的话直接读取，不存在（全新的计算或旧的已过期）则重新计算并放入运算缓存。（详见com.turingdi.rtb.service.CampaignService）&lt;/p>
+&lt;h2 id="压缩key和value">压缩key和value&lt;/h2>
+&lt;p>在数据量大的情况下，压缩key和value的长度不管对存储还是网络传输都有利。&lt;/p></description></item></channel></rss>

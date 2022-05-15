@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Thymeleaf on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Thymeleaf/</link><description>Recent content in Thymeleaf on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 26 Nov 2016 15:59:27 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Thymeleaf/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring Boot快速入门（三）——使用Thymeleaf模板引擎</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</link><pubDate>Sat, 26 Nov 2016 15:59:27 +0000</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</guid><description>&lt;h1 id="使用thymeleaf模板引擎">使用Thymeleaf模板引擎&lt;/h1>
+&lt;h2 id="thymeleaf简介">Thymeleaf简介&lt;/h2>
+&lt;p>Thymeleaf是一个XML/XHTML/HTML5模板引擎，可用于Web与非Web环境中的应用开发。它是一个开源的Java库，基于Apache License 2.0许可。&lt;br>
+Thymeleaf提供了一个用于整合Spring MVC的可选模块，在应用开发中，你可以使用Thymeleaf来完全代替JSP或其他模板引擎，如Velocity、FreeMarker等。Thymeleaf的主要目标在于提供一种可被浏览器正确显示的、格式良好的模板创建方式，&lt;strong>因此也可以用作静态建模&lt;/strong> 。你可以使用它创建经过验证的XML与HTML模板。相对于编写逻辑或代码，开发者只需将标签属性添加到模板中即可。&lt;br>
+Thymeleaf主要通过HTML的标签属性渲染标签内容，浏览器在解析html时，当检查到Thymeleaf的属性时候会忽略，所以Thymeleaf的模板可以通过浏览器直接打开展现，这样非常&lt;strong>有利于前后端的分离&lt;/strong> 。&lt;/p>
+&lt;h2 id="添加依赖">添加依赖&lt;/h2>
+&lt;p>添加模板引擎的依赖，可以在IntelliJ IDEA创建Spring Boot项目的时候选择对应的依赖，也可以在后期手动修改pom.xml文件增加依赖。&lt;/p>
+&lt;h3 id="intellij-idea创建spring-boot项目时增加">IntelliJ IDEA创建Spring Boot项目时增加&lt;/h3>
+&lt;p>在选择依赖的界面，点击左边的“Template Engine”，在中间选择所需的模板引擎即可。&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/6.png"
+width="870"
+height="550"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/6_hu6ca57f4e7f7f9ec40effa8d83a30b110_15376_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/6_hu6ca57f4e7f7f9ec40effa8d83a30b110_15376_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;h3 id="手动修改pomxml">手动修改pom.xml&lt;/h3>
+&lt;p>以Thymeleaf为例，修改pom.xml增加以下依赖：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-starter-thymeleaf&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可在resources/application.properties中对Thymeleaf进行配置。&lt;/p>
+&lt;h2 id="目录结构">目录结构&lt;/h2>
+&lt;p>Thymeleaf默认将模板放在resources/templates目录下（可以通过application.properties文件进行配置，但建议保持默认值方便管理）；同时，Spring Boot默认将静态资源放在resources/static（从根路径访问），于是，经典的目录结构是这样的：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/7.png"
+width="225"
+height="108"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/7_hu6e9db1b1b3690689af597cb77aa047bb_2524_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/7_hu6e9db1b1b3690689af597cb77aa047bb_2524_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="208"
+data-flex-basis="500px"
+>&lt;br>
+其中640-100.jpg的访问路径为http://127.0.0.1:8080/640-100.jpg。&lt;/p>
+&lt;h2 id="模板demo">模板Demo&lt;/h2>
+&lt;p>在resources/templates目录下新建temp.html，内容如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">html&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">head&lt;/span> &lt;span style="color:#06b6ef">lang&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;en&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">meta&lt;/span> &lt;span style="color:#06b6ef">charset&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;UTF-8&amp;#34;&lt;/span> /&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">title&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#5bc4bf">title&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">head&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">body&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">h1&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${host}&amp;#34;&lt;/span>&amp;gt;Hello World&amp;lt;/&lt;span style="color:#5bc4bf">h1&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">body&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">html&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中h1的&lt;strong>th:text=&amp;quot;${host}&amp;quot;&lt;/strong> 即为Thymeleaf的属性，表示获取ModelMap中的host属性赋值给h1的文本；而这个文件直接用浏览器访问的时候h1元素则显示“Hello World”。
+再编写一个Controller：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Controller&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/template&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">TemplateController&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">index&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>ModelMap map&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 加入一个属性，用来在模板中读取
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> map&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">addAttribute&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;host&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;http://www.turingdi.com&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// return模板文件的名称，对应resources/templates/temp.html
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#48b685">&amp;#34;temp&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意这里使用了@Controller注解而不是之前的@RestController，若使用后者，index()方法返回的”temp”会直接以JSON格式返回，页面显示“temp”。实际上我们使用@Controller注解并加入了Thymeleaf模板引擎后，index()方法返回的”temp”会被Thymeleaf模板引擎理解为src/main/resources/templates/temp.html文件，然后解析该文档并响应返回。在浏览器中接收到的html源码如下：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/8.png"
+width="254"
+height="177"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/8_hu4db642ab36ed21f35da9bfe856fdc56e_4180_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/8_hu4db642ab36ed21f35da9bfe856fdc56e_4180_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="344px"
+>&lt;br>
+而这个模板文件直接用浏览器打开的效果：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/9.png"
+width="712"
+height="120"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/9_hu2d2846de01e8e749313ea5e3dade173a_4806_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/9_hu2d2846de01e8e749313ea5e3dade173a_4806_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="593"
+data-flex-basis="1424px"
+>&lt;br>
+可以看到，前端开发人员可以直接修改html并直接观察修改后的效果，修改时并不影响Thymeleaf的代码，因此可以方便前后端协同开发。&lt;/p>
+&lt;h2 id="thymeleaf简单表达式">Thymeleaf简单表达式&lt;/h2>
+&lt;h3 id="变量表达式-">变量表达式 ${……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">name&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;userName&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;James Carrot&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user.name}&amp;#34;&lt;/span> /&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上述代码为引用user对象的name属性值。&lt;/p>
+&lt;h3 id="选择星号表达式-">选择/星号表达式 *{……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">div&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${session.user}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;Nationality:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">span&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{nationality}&amp;#34;&lt;/span>&amp;gt;Saturn&amp;lt;/&lt;span style="color:#5bc4bf">span&lt;/span>&amp;gt;.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>选择表达式一般跟在th:object后，直接取object中的属性。&lt;/p>
+&lt;h3 id="文字国际化表达式-">文字国际化表达式 #{……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:utext&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;#{home.welcome}&amp;#34;&lt;/span>&amp;gt;Welcome to our grocery store!&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url表达式-">URL表达式 @{……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">a&lt;/span> &lt;span style="color:#06b6ef">href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;details.html&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/order/details(orderId=${o.id})}&amp;#34;&lt;/span>&amp;gt;view&amp;lt;/&lt;span style="color:#5bc4bf">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>@{……}支持决定路径和相对路径。其中相对路径又支持跨上下文调用url和协议的引用。
+当URL为后台传出的参数时，代码如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">img&lt;/span> &lt;span style="color:#06b6ef">src&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;../../static/assets/images/qr-code.jpg&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:src&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{${path}}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">alt&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;二维码&amp;#34;&lt;/span> /&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf常用标签">Thymeleaf常用标签&lt;/h2>
+&lt;h3 id="简单数据转换数字日期">简单数据转换（数字，日期）&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;价格&amp;lt;/&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${#numbers.formatDecimal(product.price, 1, 2)}&amp;#34;&lt;/span>&amp;gt;180&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;进货日期&amp;lt;/&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${#dates.format(product.availableFrom, &amp;#39;yyyy-MM-dd&amp;#39;)}&amp;#34;&lt;/span>&amp;gt;2014-12-01&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="字符串拼接">字符串拼接&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${&amp;#39;$&amp;#39;+product.price}&amp;#34;&lt;/span>&amp;gt;235&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="表单">表单&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">form&lt;/span> &lt;span style="color:#06b6ef">th:action&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/bb}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:field&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{name}&amp;#34;&lt;/span>/&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:field&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{msg}&amp;#34;&lt;/span>/&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;submit&amp;#34;&lt;/span>/&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">form&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="循环">循环&lt;/h3>
+&lt;p>渲染列表数据是一种非常常见的场景，例如现在有n条记录需要渲染成一个表格&amp;lt;table&amp;gt;，该数据集合必须是可以遍历的，使用th:each标签：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">table&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;NAME&amp;lt;/&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;PRICE&amp;lt;/&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;IN STOCK&amp;lt;/&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">tr&lt;/span> &lt;span style="color:#06b6ef">th:each&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;prod : ${prods}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">td&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${prod.name}&amp;#34;&lt;/span>&amp;gt;Onions&amp;lt;/&lt;span style="color:#5bc4bf">td&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">td&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${prod.price}&amp;#34;&lt;/span>&amp;gt;2.41&amp;lt;/&lt;span style="color:#5bc4bf">td&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">td&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${prod.inStock}? #{true} : #{false}&amp;#34;&lt;/span>&amp;gt;yes&amp;lt;/&lt;span style="color:#5bc4bf">td&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">table&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="条件判断ifunless">条件判断If/Unless&lt;/h3>
+&lt;p>Thymeleaf中使用th:if和th:unless属性进行条件判断，下面的例子中，&lt;code>&amp;lt;a&amp;gt;&lt;/code>标签只有在th:if中条件成立时才显示：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">a&lt;/span> &lt;span style="color:#06b6ef">th:href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/login}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:unless&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">${session.user&lt;/span> &lt;span style="color:#ef6155">!=&lt;/span> &lt;span style="color:#06b6ef">null&lt;/span>&lt;span style="color:#ef6155">}&lt;/span>&amp;gt;Login&amp;lt;/&lt;span style="color:#5bc4bf">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>th:unless于th:if恰好相反，只有表达式中的条件不成立，才会显示其内容。&lt;/p>
+&lt;h3 id="switch">Switch&lt;/h3>
+&lt;p>Thymeleaf同样支持多路选择Switch结构，默认属性default可以用*表示：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">div&lt;/span> &lt;span style="color:#06b6ef">th:switch&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user.role}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&amp;#39;admin&amp;#39;&amp;#34;&lt;/span>&amp;gt;User is an administrator&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;#{roles.manager}&amp;#34;&lt;/span>&amp;gt;User is a manager&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*&amp;#34;&lt;/span>&amp;gt;User is some other thing&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf配置">Thymeleaf配置&lt;/h2>
+&lt;p>可在&lt;strong>resources/application.properties&lt;/strong> 中对Thymeleaf进行配置，配置如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Enable template caching.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.cache&lt;span style="color:#5bc4bf">=&lt;/span>true
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Check that the templates location exists.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.check-template-location&lt;span style="color:#5bc4bf">=&lt;/span>true
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Content-Type value.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.content-type&lt;span style="color:#5bc4bf">=&lt;/span>text/html
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Enable MVC Thymeleaf view resolution.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.enabled&lt;span style="color:#5bc4bf">=&lt;/span>true
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Template encoding.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.encoding&lt;span style="color:#5bc4bf">=&lt;/span>UTF-8
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Comma-separated list of view names that should be excluded from resolution.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.excluded-view-names&lt;span style="color:#5bc4bf">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Template mode to be applied to templates. See also StandardTemplateModeHandlers.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.mode&lt;span style="color:#5bc4bf">=&lt;/span>HTML5
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Prefix that gets prepended to view names when building a URL.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.prefix&lt;span style="color:#5bc4bf">=&lt;/span>classpath:/templates/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Suffix that gets appended to view names when building a URL.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.suffix&lt;span style="color:#5bc4bf">=&lt;/span>.html spring.thymeleaf.template-resolver-order&lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#776e71"># Order of the template resolver in the chain. spring.thymeleaf.view-names= # Comma-separated list of view names that can be resolved.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

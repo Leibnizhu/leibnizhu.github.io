@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JavaWeb on Heaven's Door</title><link>https://leibnizhu.github.io/tags/JavaWeb/</link><description>Recent content in JavaWeb on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 26 Nov 2016 16:00:08 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/JavaWeb/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring Boot快速入门（四）——日志系统</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</link><pubDate>Sat, 26 Nov 2016 16:00:08 +0000</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</guid><description>&lt;h1 id="日志系统">日志系统&lt;/h1>
+&lt;h2 id="简介">简介&lt;/h2>
+&lt;p>Spring Boot默认使用的Apache的Common Logging日志系统，但同时也提供了Java Util Logging, Log4J, Log4J2和Logback等日志系统的支持（无需额外增加依赖）。&lt;/p>
+&lt;h2 id="日志格式">日志格式&lt;/h2>
+&lt;p>Spring Boot默认输出的日志各列含义如下：&lt;/p>
+&lt;ul>
+&lt;li>日期和时间 - 精确到毫秒，且易于排序。&lt;/li>
+&lt;li>日志级别 - ERROR, WARN, INFO, DEBUG 或 TRACE。&lt;/li>
+&lt;li>Process ID。&lt;/li>
+&lt;li>一个用于区分实际日志信息开头的&amp;mdash;分隔符。&lt;/li>
+&lt;li>线程名 - 包括在方括号中（控制台输出可能会被截断）。&lt;/li>
+&lt;li>日志名 - 通常是源class的类名（缩写）。&lt;/li>
+&lt;li>日志信息。&lt;/li>
+&lt;/ul>
+&lt;p>如：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.112 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span> main&lt;span style="color:#5bc4bf">]&lt;/span> org.apache.catalina.core.StandardEngine : Starting Servlet Engine: Apache Tomcat/7.0.52
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.253 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.a.c.c.C.&lt;span style="color:#5bc4bf">[&lt;/span>Tomcat&lt;span style="color:#5bc4bf">]&lt;/span>.&lt;span style="color:#5bc4bf">[&lt;/span>localhost&lt;span style="color:#5bc4bf">]&lt;/span>.&lt;span style="color:#5bc4bf">[&lt;/span>/&lt;span style="color:#5bc4bf">]&lt;/span> : Initializing Spring embedded WebApplicationContext
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.253 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.web.context.ContextLoader : Root WebApplicationContext: initialization completed in &lt;span style="color:#f99b15">1358&lt;/span> ms
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.698 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.e.ServletRegistrationBean : Mapping servlet: &lt;span style="color:#48b685">&amp;#39;dispatcherServlet&amp;#39;&lt;/span> to &lt;span style="color:#5bc4bf">[&lt;/span>/&lt;span style="color:#5bc4bf">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.702 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.embedded.FilterRegistrationBean : Mapping filter: &lt;span style="color:#48b685">&amp;#39;hiddenHttpMethodFilter&amp;#39;&lt;/span> to: &lt;span style="color:#5bc4bf">[&lt;/span>/*&lt;span style="color:#5bc4bf">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以在resources/application.properties中使用logging.pattern.console和logging.pattern.file属性进行配置。&lt;/p>
+&lt;h2 id="日志配置">日志配置&lt;/h2>
+&lt;p>可以在&lt;strong>resources/application.properties&lt;/strong> 中进行配置，如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>###日志配置###
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#日志输出级别
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>logging.level.root=INFO
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>logging.level.com.turingdi.dmp=DEBUG
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#检查终端是否支持ANSI，是的话就采用彩色输出
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>spring.output.ansi.enabled=DETECT
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#设置文件，可以是绝对路径，也可以是相对路径
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#logging.file=
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#设置目录，会在该目录下创建spring.log文件，并写入日志内容
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#logging.path=
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#定义输出到控制台的样式（不支持JDK Logger）
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36}[%line]=&amp;gt; %msg%n
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#定义输出到文件的样式（不支持JDK Logger）
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#logging.pattern.file=
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="日志api调用">日志API调用&lt;/h2>
+&lt;p>类似Log4j：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.Log&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.LogFactory&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">TemplateController&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> Log log &lt;span style="color:#5bc4bf">=&lt;/span> LogFactory&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getLog&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>TemplateController&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">class&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">index&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>ModelMap map&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">……&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">info&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;hahahaha&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//还有warn\error\debug等方法
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#ef6155">……&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="其他相关网站">其他相关网站&lt;/h1>
+&lt;p>Spring Boot相关博客：&lt;br>
+&lt;a class="link" href="http://blog.didispace.com/categories/Spring-Boot/" target="_blank" rel="noopener"
+>http://blog.didispace.com/categories/Spring-Boot/&lt;/a>&lt;br>
+Thymeleaf相关博客：&lt;br>
+&lt;a class="link" href="http://www.cnblogs.com/vinphy/p/4674247.html" target="_blank" rel="noopener"
+>http://www.cnblogs.com/vinphy/p/4674247.html&lt;/a>&lt;br>
+&lt;a class="link" href="http://www.jianshu.com/p/ed9d47f92e37" target="_blank" rel="noopener"
+>http://www.jianshu.com/p/ed9d47f92e37&lt;/a>&lt;/p></description></item><item><title>Spring Boot快速入门（三）——使用Thymeleaf模板引擎</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</link><pubDate>Sat, 26 Nov 2016 15:59:27 +0000</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</guid><description>&lt;h1 id="使用thymeleaf模板引擎">使用Thymeleaf模板引擎&lt;/h1>
+&lt;h2 id="thymeleaf简介">Thymeleaf简介&lt;/h2>
+&lt;p>Thymeleaf是一个XML/XHTML/HTML5模板引擎，可用于Web与非Web环境中的应用开发。它是一个开源的Java库，基于Apache License 2.0许可。&lt;br>
+Thymeleaf提供了一个用于整合Spring MVC的可选模块，在应用开发中，你可以使用Thymeleaf来完全代替JSP或其他模板引擎，如Velocity、FreeMarker等。Thymeleaf的主要目标在于提供一种可被浏览器正确显示的、格式良好的模板创建方式，&lt;strong>因此也可以用作静态建模&lt;/strong> 。你可以使用它创建经过验证的XML与HTML模板。相对于编写逻辑或代码，开发者只需将标签属性添加到模板中即可。&lt;br>
+Thymeleaf主要通过HTML的标签属性渲染标签内容，浏览器在解析html时，当检查到Thymeleaf的属性时候会忽略，所以Thymeleaf的模板可以通过浏览器直接打开展现，这样非常&lt;strong>有利于前后端的分离&lt;/strong> 。&lt;/p>
+&lt;h2 id="添加依赖">添加依赖&lt;/h2>
+&lt;p>添加模板引擎的依赖，可以在IntelliJ IDEA创建Spring Boot项目的时候选择对应的依赖，也可以在后期手动修改pom.xml文件增加依赖。&lt;/p>
+&lt;h3 id="intellij-idea创建spring-boot项目时增加">IntelliJ IDEA创建Spring Boot项目时增加&lt;/h3>
+&lt;p>在选择依赖的界面，点击左边的“Template Engine”，在中间选择所需的模板引擎即可。&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/6.png"
+width="870"
+height="550"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/6_hu6ca57f4e7f7f9ec40effa8d83a30b110_15376_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/6_hu6ca57f4e7f7f9ec40effa8d83a30b110_15376_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="379px"
+>&lt;/p>
+&lt;h3 id="手动修改pomxml">手动修改pom.xml&lt;/h3>
+&lt;p>以Thymeleaf为例，修改pom.xml增加以下依赖：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-starter-thymeleaf&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可在resources/application.properties中对Thymeleaf进行配置。&lt;/p>
+&lt;h2 id="目录结构">目录结构&lt;/h2>
+&lt;p>Thymeleaf默认将模板放在resources/templates目录下（可以通过application.properties文件进行配置，但建议保持默认值方便管理）；同时，Spring Boot默认将静态资源放在resources/static（从根路径访问），于是，经典的目录结构是这样的：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/7.png"
+width="225"
+height="108"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/7_hu6e9db1b1b3690689af597cb77aa047bb_2524_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/7_hu6e9db1b1b3690689af597cb77aa047bb_2524_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="208"
+data-flex-basis="500px"
+>&lt;br>
+其中640-100.jpg的访问路径为http://127.0.0.1:8080/640-100.jpg。&lt;/p>
+&lt;h2 id="模板demo">模板Demo&lt;/h2>
+&lt;p>在resources/templates目录下新建temp.html，内容如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">html&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">head&lt;/span> &lt;span style="color:#06b6ef">lang&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;en&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">meta&lt;/span> &lt;span style="color:#06b6ef">charset&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;UTF-8&amp;#34;&lt;/span> /&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">title&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#5bc4bf">title&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">head&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">body&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">h1&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${host}&amp;#34;&lt;/span>&amp;gt;Hello World&amp;lt;/&lt;span style="color:#5bc4bf">h1&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">body&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">html&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中h1的&lt;strong>th:text=&amp;quot;${host}&amp;quot;&lt;/strong> 即为Thymeleaf的属性，表示获取ModelMap中的host属性赋值给h1的文本；而这个文件直接用浏览器访问的时候h1元素则显示“Hello World”。
+再编写一个Controller：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Controller&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/template&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">TemplateController&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">index&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>ModelMap map&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 加入一个属性，用来在模板中读取
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> map&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">addAttribute&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;host&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;http://www.turingdi.com&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// return模板文件的名称，对应resources/templates/temp.html
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#48b685">&amp;#34;temp&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意这里使用了@Controller注解而不是之前的@RestController，若使用后者，index()方法返回的”temp”会直接以JSON格式返回，页面显示“temp”。实际上我们使用@Controller注解并加入了Thymeleaf模板引擎后，index()方法返回的”temp”会被Thymeleaf模板引擎理解为src/main/resources/templates/temp.html文件，然后解析该文档并响应返回。在浏览器中接收到的html源码如下：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/8.png"
+width="254"
+height="177"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/8_hu4db642ab36ed21f35da9bfe856fdc56e_4180_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/8_hu4db642ab36ed21f35da9bfe856fdc56e_4180_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="344px"
+>&lt;br>
+而这个模板文件直接用浏览器打开的效果：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/9.png"
+width="712"
+height="120"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/9_hu2d2846de01e8e749313ea5e3dade173a_4806_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/9_hu2d2846de01e8e749313ea5e3dade173a_4806_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="593"
+data-flex-basis="1424px"
+>&lt;br>
+可以看到，前端开发人员可以直接修改html并直接观察修改后的效果，修改时并不影响Thymeleaf的代码，因此可以方便前后端协同开发。&lt;/p>
+&lt;h2 id="thymeleaf简单表达式">Thymeleaf简单表达式&lt;/h2>
+&lt;h3 id="变量表达式-">变量表达式 ${……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">name&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;userName&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;James Carrot&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user.name}&amp;#34;&lt;/span> /&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上述代码为引用user对象的name属性值。&lt;/p>
+&lt;h3 id="选择星号表达式-">选择/星号表达式 *{……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">div&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${session.user}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;Nationality:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">span&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{nationality}&amp;#34;&lt;/span>&amp;gt;Saturn&amp;lt;/&lt;span style="color:#5bc4bf">span&lt;/span>&amp;gt;.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>选择表达式一般跟在th:object后，直接取object中的属性。&lt;/p>
+&lt;h3 id="文字国际化表达式-">文字国际化表达式 #{……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:utext&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;#{home.welcome}&amp;#34;&lt;/span>&amp;gt;Welcome to our grocery store!&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url表达式-">URL表达式 @{……}&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">a&lt;/span> &lt;span style="color:#06b6ef">href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;details.html&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/order/details(orderId=${o.id})}&amp;#34;&lt;/span>&amp;gt;view&amp;lt;/&lt;span style="color:#5bc4bf">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>@{……}支持决定路径和相对路径。其中相对路径又支持跨上下文调用url和协议的引用。
+当URL为后台传出的参数时，代码如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">img&lt;/span> &lt;span style="color:#06b6ef">src&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;../../static/assets/images/qr-code.jpg&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:src&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{${path}}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">alt&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;二维码&amp;#34;&lt;/span> /&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf常用标签">Thymeleaf常用标签&lt;/h2>
+&lt;h3 id="简单数据转换数字日期">简单数据转换（数字，日期）&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;价格&amp;lt;/&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${#numbers.formatDecimal(product.price, 1, 2)}&amp;#34;&lt;/span>&amp;gt;180&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;进货日期&amp;lt;/&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${#dates.format(product.availableFrom, &amp;#39;yyyy-MM-dd&amp;#39;)}&amp;#34;&lt;/span>&amp;gt;2014-12-01&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="字符串拼接">字符串拼接&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${&amp;#39;$&amp;#39;+product.price}&amp;#34;&lt;/span>&amp;gt;235&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="表单">表单&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">form&lt;/span> &lt;span style="color:#06b6ef">th:action&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/bb}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:field&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{name}&amp;#34;&lt;/span>/&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:field&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{msg}&amp;#34;&lt;/span>/&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;submit&amp;#34;&lt;/span>/&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">form&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="循环">循环&lt;/h3>
+&lt;p>渲染列表数据是一种非常常见的场景，例如现在有n条记录需要渲染成一个表格&amp;lt;table&amp;gt;，该数据集合必须是可以遍历的，使用th:each标签：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">table&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;NAME&amp;lt;/&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;PRICE&amp;lt;/&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;IN STOCK&amp;lt;/&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">tr&lt;/span> &lt;span style="color:#06b6ef">th:each&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;prod : ${prods}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">td&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${prod.name}&amp;#34;&lt;/span>&amp;gt;Onions&amp;lt;/&lt;span style="color:#5bc4bf">td&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">td&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${prod.price}&amp;#34;&lt;/span>&amp;gt;2.41&amp;lt;/&lt;span style="color:#5bc4bf">td&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">td&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${prod.inStock}? #{true} : #{false}&amp;#34;&lt;/span>&amp;gt;yes&amp;lt;/&lt;span style="color:#5bc4bf">td&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">table&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="条件判断ifunless">条件判断If/Unless&lt;/h3>
+&lt;p>Thymeleaf中使用th:if和th:unless属性进行条件判断，下面的例子中，&lt;code>&amp;lt;a&amp;gt;&lt;/code>标签只有在th:if中条件成立时才显示：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">a&lt;/span> &lt;span style="color:#06b6ef">th:href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/login}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:unless&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">${session.user&lt;/span> &lt;span style="color:#ef6155">!=&lt;/span> &lt;span style="color:#06b6ef">null&lt;/span>&lt;span style="color:#ef6155">}&lt;/span>&amp;gt;Login&amp;lt;/&lt;span style="color:#5bc4bf">a&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>th:unless于th:if恰好相反，只有表达式中的条件不成立，才会显示其内容。&lt;/p>
+&lt;h3 id="switch">Switch&lt;/h3>
+&lt;p>Thymeleaf同样支持多路选择Switch结构，默认属性default可以用*表示：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">div&lt;/span> &lt;span style="color:#06b6ef">th:switch&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user.role}&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&amp;#39;admin&amp;#39;&amp;#34;&lt;/span>&amp;gt;User is an administrator&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;#{roles.manager}&amp;#34;&lt;/span>&amp;gt;User is a manager&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*&amp;#34;&lt;/span>&amp;gt;User is some other thing&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">div&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf配置">Thymeleaf配置&lt;/h2>
+&lt;p>可在&lt;strong>resources/application.properties&lt;/strong> 中对Thymeleaf进行配置，配置如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Enable template caching.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.cache&lt;span style="color:#5bc4bf">=&lt;/span>true
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Check that the templates location exists.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.check-template-location&lt;span style="color:#5bc4bf">=&lt;/span>true
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Content-Type value.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.content-type&lt;span style="color:#5bc4bf">=&lt;/span>text/html
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Enable MVC Thymeleaf view resolution.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.enabled&lt;span style="color:#5bc4bf">=&lt;/span>true
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Template encoding.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.encoding&lt;span style="color:#5bc4bf">=&lt;/span>UTF-8
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Comma-separated list of view names that should be excluded from resolution.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.excluded-view-names&lt;span style="color:#5bc4bf">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Template mode to be applied to templates. See also StandardTemplateModeHandlers.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.mode&lt;span style="color:#5bc4bf">=&lt;/span>HTML5
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Prefix that gets prepended to view names when building a URL.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.prefix&lt;span style="color:#5bc4bf">=&lt;/span>classpath:/templates/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Suffix that gets appended to view names when building a URL.&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.suffix&lt;span style="color:#5bc4bf">=&lt;/span>.html spring.thymeleaf.template-resolver-order&lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#776e71"># Order of the template resolver in the chain. spring.thymeleaf.view-names= # Comma-separated list of view names that can be resolved.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</link><pubDate>Sat, 26 Nov 2016 15:59:05 +0000</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</guid><description>&lt;h1 id="使用spring-boot">使用Spring Boot&lt;/h1>
+&lt;h2 id="编写demo的rest风格controller">编写Demo的REST风格Controller&lt;/h2>
+&lt;h3 id="前言">前言&lt;/h3>
+&lt;p>在DMP项目中，我们创建了demo分支，其中的com.turingdi.dmp.demo包中存放着这个demo。
+这个demo实现一个简单的REST风格的API：&lt;/p>
+&lt;ul>
+&lt;li>在根页面显示“Hello World”&lt;/li>
+&lt;li>POST请求访问/demo/user可插入一条用户（用name参数指定名字），返回该用户信息的JSON（包含后台生成的用户ID）；&lt;/li>
+&lt;li>GET请求访问/demo/user/可查询到所有用户的信息；&lt;/li>
+&lt;li>GET请求访问/demo/user/&amp;lt;用户ID&amp;gt;可查询到对应用户的信息JSON；&lt;/li>
+&lt;li>不使用上述HTTP方法访问的会返回错误。&lt;/li>
+&lt;/ul>
+&lt;h3 id="编写controller代码">编写Controller代码&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp.demo&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">io.swagger.annotations.ApiImplicitParam&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">io.swagger.annotations.ApiOperation&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.web.bind.annotation.*&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.ArrayList&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.HashMap&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.List&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.Map&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.concurrent.atomic.AtomicInteger&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.concurrent.atomic.AtomicLong&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Created by leibniz on 16-11-23
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@RestController&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/demo&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">UserController&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> AtomicInteger counter &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> AtomicInteger&lt;span style="color:#5bc4bf">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> Map&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>Integer&lt;span style="color:#5bc4bf">,&lt;/span> User&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> users &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> HashMap&lt;span style="color:#5bc4bf">&amp;lt;&amp;gt;();&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@ApiOperation&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>value&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;获取用户详细信息&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> notes&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;根据url的id来获取用户详细信息&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@ApiImplicitParam&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>name &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;id&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> value &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;用户ID&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> required &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> paramType&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;path&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> dataType &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;Integer&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>value &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;/user/{id}&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> method &lt;span style="color:#5bc4bf">=&lt;/span> RequestMethod&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">GET&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> User &lt;span style="color:#06b6ef">greeting&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#5bc4bf">@PathVariable&lt;/span> &lt;span style="color:#fec418">int&lt;/span> id&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> users&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">get&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>id&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@ApiOperation&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>value&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;获取用户列表&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> notes&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;获取所有用户&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>value &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;/user&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> method &lt;span style="color:#5bc4bf">=&lt;/span> RequestMethod&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">GET&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>User&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">getUserList&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> ArrayList&lt;span style="color:#5bc4bf">&amp;lt;&amp;gt;(&lt;/span>users&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">values&lt;/span>&lt;span style="color:#5bc4bf">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@ApiOperation&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>value&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;创建用户&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> notes&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;根据用户名创建用户&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@ApiImplicitParam&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>name &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> value &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;用户名&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> required &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> dataType &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;String&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> paramType&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;body&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>value &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;/user&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> method &lt;span style="color:#5bc4bf">=&lt;/span> RequestMethod&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">POST&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> User &lt;span style="color:#06b6ef">newUser&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#5bc4bf">@RequestBody&lt;/span> String name&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> System&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">out&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">println&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>name&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> User result &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> User&lt;span style="color:#5bc4bf">(&lt;/span>counter&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">incrementAndGet&lt;/span>&lt;span style="color:#5bc4bf">(),&lt;/span> name&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> users&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">put&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>result&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getId&lt;/span>&lt;span style="color:#5bc4bf">(),&lt;/span> result&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> result&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">home&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#48b685">&amp;#34;Hello World!&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中@RestController指定在Controller上，这样就不需要在每个@RequestMapping方法上加 @ResponseBody，默认返回json格式。
+该Controller逻辑比较简单：&lt;/p>
+&lt;ul>
+&lt;li>访问根路径返回&amp;quot;Hello World!&amp;quot;；&lt;/li>
+&lt;li>POST请求访问/user时，生成一个自增的ID，用于生成Greeting对象，保存在一个Map中并返回该对象；Spring Boot回自动将该对象转换成JSON格式再返回；&lt;/li>
+&lt;li>GET请求访问/user/用户ID时，从访问路径获取用户ID，然后从Map中获取对应Greeting对象并返回，同样地Spring Boot会将其转换为JSON格式返回。&lt;/li>
+&lt;/ul>
+&lt;p>注：&lt;/p>
+&lt;ul>
+&lt;li>一个典型的REST风格API是这样的：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/5.png"
+width="600"
+height="275"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/5_hu0178227fe69055d2799dbbfe731954f3_7830_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/5_hu0178227fe69055d2799dbbfe731954f3_7830_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="523px"
+>&lt;/li>
+&lt;li>可以使用Swagger2快速构建RESTful API文档，并支持在线发送请求调试API：http://blog.didispace.com/springbootswagger2/。&lt;/li>
+&lt;/ul>
+&lt;h2 id="启动项目">启动项目&lt;/h2>
+&lt;h3 id="直接运行入口类">直接运行入口类&lt;/h3>
+&lt;p>在IDE中配置、直接运行入口类com.turingdi.dmp.DMPStarter。&lt;/p>
+&lt;h3 id="打包jar运行">打包jar运行&lt;/h3>
+&lt;p>使用mvn package命令进行打包，并使用以下命令执行：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>java -jar target/***.jar
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>由于我们的入口类加上了7.@SpringBootApplication注解，并在Maven中配置了spring-boot-maven-plugin插件，因此在打jar包的时候会自动设置jar包中的META-INF/MAINFEST.MF中配置好jar包的入口类，无需我们在pom.xml文件中额外配置。&lt;/p>
+&lt;h3 id="使用spring-boot的maven插件运行">使用Spring Boot的Maven插件运行&lt;/h3>
+&lt;p>执行：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> mvn spring-boot:run
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即可。这也是spring-boot-maven-plugin插件起到的作用。&lt;/p>
+&lt;h3 id="热交换">热交换&lt;/h3>
+&lt;p>由于Spring Boot在打包的时候将内置tomcat一并打包，所以我们无法直接更新项目文件让tomcat重新加载。Spring Boot提供了Spring Loaded实现热交换。
+在pom.xml中增加以下依赖即可:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-devtools&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;optional&amp;gt;&lt;/span>true&lt;span style="color:#5bc4bf">&amp;lt;/optional&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后项目运行时，更新源代码之后，重新编译（如IDEA中按快捷键Ctrl+F9）即可在控制台看到Spring Boot重新加载了新编译后的文件。&lt;/p></description></item><item><title>Spring Boot快速入门（一）——介绍与基础Demo</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</link><pubDate>Sat, 26 Nov 2016 15:58:33 +0000</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</guid><description>&lt;p>因为团队新项目需要，最近研究了一下Spring Boot + RESTful API + Thymeleaf，总结了一份文档，也放到博客里贡献。&lt;/p>
+&lt;h1 id="spring-boot概述">Spring Boot概述&lt;/h1>
+&lt;h2 id="简介">简介&lt;/h2>
+&lt;p>Spring Boot简化了基于Spring的应用开发，你只需要&amp;quot;run&amp;quot;就能创建一个独立的，产品级别的Spring应用。我们为Spring平台及第三方库提供开箱即用的设置，这样你就可以有条不紊地开始。多数Spring Boot应用只需要很少的Spring配置。&lt;br>
+你可以使用Spring Boot创建Java应用，并使用java -jar启动它或采用传统的war部署方式。我们也提供了一个运行&amp;quot;spring脚本&amp;quot;的命令行工具。&lt;/p>
+&lt;h2 id="特性">特性&lt;/h2>
+&lt;p>Spring Boot主要的目标是：&lt;/p>
+&lt;ul>
+&lt;li>为所有Spring开发提供一个从根本上更快，且随处可得的入门体验。&lt;/li>
+&lt;li>开箱即用，但通过不采用默认设置可以快速摆脱这种方式。&lt;/li>
+&lt;li>提供一系列大型项目常用的非功能性特征，比如：内嵌服务器，安全，指标，健康检测，外部化配置。&lt;/li>
+&lt;li>绝对没有代码生成，也不需要XML配置。&lt;/li>
+&lt;/ul>
+&lt;h2 id="文档api">文档/API&lt;/h2>
+&lt;p>目前Spring Boot最新的Release版本为1.4.2。&lt;br>
+官方文档：&lt;br>
+&lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/reference/htmlsingle/" target="_blank" rel="noopener"
+>http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/reference/htmlsingle/&lt;/a>&lt;br>
+民间翻译的中文文档：&lt;br>
+&lt;a class="link" href="http://udn.yyuap.com/doc/Spring-Boot-Reference-Guide/I.%20Spring%20Boot%20Documentation/index.html" target="_blank" rel="noopener"
+>http://udn.yyuap.com/doc/Spring-Boot-Reference-Guide/I.%20Spring%20Boot%20Documentation/index.html&lt;/a>&lt;br>
+官方API：&lt;br>
+&lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/" target="_blank" rel="noopener"
+>http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/&lt;/a>&lt;/p>
+&lt;h1 id="使用spring-boot">使用Spring Boot&lt;/h1>
+&lt;p>本文的Demo可从git@turing:DMPWeb.git的demo分支（未公开于互联网）下载。&lt;/p>
+&lt;h2 id="创建spring-boot项目">创建Spring Boot项目&lt;/h2>
+&lt;h3 id="intellij-idea">IntelliJ IDEA&lt;/h3>
+&lt;ol>
+&lt;li>点击菜单File &amp;ndash;&amp;gt; New &amp;ndash;&amp;gt; Project；&lt;/li>
+&lt;li>弹出的窗口中，左边栏选择Spring Initializr，右边选择JDK版本（通过配置也可以运行在JDK6上，但建议JDK7以上，最好JDK8）和初始化服务的URL（按默认的https://start.spring.io 即可），点击Next；&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/1.png"
+width="848"
+height="459"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/1_hu0b48701cd1b6921db30afb81bdf723c4_12286_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/1_hu0b48701cd1b6921db30afb81bdf723c4_12286_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="184"
+data-flex-basis="443px"
+>&lt;/li>
+&lt;li>配置项目的基本信息，与平常Maven配置差不多，点击Next：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/2.png"
+width="753"
+height="466"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/2_hu34e27ea67223343566e19c08959b60db_8752_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/2_hu34e27ea67223343566e19c08959b60db_8752_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="161"
+data-flex-basis="387px"
+>&lt;/li>
+&lt;li>选择项目需要的依赖，Web项目可选择Web下的Web（会带上内置Tomcat和Spring MVC的依赖），不选也可以，后期手动修改pom.xml增加依赖是等效的：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/3.png"
+width="859"
+height="550"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/3_huf3803f6499283b9112a736322a8fc28f_16516_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/3_huf3803f6499283b9112a736322a8fc28f_16516_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="156"
+data-flex-basis="374px"
+>&lt;/li>
+&lt;li>点击Next，等待IDEA下载并初始化项目。&lt;/li>
+&lt;/ol>
+&lt;p>注：其实IDEA这种创建Spring Boot的方法，相当于自己去访问https://start.spring.io ，按页面提示选择了版本、项目信息和插件依赖之后，下载zip，解压导入到IDEA项目中。只不过IDEA帮你完成了下载和解压导入项目这一步而已。&lt;/p>
+&lt;h3 id="通用的项目创建方法">通用的项目创建方法&lt;/h3>
+&lt;p>任意一个IDE（在此省略截图），选择新建Maven项目，普通项目即可，填写项目基本信息后，修改pom.xml文件：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;project&lt;/span> &lt;span style="color:#06b6ef">xmlns=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">xmlns:xsi=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#06b6ef">xsi:schemaLocation=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;modelVersion&amp;gt;&lt;/span>4.0.0&lt;span style="color:#5bc4bf">&amp;lt;/modelVersion&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>com.turingdi&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>dmpweb&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>0.0.1-SNAPSHOT&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;packaging&amp;gt;&lt;/span>jar&lt;span style="color:#5bc4bf">&amp;lt;/packaging&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;name&amp;gt;&lt;/span>DMPWeb&lt;span style="color:#5bc4bf">&amp;lt;/name&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;description&amp;gt;&lt;/span>Data Manage Platform&lt;span style="color:#5bc4bf">&amp;lt;/description&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;parent&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-starter-parent&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>1.4.2.RELEASE&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;relativePath/&amp;gt;&lt;/span> &lt;span style="color:#776e71">&amp;lt;!-- lookup parent from repository --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/parent&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;properties&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;project.build.sourceEncoding&amp;gt;&lt;/span>UTF-8&lt;span style="color:#5bc4bf">&amp;lt;/project.build.sourceEncoding&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;project.reporting.outputEncoding&amp;gt;&lt;/span>UTF-8&lt;span style="color:#5bc4bf">&amp;lt;/project.reporting.outputEncoding&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;java.version&amp;gt;&lt;/span>1.8&lt;span style="color:#5bc4bf">&amp;lt;/java.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/properties&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 核心模块，包括自动配置支持、日志和YAML等--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependencies&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-starter&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 测试模块，包括JUnit、Hamcrest、Mockito等--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-starter-test&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;scope&amp;gt;&lt;/span>test&lt;span style="color:#5bc4bf">&amp;lt;/scope&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- Web模块，包括Spring MVC、内置Tomcat等--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-starter-web&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependencies&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>. &lt;span style="color:#5bc4bf">&amp;lt;build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-maven-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/project&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后compile等待下载依赖即可。
+为提高Maven依赖下载速度，请配置本地Nexus镜像：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;repositories&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;repository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>public&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;name&amp;gt;&lt;/span>public&lt;span style="color:#5bc4bf">&amp;lt;/name&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;url&amp;gt;&lt;/span>http://172.16.99.235:8081/nexus/content/groups/public/&lt;span style="color:#5bc4bf">&amp;lt;/url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;snapshots&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;enabled&amp;gt;&lt;/span>true&lt;span style="color:#5bc4bf">&amp;lt;/enabled&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;updatePolicy&amp;gt;&lt;/span>always&lt;span style="color:#5bc4bf">&amp;lt;/updatePolicy&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/snapshots&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repositories&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="编写项目入口类">编写项目入口类&lt;/h2>
+&lt;h3 id="入口类的位置">入口类的位置&lt;/h3>
+&lt;p>Spring Boot官方文档建议将入口类（包含main方法的类）放在项目根包下，如com.turingdi.dmp.DMPStarter，下图是一个典型的Spring Boot项目结构，注意DMPStarter类在项目中的位置：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/4.png"
+width="212"
+height="181"
+srcset="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/4_hu20da724b6f0aad69332271d617a30a02_2688_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/4_hu20da724b6f0aad69332271d617a30a02_2688_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="117"
+data-flex-basis="281px"
+>&lt;br>
+这样做的好处是使用@ComponentScan注解时可以使用默认value、无需额外指定扫描根包名的参数；而Spring Boot还提供了一个注解，包含了无参数的@ComponentScan注解及几个常用的注解，亦即在这样的项目结构下，入口类只需要一个注解即可。&lt;/p>
+&lt;h3 id="写入口类代码">写入口类代码&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.boot.SpringApplication&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.boot.autoconfigure.*&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.context.annotation.*&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@SpringBootApplication&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">DMPStarter&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">main&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>String&lt;span style="color:#5bc4bf">[]&lt;/span> args&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> SpringApplication&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">run&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>DMPStarter&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">class&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> args&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中@SpringBootApplication注解等价于以默认属性使用@Configuration，@EnableAutoConfiguration和@ComponentScan，作用分别为①@Configuration：当前类可以使用 Spring IoC 容器作为 bean 定义的来源；②@EnableAutoConfiguration：根据项目依赖的jar包自动配置；③@ComponentScan：注解自动收集所有Spring组件。&lt;br>
+main()方法中调用SpringApplication的run()静态方法来启动Spring Boot，具体的工作为：&lt;/p>
+&lt;ol>
+&lt;li>根据classspath创建合适的ApplicationContext；&lt;/li>
+&lt;li>注册CommandLinePropertySource生成命令行参数；&lt;/li>
+&lt;li>刷新application context，载入所有bean；&lt;/li>
+&lt;li>运行CommandLineRunner bean。&lt;/li>
+&lt;/ol>
+&lt;p>参数中选择启动的带@SpringBootApplication注解的类，一般按上面的常规写法就可以，暂时无需深入理解。&lt;/p></description></item></channel></rss>

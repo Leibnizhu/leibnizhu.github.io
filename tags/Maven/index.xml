@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Maven on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Maven/</link><description>Recent content in Maven on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 01 Aug 2018 15:05:44 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Maven/index.xml" rel="self" type="application/rss+xml"/><item><title>Scala项目发布的小坑</title><link>https://leibnizhu.github.io/p/Scala%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E7%9A%84%E5%B0%8F%E5%9D%91/</link><pubDate>Wed, 01 Aug 2018 15:05:44 +0000</pubDate><guid>https://leibnizhu.github.io/p/Scala%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E7%9A%84%E5%B0%8F%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E7%9A%84%E5%B0%8F%E5%9D%91/raindrop.jpg" alt="Featured image of post Scala项目发布的小坑" />&lt;p>之前写了一篇文章 &lt;a class="link" href="https://leibnizhu.github.io/p/%e5%8f%91%e5%b8%83%e9%a1%b9%e7%9b%ae%e5%88%b0maven%e4%b8%ad%e5%a4%ae%e4%bb%93%e5%ba%93/" >发布项目到Maven中央仓库&lt;/a>, 最近发布一个scala项目的时候, 用原来的配置, deploy到仓库后,提示找不到javadoc.&lt;br>
+折腾了一番, 结论:&lt;/p>
+&lt;ol>
+&lt;li>***-javadoc.jar肯定是要有的, 否则Nexus校验不通过&lt;/li>
+&lt;li>用maven的javadoc插件默认查找&lt;code>src/main/java&lt;/code>下面的源码进行文档构建, scala项目里这个目录当然是不存在的&lt;/li>
+&lt;li>可以通过&lt;code>&amp;lt;sourceDictionary&amp;gt;&lt;/code>配置让javadoc插件去&lt;code>src/main/scala&lt;/code>目录去找源码, 但是显然没有java文件给他找,也是构建不出文档的&lt;/li>
+&lt;li>所以要用maven的scala插件进行scaladoc构建文档并打包(默认jar包文件名跟javadoc兼容), 命令是&lt;code>mvn scala:doc-jar&lt;/code>&lt;/li>
+&lt;li>为了和gpg签名,以及最后的deploy到远程maven仓库配合, 只要修改scala插件的配置即可&lt;/li>
+&lt;/ol>
+&lt;p>最后配置如下:
+&lt;strong>注&lt;/strong>: 主要增加了&lt;code>doc-jar&lt;/code>的&lt;code>goal&lt;/code>, 其实在profile或直接在build中配置均可&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!--scala编译,scala-doc等--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>net.alchim31.maven&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>scala-maven-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>3.2.2&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;recompileMode&amp;gt;&lt;/span>incremental&lt;span style="color:#5bc4bf">&amp;lt;/recompileMode&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;args&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;arg&amp;gt;&lt;/span>-target:jvm-1.8&lt;span style="color:#5bc4bf">&amp;lt;/arg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/args&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;javacArgs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;javacArg&amp;gt;&lt;/span>-source&lt;span style="color:#5bc4bf">&amp;lt;/javacArg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;javacArg&amp;gt;&lt;/span>1.8&lt;span style="color:#5bc4bf">&amp;lt;/javacArg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;javacArg&amp;gt;&lt;/span>-target&lt;span style="color:#5bc4bf">&amp;lt;/javacArg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;javacArg&amp;gt;&lt;/span>1.8&lt;span style="color:#5bc4bf">&amp;lt;/javacArg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/javacArgs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;jvmArgs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;jvmArg&amp;gt;&lt;/span>-Xms1024m&lt;span style="color:#5bc4bf">&amp;lt;/jvmArg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;jvmArg&amp;gt;&lt;/span>-Xmx1024m&lt;span style="color:#5bc4bf">&amp;lt;/jvmArg&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/jvmArgs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>scala-compile-first&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;phase&amp;gt;&lt;/span>process-resources&lt;span style="color:#5bc4bf">&amp;lt;/phase&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>add-source&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>compile&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>doc-jar&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span> &lt;span style="color:#776e71">&amp;lt;!--scaladoc打jar包--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>scala-test-compile&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;phase&amp;gt;&lt;/span>process-test-resources&lt;span style="color:#5bc4bf">&amp;lt;/phase&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>add-source&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>testCompile&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 以前的配置 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>发布项目到Maven中央仓库</title><link>https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/</link><pubDate>Tue, 05 Sep 2017 13:36:04 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/melen.png" alt="Featured image of post 发布项目到Maven中央仓库" />&lt;h1 id="发布项目到maven中央仓库">发布项目到Maven中央仓库&lt;/h1>
+&lt;h2 id="前言">前言&lt;/h2>
+&lt;p>写完项目之后，为了方便别人调用，需要发布到网上，有以下方法：&lt;/p>
+&lt;ol>
+&lt;li>提交到Github/Gitlab上的公开项目（包含pom.xml），其他人clone后，通过&lt;code>mvn install&lt;/code>安装到本地仓库，再通过maven依赖引入。缺点：需要使用者手动操作的比较多，体验不好。&lt;/li>
+&lt;li>提交到Maven中央仓库，使用者只要直接通过maven依赖引入即可。缺点：发布者操作较多麻烦。&lt;/li>
+&lt;/ol>
+&lt;p>本文讨论的是第二种方法，目前网上也有很多相关文章，经过实践发现一些具体的操作已经过时/不可用，本人也踩了不少坑。所以写下本文记录。&lt;/p>
+&lt;h2 id="注册sonatype提交申请">注册Sonatype提交申请&lt;/h2>
+&lt;p>Maven中央仓库由Sonatype公司在维护，在向Maven中央仓库提交项目前，需要先注册Sonatype账户，然后提交issue申请。&lt;/p>
+&lt;h3 id="注册sonatype">注册Sonatype&lt;/h3>
+&lt;p>到 &lt;a class="link" href="https://issues.sonatype.org/secure/Signup!default.jspa" target="_blank" rel="noopener"
+>Sonatype官网&lt;/a> 注册帐号，随后登录。&lt;/p>
+&lt;h3 id="提交issue申请">提交issue申请&lt;/h3>
+&lt;p>登录点击上方导航栏的&lt;code>Create&lt;/code>按钮：
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/1.png"
+width="933"
+height="58"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/1_hu43f17aed28e4867488ff5a14926208ff_4880_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/1_hu43f17aed28e4867488ff5a14926208ff_4880_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1608"
+data-flex-basis="3860px"
+>&lt;br>
+弹出模态窗：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/2.png"
+width="1029"
+height="808"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/2_hue05c559bb8b182b335a7a1614a184cc8_19932_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/2_hue05c559bb8b182b335a7a1614a184cc8_19932_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="127"
+data-flex-basis="305px"
+>&lt;br>
+其中&lt;code>Project&lt;/code>选择&lt;code>Community Support - Open Source Project Repository Hosting&lt;/code>，&lt;code>Already Synced to Central&lt;/code>按默认选&lt;code>No&lt;/code>其他信息按实际填写，页面上也有例子。值得注意的是&lt;code>Group Id&lt;/code>要与项目pom.xml里面的以及实际包名一致，最好是你拥有的域名倒着写；&lt;code>Project URL&lt;/code>和&lt;code>SCM url&lt;/code>可以写Gitlab/Github地址。&lt;br>
+创建后可以通过导航栏的&lt;code>issue&lt;/code>菜单找到我们提交的issue：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/3.png"
+width="448"
+height="173"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/3_hucae461f926ddf10e87936e0aa56c47db_5696_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/3_hucae461f926ddf10e87936e0aa56c47db_5696_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="258"
+data-flex-basis="621px"
+>&lt;/p>
+&lt;h3 id="等待工作人员确认">等待工作人员确认&lt;/h3>
+&lt;p>由于时差关系，Sonatype的工作人员大约会在北京时间22：00开始处理issue。&lt;br>
+分配工作人员后，在issue页面右边看到&lt;code>Assignee&lt;/code>分配给谁了：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/4.png"
+width="395"
+height="212"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/4_hub9ca58a326a2cb552c3c1a5d9d86674a_4936_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/4_hub9ca58a326a2cb552c3c1a5d9d86674a_4936_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="186"
+data-flex-basis="447px"
+>&lt;br>
+如果这个groupId是第一次用来提交，会有工作人员留言，向你确认groupId：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/5.png"
+width="979"
+height="268"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/5_hua88af01423cb1242d9cd43343e4fe9e4_17878_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/5_hua88af01423cb1242d9cd43343e4fe9e4_17878_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="365"
+data-flex-basis="876px"
+>&lt;br>
+我们回复、工作人员确认没问题之后，会告诉你审批通过，准备好配置了：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/6.png"
+width="904"
+height="305"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/6_hud3c9255d5839571891995826dd8033b8_32080_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/6_hud3c9255d5839571891995826dd8033b8_32080_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="296"
+data-flex-basis="711px"
+>&lt;br>
+这时就可以准备上传了。&lt;/p>
+&lt;h2 id="上传前的准备">上传前的准备&lt;/h2>
+&lt;h3 id="gpg签名">GPG签名&lt;/h3>
+&lt;p>一般Linux发行版都会预装gpg，没有的自行安装即可（apt、pacman等命令，不再赘述）。输入命令：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>gpg --gen-key
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>需要输入姓名、邮箱等字段，其它字段可使用默认值，此外，还需要输入一个 Passphase，相当于一个密钥库的密码，要记好，deploy要用。&lt;br>
+再输入下面命令来获取公钥ID：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>gpg --list-signatures
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/7.png"
+width="701"
+height="159"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/7_hu3a90b98cb33030f9fe786c53a8dbccfc_17292_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/7_hu3a90b98cb33030f9fe786c53a8dbccfc_17292_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="440"
+data-flex-basis="1058px"
+>&lt;br>
+上图是输出结果，其中红框里的就是公钥ID，记下来。&lt;br>
+最后输入以下命令将公钥发布到 PGP 密钥服务器（以下三句命令发布到三个不同的服务器，任意输入一句即可，Sonatype对这三个服务器均认可）：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>gpg --keyserver hkp://pool.sks-keyservers.net：11371 --send-keys 刚才的公钥ID
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg --keyserver hkp://pgp.mit.edu:11371 --send-keys 刚才的公钥ID
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg --keyserver hkp://keyserver.ubuntu.com:11371 --send-keys 刚才的公钥ID
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后验证是否发布成功（也是任选一句，对应上面输入的服务器）：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>gpg --keyserver hkp://pool.sks-keyservers.net：11371 --recv-keys 刚才的公钥ID
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg --keyserver hkp://pgp.mit.edu:11371 --recv-keys 刚才的公钥ID
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg --keyserver hkp://keyserver.ubuntu.com:11371 --recv-keys 刚才的公钥ID
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>正常结果应该类似：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>gpg: 密钥 F***9：“L***z &amp;lt;l***u@***.***&amp;gt;”未改变
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg: 合计被处理的数量：1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg: 未改变：1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改pomxml">修改pom.xml&lt;/h3>
+&lt;p>pom.xml文件需要修改比较多，在这直接列出相关的：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;licenses&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;license&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;name&amp;gt;&lt;/span>The Apache Software License, Version 2.0&lt;span style="color:#5bc4bf">&amp;lt;/name&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;url&amp;gt;&lt;/span>http://www.apache.org/licenses/LICENSE-2.0.txt&lt;span style="color:#5bc4bf">&amp;lt;/url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;distribution&amp;gt;&lt;/span>repo&lt;span style="color:#5bc4bf">&amp;lt;/distribution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/license&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/licenses&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;scm&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 修改自己的地址 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;tag&amp;gt;&lt;/span>master&lt;span style="color:#5bc4bf">&amp;lt;/tag&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;url&amp;gt;&lt;/span>https://github.com/Leibnizhu/spring-boot-starter-netty&lt;span style="color:#5bc4bf">&amp;lt;/url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;connection&amp;gt;&lt;/span>scm:git:git@github.com:Leibnizhu/spring-boot-starter-netty.git&lt;span style="color:#5bc4bf">&amp;lt;/connection&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;developerConnection&amp;gt;&lt;/span>scm:git:git@github.com:Leibnizhu/spring-boot-starter-netty.git&lt;span style="color:#5bc4bf">&amp;lt;/developerConnection&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/scm&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;developers&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;developer&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>***&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;name&amp;gt;&lt;/span>***&lt;span style="color:#5bc4bf">&amp;lt;/name&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;email&amp;gt;&lt;/span>L***@***.***&lt;span style="color:#5bc4bf">&amp;lt;/email&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/developer&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/developers&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;properties&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;project.build.sourceEncoding&amp;gt;&lt;/span>UTF-8&lt;span style="color:#5bc4bf">&amp;lt;/project.build.sourceEncoding&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;project.reporting.outputEncoding&amp;gt;&lt;/span>UTF-8&lt;span style="color:#5bc4bf">&amp;lt;/project.reporting.outputEncoding&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;java.version&amp;gt;&lt;/span>1.8&lt;span style="color:#5bc4bf">&amp;lt;/java.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;javadoc.version&amp;gt;&lt;/span>8&lt;span style="color:#5bc4bf">&amp;lt;/javadoc.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;compiler-plugin.version&amp;gt;&lt;/span>3.6.2&lt;span style="color:#5bc4bf">&amp;lt;/compiler-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;war-plugin.version&amp;gt;&lt;/span>3.1.0&lt;span style="color:#5bc4bf">&amp;lt;/war-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;clean-plugin.version&amp;gt;&lt;/span>3.0.0&lt;span style="color:#5bc4bf">&amp;lt;/clean-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;resources-plugin.version&amp;gt;&lt;/span>3.0.2&lt;span style="color:#5bc4bf">&amp;lt;/resources-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;surefire-plugin.version&amp;gt;&lt;/span>2.20&lt;span style="color:#5bc4bf">&amp;lt;/surefire-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;jar-plugin.version&amp;gt;&lt;/span>3.0.2&lt;span style="color:#5bc4bf">&amp;lt;/jar-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;source-plugin.version&amp;gt;&lt;/span>3.0.1&lt;span style="color:#5bc4bf">&amp;lt;/source-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;javadoc-plugin.version&amp;gt;&lt;/span>2.10.4&lt;span style="color:#5bc4bf">&amp;lt;/javadoc-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;gpg-plugin.version&amp;gt;&lt;/span>1.6&lt;span style="color:#5bc4bf">&amp;lt;/gpg-plugin.version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/properties&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;distributionManagement&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;repository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>oss&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> https://oss.sonatype.org/service/local/staging/deploy/maven2
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;snapshotRepository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>oss&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;uniqueVersion&amp;gt;&lt;/span>false&lt;span style="color:#5bc4bf">&amp;lt;/uniqueVersion&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> https://oss.sonatype.org/content/repositories/snapshots
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/snapshotRepository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/distributionManagement&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;profiles&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;profile&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>release&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.apache.maven.plugins&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>maven-source-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${source-plugin.version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>attach-sources&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>jar-no-fork&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;attach&amp;gt;&lt;/span>true&lt;span style="color:#5bc4bf">&amp;lt;/attach&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.apache.maven.plugins&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>maven-javadoc-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${javadoc-plugin.version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;phase&amp;gt;&lt;/span>package&lt;span style="color:#5bc4bf">&amp;lt;/phase&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>jar&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;links&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;link&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> http://docs.oracle.com/javase/${javadoc.version}/docs/api
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/link&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/links&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.apache.maven.plugins&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>maven-gpg-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${gpg-plugin.version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;phase&amp;gt;&lt;/span>install&lt;span style="color:#5bc4bf">&amp;lt;/phase&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>sign&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;distributionManagement&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;repository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>oss&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> https://oss.sonatype.org/service/local/staging/deploy/maven2/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/url&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repository&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/distributionManagement&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/profile&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/profiles&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.apache.maven.plugins&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>maven-compiler-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;source&amp;gt;&lt;/span>${java.version}&lt;span style="color:#5bc4bf">&amp;lt;/source&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;target&amp;gt;&lt;/span>${java.version}&lt;span style="color:#5bc4bf">&amp;lt;/target&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.apache.maven.plugins&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>maven-jar-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${jar-plugin.version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.apache.maven.plugins&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>maven-surefire-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${surefire-plugin.version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;skip&amp;gt;&lt;/span>true&lt;span style="color:#5bc4bf">&amp;lt;/skip&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这里加了很多插件，因为Sonatype要求有javadoc、GPG签名等等。&lt;/p>
+&lt;h3 id="修改m2settingsxml">修改~/.m2/settings.xml&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;settings&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ...
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;servers&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;server&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;id&amp;gt;&lt;/span>oss&lt;span style="color:#5bc4bf">&amp;lt;/id&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;username&amp;gt;&lt;/span>用户名&lt;span style="color:#5bc4bf">&amp;lt;/username&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;password&amp;gt;&lt;/span>密码&lt;span style="color:#5bc4bf">&amp;lt;/password&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/server&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/servers&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ...
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/settings&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="上传发布">上传&amp;amp;&amp;amp;发布&lt;/h2>
+&lt;h3 id="maven上传">Maven上传&lt;/h3>
+&lt;p>进入项目，输入以下命令：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>mvn deploy -P release -Dgpg.passphrase&lt;span style="color:#5bc4bf">=[&lt;/span>GPG密码&lt;span style="color:#5bc4bf">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>稍等片刻，期间可能会弹窗要求输入GPG密码。最后看到&lt;code>BUILD SUCCESS&lt;/code>成功。&lt;br>
+注: MacOS下可能会提示：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>gpg: signing failed: Inappropriate ioctl for device
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>请先输入：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>export GPG_TTY=$(tty)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再执行&lt;code>mvn deploy&lt;/code>&lt;/p>
+&lt;h3 id="oss发布">OSS发布&lt;/h3>
+&lt;p>打开 &lt;a class="link" href="https://oss.sonatype.org/" target="_blank" rel="noopener"
+>https://oss.sonatype.org/&lt;/a> 并登陆（帐号密码与前面注册一样）。&lt;br>
+点击左边的&lt;code>Staging Repositories&lt;/code>，再在右上角搜索groupid：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/8.png"
+width="1371"
+height="466"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/8_hue2ce7b03c4a605c561c88ae3b01d0422_30870_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/8_hue2ce7b03c4a605c561c88ae3b01d0422_30870_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="294"
+data-flex-basis="706px"
+>&lt;br>
+选中自己的项目，点击&lt;code>Close&lt;/code>再在弹出模态窗点&lt;code>Confirm&lt;/code>，描述可以不用写：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/9.png"
+width="532"
+height="357"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/9_hu01e188b2ce57fcc1a27adb92a8452b69_7214_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/9_hu01e188b2ce57fcc1a27adb92a8452b69_7214_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="357px"
+>&lt;br>
+等一两分钟再刷新上面的列表，可以看到状态已经变成Closed（如果没有的话，在下方的Acitivity可以看到close操作的情况，看具体是什么问题，我一开始就一直说找不到签名，将GPG公钥发布后又说缺少javadoc，于是再加Maven插件生成javadoc）。
+这时候再选中自己的项目，然后点&lt;code>Release&lt;/code>按钮，再点&lt;code>Confirm&lt;/code>提交，即可。&lt;/p>
+&lt;h2 id="收尾工作">收尾工作&lt;/h2>
+&lt;h3 id="关闭oss的issue">关闭OSS的issue&lt;/h3>
+&lt;p>回到OSS &lt;a class="link" href="https://issues.sonatype.org" target="_blank" rel="noopener"
+>https://issues.sonatype.org&lt;/a> ，打开自己提交的issue，回复一下，告诉工作人员已经上传发布到OSS了，很快他们就会回复说10分钟内会同步到中央仓库，2小时内可以被搜索到：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/10.png"
+width="953"
+height="112"
+srcset="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/10_huc18c1609081400298b4026f8251ab410_12510_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/10_huc18c1609081400298b4026f8251ab410_12510_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="850"
+data-flex-basis="2042px"
+>&lt;/p>
+&lt;h3 id="等待同步中央仓库">等待同步中央仓库&lt;/h3>
+&lt;p>一般等最多两个小时，就可以在 &lt;a class="link" href="https://search.maven.org" target="_blank" rel="noopener"
+>https://search.maven.org&lt;/a> 搜索到自己发布的项目啦。&lt;br>
+我的Spring-Boot-Starter-Netty项目地址： &lt;a class="link" href="https://search.maven.org/#artifactdetails%7Cio.gitlab.leibnizhu%7Cspring-boot-starter-netty%7C1.0%7Cjar" target="_blank" rel="noopener"
+>https://search.maven.org/#artifactdetails%7Cio.gitlab.leibnizhu%7Cspring-boot-starter-netty%7C1.0%7Cjar&lt;/a>&lt;/p></description></item></channel></rss>

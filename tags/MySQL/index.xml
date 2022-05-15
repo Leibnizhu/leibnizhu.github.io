@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MySQL on Heaven's Door</title><link>https://leibnizhu.github.io/tags/MySQL/</link><description>Recent content in MySQL on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 26 Apr 2017 15:29:19 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/MySQL/index.xml" rel="self" type="application/rss+xml"/><item><title>Spark快速统计树状关系各层数量的一种算法</title><link>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 26 Apr 2017 15:29:19 +0000</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</guid><description>&lt;h1 id="需求">需求&lt;/h1>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1.png"
+width="132"
+height="253"
+srcset="https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1_hubd9923802d0015358925e3115284715b_2858_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1_hubd9923802d0015358925e3115284715b_2858_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="52"
+data-flex-basis="125px"
+>&lt;br>
+对于类似上图所示的树状结构数据，统计每个节点的总子孙数、每个节点在各层的子孙数。&lt;br>
+比如B的总子孙数就是7（D/E/F/G/H/I/J），F的一级子孙数为2（G/H），F的二级和三级子孙数都为1（分别对应I和J）。&lt;br>
+注：此处用字母代替节点ID，是为了与级别区分，方便描述和理解，实际的节点ID并非如此。&lt;/p>
+&lt;h2 id="数据结构">数据结构&lt;/h2>
+&lt;p>树状关系在采集初期，是通过Netty搭建的微服务保存在HBase中，再通过Spark定期计算，保存到关系型数据库MySQL中。在MySQL中的表结构及保存的数据如下（经过精简，只保留与本文相关的字段）：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:center">ID&lt;/th>
+&lt;th style="text-align:center">父节点ID&lt;/th>
+&lt;th style="text-align:center">父链&lt;/th>
+&lt;th style="text-align:center">等级&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:center">A&lt;/td>
+&lt;td style="text-align:center">null&lt;/td>
+&lt;td style="text-align:center">-&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">B&lt;/td>
+&lt;td style="text-align:center">A&lt;/td>
+&lt;td style="text-align:center">-A-&lt;/td>
+&lt;td style="text-align:center">2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">C&lt;/td>
+&lt;td style="text-align:center">A&lt;/td>
+&lt;td style="text-align:center">-A-&lt;/td>
+&lt;td style="text-align:center">2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">D&lt;/td>
+&lt;td style="text-align:center">B&lt;/td>
+&lt;td style="text-align:center">-A-B-&lt;/td>
+&lt;td style="text-align:center">3&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">E&lt;/td>
+&lt;td style="text-align:center">B&lt;/td>
+&lt;td style="text-align:center">-A-B-&lt;/td>
+&lt;td style="text-align:center">3&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">F&lt;/td>
+&lt;td style="text-align:center">B&lt;/td>
+&lt;td style="text-align:center">-A-B-&lt;/td>
+&lt;td style="text-align:center">3&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">G&lt;/td>
+&lt;td style="text-align:center">F&lt;/td>
+&lt;td style="text-align:center">-A-B-F-&lt;/td>
+&lt;td style="text-align:center">4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">H&lt;/td>
+&lt;td style="text-align:center">F&lt;/td>
+&lt;td style="text-align:center">-A-B-F-&lt;/td>
+&lt;td style="text-align:center">4&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">I&lt;/td>
+&lt;td style="text-align:center">G&lt;/td>
+&lt;td style="text-align:center">-A-B-F-G-&lt;/td>
+&lt;td style="text-align:center">5&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">J&lt;/td>
+&lt;td style="text-align:center">I&lt;/td>
+&lt;td style="text-align:center">-A-B-F-G-I-&lt;/td>
+&lt;td style="text-align:center">6&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>ID、父节点ID、等级这几个字段比较好理解，父链稍加思考也可以看出来是从根节点一直到当前节点的链，以减号分割，父链字段前后都有减号，方便like查询的精准性。&lt;/p>
+&lt;h2 id="难点">难点&lt;/h2>
+&lt;p>可以看出来，单纯计算我们需要的指标并不困难，比如总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到；而各级子孙数也是，父链条件结合等级的条件就能查出来。&lt;br>
+但这些查询都需要遍历整个树，而每个节点会产生一次查询，相当于复杂度是O(N^2)；而且每次需要查询MySQL，计算速度被IO开销限制，Spark批量计算的优势丝毫无存，可以预见计算是相当缓慢的。&lt;/p>
+&lt;h1 id="解决方案">解决方案&lt;/h1>
+&lt;h2 id="思路">思路&lt;/h2>
+&lt;p>父链这个字段是为了将数据保存到MySQL，方便数据分析员进行查询而作出的妥协，而我们可以从父链下手，减少计算时间复杂度。&lt;/p>
+&lt;h3 id="总子孙数">总子孙数&lt;/h3>
+&lt;p>上面的分析已经提到，总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到，而考虑到树中没有环路，也就是说一个节点在树中只出现一次，那么在父链中也只会出现一次；也就是说，在整棵树里，一个节点的ID在所有父链中出现多少次（每次对应一个子节点的父链），就有多少个子孙节点。&lt;br>
+在SQL中查询父链包含某节点ID用的是like操作，查询速度很慢，我们在Spark中可以进行优化：&lt;/p>
+&lt;ol>
+&lt;li>每个节点的父链依据减号进行split，一个节点对应多个父祖节点（父链上所有节点）；&lt;/li>
+&lt;li>所有节点父链split的结果进行Word-Count，一个节点ID在父链split结果中出现多少次，意味着它有多少个总子孙数。&lt;/li>
+&lt;/ol>
+&lt;p>以开始的图为例，所有父链拆分后拿到的结果是：&lt;code>(A,A,A,B,A,B,A,B,A,B,F,A,B,F,A,B,F,G,A,B,F,G,I)&lt;/code>，进行Word-Count的结果（Spark中可以直接用countByValue方法）是&lt;code>((A,9),(B,7),(F,4),(G,2),(I,1))&lt;/code>。这里已经出来每个节点的总子孙数了，结果中不存在的节点就是总子孙数为0。&lt;/p>
+&lt;h3 id="各层子孙数">各层子孙数&lt;/h3>
+&lt;p>从总子孙数的计算中进行扩展就可以计算各层的子孙数了。&lt;/p>
+&lt;ol>
+&lt;li>在父链split的时候加上当前节点的等级构成RDD，以节点D为例，D的父链为-A-B-，级别为3，split后就是&lt;code>(A,3),(B,3)&lt;/code>;&lt;/li>
+&lt;li>当计算N级子孙数的时候，构造一个(节点ID，节点等级+N)的RDD；&lt;/li>
+&lt;li>两个RDD在join之后（以节点ID为key），过滤出两个RDD的value（对应父链中节点所在等级，和需要计算的等级）相等的数据；&lt;/li>
+&lt;li>过滤后map掉无用信息，再count就是所要求的等级上的子孙数。&lt;/li>
+&lt;/ol>
+&lt;p>以开始的图为例，计算2级子孙数，所有父链拆分后拿到的结果是：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>(A,2),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,2),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,3),(B,3),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,3),(B,3),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,3),(B,3),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,4),(B,4),(F,4),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,4),(B,4),(F,4),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,5),(B,5),(F,5),(G,5),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(A,6),(B,6),(F,6),(G,6),(I,6)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>构造(节点ID，节点等级+2)的RDD：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>(A,3),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(B,4),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(C,4),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(D,5),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(E,5),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(F,5),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(G,6),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(H,6),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(I,7),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(J,8)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>两个RDD在join之后（join的结果太多，不列出了），过滤出两边等级相等的数据：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>(A,3,3),(A,3,3),(A,3,3),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(B,4,4),(B,4,4),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(F,5,5),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>(G,6,6)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>map掉无用的等级，再count得到：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>(A,3),(B,2),(F,1),(G,1)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即只有这些节点有二级子孙，二级子孙个数也拿到了。&lt;/p>
+&lt;h2 id="spark代码scala">Spark代码(scala)&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//全部MySQL数据读到RDD中，格式为(用户ID,(*,*,*,*,等级,父节点ID,父链,*))
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> rsRDD &lt;span style="color:#815ba4">=&lt;/span> sc&lt;span style="color:#5bc4bf">.&lt;/span>makeRDD&lt;span style="color:#5bc4bf">(&lt;/span>readAllMySQLData&lt;span style="color:#5bc4bf">()).&lt;/span>cache&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//统计总子孙数
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> totalList &lt;span style="color:#815ba4">=&lt;/span> rsRDD&lt;span style="color:#5bc4bf">.&lt;/span>flatMap&lt;span style="color:#5bc4bf">(&lt;/span>r &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> r&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_7&lt;span style="color:#5bc4bf">.&lt;/span>split&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;-&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)).&lt;/span>filter&lt;span style="color:#5bc4bf">(&lt;/span>p &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> p &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span> &lt;span style="color:#5bc4bf">&amp;amp;&amp;amp;&lt;/span> p &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">).&lt;/span>countByValue&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//统计二级子孙数
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//切分父链
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> secondList &lt;span style="color:#815ba4">=&lt;/span> rsRDD&lt;span style="color:#5bc4bf">.&lt;/span>flatMap&lt;span style="color:#5bc4bf">(&lt;/span>r &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> values &lt;span style="color:#815ba4">=&lt;/span> r&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_7&lt;span style="color:#5bc4bf">.&lt;/span>split&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;-&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#5bc4bf">-&lt;/span>&lt;span style="color:#f99b15">1&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> values&lt;span style="color:#5bc4bf">.&lt;/span>filter&lt;span style="color:#5bc4bf">(&lt;/span>p &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> p&lt;span style="color:#5bc4bf">!=&lt;/span>&lt;span style="color:#815ba4">null&lt;/span> &lt;span style="color:#5bc4bf">&amp;amp;&amp;amp;&lt;/span> p&lt;span style="color:#5bc4bf">.&lt;/span>length &lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#f99b15">0&lt;/span>&lt;span style="color:#5bc4bf">).&lt;/span>map&lt;span style="color:#5bc4bf">(&lt;/span>userid &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">Integer&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>parseInt&lt;span style="color:#5bc4bf">(&lt;/span>userid&lt;span style="color:#5bc4bf">),&lt;/span> r&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_5&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//构造(节点ID，节点等级+2)的RDD
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> secondUser &lt;span style="color:#815ba4">=&lt;/span> rsRDD&lt;span style="color:#5bc4bf">.&lt;/span>map&lt;span style="color:#5bc4bf">(&lt;/span>p &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>p&lt;span style="color:#5bc4bf">.&lt;/span>_1&lt;span style="color:#5bc4bf">,&lt;/span> p&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_5 &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#f99b15">2&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//join之后，过滤出两边等级相等的数据，map掉无用信息，再count
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> secondShare &lt;span style="color:#815ba4">=&lt;/span> secondUser&lt;span style="color:#5bc4bf">.&lt;/span>join&lt;span style="color:#5bc4bf">(&lt;/span>secondList&lt;span style="color:#5bc4bf">).&lt;/span>filter&lt;span style="color:#5bc4bf">(&lt;/span>p &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> p&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_1 &lt;span style="color:#5bc4bf">==&lt;/span> p&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">).&lt;/span>map&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">_&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>_1&lt;span style="color:#5bc4bf">).&lt;/span>countByValue&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">………………&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

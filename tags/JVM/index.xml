@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JVM on Heaven's Door</title><link>https://leibnizhu.github.io/tags/JVM/</link><description>Recent content in JVM on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Jun 2017 12:55:14 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/JVM/index.xml" rel="self" type="application/rss+xml"/><item><title>《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</title><link>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%94.%E7%BB%88%E7%AB%A0Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/%E4%BC%98%E5%8C%96/</link><pubDate>Tue, 20 Jun 2017 12:55:14 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%94.%E7%BB%88%E7%AB%A0Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/%E4%BC%98%E5%8C%96/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%94.%E7%BB%88%E7%AB%A0Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/%E4%BC%98%E5%8C%96/touhou_yuyuko.png" alt="Featured image of post 《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化" />&lt;p>&lt;strong>JVM笔记系列索引&lt;/strong>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%80JVM%e5%86%85%e5%ad%98%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%8c%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/" >《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
+&lt;h2 id="java内存模型">Java内存模型&lt;/h2>
+&lt;p>JVM定义了一种Java内存模型以消除各种硬件和操作系统的内存访问差异，保证Java程序的跨平台性。&lt;/p>
+&lt;h3 id="主内存和工作内存">主内存和工作内存&lt;/h3>
+&lt;p>所有的变量存储在主内存，每个线程有自己的工作内存，保存了被这个线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都在对应工作内存进行。&lt;br>
+主内存和工作内存与第一篇的内存结构不是一个层面上的概念，主内存主要对应Java堆的对象实例数据，工作内存主要对应虚拟机栈的部分区域，而且工作内存可能优先存储与寄存器和高速缓存中。&lt;/p>
+&lt;h3 id="内存操作">内存操作&lt;/h3>
+&lt;p>Java内存模型规定了8种内存操作：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>lock&lt;/strong>锁定，将变量表示为某线程独占；&lt;/li>
+&lt;li>&lt;strong>unlock&lt;/strong>解锁，将变量的lock状态借出，执行后才能被其他线程lock；&lt;/li>
+&lt;li>&lt;strong>read&lt;/strong>读取，将变量的值从主内存中读取，准备load；&lt;/li>
+&lt;li>&lt;strong>load&lt;/strong>载入，必须先进行read，将read到的数据放入工作内存的变量副本；&lt;/li>
+&lt;li>&lt;strong>use&lt;/strong>使用，将工作内存的变量的值传递给执行引擎；&lt;/li>
+&lt;li>&lt;strong>assign&lt;/strong>赋值，接收执行引擎的值付给工作内存的变量；&lt;/li>
+&lt;li>&lt;strong>store&lt;/strong>存储，将变量的值从工作内存读取，准备write；&lt;/li>
+&lt;li>&lt;strong>write&lt;/strong>写入，必须先进行store，将store到的数据放入主内存对应变量。&lt;/li>
+&lt;/ol>
+&lt;p>此外规定了对应的一些规则，如read、load和store、write不能单独出现，assign后的变量必须同步回主内存，没有assign的变量不能同步回注内存等等。&lt;/p>
+&lt;h3 id="volatile变量">volatile变量&lt;/h3>
+&lt;p>volatile声明能保证变量对所有线程可见性，即一个线程修改了变量的值，其他线程立即得知新的值。但由于Java操作并非全是原子操作，所以volatile变量在并发下不能保证线程安全。例如++操作，对应字节码为4个指令，大致可分为读值/加一/写入等步骤，volatile关键值只能保证在取值放入操作栈顶的时候是最新的值，此后的操作之前可能其他线程已经修改了变量的值，就会导致线程安全问题。&lt;br>
+适合使用volatile的情况有：&lt;/p>
+&lt;ol>
+&lt;li>运算结果不依赖变量的当前值，或者只有单一线程修改变量的值；&lt;/li>
+&lt;li>变量不需要与其他状态变量共同参与不变约束。&lt;/li>
+&lt;/ol>
+&lt;p>volatile关键字还能禁止指令重排优化，普通变量只能保证依赖赋值结果的地方都获得正确结果，但不能保证赋值操作的顺序与代码一致。volatile关键字可以避免多线程情况下，代码执行顺序被重排导致的一些错误。&lt;br>
+volatile变量的读操作性能与普通变量基本无差别，写操作可能慢一些，总体开销比锁小。&lt;br>
+在Java内存模型层面上来看，volatile变量要求load操作和use操作必须连续一起出现，assign和store操作也必须连续一起出现，即每次使用volatile变量前必须从主内存刷新最新的值，每次修改volatile变量之后必须立刻同步到主内存。&lt;/p>
+&lt;h3 id="long和double变量">long和double变量&lt;/h3>
+&lt;p>没有被volatile修饰的64位数据（long和double）的读写操作划分位两次32位操作，不能保证其操作的原子性。但实际目前商用JVM基本都把64位数据的读写操作作为原子操作。&lt;/p>
+&lt;h2 id="java线程">Java线程&lt;/h2>
+&lt;h3 id="java线程实现">Java线程实现&lt;/h3>
+&lt;p>一般来说线程有3种实现方法：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>使用内核线程&lt;/strong>：使用操作系统内核的轻量级进程（LWP），每个轻量级进程与一个内核线程一一对应，一对一。缺点是代价较高，在内核态和用户态之间来回切换，并消耗内核资源，操作系统支持的轻量级进程数量有限；&lt;/li>
+&lt;li>&lt;strong>使用用户线程&lt;/strong>：用户线程建立在用户空间的线程库上，其建立、同步、销毁、调度完全在用户态完成，不需要内核帮助，一对多。因此快速且低消耗，支持更大的线程数量。缺点是实现复杂，很多问题需要考虑实现；&lt;/li>
+&lt;li>&lt;strong>用户线程+轻量级进程&lt;/strong>：以上两者的混合，多対多。&lt;/li>
+&lt;/ol>
+&lt;p>JDK1.2之前使用用户线程实现，JDK1.2开始替换为基于操作系统原生线程模型实现。对Sun JDK而言，Windows和Linux版都是一对一线程模型，一条Java线程映射到一条轻量级进程，Solaris中支持一对一和多対多。&lt;/p>
+&lt;h3 id="java线程调度">Java线程调度&lt;/h3>
+&lt;p>线程调度方式分为协同式和抢占式。协同式(Cooperative)指线程执行时间由线程自身控制，执行完完成后主动通知系统切换线程；抢占式(Preemptive)指由系统统一分配每个线程的执行时间，线程自身不能决定线程切换。Java使用抢占式。&lt;/p>
+&lt;h2 id="java线程安全">Java线程安全&lt;/h2>
+&lt;h3 id="线程安全等级">线程安全等级&lt;/h3>
+&lt;p>按由强至弱分为以下5种：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>不可变&lt;/strong>：基本数据类型加final修饰，对象则保证其行为不影响其状态。注意AtomicInteger和AtomicLong并非不可变，这样的设计应该是考虑到线程访问外部变量需要final，但有时候需要可变的数，于是有了这些类；&lt;/li>
+&lt;li>&lt;strong>绝对线程安全&lt;/strong>：不需要任何额外的同步措施，即可实现线程安全。Java API标注线程安全的类很多并不是绝对线程安全；&lt;/li>
+&lt;li>&lt;strong>相对线程安全&lt;/strong>：通常意义上的线程安全，指保证对象单独的操作是线程安全的，但不保证任何顺序连续调用都能保证线程安全/正确性；&lt;/li>
+&lt;li>&lt;strong>线程兼容&lt;/strong>：通常意义上的线程不安全，指对象本身并不线程安全，但可以通过同步手段保证在并发环境下安全、准确；&lt;/li>
+&lt;li>&lt;strong>相互层对立&lt;/strong>：无论是否采取同步手段，都无法在多线程环境下并发使用。极少出现，比如Thread类的suspend()和resume()方法，如果两个线程同时持有同一个线程对象，同时分别去中断及恢复线程，中断的是进行恢复操作的线程，那么就会产生死锁。&lt;/li>
+&lt;/ol>
+&lt;h3 id="线程安全实现方法">线程安全实现方法&lt;/h3>
+&lt;p>包括以下几种：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>互斥同步&lt;/strong>：保证共享数据同一时刻制备一个线程使用。Java最基本的互斥同步手段是sychronized关键字，编译后在同步块前后形成monitorenter和monitorexit两个字节码指令，需要一个reference类型参数来指定锁定/解锁的对象；执行monitorenter指令时，先尝试获取锁，如果锁对象没被锁定或者当前线程已经拥有这个锁，那么锁的计数器加一，并进入代码块，到monitorexit指令执行时则计数器减一，到计数器为0时释放锁。也就是说sychronized对同个线程而言是可重入的，不会自己把自己死锁。但阻塞或唤醒线程开销都比较大，需要切换用户态/内核态，因此sychronized是重量级操作。还可以使用ReentrantLock实现同步，相比sychronized，有等待可中断、公平锁、绑定多条件(Condition)等功能。JDK1.6之后sychronized与ReentrantLock性能基本持平。&lt;/li>
+&lt;li>&lt;strong>非阻塞同步&lt;/strong>：先进行操作，没有其他线程争用共享数据则操作成功，否则产生冲突，则采取补偿措施（比如不断重试），基于处理器的一些新指令实现，如Compare-and-Swap（比较并交换，CAS），用户程序不能直接调用，但AtomicInteger等类使用到了。&lt;/li>
+&lt;li>&lt;strong>无同步方案&lt;/strong>：如可重入代码（可以在代码执行的任何时刻中断，去执行别的代码，再返回继续执行而不出现错误），线程本地存储（Thread Local Storage）。&lt;/li>
+&lt;/ol>
+&lt;h2 id="java锁优化">Java锁优化&lt;/h2>
+&lt;p>JDK1.6开始引入了许多高效并发优化，实现了各种锁优化技术：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>自旋锁与自适应锁&lt;/strong>：自旋锁即多个线程请求锁，若持有锁的线程很快会释放锁的话，让其他线程在其他CPU内核执行忙循环（自旋），而不是来回切换挂起/恢复线程，减少开销。自适应锁就是自旋时间由前一次在同一个锁上自旋时间、以及锁的拥有者状态决定自旋时间的自旋锁。&lt;/li>
+&lt;li>&lt;strong>锁消除&lt;/strong>：根据逃逸分析结果，判定代码对应堆中数据都不会逃逸的话，可以认为是线程私有的数据，就可以不加同步锁，提高效率。&lt;/li>
+&lt;li>&lt;strong>锁粗化&lt;/strong>：如果一系列连续操作都对同一个对象反复加锁解锁，甚至是循环体内加锁，那么频繁进行互斥同步操作会导致不必要的性能损耗，可以将锁的范围扩大，即称为锁粗化。&lt;/li>
+&lt;li>&lt;strong>轻量级锁&lt;/strong>：在无竞争的情况下使用CAS操作消除同步的互斥量&lt;/li>
+&lt;li>&lt;strong>偏向锁&lt;/strong>：锁偏向第一个获取该锁的线程，如果执行过程中锁没有被其他线程获取，那么持有偏向锁的线程无需同步；如果有其他线程尝试获取该锁，那么结束偏向模式。&lt;/li>
+&lt;/ol></description></item><item><title>《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化</title><link>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/</link><pubDate>Fri, 09 Jun 2017 12:43:44 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/</guid><description>&lt;p>&lt;strong>JVM笔记系列索引&lt;/strong>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%80JVM%e5%86%85%e5%ad%98%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%8c%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/" >《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
+&lt;h2 id="类加载机制">类加载机制&lt;/h2>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/8.png"
+width="737"
+height="210"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/8_hu869176d3a01388de7dd81ab41b02155c_8084_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/8_hu869176d3a01388de7dd81ab41b02155c_8084_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="350"
+data-flex-basis="842px"
+>
+类从加载导卸载出内存的整个生命周期如上图所示。图中的7个阶段中，加载、验证、准备、初始化和卸载的顺序是确定的，而解析和使用阶段不一定，解析可能在初始化之后（动态绑定）。&lt;/p>
+&lt;h3 id="类加载时机">类加载时机&lt;/h3>
+&lt;p>&lt;strong>有且只有&lt;/strong>以下5种情况：&lt;/p>
+&lt;ol>
+&lt;li>遇到new、getstatic、putstatic、invokestatic等字节码，对应Java代码中的new对象、读取或者设置类的静态变量、调用类的静态方法；&lt;/li>
+&lt;li>使用reflect包进行反射的时候；&lt;/li>
+&lt;li>初始化类时，若父类未初始化，则先出发父类的初始化；&lt;/li>
+&lt;li>JVM启动时，执行的主类（包含main()方法的类）；&lt;/li>
+&lt;li>JDK1.7以后动态语言支持。&lt;/li>
+&lt;/ol>
+&lt;p>注意是有且仅有，其他情况，譬如数组定义引用到未加载的类、调用类的静态常量（存储在常量池中）等其他情况并不会触发类的初始化加载。&lt;/p>
+&lt;h3 id="加载">加载&lt;/h3>
+&lt;p>完成以下事情：&lt;/p>
+&lt;ol>
+&lt;li>通过类的全限定名获取类的二进制字节流（不一定从文件获取，也可能是从网络、zip包、动态代理、其他文件如jsp等途径生成）；&lt;/li>
+&lt;li>将字节流的静态存储结构转化为方法区的运行时数据结构，具体由虚拟机自行实现定义；&lt;/li>
+&lt;li>生成对应java.lang.Class对象，放在方法区。&lt;/li>
+&lt;/ol>
+&lt;p>数组类本身不通过类加载器创建，而是JVM直接创建的，如果数组类加载的时候，其组件类型（去掉最外面维度之后的类型）是引用类型，则递归地加载。&lt;br>
+加载阶段和连接阶段的部分内容（比如一部分字节码文件格式的验证动作）时交叉进行的，但两者的开始时间肯定是保持先后顺序的。&lt;/p>
+&lt;h3 id="验证">验证&lt;/h3>
+&lt;p>验证步骤是为了确保Class文件的字节流中的信息符合JVM要求，且不危害JVM安全。验证过程又细分为以下4个子过程：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>文件格式验证&lt;/strong>：验证是否符合Class文件格式，如果验证到不符合Class文件格式约束，则JVM抛出java.lang.VerifyError异常或其子类；&lt;/li>
+&lt;li>&lt;strong>元数据验证&lt;/strong>:进行语义分析，保证其符合Java语言规范；&lt;/li>
+&lt;li>&lt;strong>字节码验证&lt;/strong>：通过数据流和控制流分析，确认语义合法且符合逻辑。JDK1.6之后的javac在Code属性的属性表里面增加了一项“StackMapTable”属性，描述了方法提中所有基本块（按控制流拆分的代码块）开始时本地变量表和操作栈应有的状态，字节码验证过程中秩序检查StackMapTable属性的记录是否合法即可；&lt;/li>
+&lt;li>&lt;strong>符号引用验证&lt;/strong>：在连接的第三阶段——解析阶段中，JVM将符号引用转化为直接引用进行符号引用验证，对类自身以外的信息进行匹配行校验，比如符号引用的类是否能找到，类、方法、字段的访问性是否能被当前类访问。&lt;/li>
+&lt;/ol>
+&lt;h3 id="准备">准备&lt;/h3>
+&lt;p>为类的静态变量分配内存，并初始化其值（初始化为零值）。如果有定义其取值，且非final变量，比如&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> String test &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;test&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>test变量不是final变量，会被初始化为零值null，在初始化阶段调用&amp;lt;clinit&amp;gt;方法时才会赋值&amp;quot;test&amp;quot;。&lt;br>
+而一个final的静态变量，即常量，如：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> String test &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;test&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是会通过ConstantValue属性在准备阶段就初始化为&amp;quot;test&amp;quot;。&lt;/p>
+&lt;h3 id="解析">解析&lt;/h3>
+&lt;p>JVM将常量池的符号引用替换为直接引用的过程。JVM规范要求在调用符号引用操作的字节码指令之前必须先对其所使用的符号引用进行解析。JVM会将第一次解析结果进行缓存，避免解析动作重复进行。&lt;/p>
+&lt;h3 id="初始化">初始化&lt;/h3>
+&lt;p>初始化是类加载过程的最后一步，执行类构造器&amp;lt;clinit&amp;gt;()方法。&lt;br>
+&amp;lt;clinit&amp;gt;方法由编译器自动收集类中所有静态变量的赋值动作以及静态代码块合并生成的，按源文件中出现的顺序（即静态代码块对于其后的静态变量，可以赋值，但不能访问）。&amp;lt;clinit&amp;gt;方法不需要调用父类的类构造器，JVM会保证&amp;lt;clinit&amp;gt;执行前父类的&amp;lt;clinit&amp;gt;方法已经执行，所以JVM第一个执行的&amp;lt;clinit&amp;gt;方法是Object的。JVM会保证多线程环境中&amp;lt;clinit&amp;gt;方法执行的安全性，保证只有一个线程去执行。&lt;br>
+&amp;lt;clinit&amp;gt;方法不是必须的，比如没有静态变量的接口，或没有静态代码块和静态变量的类。&lt;/p>
+&lt;h2 id="编译期优化">编译期优化&lt;/h2>
+&lt;p>javac对代码的运行效率几乎没有任何优化措施（JDK1.3之后-O优化参数没有意义了），性能优化主要集中在运行期（后端的即时编译期），javac主要进行了一些针对Java语言编码过程的优化，如语法糖。&lt;/p>
+&lt;h3 id="编译过程">编译过程&lt;/h3>
+&lt;p>编译过程大概分为3个过程：
+&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/9.png"
+width="1306"
+height="123"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/9_hub3b3d3b47598e5c2da162c1d89b967a1_11406_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/9_hub3b3d3b47598e5c2da162c1d89b967a1_11406_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="1061"
+data-flex-basis="2548px"
+>
+javac中的代码是这样的：
+&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/10.png"
+width="819"
+height="460"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/10_hufd3f342c03009d08f18a4b1b1ada6259_23374_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/10_hufd3f342c03009d08f18a4b1b1ada6259_23374_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="178"
+data-flex-basis="427px"
+>&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>解析与填充符号表&lt;/strong>过程：首先进行词法、语法分析，将源代码的字符流转换为Token集合，然后根据Token序列构造抽象语法树AST，对应parseFiles()方法；然后填充符号表（记录符号地址和符号信息映射关系），符号表中记录的信息在编译的不同阶段都会用到，对应enterTress()方法；&lt;/li>
+&lt;li>插入式注解处理器的&lt;strong>注解处理&lt;/strong>过程：处理代码中的注解，这个过程中可能影响到语法树的元素，如果影响到了，则要重新回到解析及填充符号表的过程，这样一个循环称作一个Round，直到注解处理器没有对语法树进行修改；&lt;/li>
+&lt;li>&lt;strong>分析与字节码生成&lt;/strong>过程：具体又分为&lt;strong>标注检查&lt;/strong>（检查变量使用前是否已生命、变量与赋值之间类型是否匹配等问题，以及常量折叠，如&amp;quot;1&amp;quot;+&amp;ldquo;2&amp;quot;优化为&amp;quot;12&amp;rdquo;）、&lt;strong>数据及控制流分析&lt;/strong>（检查局部变量使用前是否赋值、每条路径是否都有返回值、异常是否都处理了等问题）、&lt;strong>解语法糖&lt;/strong>（由desugar()方法完成）、&lt;strong>字节码生成&lt;/strong>（收敛生成&amp;lt;clinit&amp;gt;()方法he &amp;lt;init&amp;gt;()方法，将所有生成的信息转换成字节码写入磁盘）等子过程。&lt;/li>
+&lt;/ol>
+&lt;h3 id="语法糖">语法糖&lt;/h3>
+&lt;h4 id="泛型">泛型&lt;/h4>
+&lt;p>Java的泛型是伪泛型，只在源码中存在，编译时进行类型擦除变成原生类型（Raw Type），并在调用的地方加上强转类型代码，这是为了兼容旧版本。对于重载方法，如果泛型参数的泛型类型不同而其他参数以及返回类型相同，是不允许重载的，比如以下方法1和方法2不能重载；而如果泛型参数的泛型类型不同，且返回类型不同，则可以重载，比如方法1和方法3（JVM本来就允许）。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//方法1和方法2不能重载，方法1和方法3可以重载
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//方法1
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">test&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>Integer&lt;span style="color:#5bc4bf">&amp;gt;);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//方法2
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">test&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//方法3
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">test&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="自动装箱拆箱遍历循环变长参数">自动装箱/拆箱、遍历循环、变长参数&lt;/h4>
+&lt;p>遍历循环（增强for）的实现是编译时还原为迭代其的实现，因此需要实现Iterable接口。&lt;/p>
+&lt;h4 id="条件编译">条件编译&lt;/h4>
+&lt;p>java的条件编译通过条件为常量的if语句实现。如下面代码中，编译后的字节码不会包含调用B()方法的指令。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">if&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> A&lt;span style="color:#5bc4bf">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#815ba4">else&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> B&lt;span style="color:#5bc4bf">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="运行期优化">运行期优化&lt;/h2>
+&lt;h3 id="解释器与编译器">解释器与编译器&lt;/h3>
+&lt;p>许多主流商用JVM包括HotSpot采用解释器与编译器并存的结构，启动的时候使用解释器，保证启动速度，随着运行时间推移，编译器发挥作用，编译为本地代码，提高执行效率。在JVM中这种模式被称为混合模式，可以用&lt;code>-Xint&lt;/code>强制JVM运行于解释模式，或用&lt;code>-Xcomp&lt;/code>强制JVM运行于编译模式。HotSpot包含两个及时编译器Client Compiler和Server Compiler，一般简称为C1和C2。&lt;/p>
+&lt;h3 id="热点探测">热点探测&lt;/h3>
+&lt;p>运行过程中被即时编译器编译的&lt;strong>热点代码&lt;/strong>包括被多次调用的 &lt;strong>方法&lt;/strong> 或 &lt;strong>循环体&lt;/strong>，对于后者编译器还是会以整个方法作为编译对象。&lt;br>
+判断方法或循环体是否热点代码的行为被称为&lt;strong>热点探测&lt;/strong>，目前主要的热点探测方法有两种：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>基于采样的热点探测&lt;/strong>。JVM周期性的检查各个线程的栈顶，如果发现某些方法经常出现在栈顶，那么就是热点方法。缺点是容易收到线程阻塞或其他外界因素影响，优点是简单高效；&lt;/li>
+&lt;li>&lt;strong>基于计数器的热点探测&lt;/strong>。为每个方法甚至代码块建立计数器，统计执行次数，超过一定阈值就认为是热点方法。缺点是不能获取导方法的调用关系，优点是精确且严谨。&lt;/li>
+&lt;/ol>
+&lt;p>HotSpot使用第二种，准备了&lt;strong>方法调用计数器&lt;/strong>和&lt;strong>回边计数器&lt;/strong>。前者统计方法被调用的次数，默认的阈值：Client模式1500次，Server模式10000次，可以通过&lt;code>-XX:CompileThreshold&lt;/code>来设定；后者统计循环体被执行的次数，字节码遇到控制流向后跳转的指令称为回边(Back Edge)，通过&lt;code>-XX:BackEdgeThreshold&lt;/code>来手动设置阈值。&lt;br>
+对于方法调用计数器，一个方法执行时先判断存不存在JIT编译过的版本，存在的话执行编译后版本，不存在的话计数器加一，再判断是否超过阈值，超过的话向即时编译器提交编译申请。其统计的并不是方法被调用的绝对次数，而是一段时间内的调用次数，如果超过一定时间计数器仍不足阈值，则计数值会减少一半，这被成为&lt;strong>热度衰减&lt;/strong>(Counter Decay)，这段时间被称为半衰期。热度衰减的动作时在GC时顺便进行的。&lt;br>
+回边计数器没有计数热度衰减的过程，记录循环体被调用的绝对次数。&lt;br>
+默认配置下，编译是在后台的编译线程进行的，除非用&lt;code>-XX:-BackgroundCompilation&lt;/code>来禁止后台编译，这样提交编译请求的线程会一直等待编译完成。&lt;/p>
+&lt;h3 id="编译优化技术">编译优化技术&lt;/h3>
+&lt;p>JVM几乎所有的优化措施都集中在及时编译器中。&lt;/p>
+&lt;h4 id="方法内联">方法内联&lt;/h4>
+&lt;p>方法内联（Method Inlining）指的是将调用的方法代码替换掉调用者的调用语句。目的：&lt;/p>
+&lt;ol>
+&lt;li>取出调用方法的成本，如建立栈帧；&lt;/li>
+&lt;li>为其他优化建立良好基础，比如内联可以发现更多的无用代码。&lt;/li>
+&lt;/ol>
+&lt;p>考虑到多态，方法内联的实现并不简单，在编译器无法得出调用的方法是哪个版本的结论（父类还是子类），需要在运行期确定。&lt;br>
+JVM引入了类型继承关系分析（Class Hierarchy Analysis，CHA）技术，用于确定目前加载的类中某个接口是否有多于一种的实现、某类是否存在子类、子类是否抽象等信息。进行内联时：&lt;/p>
+&lt;ol>
+&lt;li>如果目标方法是非虚方法（私有方法、实力构造器、父类方法、静态方法等），那么直接进行内联；&lt;/li>
+&lt;li>对于虚方法，向CHA查询该方法是否有多个版本可选，如果只有一个版本，则直接进行内联，此时属于激进优化，需要预留逃生门（守护内联），此后如果JVM没有加载到改变方法接受者的继承关系的类，则可以继续使用内联优化的版本，否则抛弃已编译的代码、退回到解释状态进行或重新编译；&lt;/li>
+&lt;li>如果虚方法有多个版本，则尝试内联缓存（Inline Cache）。发生方法调用前，内联缓存状态为空；第一次调用后，缓存记录下方法接受者的版本信息，每次进行方法调用的时候都比较接受者版本，如果方法接受者版本一样，则继续调用内联缓存进行内联，否则取消内联。&lt;/li>
+&lt;/ol>
+&lt;h4 id="冗余访问消除">冗余访问消除&lt;/h4>
+&lt;p>冗余访问消除（Redundant Loads Elimination）指的是如果能保证一个方法的两次调用之间的代码不会引起其返回值的更改，那么这第二次调用的结果可以直接用第一次调用结果去赋值，比如一下代码：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">foo1&lt;/span>&lt;span style="color:#5bc4bf">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> y&lt;span style="color:#5bc4bf">=&lt;/span>b&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">value&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//其他调用，不会影响b.value的返回值
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> z&lt;span style="color:#5bc4bf">=&lt;/span>b&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">value&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>以上代码可以优化为：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">foo1&lt;/span>&lt;span style="color:#5bc4bf">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> y&lt;span style="color:#5bc4bf">=&lt;/span>b&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">value&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//其他调用，不会影响b.value的返回值
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> z&lt;span style="color:#5bc4bf">=&lt;/span>y&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="复写传播">复写传播&lt;/h4>
+&lt;p>复写传播（Copy Propagation）指的是去掉重复的变量。&lt;/p>
+&lt;h4 id="无用代码消除">无用代码消除&lt;/h4>
+&lt;p>无用代码消除（Dead Code Elimination），无用代码指的是永远不会izhixing的代码，或者完全没有意义的代码。&lt;/p>
+&lt;h4 id="公共子表达式消除">公共子表达式消除&lt;/h4>
+&lt;p>Common Subexpression Elimination定义：一个表达式E已经计算过，且计算后到现在E的变量全部没有变化，那么E这次出现成为了公共子表达式，无需重复计算，直接用前面计算结果替换即可。如果消除优化仅限于程序基本块内，则成为局部公共子表达式消除，如果覆盖范围涵盖多个基本块，则成为全局公共子表达式消除。&lt;/p>
+&lt;h4 id="数组边界检查消除">数组边界检查消除&lt;/h4>
+&lt;p>Java访问数组元素时，会对下标进行上下界范围检查，不满足上下界时会抛出ArrayIndexOutOfBoundsException异常。&lt;br>
+编译器根据数据流分析确定数组长度，并判断下标有无越界；在循环中进行数组访问时，也是可以通过数据流分析判定循环变量的取值是否越界，如果能保证循环体中不越界的话循环体中访问数组的语句可以消除边界检查。&lt;br>
+还有一种思路时隐式异常处理，将空指针检查和除数为零检查消除，注册一个Segment Fault信号的异常处理器，放在异常处理里面，在这个异常处理器里面再转换为对应的异常并抛出。&lt;br>
+还有一些其他的消除操作，比如自动装箱消除、安全点消除、消除反射等等。&lt;/p>
+&lt;h4 id="逃逸分析">逃逸分析&lt;/h4>
+&lt;p>逃逸分析不能直接优化代码，而是为其他优化手段提供优化的依据。逃逸分析指的是分析对象动态作用域：一个对象在方法中被定义后，被外部方法引用，则称为&lt;strong>方法逃逸&lt;/strong>，被外部线程引用访问到的话，被称为&lt;strong>线程逃逸&lt;/strong>。如果能证明一个对象不会逃逸到方法或线程外，则可以进行以下优化：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>栈上分配&lt;/strong>（Stack Allocation）：若确认对象没有方法逃逸，可以将其在栈上分配内存，则其占用内存会随着栈帧出栈而被销毁，减少GC压力，而一般应用中不逃逸的局部对象占很大比例；&lt;/li>
+&lt;li>&lt;strong>同步消除&lt;/strong>（Synchronization Elimination）：若确认对象没有线程逃逸，可以对该变量实时的同步措施消除；&lt;/li>
+&lt;li>&lt;strong>标量替换&lt;/strong>（Scalar Replacement）：&lt;strong>标量&lt;/strong>指一个数据无法再分解为更小的数据来表示，如基础数据类型，反之称之为&lt;strong>聚合量&lt;/strong>（Aggregate），如对象。若确认一个对象没有逃逸，则可以不创建对象，改为直接创建它会被使用到的成员变量来代替，同时可以保存在栈上，提高读写效率，并为进一步优化创造条件。&lt;/li>
+&lt;/ol></description></item><item><title>《深入理解Java虚拟机》 学习笔记(三)——类文件结构</title><link>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/</link><pubDate>Tue, 06 Jun 2017 12:46:22 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/classfile.png" alt="Featured image of post 《深入理解Java虚拟机》 学习笔记(三)——类文件结构" />&lt;p>&lt;strong>JVM笔记系列索引&lt;/strong>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%80JVM%e5%86%85%e5%ad%98%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%8c%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/" >《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
+&lt;h2 id="jvm多语言支持">JVM多语言支持&lt;/h2>
+&lt;p>Java规范分为Java语言规范（The Java Language Specification）和Java虚拟机规范（The Java Virtual Machine Specification），因此JVM支持多种语言，只要该语言编译后的类文件符合JVM规范。比如我们常用的Scala、Kotlin、Clojure、Groovy等等。&lt;/p>
+&lt;h2 id="类文件结构">类文件结构&lt;/h2>
+&lt;p>基础原则：多字节的数据，高位在前。JVM加载Class文件的时候进行动态连接。&lt;br>
+Class文件结构类似C的结构体，包含无符号数（u1/u2/u4/u8表示1/2/4/8字节的无符号数）和表（由多个无符号数或表组成的结构体，class文件本身就是一个大的表），有多个同类的无符号数或者表并数量不确定的时候，一般先用一个无符号数记录数量，后面接上一系列连续的这种无符号数或者表。Class文件没有分隔符号，所以整个数据结构都是被严格规定的。&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/7.png"
+width="656"
+height="141"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/7_huf22e46ef28e575f35893ae1dc5b63fdf_20734_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/7_huf22e46ef28e575f35893ae1dc5b63fdf_20734_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="465"
+data-flex-basis="1116px"
+>&lt;/p>
+&lt;h3 id="魔数与class文件版本">魔数与Class文件版本&lt;/h3>
+&lt;p>Class文件头4个字节是固定的0xCAFEBABE（咖啡宝贝），显然与Java语言命名的历史相关。&lt;br>
+紧接着4个字节存储Class文件版本号，5-6字节是子版本号，7-8字节是主版本号（比如1.7.0是0x0033）。JVM读取Class文件的时候，搞版本JDK可以兼容旧版本Class文件，就是通过这4个字节进行判定的。&lt;/p>
+&lt;h3 id="常量池">常量池&lt;/h3>
+&lt;p>一般来说常量池占Class文件空间最大，由于长度不定，所以入口有u2类型的常量池容量计数器（8-9位），计数从1开始（Class文件中其他容量计数器都是从0开始的）。&lt;br>
+常量池存储两类常量：字面量（类似Java语言中的常量）和符号引用，后者包括类和接口全名、字段名称和描述符、方法名称和描述符。JVM运行时从常量池获取符号引用再在类创建时解析到具体内存地址，没有C语言的“连接”步骤。&lt;br>
+常量池每一个常量都是一个表。，一共有14种表，表的开头都是一个u1类型的标志位代表当前常量的类型（浮点整形之类），后面的结构与具体的常量类型有关，各自不同。&lt;br>
+使用&lt;code>javap -verbose 类名&lt;/code>可以解析类的结构，输出结构大概这样：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> javap -verbose com.turingdi.breorent.user.controller.RentAndReturnController
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Classfile /home/leibniz/workspace/BreoRent/target/classes/com/turingdi/breorent/user/controller/RentAndReturnController.class
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Last modified 2017-6-6; size &lt;span style="color:#f99b15">9126&lt;/span> bytes
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> MD5 checksum 26ed5594f39cfc9d6b109637ad76bf12
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Compiled from &lt;span style="color:#48b685">&amp;#34;RentAndReturnController.java&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>public class com.turingdi.breorent.user.controller.RentAndReturnController
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> minor version: &lt;span style="color:#f99b15">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> major version: &lt;span style="color:#f99b15">52&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> flags: ACC_PUBLIC, ACC_SUPER
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Constant pool:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#1 = Methodref #111.#203 // java/lang/Object.&amp;#34;&amp;lt;init&amp;gt;&amp;#34;:()V&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#2 = Class #204 // org/springframework/web/servlet/ModelAndView&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#3 = Methodref #2.#203 // org/springframework/web/servlet/ModelAndView.&amp;#34;&amp;lt;init&amp;gt;&amp;#34;:()V&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#4 = Class #205 // com/turingdi/breorent/common/wechatApi/process/WechatJdk&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#5 = Methodref #4.#206 // com/turingdi/breorent/common/wechatApi/process/WechatJdk.&amp;#34;&amp;lt;init&amp;gt;&amp;#34;:(Ljavax/servlet/http/HttpServletRequest;)V&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#6 = Methodref #4.#207 // com/turingdi/breorent/common/wechatApi/process/WechatJdk.getMap:()Ljava/util/Map;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#7 = String #208 // appId&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#8 = String #209 // wechat&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">#9 = String #210 // APP_ID&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>……
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>常见的两种常量举例：&lt;/p>
+&lt;ol>
+&lt;li>CONSTANT_Class_info，类常量，标志为0x07，紧接着是1个u2类型的类名索引，指的是类名（字符串常量）在常量池中的索引（如上面所说，从1开始数）。&lt;/li>
+&lt;li>CONSTANT_Utf8_info，字符串变量，标志为0x01，紧接着是1个u2类型的字符串长度，然后是字符串内容的bytes，u1类型，数量等于前面u2定义的。&lt;/li>
+&lt;/ol>
+&lt;p>从上面可以推导：类名（全限定名）是字符串常量，长度用u2类型表示，也就是最大长度是65535，换言之就是Java类全名最长65535，超过的无法编译。&lt;/p>
+&lt;h3 id="访问标志">访问标志&lt;/h3>
+&lt;p>常量池结束之后，有两个字节为访问标志，代表当前Class文件是否public、是否类/接口/枚举、是否抽象、是否注解等等。&lt;/p>
+&lt;h3 id="类索引父类索引及接口索引集合">类索引、父类索引及接口索引集合&lt;/h3>
+&lt;p>&lt;strong>类索引&lt;/strong>和&lt;strong>父类索引&lt;/strong>分别为u2类型数据，&lt;strong>接口索引集合&lt;/strong>结合为u2类型数据的集合（只能有一个父类，可以实现多个接口），分别用于记录当前类、父类、实现的接口的类描述符（CONSTANT_Class_info）在常量池中的索引。&lt;br>
+类索引和父类索引紧接在访问标志后面，再后面是接口索引集合，入口是一个数量计数器，0表示没有实现任何接口，再后面就是具体的接口类描述符索引。&lt;/p>
+&lt;h3 id="字段表集合">字段表集合&lt;/h3>
+&lt;p>描述类或接口中定义的字段，包括静态和非静态的。结构如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:center">类型&lt;/th>
+&lt;th style="text-align:center">名称&lt;/th>
+&lt;th style="text-align:center">数量&lt;/th>
+&lt;th style="text-align:center">含义&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">access_flags&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">访问标志，public/private/final/static/enum等描述符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">name_index&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">字段简单名称在常量池中的索引，即变量名或方法名&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">descriptor_index&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">字段和方法的描述符在常量池的索引，描述字段类型或方法参数列表/返回类型&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">attibutes_count&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">属性表计数器&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">attribute_info&lt;/td>
+&lt;td style="text-align:center">attributes&lt;/td>
+&lt;td style="text-align:center">attibutes_count&lt;/td>
+&lt;td style="text-align:center">属性额外描述，比如描述变量初始化值在常量池中的索引&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>描述符描述方法的时候，先是参数列表，然后是返回值类型。而方法&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">toString&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">int&lt;/span> test&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>对应的描述符是&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">(&lt;/span>I&lt;span style="color:#5bc4bf">)&lt;/span>Ljava&lt;span style="color:#5bc4bf">/&lt;/span>lang&lt;span style="color:#5bc4bf">/&lt;/span>String&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中L是表示对象类型。&lt;br>
+此外，字段表集合不会列出从父类或接口中继承的字段，但可能会有代码中不存在的字段，比如内部类对外部类实例的引用之类。&lt;/p>
+&lt;h3 id="方法表集合">方法表集合&lt;/h3>
+&lt;p>方法表集合的入口同样也是一个u2类型的计数器，紧接着是各个具体的方法。方法表的结构与字段表基本一样，不列出来了。区别：&lt;/p>
+&lt;ol>
+&lt;li>首先是access_flags的取值范围不同，比如没有ACC_TRANSIENT、有ACC_SYNCHRONIZED等值；&lt;/li>
+&lt;li>name_index表示方法名索引，descriptor_index表示方法描述符索引，跟字段表一样；&lt;/li>
+&lt;li>而编译后的方法代码，放在属性表里面名为“Code”的属性中；&lt;/li>
+&lt;li>没有Override的父类方法，不会出现在子类的方法表集合中；&lt;/li>
+&lt;li>同样可能出现代码中原本没有的方法，比如&amp;lt;clinit&amp;gt;（类构造器）、&amp;lt;init&amp;gt;（实例对象构造器）。&lt;/li>
+&lt;/ol>
+&lt;p>两个方法名字相同，参数列表相同，返回值类型不同，是允许共存在一个Class文件中的，但Java语言不允许这样。&lt;/p>
+&lt;h3 id="属性表集合">属性表集合&lt;/h3>
+&lt;p>Class文件、字段表、方法表都可以有自己的属性表，Java7里面定义了21种属性。&lt;/p>
+&lt;h4 id="code属性">Code属性&lt;/h4>
+&lt;p>并非所有方法表都有Code属性，比如接口和抽象类的方法就没有。结构如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:center">类型&lt;/th>
+&lt;th style="text-align:center">名称&lt;/th>
+&lt;th style="text-align:center">数量&lt;/th>
+&lt;th style="text-align:center">含义&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">attribute_name_index&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">属性名的索引，对Code属性而言恒为&amp;quot;Code&amp;quot;&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u4&lt;/td>
+&lt;td style="text-align:center">attribute_length&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">属性值长度，相当于整个属性表长度长度减6(u2+u4)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">max_stack&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">操作数栈深度最大值。JVM运行时根据此值分配栈桢的操作栈深度&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">max_locals&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">局部变量表所需存储空间，单位是Slot，double和long占用2个Slot、其他基本类型1Slot，Slot空间可以重用(变量作用域问题)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u4&lt;/td>
+&lt;td style="text-align:center">code_length&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">编译后的字节码长度，理论上最长2^32-1，实际上JVM规定一个方法不允许超过65535条字节码指令&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u1&lt;/td>
+&lt;td style="text-align:center">code&lt;/td>
+&lt;td style="text-align:center">code_length&lt;/td>
+&lt;td style="text-align:center">代码编译后的字节码&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">exception_table_length&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">异常表长度&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">exception_info&lt;/td>
+&lt;td style="text-align:center">exception_table&lt;/td>
+&lt;td style="text-align:center">exception_table_length&lt;/td>
+&lt;td style="text-align:center">异常表，记录字节码在start_pc到end_pc行之间如果出现类型为catch_type或其子类的异常则跳转到handler_pc行继续处理&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">u2&lt;/td>
+&lt;td style="text-align:center">attibutes_count&lt;/td>
+&lt;td style="text-align:center">1&lt;/td>
+&lt;td style="text-align:center">属性表计数器&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">attribute_info&lt;/td>
+&lt;td style="text-align:center">attributes&lt;/td>
+&lt;td style="text-align:center">attibutes_count&lt;/td>
+&lt;td style="text-align:center">属性额外描述，比如描述变量初始化值在常量池中的索引&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>字节码值得注意的一个地方是，javac编译时将this关键字作为一个普通方法参数由JVM调用时自动传入。&lt;/p>
+&lt;h4 id="exceptions属性">Exceptions属性&lt;/h4>
+&lt;p>描述方法可能抛出的受检异常。&lt;/p>
+&lt;h4 id="linenumbertable属性">LineNumberTable属性&lt;/h4>
+&lt;p>描述Java远吗行号与字节码行号之间映射关系，也就是为什么抛异常的时候可以显示源码哪一行抛出的。&lt;/p>
+&lt;h4 id="localvariabletable属性">LocalVariableTable属性&lt;/h4>
+&lt;p>描述栈桢中局部变量表与Java源码中变量的关系，以保证编译后的代码被其他代码调用时，IDE可以显示参数名（否则被arg0、arg1之类的变量名代替）&lt;/p>
+&lt;h4 id="sourcefile属性">SourceFile属性&lt;/h4>
+&lt;p>描述生成当前Class文件的源文件名称，也是抛异常时可以显示源文件名字的原因。但内部类不会生成这个属性。&lt;/p>
+&lt;h4 id="constantvalue属性">ConstantValue属性&lt;/h4>
+&lt;p>static关键字修饰的变量可以使用这个属性。对于Sun javac编译器，final static的变量采用ConstantValue属性初始化，其他static变量在&amp;lt;clinit&amp;gt;（类构造器）中初始化。&lt;/p>
+&lt;h4 id="innerclasses属性">InnerClasses属性&lt;/h4>
+&lt;p>记录内部类和宿主类的关联。内部类和宿主类的Class文件都会有这个属性。&lt;/p>
+&lt;h4 id="signature属性">Signature属性&lt;/h4>
+&lt;p>记录泛型签名信息。Java的泛型是使用擦除式实现的伪泛型，编译后擦除泛型，这个属性为了弥补此缺陷，方便反射API可以拿到泛型类型。&lt;/p>
+&lt;h2 id="字节码指令">字节码指令&lt;/h2>
+&lt;p>字节码指令由一个字节的&lt;strong>操作码&lt;/strong>（代表具体操作）及跟随其后的0个或多个&lt;strong>操作数&lt;/strong>（操作所需的参数）组成。JVM大多数指令不含操作数只有操作码。&lt;br>
+Class文件放弃了操作数对齐，因此省略很多填充和分割符，因此体积可以尽量小；缺点是损失一些解析字节码的性能。&lt;br>
+JVM的指令大多数包含了操作的数据类型信息，但因为只有一个字节，也就是说最多只有256种指令，所以不是所有命令对所有数据类型都有独立的指令（非完全独立），同时提供一些指令将指令不支持类型的操作数转换为可支持的类型。&lt;br>
+JVM的浮点数运算，舍入模式是最低有效位向下（0）取整。操作溢出时用有符号的无穷大表示（INF），如果操作结果没有明确数学意义则得到NaN（非数字，比如0/0，∞×0之类）&lt;/p></description></item><item><title>《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</title><link>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</link><pubDate>Sun, 04 Jun 2017 13:57:44 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2.png" alt="Featured image of post 《深入理解Java虚拟机》 学习笔记(二)——垃圾回收" />&lt;p>&lt;strong>JVM笔记系列索引&lt;/strong>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%80JVM%e5%86%85%e5%ad%98%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%8c%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/" >《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
+&lt;h2 id="判断对象可回收">判断对象可回收&lt;/h2>
+&lt;p>有以下方法：&lt;/p>
+&lt;h3 id="引用计数法">引用计数法&lt;/h3>
+&lt;p>维护引用计数的Map，对象被引用时计数加1，引用失效时计数减1，简单粗暴。&lt;br>
+实现简单，判断效率高。但主流JVM没有用这个方法的，因为无法解决循环引用的问题。&lt;/p>
+&lt;h3 id="可达性分析算法">可达性分析算法&lt;/h3>
+&lt;p>JVM主流实现时可达性分析。&lt;br>
+通过一系列GC Root的对象作为起点，开始向下搜索，搜索经过的路径为引用链，当一个对象到GC Root没有任何引用链项链，则引用不可达，可以GC掉。&lt;br>
+GC Root通常包括以下几种：&lt;/p>
+&lt;ol>
+&lt;li>虚拟机栈（栈帧中的本地变量表）中引用的对象；&lt;/li>
+&lt;li>方法区中类静态属性引用的对象；&lt;/li>
+&lt;li>方法区中常量引用的对象；&lt;/li>
+&lt;li>本地方法栈中JNI（即一般说的Native方法）引用的对象；&lt;/li>
+&lt;li>…………&lt;/li>
+&lt;/ol>
+&lt;h2 id="引用分类">引用分类&lt;/h2>
+&lt;p>引用分为&lt;strong>强引用&lt;/strong>（平常用的引用，只要还存在有效，就不会被GC），&lt;strong>软引用&lt;/strong>（SoftReference类，将要发生内存溢出前GC回收），&lt;strong>弱引用&lt;/strong>（WeakReference类，生存到下一次GC，只被弱引用关联的对象会被回收！），&lt;strong>虚引用&lt;/strong>（PhantomReference类，不影响实例生存时间，无法取得实例，唯一作用是被GC时收到一个系统通知）。&lt;/p>
+&lt;h2 id="finalize方法">finalize()方法&lt;/h2>
+&lt;p>可达性分析中发现不可达的对象，会被标记，如果没有覆盖finalize()方法，或者其finalize()方法已经被JVM调用过，则不会执行finalize()方法。&lt;br>
+否则需要执行finalize()方法，此对象放入F-Queue队列中，由JVM的低优先级Finalizer线程去执行。&lt;br>
+稍后，GC会对F-Queue的对象进行第二次标记，如果对象在finalize()方法中拯救了自己（重新被引用），则将会被移出要回收的集合。&lt;br>
+一般不覆盖finalize()方法，该方法设计之初是为了迎合C++语法的析构函数，应该用try-finally取代之。&lt;/p>
+&lt;h2 id="方法区永生代的gc">方法区/永生代的GC&lt;/h2>
+&lt;p>永生代也会进行GC，主要收集废弃的常量和无用的类。&lt;br>
+其中无用的类的判定比较严格，要求：&lt;/p>
+&lt;ol>
+&lt;li>该类所有实例已被回收；&lt;/li>
+&lt;li>加载该类的ClassLoader已被回收；&lt;/li>
+&lt;li>该类的Class对象没有任何地方被引用，无法在任何地方通过反射访问该类的方法。&lt;/li>
+&lt;/ol>
+&lt;p>然而满足了以上条件的类，也不一定会被回收，仅仅是可以回收。&lt;/p>
+&lt;h2 id="垃圾收集算法">垃圾收集算法&lt;/h2>
+&lt;p>包括以下：&lt;/p>
+&lt;h3 id="标记-清除算法mark-sweep">标记-清除算法(Mark-Sweep)&lt;/h3>
+&lt;p>先标记出所有需要回收的对象，然后统一回收被标记需要回收的对象。&lt;br>
+&lt;strong>缺点&lt;/strong>：标记和清除的效率都不高，且清除后产生大量不连续的内存碎片。&lt;/p>
+&lt;h3 id="复制算法copying">复制算法(Copying)&lt;/h3>
+&lt;p>内存划分成等大小的两块，只有一块在使用，GC时将存活对象复制到另一块区域中，清除另一半。&lt;br>
+&lt;strong>缺点&lt;/strong>：有一半内存浪费，复制操作效率低，不适合老年代。&lt;br>
+实际使用中并不是一半一半的内存分配，因为大部分对象生命周期很短，所以划分成一块很大的&lt;strong>Eden区&lt;/strong>和两块小的&lt;strong>Survivor区&lt;/strong>，一般默认8:1:1的比例。每次使用一块Eden和一块Survivor区，GC时讲Eden和Survivor中存活的对象复制到另一块Survivor区中。当Survivor区不够大时，使用&lt;strong>老年代&lt;/strong>进行&lt;strong>分配担保&lt;/strong>，存活对象放入老年代。&lt;/p>
+&lt;h3 id="标记-整理算法mark-compact">标记-整理算法(Mark-Compact)&lt;/h3>
+&lt;p>类似标记-清除算法，标记之后存活的对象向一端移动，最后清理掉边界以外的内存，保证内存的规整。&lt;/p>
+&lt;h2 id="hotspot的算法实现">HotSpot的算法实现&lt;/h2>
+&lt;p>以下是HotSpot中垃圾回收的几个关键点技术实现方法。&lt;/p>
+&lt;h3 id="枚举gc-root">枚举GC Root&lt;/h3>
+&lt;p>可达性分析要求在一个能保证一致性的快照中进行工作，即GC时必须停止所有线程，即Stop The World~~（JOJO里面Dio的世界 ザ・ワールド？）~~。&lt;br>
+在HotSpot里面，通过一个叫OopMap的数据结构来维护哪些地方存放着对象引用，记录栈上本地变量与堆中对象的引用关系，方便枚举GC Root。&lt;/p>
+&lt;h3 id="安全点">安全点&lt;/h3>
+&lt;p>并不是所有指令都会生成/改变OopMap，这样效率太低。线程必须到达安全点（SafePoint）才会生成OopMap，然后开始GC。安全点的选定是以“有让程序长时间执行的特征”的原则进行的（如方法调用，循环跳转，异常跳转等）。&lt;br>
+考虑多线程，必须所有线程都跑到安全点才能开始GC。方法有二：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>抢先式中断&lt;/strong>：GC时先中断所有线程，对于还没跑到安全点的线程，让其恢复并等它跑到安全点上再停。——商业JVM几乎没有这样实现的；&lt;/li>
+&lt;li>&lt;strong>主动式中断&lt;/strong>：GC需要中断线程时，设置一个标志，各个线程执行时，跑到安全点的时候轮询这个标志，发现标志为真的时候自己中断挂起。&lt;/li>
+&lt;/ol>
+&lt;h3 id="安全区域">安全区域&lt;/h3>
+&lt;p>线程执行的时候，可能很久都不会跑到安全点（比如执行了Thread.Sleep()的情况），导致GC不能马上执行。因此引入安全区域的概念（Safe Region），表示这段代码片段中引用关系不会发生变化。&lt;br>
+线程执行到安全区域的时候，标识自己进入了安全区域；则发动GC的时候，可以忽略标识为安全区域的线程；而线程在离开安全区域的时候，需要检查是否已完成GC Root枚举（或者是整个GC过程），没完成的话要GC发出等待离开的信号。&lt;/p>
+&lt;h2 id="实际的垃圾收集器">实际的垃圾收集器&lt;/h2>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2.png"
+width="547"
+height="374"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2_huccc5a32b9972667086692466cd3686f0_65721_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2_huccc5a32b9972667086692466cd3686f0_65721_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="146"
+data-flex-basis="351px"
+>
+上图给出了HotSpot的7个垃圾收集器，中间有连线的标识可以搭配使用。&lt;/p>
+&lt;h3 id="serial收集器">Serial收集器&lt;/h3>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/3.png"
+width="512"
+height="302"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/3_hu802ad8072fdb069c6bb8342d0d54f6b2_35081_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/3_hu802ad8072fdb069c6bb8342d0d54f6b2_35081_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="406px"
+>
+收集时，暂停所有其他工作线程（Stop The World），开一个线程进行GC。对新生代采用复制算法，对老年代采取标记-整理算法。&lt;br>
+JVM在client模式下默认新生代垃圾收集器还在用Serial。&lt;br>
+优点：简单高效。&lt;br>
+缺点：GC时的停顿时间长。&lt;/p>
+&lt;h3 id="serial-old收集器">Serial Old收集器&lt;/h3>
+&lt;p>Serial收集器的老年代版本，单线程，标记-整理算法。&lt;/p>
+&lt;h3 id="parnew收集器">ParNew收集器&lt;/h3>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/4.png"
+width="512"
+height="296"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/4_hub1fff94d353711782a444916ee6aa317_39140_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/4_hub1fff94d353711782a444916ee6aa317_39140_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="172"
+data-flex-basis="415px"
+>
+Serial收集器的多线程版本，可以配合CMS收集器工作，不能配合Parallel Scavenge收集器工作。使用&lt;code>-XX+UseParNewGC&lt;/code>指定使用之。&lt;br>
+澄清垃圾收集器的两个概念：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>并行Parallel&lt;/strong>：多条垃圾回收线程并行工作，用户线程在等待；&lt;/li>
+&lt;li>&lt;strong>并发Concurrent&lt;/strong>：垃圾收集线程和用户线程同事执行（CMS）。&lt;/li>
+&lt;/ol>
+&lt;h3 id="parallel-scavenge收集器">Parallel Scavenge收集器&lt;/h3>
+&lt;p>新生代收集器，多线程、复制算法，与ParNew收集器的区别在于，关注点在于吞吐量（Thoughput，=运行用户代码时间/(运行用户代码时间+GC时间)），适合在后台运算而不需要提案多交互的任务。&lt;br>
+用&lt;code>-XX:MaxGCPauseMillis&lt;/code>参数指定保证GC消耗时间的最大值（毫秒），减少GC时间是以牺牲吞吐量及新生代空间来获取的。&lt;br>
+用&lt;code>-XX:GCTimeRatio&lt;/code>参数指定GC占总时间的比例，0-100，默认99，即允许1/(1+99)=1%的GC时间。&lt;br>
+使用&lt;code>-XX:UseAdaptiveSizePolicy&lt;/code>参数之后，JVM根据当前系统情况动态调整新生代大小、Eden与Survivor比例等参数以保证最佳的吞吐量和设定的最长GC时间。&lt;/p>
+&lt;h3 id="parallel-old收集器">Parallel Old收集器&lt;/h3>
+&lt;p>Parallel Scavenge收集器的老年代版本，多线程，标记-整理算法，JDK1.6开始提供。&lt;/p>
+&lt;h3 id="cms收集器">CMS收集器&lt;/h3>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/5.png"
+width="512"
+height="254"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/5_hue412b55637f9a09397c4378c2dc2ec00_38212_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/5_hue412b55637f9a09397c4378c2dc2ec00_38212_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="201"
+data-flex-basis="483px"
+>
+老年代收集，设计目标是获取最短回收停顿时间，基于标记-清除算法设计，包括以下步骤：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>初始标记&lt;/strong>：标记GC Root可以直接关联到的对象，速度很快，需要Stop The World；&lt;/li>
+&lt;li>&lt;strong>并发标记&lt;/strong>：可达性分析枚举，耗时较长；&lt;/li>
+&lt;li>&lt;strong>重新标记&lt;/strong>：修正并发标记期间因用户程序继续运行而导致的引用变动，需要Stop The World；&lt;/li>
+&lt;li>&lt;strong>并发清除&lt;/strong>：耗时较长。&lt;/li>
+&lt;/ol>
+&lt;p>CMS收集器缺点：&lt;/p>
+&lt;ol>
+&lt;li>对CPU资源敏感，并发阶段总吞吐量降低，CPU数量少的时候对用户程序影响大；&lt;/li>
+&lt;li>无法处理浮动垃圾（Floating Garbage），即并发清理阶段新产生的垃圾，要等到下一次GC；因此需要预留内存空间给用户线程使用，不能等内存快满才进行收集；当
+CMS运行期间预留的内存不够，会出现“Concurrent Mode Failure”失败，JVM会临时启用Serial Old收集器重新进行老年代垃圾收集，导致停顿时间变长。可以通过&lt;code>-XX:CMSInitiatingOccupancyFraction&lt;/code>参数调整老年代内存占用比例触发GC的阈值。&lt;/li>
+&lt;li>收集后产生内存碎片。&lt;/li>
+&lt;/ol>
+&lt;h3 id="g1收集器">G1收集器&lt;/h3>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/6.png"
+width="789"
+height="150"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/6_hu7afd55c2bc04e9e99a239ca7f26e06a6_30498_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/6_hu7afd55c2bc04e9e99a239ca7f26e06a6_30498_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="526"
+data-flex-basis="1262px"
+>
+面向服务端，全称Garbage-First，停顿时间可控、可预测，不会产生内存碎片。&lt;br>
+G1收集器将整个Java堆划分成多个大小相等的独立区域（Region），跟踪各个Region里面垃圾堆积的价值（根据回收所获得的空间大小及回收耗费时间的经验值），维护优先列表，每次收集的时候，根据允许的收集时间，优先回收价值更大的Region。&lt;br>
+此外每个Region维护一个Remembered Set来避免全堆扫描，引用型数据进行写操作的时候，会产生中断写操作，检查引用的对象是否处于不同的Region，如果是，则记录到被引用对象所属的Remember Set中；那么在GC时，GC Root的枚举范围加入Remembered Set，保证不进行全堆扫描也不会有遗漏。&lt;br>
+G1收集器的回收步骤包括：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>初始标记&lt;/strong>：与CMS一样；&lt;/li>
+&lt;li>&lt;strong>并发标记&lt;/strong>：与CMS一样，包含Remembered Set；&lt;/li>
+&lt;li>&lt;strong>最终标记&lt;/strong>：并发标记期间对象变化记录到Remembered Set Logs中，合并到Remembered Set；&lt;/li>
+&lt;li>&lt;strong>筛选回收&lt;/strong>：先根据回收价值和回收成本进行排序，再根据用户期望GC停顿时间制定回收计划。&lt;/li>
+&lt;/ol>
+&lt;h2 id="内存分配回收策略">内存分配、回收策略&lt;/h2>
+&lt;ol>
+&lt;li>&lt;strong>优先在Eden分配&lt;/strong>：大多数情况下，对象在新生代Eden区分配，当Eden区空间不够时，发起Minor GC；&lt;/li>
+&lt;li>&lt;strong>大对象直接进入老年代&lt;/strong>：提供&lt;code>-XX:PretenureSizeThreshold&lt;/code>参数，大于此值的对象直接在老年代分配，避免在Eden区和Survivor区之间大量内存复制；&lt;/li>
+&lt;li>&lt;strong>长期存活的对象进入老年代&lt;/strong>：JVM为对象定义年龄计数器，经过Minor GC依然存活且被Survivor区容纳的，移动到Survivor区，年龄加1，每经历一次Minor GC不被清理则年龄加1，增加到一定年龄则移动到老年区（默认15岁，通过&lt;code>-XX:MaxTenuringThreshold&lt;/code>设置）；&lt;/li>
+&lt;li>&lt;strong>动态对象年龄判定&lt;/strong>：若Survivor区中同年龄所有对象大小总和大于Survivor空间一半，则年龄大于等于该年龄的对象可以直接进入老年代；&lt;/li>
+&lt;li>&lt;strong>空间分配担保&lt;/strong>：Minor GC之前，JVM检查老年代最大可用连续空间大于新生代所有对象总空间，成立的话Minor GC确认是安全的；否则检查老年代最大可用连续空间大于历次晋升到老年代对象的平均大小，大于的话进行Minor GC；小于的话进行Full GC。&lt;/li>
+&lt;/ol></description></item><item><title>《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构</title><link>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/</link><pubDate>Sat, 27 May 2017 21:31:01 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/java.png" alt="Featured image of post 《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构" />&lt;p>最近一个月把经典Java书籍《深入理解Java虚拟机》读了一遍，受益匪浅，接下来几篇博客里将会总结一些学习笔记，或许会跟很多现有的博文重复，但主要是为了自己总结一下。&lt;br>
+&lt;strong>JVM笔记系列索引&lt;/strong>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%80JVM%e5%86%85%e5%ad%98%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%8c%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/" >《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
+&lt;h2 id="jvm内存结构">JVM内存结构&lt;/h2>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/1.png"
+width="698"
+height="334"
+srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/1_hu6033c8087bc94d9bfc87edb69e8b52d6_73796_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/1_hu6033c8087bc94d9bfc87edb69e8b52d6_73796_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="208"
+data-flex-basis="501px"
+>
+JVM内存结构不光是只有堆内存和栈内存，实际情况要复杂很多，主要包含以下结构。&lt;/p>
+&lt;h3 id="程序计数器">程序计数器&lt;/h3>
+&lt;p>每个线程都有独立的程序计数器，各线程的互不影响，用于存储正在执行的虚拟机指令地址（对于Native方法则为空undefined）.&lt;/p>
+&lt;h3 id="jvm栈">JVM栈&lt;/h3>
+&lt;p>JVM栈是线程私有的，每个方法执行的时候都会建立栈帧，栈帧包含以下内容：&lt;/p>
+&lt;ol>
+&lt;li>局部变量表：存放编译期可知的基本数据类型数据、对象引用和returnAddress，亦即运行期不会改变局部变量表大小;&lt;/li>
+&lt;li>操作数栈；&lt;/li>
+&lt;li>动态链接；&lt;/li>
+&lt;li>方法出口，等等。&lt;/li>
+&lt;/ol>
+&lt;p>该区域可能抛出以下异常：&lt;/p>
+&lt;ol>
+&lt;li>当线程请求的栈深度超过最大值，会抛出StackOverflowError异常；&lt;/li>
+&lt;li>JVM栈动态扩展时无法申请导足够内存，抛出OutOfMemoryError异常。&lt;/li>
+&lt;/ol>
+&lt;h3 id="本地方法栈">本地方法栈&lt;/h3>
+&lt;p>类似JVM栈，区别只在于本地方法栈用于执行本地(Native)方法。&lt;/p>
+&lt;h3 id="java堆">Java堆&lt;/h3>
+&lt;p>所有线程共享的内存区域，用于存放对象实例（但现在不一定全部对象都在堆里了，栈上分配/标量替换等技术）。在GC的概念中还可以分为Eden区、FromSurvivor区及ToSurvivor区。也可能会划分出线程私有的分配缓冲区TLAB。&lt;/p>
+&lt;h3 id="方法区">方法区&lt;/h3>
+&lt;p>线程共享，用于存放已加载的类、常量、静态变量、JIT编译后的代码等数据。&lt;br>
+对于HotSpot虚拟机用户而言，经常将方法区称为永生代（Permanent Generation），是因为HotSpot虚拟机用永生代实现方法区，用GC管理方法区&lt;/p>
+&lt;h4 id="运行时常量池">运行时常量池&lt;/h4>
+&lt;p>运行时常量池是方法区的一部分，类文件被加载后，常量部分就会被放到运行时常量池里。运行期期间也可以将新的常量放入常量池，比如String.intern()方法。&lt;/p>
+&lt;h3 id="直接内存">直接内存&lt;/h3>
+&lt;p>NIO里面引入直接内存的API，可以使用本地方法分配堆外内存，在某些情况下可以提高IO性能。&lt;/p>
+&lt;h2 id="创建对象过程">创建对象过程&lt;/h2>
+&lt;ol>
+&lt;li>遇到new关键字的时候，检查对应类是否能在常量池定位到类的符号引用，并检查是否已加载、解析、初始化。没有的话线加载类；&lt;/li>
+&lt;li>分配内存。加载类之后一个对象所需的内存大小就确定了；使用Serial、ParNew等收集器时，堆内存是整齐的，使用&lt;strong>指针碰撞&lt;/strong>划分内存，即在空闲内存的分界点开始分配指定大小的内存空间；如果用CMS等给予Mark-Sweep算法的收集器时，使用&lt;strong>空闲列表&lt;/strong>划分内存，即JVM维护了一个记录可用内存的表，从改变中找一块足够大小的内存空间用于分配。&lt;/li>
+&lt;li>考虑到多线程同时创建对象的情况，会使用到前面说的TLAB，每个线程在自己的TLAB上分配内存，TLAB用完并重新分配新TLAB的时候才需要同步锁定。&lt;/li>
+&lt;li>申请内存后，进行初始化零值（可以在TLAB分配时进行）；&lt;/li>
+&lt;li>设置对象的对象头（Object Header）；&lt;/li>
+&lt;li>执行&amp;lt;init&amp;gt;方法。&lt;/li>
+&lt;/ol></description></item></channel></rss>

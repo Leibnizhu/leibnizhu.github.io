@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kylin on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Kylin/</link><description>Recent content in Kylin on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 27 Apr 2020 14:05:57 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Kylin/index.xml" rel="self" type="application/rss+xml"/><item><title>DBeaver接入Kylin数据源</title><link>https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/</link><pubDate>Mon, 27 Apr 2020 14:05:57 +0000</pubDate><guid>https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/</guid><description>&lt;img src="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/bg4.jpg" alt="Featured image of post DBeaver接入Kylin数据源" />&lt;p>DBeaver接入Kylin数据源现在网上好象没有靠谱的博客，写一篇吧。&lt;br>
+打开DBeaver：
+&lt;img src="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin1.png"
+width="580"
+height="248"
+srcset="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin1_hu7fd02b2cea30738dd3dc7ec1842dea5f_151626_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin1_hu7fd02b2cea30738dd3dc7ec1842dea5f_151626_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="233"
+data-flex-basis="561px"
+>
+新建：
+&lt;img src="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin2.png"
+width="1000"
+height="1410"
+srcset="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin2_hu5acabfd772d413b8f5f9989243c73062_180191_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin2_hu5acabfd772d413b8f5f9989243c73062_180191_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="70"
+data-flex-basis="170px"
+>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:left">属性&lt;/th>
+&lt;th style="text-align:left">填的值&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:left">驱动名称&lt;/td>
+&lt;td style="text-align:left">Apache Kylin 或随意&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">驱动类型&lt;/td>
+&lt;td style="text-align:left">默认&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">类名&lt;/td>
+&lt;td style="text-align:left">org.apache.kylin.jdbc.Driver&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">URL模板&lt;/td>
+&lt;td style="text-align:left">jdbc:kylin://{host}:{port}/{database}&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">默认端口&lt;/td>
+&lt;td style="text-align:left">7070&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">目录&lt;/td>
+&lt;td style="text-align:left">Hadoop 或随意&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">添加文件&lt;/td>
+&lt;td style="text-align:left">可以在maven仓库找 ~/.m2/repository/org/apache/kylin/kylin-jdbc/&amp;lt;版本号&amp;gt;/kylin-jdbc-&amp;lt;版本号&amp;gt;.jar&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">驱动类&lt;/td>
+&lt;td style="text-align:left">点击找到类，一般需要选择的就是列表中第一个，与类名一致&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>点高级参数（否则会使用catalog，然后导致查询失败）：&lt;br>
+&lt;img src="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin3.png"
+width="954"
+height="776"
+srcset="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin3_hu3a436a1a0b851b80840220a69b88635b_130035_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin3_hu3a436a1a0b851b80840220a69b88635b_130035_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="122"
+data-flex-basis="295px"
+>
+然后新建连接，搜索kylin，填入连接信息即可：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin4.png"
+width="572"
+height="272"
+srcset="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin4_hu7ba29632acf7486ee178aa5361bbdf7e_39120_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin4_hu7ba29632acf7486ee178aa5361bbdf7e_39120_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="210"
+data-flex-basis="504px"
+>&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin5.png"
+width="1374"
+height="1314"
+srcset="https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin5_hu422924992466c4eca264344a8be9ce59_162354_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/DBeaver%E6%8E%A5%E5%85%A5Kylin%E6%95%B0%E6%8D%AE%E6%BA%90/kylin5_hu422924992466c4eca264344a8be9ce59_162354_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="104"
+data-flex-basis="250px"
+>&lt;/p>
+&lt;p>目前只能看到table，看不到model和cube。&lt;/p></description></item></channel></rss>

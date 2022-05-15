@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VirtualBox on Heaven's Door</title><link>https://leibnizhu.github.io/tags/VirtualBox/</link><description>Recent content in VirtualBox on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 10 May 2017 12:54:24 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/VirtualBox/index.xml" rel="self" type="application/rss+xml"/><item><title>调整VirtualBox CentOS虚拟机磁盘大小</title><link>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</link><pubDate>Wed, 10 May 2017 12:54:24 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/vbox.png" alt="Featured image of post 调整VirtualBox CentOS虚拟机磁盘大小" />&lt;h1 id="背景">背景&lt;/h1>
+&lt;p>昨天发现本地HDP集群的HBase连不上了，解决了这个问题后，又发现HBase同步脚本一直执行失败，进YARN看了下，几天前开始堆积了很多ACCEPT了的任务，但没一个在执行，先用&lt;code>hadoop job kill &lt;/code>干掉了旧的任务，重新执行脚本，还是不行，日志上面却没报错。&lt;br>
+于是进Ambari一看，HDFS的DataNode全都满了……看来要扩容了。&lt;br>
+集群是部署在几台VirtualBox的CentOS虚拟机上的（起始我一直想转移到Docker上，但一直没时间+懒）。网上关于VirtualBox虚拟机磁盘扩容的文章很多，试了下，很多是行不通的，而且不太完整，于是把今天的经验记下来吧。&lt;/p>
+&lt;h1 id="具体步骤">具体步骤&lt;/h1>
+&lt;h2 id="磁盘映像扩容">磁盘映像扩容&lt;/h2>
+&lt;p>下面的命令以名为CentOS05的虚拟机为例进行。&lt;br>
+关闭虚拟机。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage controlvm CentOS05 poweroff
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>因为原来的磁盘是vmdk的不能直接扩展容量，需要先转换成vdi(这个步骤相当缓慢，视乎电脑配置和原磁盘映像大小，请耐心等待)：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>cd /path/to/虚拟机vmdk磁盘映像存储位置
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>vboxmanage clonehd CentOS05-disk1.vmdk CentOS05-disk1.vdi --format VDI
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再扩容，注意默认单位是MB：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage modifyhd CentOS05-disk1.vdi --resize &lt;span style="color:#f99b15">122880&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="修改虚拟机挂载磁盘">修改虚拟机挂载磁盘&lt;/h2>
+&lt;p>查看虚拟机原来配置&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage showvminfo CentOS05
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意类似以下的信息，包括名称（IDE），端口号，设备ID（如IDE(1,0)的端口号是1，设备号0），下面要用到：&lt;/p>
+&lt;blockquote>
+&lt;p>Storage Controller Name (0): IDE
+Storage Controller Type (0): PIIX4
+Storage Controller Instance Number (0): 0
+Storage Controller Max Port Count (0): 2
+Storage Controller Port Count (0): 2
+Storage Controller Bootable (0): on
+IDE (0, 0): /home/turing/VirtualBox VMs/CentOS03/CentOS03-disk1.vdmk (UUID: 2e2d32dc-e66b-42c2-8c9c-4cbb7abb6182)
+IDE (1, 0): Empty&lt;/p>
+&lt;/blockquote>
+&lt;p>修改虚拟机挂载的磁盘：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage storageattach CentOS05 --storagectl &lt;span style="color:#48b685">&amp;#39;IDE&amp;#39;&lt;/span> --port &lt;span style="color:#f99b15">0&lt;/span> --device &lt;span style="color:#f99b15">0&lt;/span> --type hdd --medium CentOS05-disk1.vdi
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>参数说明：&lt;/p>
+&lt;blockquote>
+&lt;p>storagectl：存储控制器的名称。必须。
+port：介质将被连接／断开／修改的端口号。必须。
+device：介质将被连接／断开／修改的设备号。必须。
+type：定义 介质将被连接／断开／修改的驱动器类型。
+medium：允许指定DVD／软盘驱动器是完全断开的（none）或仅是需要被连接的空的DVD／软盘驱动器（emptydrive）。如果指定了uuid，filename或host:&lt;!-- raw HTML omitted -->，将连接到存储控制器的指定端口和设备号。&lt;/p>
+&lt;/blockquote>
+&lt;p>再次查看配置确认修改成功：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage showvminfo CentOS05
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="修改centos分区配置">修改CentOS分区配置&lt;/h2>
+&lt;p>因为在系统启动后根目录的卸载之类的动作旧就不能执行了，所以只能在LiveCD里面改，建议使用gparted图形化工具修改分区大小，比较简单，此处不表。&lt;br>
+修改好启动虚拟机：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage startvm CentOS05 --type headless
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ssh CentOS05
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>查看分区情况：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>fdisk -l /dev/sda
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>Disk /dev/sda: 128.8 GB, 128849018880 bytes
+255 heads, 63 sectors/track, 15665 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000636d5
+Device Boot Start End Blocks Id System
+/dev/sda1 * 1 64 512000 83 Linux
+Partition 1 does not end on cylinder boundary.
+/dev/sda2 64 15666 125316096 8e Linux LVM&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>df -h
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>Filesystem Size Used Avail Use% Mounted on
+/dev/mapper/vg_centos03-lv_root
+50G 44G 3.1G 94% /
+tmpfs 1.9G 0 1.9G 0% /dev/shm
+/dev/sda1 477M 30M 422M 7% /boot
+/dev/mapper/vg_centos03-lv_home
+6.4G 82M 6.0G 2% /home&lt;/p>
+&lt;/blockquote>
+&lt;p>发现fdisk正确识别分区容量，但df还是旧容量。仔细观察df的输出，原来LVM管理的，需要执行修改逻辑卷的命令。先看情况：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>pvdisplay -v -m
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>Using physical volume(s) on command line.
+Wiping cache of LVM-capable devices
+Finding all volume groups.
+&amp;mdash; Physical volume &amp;mdash;
+PV Name /dev/sda2
+VG Name vg_centos03
+PV Size 119.51 GiB / not usable 2.00 MiB
+Allocatable yes
+PE Size 4.00 MiB
+Total PE 30594
+Free PE 15360
+Allocated PE 15234
+PV UUID Eq5aod-THPs-vdcM-T40A-fCQW-dqQ1-NERrdH
+&amp;mdash; Physical Segments &amp;mdash;
+Physical extent 0 to 12799:
+Logical volume /dev/vg_centos03/lv_root
+Logical extents 0 to 12799
+Physical extent 12800 to 14477:
+Logical volume /dev/vg_centos03/lv_home
+Logical extents 0 to 1677
+Physical extent 14478 to 15233:
+Logical volume /dev/vg_centos03/lv_swap
+Logical extents 0 to 755
+Physical extent 15234 to 30593:
+FREE&lt;/p>
+&lt;/blockquote>
+&lt;p>结合&lt;code>df -h&lt;/code>的输出，可知我们要改的是就是vg_centos03/lv_root逻辑卷，修改容量为110G：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>lvresize -L 110G -r vg_centos05/lv_root
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再次查看容量发现OK。&lt;br>
+进入Ambari，重启服务，也看到空间警告消除了。&lt;/p></description></item></channel></rss>

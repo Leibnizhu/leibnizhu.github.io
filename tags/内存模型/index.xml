@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>内存模型 on Heaven's Door</title><link>https://leibnizhu.github.io/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</link><description>Recent content in 内存模型 on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Jun 2017 12:55:14 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/index.xml" rel="self" type="application/rss+xml"/><item><title>《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化</title><link>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%94.%E7%BB%88%E7%AB%A0Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/%E4%BC%98%E5%8C%96/</link><pubDate>Tue, 20 Jun 2017 12:55:14 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%94.%E7%BB%88%E7%AB%A0Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/%E4%BC%98%E5%8C%96/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%94.%E7%BB%88%E7%AB%A0Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/%E4%BC%98%E5%8C%96/touhou_yuyuko.png" alt="Featured image of post 《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化" />&lt;p>&lt;strong>JVM笔记系列索引&lt;/strong>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%80JVM%e5%86%85%e5%ad%98%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%8c%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6/" >《深入理解Java虚拟机》 学习笔记(二)——垃圾回收&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
+&lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
+&lt;h2 id="java内存模型">Java内存模型&lt;/h2>
+&lt;p>JVM定义了一种Java内存模型以消除各种硬件和操作系统的内存访问差异，保证Java程序的跨平台性。&lt;/p>
+&lt;h3 id="主内存和工作内存">主内存和工作内存&lt;/h3>
+&lt;p>所有的变量存储在主内存，每个线程有自己的工作内存，保存了被这个线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都在对应工作内存进行。&lt;br>
+主内存和工作内存与第一篇的内存结构不是一个层面上的概念，主内存主要对应Java堆的对象实例数据，工作内存主要对应虚拟机栈的部分区域，而且工作内存可能优先存储与寄存器和高速缓存中。&lt;/p>
+&lt;h3 id="内存操作">内存操作&lt;/h3>
+&lt;p>Java内存模型规定了8种内存操作：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>lock&lt;/strong>锁定，将变量表示为某线程独占；&lt;/li>
+&lt;li>&lt;strong>unlock&lt;/strong>解锁，将变量的lock状态借出，执行后才能被其他线程lock；&lt;/li>
+&lt;li>&lt;strong>read&lt;/strong>读取，将变量的值从主内存中读取，准备load；&lt;/li>
+&lt;li>&lt;strong>load&lt;/strong>载入，必须先进行read，将read到的数据放入工作内存的变量副本；&lt;/li>
+&lt;li>&lt;strong>use&lt;/strong>使用，将工作内存的变量的值传递给执行引擎；&lt;/li>
+&lt;li>&lt;strong>assign&lt;/strong>赋值，接收执行引擎的值付给工作内存的变量；&lt;/li>
+&lt;li>&lt;strong>store&lt;/strong>存储，将变量的值从工作内存读取，准备write；&lt;/li>
+&lt;li>&lt;strong>write&lt;/strong>写入，必须先进行store，将store到的数据放入主内存对应变量。&lt;/li>
+&lt;/ol>
+&lt;p>此外规定了对应的一些规则，如read、load和store、write不能单独出现，assign后的变量必须同步回主内存，没有assign的变量不能同步回注内存等等。&lt;/p>
+&lt;h3 id="volatile变量">volatile变量&lt;/h3>
+&lt;p>volatile声明能保证变量对所有线程可见性，即一个线程修改了变量的值，其他线程立即得知新的值。但由于Java操作并非全是原子操作，所以volatile变量在并发下不能保证线程安全。例如++操作，对应字节码为4个指令，大致可分为读值/加一/写入等步骤，volatile关键值只能保证在取值放入操作栈顶的时候是最新的值，此后的操作之前可能其他线程已经修改了变量的值，就会导致线程安全问题。&lt;br>
+适合使用volatile的情况有：&lt;/p>
+&lt;ol>
+&lt;li>运算结果不依赖变量的当前值，或者只有单一线程修改变量的值；&lt;/li>
+&lt;li>变量不需要与其他状态变量共同参与不变约束。&lt;/li>
+&lt;/ol>
+&lt;p>volatile关键字还能禁止指令重排优化，普通变量只能保证依赖赋值结果的地方都获得正确结果，但不能保证赋值操作的顺序与代码一致。volatile关键字可以避免多线程情况下，代码执行顺序被重排导致的一些错误。&lt;br>
+volatile变量的读操作性能与普通变量基本无差别，写操作可能慢一些，总体开销比锁小。&lt;br>
+在Java内存模型层面上来看，volatile变量要求load操作和use操作必须连续一起出现，assign和store操作也必须连续一起出现，即每次使用volatile变量前必须从主内存刷新最新的值，每次修改volatile变量之后必须立刻同步到主内存。&lt;/p>
+&lt;h3 id="long和double变量">long和double变量&lt;/h3>
+&lt;p>没有被volatile修饰的64位数据（long和double）的读写操作划分位两次32位操作，不能保证其操作的原子性。但实际目前商用JVM基本都把64位数据的读写操作作为原子操作。&lt;/p>
+&lt;h2 id="java线程">Java线程&lt;/h2>
+&lt;h3 id="java线程实现">Java线程实现&lt;/h3>
+&lt;p>一般来说线程有3种实现方法：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>使用内核线程&lt;/strong>：使用操作系统内核的轻量级进程（LWP），每个轻量级进程与一个内核线程一一对应，一对一。缺点是代价较高，在内核态和用户态之间来回切换，并消耗内核资源，操作系统支持的轻量级进程数量有限；&lt;/li>
+&lt;li>&lt;strong>使用用户线程&lt;/strong>：用户线程建立在用户空间的线程库上，其建立、同步、销毁、调度完全在用户态完成，不需要内核帮助，一对多。因此快速且低消耗，支持更大的线程数量。缺点是实现复杂，很多问题需要考虑实现；&lt;/li>
+&lt;li>&lt;strong>用户线程+轻量级进程&lt;/strong>：以上两者的混合，多対多。&lt;/li>
+&lt;/ol>
+&lt;p>JDK1.2之前使用用户线程实现，JDK1.2开始替换为基于操作系统原生线程模型实现。对Sun JDK而言，Windows和Linux版都是一对一线程模型，一条Java线程映射到一条轻量级进程，Solaris中支持一对一和多対多。&lt;/p>
+&lt;h3 id="java线程调度">Java线程调度&lt;/h3>
+&lt;p>线程调度方式分为协同式和抢占式。协同式(Cooperative)指线程执行时间由线程自身控制，执行完完成后主动通知系统切换线程；抢占式(Preemptive)指由系统统一分配每个线程的执行时间，线程自身不能决定线程切换。Java使用抢占式。&lt;/p>
+&lt;h2 id="java线程安全">Java线程安全&lt;/h2>
+&lt;h3 id="线程安全等级">线程安全等级&lt;/h3>
+&lt;p>按由强至弱分为以下5种：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>不可变&lt;/strong>：基本数据类型加final修饰，对象则保证其行为不影响其状态。注意AtomicInteger和AtomicLong并非不可变，这样的设计应该是考虑到线程访问外部变量需要final，但有时候需要可变的数，于是有了这些类；&lt;/li>
+&lt;li>&lt;strong>绝对线程安全&lt;/strong>：不需要任何额外的同步措施，即可实现线程安全。Java API标注线程安全的类很多并不是绝对线程安全；&lt;/li>
+&lt;li>&lt;strong>相对线程安全&lt;/strong>：通常意义上的线程安全，指保证对象单独的操作是线程安全的，但不保证任何顺序连续调用都能保证线程安全/正确性；&lt;/li>
+&lt;li>&lt;strong>线程兼容&lt;/strong>：通常意义上的线程不安全，指对象本身并不线程安全，但可以通过同步手段保证在并发环境下安全、准确；&lt;/li>
+&lt;li>&lt;strong>相互层对立&lt;/strong>：无论是否采取同步手段，都无法在多线程环境下并发使用。极少出现，比如Thread类的suspend()和resume()方法，如果两个线程同时持有同一个线程对象，同时分别去中断及恢复线程，中断的是进行恢复操作的线程，那么就会产生死锁。&lt;/li>
+&lt;/ol>
+&lt;h3 id="线程安全实现方法">线程安全实现方法&lt;/h3>
+&lt;p>包括以下几种：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>互斥同步&lt;/strong>：保证共享数据同一时刻制备一个线程使用。Java最基本的互斥同步手段是sychronized关键字，编译后在同步块前后形成monitorenter和monitorexit两个字节码指令，需要一个reference类型参数来指定锁定/解锁的对象；执行monitorenter指令时，先尝试获取锁，如果锁对象没被锁定或者当前线程已经拥有这个锁，那么锁的计数器加一，并进入代码块，到monitorexit指令执行时则计数器减一，到计数器为0时释放锁。也就是说sychronized对同个线程而言是可重入的，不会自己把自己死锁。但阻塞或唤醒线程开销都比较大，需要切换用户态/内核态，因此sychronized是重量级操作。还可以使用ReentrantLock实现同步，相比sychronized，有等待可中断、公平锁、绑定多条件(Condition)等功能。JDK1.6之后sychronized与ReentrantLock性能基本持平。&lt;/li>
+&lt;li>&lt;strong>非阻塞同步&lt;/strong>：先进行操作，没有其他线程争用共享数据则操作成功，否则产生冲突，则采取补偿措施（比如不断重试），基于处理器的一些新指令实现，如Compare-and-Swap（比较并交换，CAS），用户程序不能直接调用，但AtomicInteger等类使用到了。&lt;/li>
+&lt;li>&lt;strong>无同步方案&lt;/strong>：如可重入代码（可以在代码执行的任何时刻中断，去执行别的代码，再返回继续执行而不出现错误），线程本地存储（Thread Local Storage）。&lt;/li>
+&lt;/ol>
+&lt;h2 id="java锁优化">Java锁优化&lt;/h2>
+&lt;p>JDK1.6开始引入了许多高效并发优化，实现了各种锁优化技术：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>自旋锁与自适应锁&lt;/strong>：自旋锁即多个线程请求锁，若持有锁的线程很快会释放锁的话，让其他线程在其他CPU内核执行忙循环（自旋），而不是来回切换挂起/恢复线程，减少开销。自适应锁就是自旋时间由前一次在同一个锁上自旋时间、以及锁的拥有者状态决定自旋时间的自旋锁。&lt;/li>
+&lt;li>&lt;strong>锁消除&lt;/strong>：根据逃逸分析结果，判定代码对应堆中数据都不会逃逸的话，可以认为是线程私有的数据，就可以不加同步锁，提高效率。&lt;/li>
+&lt;li>&lt;strong>锁粗化&lt;/strong>：如果一系列连续操作都对同一个对象反复加锁解锁，甚至是循环体内加锁，那么频繁进行互斥同步操作会导致不必要的性能损耗，可以将锁的范围扩大，即称为锁粗化。&lt;/li>
+&lt;li>&lt;strong>轻量级锁&lt;/strong>：在无竞争的情况下使用CAS操作消除同步的互斥量&lt;/li>
+&lt;li>&lt;strong>偏向锁&lt;/strong>：锁偏向第一个获取该锁的线程，如果执行过程中锁没有被其他线程获取，那么持有偏向锁的线程无需同步；如果有其他线程尝试获取该锁，那么结束偏向模式。&lt;/li>
+&lt;/ol></description></item></channel></rss>

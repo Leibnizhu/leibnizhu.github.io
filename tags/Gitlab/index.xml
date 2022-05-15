@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Gitlab on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Gitlab/</link><description>Recent content in Gitlab on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 26 Apr 2017 15:02:26 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Gitlab/index.xml" rel="self" type="application/rss+xml"/><item><title>Docker中Gitlab的持续集成安装与配置</title><link>https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/</link><pubDate>Wed, 26 Apr 2017 15:02:26 +0000</pubDate><guid>https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/docker-gitlab.png" alt="Featured image of post Docker中Gitlab的持续集成安装与配置" />&lt;h1 id="安装gitlab-ci-runner">安装Gitlab-CI-Runner&lt;/h1>
+&lt;h2 id="下载">下载&lt;/h2>
+&lt;p>根据&lt;a class="link" href="https://gitlab.com/gitlab-org/gitlab-ci-multi-runner" target="_blank" rel="noopener"
+>官方的说法&lt;/a>，Gitlab-CI-Runner9.0以后的版本需要GitLab9.0以上版本支持，我们目前部署的GitLab是8.x，所以需要下载旧版。&lt;br>
+最新版：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo wget -O /usr/local/bin/gitlab-runner https://gitlab-ci-multi-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-ci-multi-runner-linux-amd64
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>旧版（如v1.11.0）：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo wget -O /usr/local/bin/gitlab-runner https://gitlab-ci-multi-runner-downloads.s3.amazonaws.com/v1.11.0/binaries/gitlab-ci-multi-runner-linux-amd64
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="安装配置">安装配置&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo chmod +x /usr/local/bin/gitlab-runner
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo useradd --comment &lt;span style="color:#48b685">&amp;#39;GitLab Runner&amp;#39;&lt;/span> --create-home gitlab-runner --shell /bin/bash
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo gitlab-runner register
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>执行上面最后一句命令的时候，会要求输入网址和秘钥，此时打开Gitlab页面，进项目，右上角配置按钮-Runners，再按此时页面上给出的来填。&lt;br>
+还会要求输入名称和标签之类的信息，到最后会提示输入运行环境之类，我们Gitlab是在docker上，但Runner和Gitlab在同一个docker容器中的，就是在Gitlab调用的角度上来看，Runner并不是在docker中，所以运行环境那里选shell就行。&lt;/p>
+&lt;h2 id="运行">运行&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo gitlab-runner install --user&lt;span style="color:#5bc4bf">=&lt;/span>gitlab-runner --working-directory&lt;span style="color:#5bc4bf">=&lt;/span>/home/gitlab-runner
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo gitlab-runner start
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="配置项目的ci脚本">配置项目的CI脚本&lt;/h1>
+&lt;p>在项目根目录创建文件.gitlab-ci.yml，写入CI执行的脚本，具体参考&lt;a class="link" href="http://docs.gitlab.com/ce/ci/yaml/README.html" target="_blank" rel="noopener"
+>官方文档&lt;/a>&lt;br>
+此处以最简单的maven打包部署tomcat为例：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">stages&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#f99b15">deploy&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">deploy&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">stage&lt;/span>: &lt;span style="color:#f99b15">deploy&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">only&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#f99b15">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">script&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#f99b15">mvn clean&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#f99b15">mvn package&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> - &lt;span style="color:#f99b15">cp target/FissionSales.war /var/opt/gitlab/webapps/&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>此处限定了dev分支的提交才会触发CI任务，打包后复制到指定文件夹里。&lt;br>
+此外，我们将打包成功的war包复制到&lt;code>/var/opt/gitlab/webapps/&lt;/code>中，这样做是因为，Gitlab在docker中，而Tomcat在宿主机里，因为权限方面的问题，我只好让Gitlab的CI任务将war包放在docker的volume（已经配置了&lt;code>/var/opt/gitlab/&lt;/code>的volume）中，然后在宿主机中通过定时任务，检查war包的版本，检查到新版本时复制到宿主机的Tomcat中进行部署，具体的检查脚本如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#ef6155">a&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">`&lt;/span>sudo stat -c %Y /var/lib/docker/volumes/gitlab-data/_data/webapps/***.war&lt;span style="color:#48b685">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">b&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">`&lt;/span>date +%s&lt;span style="color:#48b685">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">b&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>$&lt;span style="color:#5bc4bf">[&lt;/span>b-a&lt;span style="color:#5bc4bf">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#ef6155">$b&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">[&lt;/span> &lt;span style="color:#ef6155">$b&lt;/span> -le &lt;span style="color:#f99b15">60&lt;/span> &lt;span style="color:#5bc4bf">]&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sudo cp /var/lib/docker/volumes/gitlab-data/_data/webapps/***.war /enviroment/apache-tomcat-8.0.33/webapps/
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> echo &lt;span style="color:#48b685">&amp;#34;No new war package...&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这个脚本通过crontab定时每分钟执行，所以检查war包的修改时间与当前时间相差小于60秒就会复制war包到tomcat的webapps中。&lt;/p>
+&lt;h1 id="配置pipeline邮件通知">配置Pipeline邮件通知&lt;/h1>
+&lt;p>Gitlab默认CI Pipeline任务成功失败都会发邮件通知，这样或许会困扰到大家，所以修改Gitlab的源码，只让部署不成功的时候才发邮件通知。&lt;br>
+进入docker，编辑&lt;code>/opt/gitlab/embedded/service/gitlab-rails/app/services/notification_service.rb&lt;/code>，在&lt;code>pipeline_finished&lt;/code>方法的开头添加&lt;code>return if pipeline.status == &amp;quot;success&amp;quot; &lt;/code>，如：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ruby" data-lang="ruby">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">pipeline_finished&lt;/span>(pipeline, recipients &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">nil&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#815ba4">if&lt;/span> pipeline&lt;span style="color:#5bc4bf">.&lt;/span>status &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#48b685">&amp;#34;success&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> email_template &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;pipeline_&lt;/span>&lt;span style="color:#f99b15">#{&lt;/span>pipeline&lt;span style="color:#5bc4bf">.&lt;/span>status&lt;span style="color:#f99b15">}&lt;/span>&lt;span style="color:#48b685">_email&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">…………………………&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

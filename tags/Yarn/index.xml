@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Yarn on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Yarn/</link><description>Recent content in Yarn on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 14 May 2022 20:33:58 +0000</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Yarn/index.xml" rel="self" type="application/rss+xml"/><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h1 id="背景">背景&lt;/h1>
+&lt;p>去年写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2021/12/04/%e8%b7%a8Yarn%e9%9b%86%e7%be%a4%e6%8f%90%e4%ba%a4spark%e4%bb%bb%e5%8a%a1/" >跨Yarn集群提交spark任务&lt;/a> ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 &lt;code>*-site.xml&lt;/code> 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 &lt;code>*-site.xml&lt;/code> 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。&lt;/p>
+&lt;p>简单回顾下，主要做了两件事情：&lt;/p>
+&lt;ol>
+&lt;li>创建SparkContext前，将外部集群的 &lt;code>*-site.xml&lt;/code> 放入classpath，如 &lt;code>$PWD&lt;/code> 。&lt;/li>
+&lt;li>创建SparkContext前，&lt;code>HADOOP_CONF_DIR&lt;/code> 和 &lt;code>YARN_CONF_DIR&lt;/code> 环境变量改为外部集群 &lt;code>*-site.xml&lt;/code> 配置文件所在位置；由于启动java程序后不能直接修改环境变量，在实现上使用了黑魔法。&lt;/li>
+&lt;/ol>
+&lt;p>时隔半年终于重拾博客，显然又被坑了，没错，之前的方法在Spark2.4里行不通了。&lt;/p>
+&lt;h1 id="问题原因分析及解决方案">问题、原因分析、及解决方案&lt;/h1>
+&lt;h2 id="spark24中的报错">Spark2.4中的报错&lt;/h2>
+&lt;p>在原来代码基础上，升级Spark为2.4.8，执行提交到外部集群的任务，提交到Yarn的AM报错如下：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Container id: container_e36_1650338235135_41710_02_000001
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Exit code: 1
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Container exited with a non-zero exit code 1. Error file: prelaunch.err.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Last 4096 bytes of prelaunch.err :
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Last 4096 bytes of stderr :
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Exception in thread &amp;#34;main&amp;#34; java.lang.IllegalArgumentException: java.net.UnknownHostException: channel
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.security.SecurityUtil.buildTokenService(SecurityUtil.java:374)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.hdfs.NameNodeProxies.createNonHAProxy(NameNodeProxies.java:312)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.hdfs.NameNodeProxies.createProxy(NameNodeProxies.java:178)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.hdfs.DFSClient.&amp;lt;init&amp;gt;(DFSClient.java:665)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.hdfs.DFSClient.&amp;lt;init&amp;gt;(DFSClient.java:601)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.hdfs.DistributedFileSystem.initialize(DistributedFileSystem.java:148)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2619)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:91)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2653)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2635)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:370)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster$$anonfun$8$$anonfun$apply$3.apply(ApplicationMaster.scala:219)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster$$anonfun$8$$anonfun$apply$3.apply(ApplicationMaster.scala:217)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at scala.Option.foreach(Option.scala:257)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster$$anonfun$8.apply(ApplicationMaster.scala:217)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster$$anonfun$8.apply(ApplicationMaster.scala:182)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:780)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at java.security.AccessController.doPrivileged(Native Method)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at javax.security.auth.Subject.doAs(Subject.java:422)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1628)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster.doAsUser(ApplicationMaster.scala:779)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster.&amp;lt;init&amp;gt;(ApplicationMaster.scala:182)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ApplicationMaster$.main(ApplicationMaster.scala:803)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ExecutorLauncher$.main(ApplicationMaster.scala:834)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.apache.spark.deploy.yarn.ExecutorLauncher.main(ApplicationMaster.scala)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Caused by: java.net.UnknownHostException: xxx
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ... 25 more
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中 &lt;code>xxx&lt;/code> 是外部集群的集群名（&lt;code>dfs.nameservices&lt;/code> 配置）。&lt;/p>
+&lt;h2 id="直接原因分析">直接原因分析&lt;/h2>
+&lt;p>仔细观察异常的调用栈，调用到了 &lt;code>NameNodeProxies.createNonHAProxy&lt;/code> ，而我们的集群是HA的，显然是读取到的配置不对了。&lt;/p>
+&lt;p>看到这个类，阅读过hadoop源码的应该都知道，这是创建 &lt;code>DFSClient&lt;/code> 的时候，会先读取 &lt;code>dfs.client.failover.proxy.provider.{hdfs路径对应host}&lt;/code> 配置（取值是一个 &lt;code>FailoverProxyProvider&lt;/code> 具体实现的全限定类名），反射出Class对象并实例化，然后创建对应的HAProxy；而如果配置为空，则认为NameNode没有开启HA，直接将hdfs路径当作普通host来进行读取，如果实际上这个host是一个HA的nameservices名，不存在这个host，则会报上面的错误。&lt;/p>
+&lt;p>所以可以确定，是AM读取不到正确的hdfs配置导致的。那么是为什么呢？&lt;/p>
+&lt;p>仔细观察AM的日志，&lt;code>launch_container.sh&lt;/code> 里面：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#………………&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">HADOOP_YARN_HOME&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#f99b15">${&lt;/span>&lt;span style="color:#ef6155">HADOOP_YARN_HOME&lt;/span>&lt;span style="color:#815ba4">:-&lt;/span>&lt;span style="color:#48b685">&amp;#34;/usr/hdp/2.6.5.0-292/hadoop-yarn&amp;#34;&lt;/span>&lt;span style="color:#f99b15">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">CLASSPATH&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_conf__:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_libs__/*:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_conf__/__hadoop_conf__&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">SPARK_CONF_DIR&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;/opt/package/spark-2.4.8-bin-hadoop2.6/conf&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#………………&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>同时注意到 directory.info 记录的目录结构：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ls -l:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>total &lt;span style="color:#f99b15">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>-rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">71&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 container_tokens
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>-rwx------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">712&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 default_container_executor_session.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>-rwx------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">766&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 default_container_executor.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>-rwx------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">5787&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 launch_container.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>lrwxrwxrwx &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">80&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 __spark_conf__ -&amp;gt; /path/to/filecache/29549/__spark_conf__.zip
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>drwxr-xr-x &lt;span style="color:#f99b15">2&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 __spark_libs__
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>drwx--x--- &lt;span style="color:#f99b15">2&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 tmp
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>find -L . -maxdepth &lt;span style="color:#f99b15">5&lt;/span> -ls:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734730&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwx--x--- &lt;span style="color:#f99b15">4&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 .
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734738&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rwx------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">766&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./default_container_executor.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734734&lt;/span> &lt;span style="color:#f99b15">8&lt;/span> -rwx------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">5787&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./launch_container.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734733&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">12&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./.container_tokens.crc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734741&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwxr-xr-x &lt;span style="color:#f99b15">2&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_libs__
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105382561&lt;/span> &lt;span style="color:#f99b15">555832&lt;/span> -r-xr-xr-x &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">569170427&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_libs__/mySparkApp.jar
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734731&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwx--x--- &lt;span style="color:#f99b15">2&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./tmp
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734735&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">56&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./.launch_container.sh.crc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734739&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">16&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./.default_container_executor.sh.crc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734732&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">71&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./container_tokens
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734736&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rwx------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">712&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./default_container_executor_session.sh
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">204734737&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">16&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./.default_container_executor_session.sh.crc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120101&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwx------ &lt;span style="color:#f99b15">3&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120108&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">3063&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__spark_conf__.properties
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120107&lt;/span> &lt;span style="color:#f99b15">120&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">120306&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__spark_hadoop_conf__.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120102&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwx------ &lt;span style="color:#f99b15">2&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120103&lt;/span> &lt;span style="color:#f99b15">20&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">19814&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__/yarn-site.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120104&lt;/span> &lt;span style="color:#f99b15">8&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4282&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__/core-site.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120106&lt;/span> &lt;span style="color:#f99b15">20&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">19567&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__/hive-site.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120105&lt;/span> &lt;span style="color:#f99b15">12&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">8312&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__/hdfs-site.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>broken symlinks&lt;span style="color:#5bc4bf">(&lt;/span>find -L . -maxdepth &lt;span style="color:#f99b15">5&lt;/span> -type l -ls&lt;span style="color:#5bc4bf">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>./__spark_conf__/__hadoop_conf__/&lt;/code> 里面是外部集群配置文件，而 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 是spark应用的jar，里面已经有原集群的配置文件。按 &lt;code>CLASSPATH&lt;/code> 定义的顺序，&lt;code>Configuration&lt;/code> 读取默认资源 &lt;code>core-site.xml&lt;/code> 、 &lt;code>hdfs-site.xml&lt;/code> （由&lt;code>HdfsConfiguration&lt;/code>静态代码块加入）的时候，优先从 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 读取了，而真正要用的外部集群配置，由于在 &lt;code>CLASSPATH&lt;/code> 中位置较后，不会被加载到。&lt;/p>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;p>知道问题的原因后，根据 &lt;code>CLASSPATH&lt;/code> 定义的顺序：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>$PWD&lt;/code> 里面的文件无法控制，跳过&lt;/li>
+&lt;li>&lt;code>$PWD/__spark_conf__&lt;/code> 目录里面是Driver的SparkConf内容 &lt;code>__spark_conf__.properties&lt;/code> ，及所有hadoop相关配置整合到一起的的 &lt;code>__spark_hadoop_conf__.xml&lt;/code> ，也是无法控制的。注意这个 &lt;code>__spark_hadoop_conf__.xml&lt;/code> 里面虽然已经由Driver打入了外部集群的配置，但由于文件名不是 &lt;code>hdfs-site.xml&lt;/code> ，不会被 &lt;code>Configuration&lt;/code> 加载的。&lt;/li>
+&lt;li>&lt;code>$PWD/__spark_libs__/*&lt;/code> 这里面就是我们的jar包，目前里面有原集群的配置文件，这其实也违反了 &lt;a class="link" href="https://12factor.net/config" target="_blank" rel="noopener"
+>12-Factor 的 Config&lt;/a> 。&lt;/li>
+&lt;li>中间两个忽略&lt;/li>
+&lt;li>&lt;code>$PWD/__spark_conf__/__hadoop_conf__&lt;/code> 就是外部集群配置文件所在&lt;/li>
+&lt;/ul>
+&lt;p>那么解决方案也很简单了：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>spark应用jar包里不要放任何 `*-site.xml` 配置文件
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>考虑到我们的Spark应用是用maven的shade插件打包的，可以配置为跳过这些xml即可：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.apache.maven.plugins&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>maven-shade-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;phase&amp;gt;&lt;/span>package&lt;span style="color:#5bc4bf">&amp;lt;/phase&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;goal&amp;gt;&lt;/span>shade&lt;span style="color:#5bc4bf">&amp;lt;/goal&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/goals&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;filters&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;filter&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifact&amp;gt;&lt;/span>*:*&lt;span style="color:#5bc4bf">&amp;lt;/artifact&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;excludes&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;exclude&amp;gt;&lt;/span>yarn-site.xml&lt;span style="color:#5bc4bf">&amp;lt;/exclude&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;exclude&amp;gt;&lt;/span>hdfs-site.xml&lt;span style="color:#5bc4bf">&amp;lt;/exclude&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;exclude&amp;gt;&lt;/span>core-site.xml&lt;span style="color:#5bc4bf">&amp;lt;/exclude&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;exclude&amp;gt;&lt;/span>hbase-site.xml&lt;span style="color:#5bc4bf">&amp;lt;/exclude&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;exclude&amp;gt;&lt;/span>hive-site.xml&lt;span style="color:#5bc4bf">&amp;lt;/exclude&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;exclude&amp;gt;&lt;/span>kms-site.xml&lt;span style="color:#5bc4bf">&amp;lt;/exclude&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;exclude&amp;gt;&lt;/span>mapred-site.xml&lt;span style="color:#5bc4bf">&amp;lt;/exclude&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/excludes&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/filter&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/filters&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/execution&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>重新打包、运行任务，顺利执行。&lt;/p>
+&lt;h1 id="spark22-与-spark24-yarn-client-模式提交任务差异">Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异&lt;/h1>
+&lt;h2 id="am的classpath目录结构差异">AM的classpath、目录结构差异&lt;/h2>
+&lt;p>问题解决了，那么为什么Spark2.2升级Spark2.4之后就有这样的问题呢？从上面的分析，不难猜测到是AM的 &lt;code>CLASSPATH&lt;/code> 变了。随便找一个Spark2.2提交的任务也可以看到：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">### launch_container.sh&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">CLASSPATH&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_conf__:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_libs__/*:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 对比 Spark2.4的：&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#export CLASSPATH=&amp;#34;$PWD:$PWD/__spark_conf__:$PWD/__spark_libs__/*:$HADOOP_CONF_DIR:$HADOOP_CONF_DIR:$PWD/__spark_conf__/__hadoop_conf__&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">### directory.info&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>find -L . -maxdepth &lt;span style="color:#f99b15">5&lt;/span> -ls:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">6554176&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwx--x--- &lt;span style="color:#f99b15">4&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 .
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">6554177&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">69&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./container_tokens
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">6554182&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">16&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./.default_container_executor_session.sh.crc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">6816116&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwxr-xr-x &lt;span style="color:#f99b15">2&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./__spark_libs__
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">32768042&lt;/span> &lt;span style="color:#f99b15">559764&lt;/span> -r-xr-xr-x &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">573191196&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 10:44 ./__spark_libs__/titanServEtl.jar
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">6554180&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">52&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./.launch_container.sh.crc
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">31457924&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwx------ &lt;span style="color:#f99b15">2&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./__spark_conf__
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">31457928&lt;/span> &lt;span style="color:#f99b15">20&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">19371&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./__spark_conf__/hive-site.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">31457926&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">3064&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./__spark_conf__/core-site.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">31457925&lt;/span> &lt;span style="color:#f99b15">20&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">17378&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./__spark_conf__/yarn-site.xml
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">31457929&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">2473&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./__spark_conf__/__spark_conf__.properties
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">31457927&lt;/span> &lt;span style="color:#f99b15">8&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">8009&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./__spark_conf__/hdfs-site.xml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到，Spark2.4对比Spark2.2:&lt;/p>
+&lt;ul>
+&lt;li>AM 执行任务的目录：
+&lt;ul>
+&lt;li>将 &lt;code>*-site.xml&lt;/code> 配置文件独立放入了 &lt;code>./__spark_conf__/__hadoop_conf__&lt;/code> 目录，而非原来的 &lt;code>./__spark_conf__/&lt;/code> 目录&lt;/li>
+&lt;li>多了一个 &lt;code>./__spark_conf__/__spark_hadoop_conf__.xml&lt;/code> 文件，存放了所有hadoop相关配置&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>CLASSPATH 环境变量里将存放 &lt;code>*-site.xml&lt;/code> 配置文件的 &lt;code>$PWD/__spark_conf__/__hadoop_conf__&lt;/code> 目录放到了最后面。&lt;/li>
+&lt;/ul>
+&lt;p>以上两个原因共同导致了本文的错误发生。&lt;/p>
+&lt;p>附目录对比截图：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/spark_dir.png"
+width="1690"
+height="712"
+srcset="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/spark_dir_hu6d2902441b2adecf343dfaca58876801_229119_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/spark_dir_hu6d2902441b2adecf343dfaca58876801_229119_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="237"
+data-flex-basis="569px"
+>&lt;/p>
+&lt;h2 id="spark源码里的体现">Spark源码里的体现&lt;/h2>
+&lt;p>上篇博客里提到Spark的yarn-client模式是通过 &lt;code>YarnClientSchedulerBackend&lt;/code> 处理的。&lt;br>
+其 &lt;code>start()&lt;/code> 方法会调用 &lt;code>org.apache.spark.deploy.yarn.Client&lt;/code> 的 &lt;code>submitApplication()&lt;/code> 方法提交Yarn AM。&lt;br>
+&lt;code>submitApplication()&lt;/code> 调用 &lt;code>createContainerLaunchContext&lt;/code> 构造ContainerLaunchContext对应的上下文，构建的启动Yarn AM的任务命令cmds，里面比较重要的有两步:&lt;/p>
+&lt;ol>
+&lt;li>调用 &lt;code>setupLaunchEnv()&lt;/code> 构造环境变量，其中我们关心的 &lt;code>CLASSPATH&lt;/code> 是在 &lt;code>populateClasspath()&lt;/code> 方法里处理的；&lt;/li>
+&lt;li>调用 &lt;code>prepareLocalResources()&lt;/code> 准备Yarn AM需要的一些资源，包括调用 &lt;code>createConfArchive()&lt;/code> 创建 &lt;code>__spark_conf__.zip&lt;/code> ，里面解压出来就是上面所讨论的AM 目录结构里面的 &lt;code>./__spark_conf__/&lt;/code> 目录&lt;/li>
+&lt;/ol>
+&lt;h3 id="populateclasspath">populateClasspath()&lt;/h3>
+&lt;p>对比两个版本的 &lt;code>populateClasspath()&lt;/code> 方法，注意差异在最后：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/populateClasspath.png"
+width="3624"
+height="2248"
+srcset="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/populateClasspath_hu8dc1913df6b01084e2ef7ab5c80946cd_360458_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/populateClasspath_hu8dc1913df6b01084e2ef7ab5c80946cd_360458_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="161"
+data-flex-basis="386px"
+>&lt;/p>
+&lt;p>参考注释：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// Add the localized Hadoop config at the end of the classpath, in case it contains other
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// files (such as configuration files for different services) that are not part of the
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// YARN cluster&amp;#39;s config.
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是为了防止将其他非Yarn集群配置的文件也引入了。&lt;/p>
+&lt;h3 id="createconfarchive">createConfArchive()&lt;/h3>
+&lt;p>这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。&lt;/p>
+&lt;p>&lt;a class="link" href="https://issues.apache.org/jira/browse/SPARK-23630" target="_blank" rel="noopener"
+>SPARK-23630&lt;/a> 增加了一个用于测试的环境变量 &lt;code>SPARK_TEST_HADOOP_CONF_DIR&lt;/code> ，该环境变量指定的目录里面的配置文件也会被打进去 &lt;code>__spark_conf__.zip&lt;/code> 。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// SPARK-23630: during testing, Spark scripts filter out hadoop conf dirs so that user&amp;#39;s
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// environments do not interfere with tests. This allows a special env variable during
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// tests so that custom conf dirs can be used by unit tests.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> confDirs &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">Seq&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;HADOOP_CONF_DIR&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;YARN_CONF_DIR&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">++&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">Utils&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>isTesting&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#fec418">Seq&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;SPARK_TEST_HADOOP_CONF_DIR&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#815ba4">else&lt;/span> &lt;span style="color:#fec418">Nil&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hadoop配置文件独立出来，放在 &lt;code>__hadoop_conf__&lt;/code> 目录。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// Save the Hadoop config files under a separate directory in the archive. This directory
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// is appended to the classpath so that the cluster-provided configuration takes precedence.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>putNextEntry&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ZipEntry&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">s&amp;#34;&lt;/span>&lt;span style="color:#f99b15">$LOCALIZED_HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">/&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>closeEntry&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hadoopConfFiles&lt;span style="color:#5bc4bf">.&lt;/span>foreach &lt;span style="color:#5bc4bf">{&lt;/span> &lt;span style="color:#815ba4">case&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>name&lt;span style="color:#5bc4bf">,&lt;/span> file&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#815ba4">=&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>file&lt;span style="color:#5bc4bf">.&lt;/span>canRead&lt;span style="color:#5bc4bf">())&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> confStream&lt;span style="color:#5bc4bf">.&lt;/span>putNextEntry&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ZipEntry&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">s&amp;#34;&lt;/span>&lt;span style="color:#f99b15">$LOCALIZED_HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">/&lt;/span>&lt;span style="color:#f99b15">$name&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">Files&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>copy&lt;span style="color:#5bc4bf">(&lt;/span>file&lt;span style="color:#5bc4bf">,&lt;/span> confStream&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> confStream&lt;span style="color:#5bc4bf">.&lt;/span>closeEntry&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>增加了一个 &lt;code>__spark_hadoop_conf__.xml&lt;/code> 存放所有hadoop配置。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//Client 里面的代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> hadoopConf &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">YarnConfiguration&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">SparkHadoopUtil&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>newConfiguration&lt;span style="color:#5bc4bf">(&lt;/span>sparkConf&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//createConfArchive() 里面的代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// Save the YARN configuration into a separate file that will be overlayed on top of the
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// cluster&amp;#39;s Hadoop conf.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>putNextEntry&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ZipEntry&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">SparkHadoopUtil&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#fec418">SPARK_HADOOP_CONF_FILE&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hadoopConf&lt;span style="color:#5bc4bf">.&lt;/span>writeXml&lt;span style="color:#5bc4bf">(&lt;/span>confStream&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>closeEntry&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>跨Yarn集群提交spark任务</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</link><pubDate>Sat, 04 Dec 2021 18:17:55 +0000</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/93990522.jpg" alt="Featured image of post 跨Yarn集群提交spark任务" />&lt;h1 id="背景">背景&lt;/h1>
+&lt;p>之前写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2020/05/06/%e5%8a%a8%e6%80%81%e5%8a%a0%e8%bd%bdhive%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e7%9a%84%e6%96%b9%e6%a1%88/" >Spark动态加载hive配置的方案&lt;/a> ，当时是为了spark应用的fat-jar里面已经有Hadoop相关xml配置文件的情况下，将数据输出到不是该配置的Hadoop集群的方案。&lt;br>
+现在这个需求有点类似，没有走spark-submit提交任务，而是在spark应用里面通过创建&lt;code>SparkContext&lt;/code>的形式提交任务，而spark应用的fat-jar里面已经有Hadoop相关xml配置文件，在此情况下，想将Spakr任务提交到外部的Yarn集群（不是fat-jar里面配置文件对应的yarn集群）。&lt;/p>
+&lt;h1 id="思考一个问题">思考一个问题&lt;/h1>
+&lt;p>先思考一个问题，如果Spark应用的fat-jar里面有外部Yarn集群对应的配置文件(&lt;code>core-site.xml&lt;/code>，&lt;code>hdfs-site.xml&lt;/code>，&lt;code>yarn-site.xml&lt;/code>等)，此时Spark应用代码里面创建&lt;code>SparkContext&lt;/code>，是不是就一定能提交到那个集群里？&lt;br>
+可以做个实验，但实验不一定会cover到所有情况。&lt;br>
+直接给结论吧，不一定能提交过去，但自己做实验的话很可能还是能直接提交过去的，还是直接看代码吧（以&lt;code>yarn-client&lt;/code>模式为例）。&lt;/p>
+&lt;h2 id="spark-yarn-client-默认提交任务简析">Spark Yarn-client 默认提交任务简析&lt;/h2>
+&lt;p>通过代码创建&lt;code>SparkContext&lt;/code>后，其动态代码块会根据启动模式创建&lt;code>SchedulerBackend&lt;/code>和&lt;code>TaskScheduler&lt;/code>并启动：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// org.apache.spark.SparkContext #501
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// Create and start the scheduler
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>sched&lt;span style="color:#5bc4bf">,&lt;/span> ts&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">SparkContext&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>createTaskScheduler&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">this&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> master&lt;span style="color:#5bc4bf">,&lt;/span> deployMode&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">_schedulerBackend&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> sched
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">_taskScheduler&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> ts
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">_dagScheduler&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">DAGScheduler&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">this&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// start TaskScheduler after taskScheduler sets DAGScheduler reference in DAGScheduler&amp;#39;s
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// constructor
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#fec418">_taskScheduler&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>start&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中 &lt;code>TaskScheduler&lt;/code> 是通过 &lt;code>org.apache.spark.scheduler.cluster.YarnClusterManager#createTaskScheduler&lt;/code> 创建的，对应 yarn-client 创建的是&lt;code>YarnScheduler&lt;/code>（继承了&lt;code>TaskSchedulerImpl&lt;/code>），start()方法调用到&lt;code>SchedulerBackend&lt;/code>的&lt;code>start&lt;/code>方法，后者就会创建yarn模式下的Client客户端（&lt;code>org.apache.spark.deploy.yarn.Client&lt;/code>，不是yarn自己那个client），并调用其&lt;code>submitApplication&lt;/code>方法提交任务到Yarn：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//org.apache.spark.scheduler.cluster.YarnClientSchedulerBackend#start
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">override&lt;/span> &lt;span style="color:#815ba4">def&lt;/span> start&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> driverHost &lt;span style="color:#815ba4">=&lt;/span> conf&lt;span style="color:#5bc4bf">.&lt;/span>get&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;spark.driver.host&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> driverPort &lt;span style="color:#815ba4">=&lt;/span> conf&lt;span style="color:#5bc4bf">.&lt;/span>get&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;spark.driver.port&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> hostport &lt;span style="color:#815ba4">=&lt;/span> driverHost &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#48b685">&amp;#34;:&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> driverPort
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sc&lt;span style="color:#5bc4bf">.&lt;/span>ui&lt;span style="color:#5bc4bf">.&lt;/span>foreach &lt;span style="color:#5bc4bf">{&lt;/span> ui &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> conf&lt;span style="color:#5bc4bf">.&lt;/span>set&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;spark.driver.appUIAddress&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> ui&lt;span style="color:#5bc4bf">.&lt;/span>webUrl&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> argsArrayBuf &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ArrayBuffer&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">String&lt;/span>&lt;span style="color:#5bc4bf">]()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> argsArrayBuf &lt;span style="color:#5bc4bf">+=&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;--arg&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> hostport&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> logDebug&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;ClientArguments called with: &amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> argsArrayBuf&lt;span style="color:#5bc4bf">.&lt;/span>mkString&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34; &amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> args &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ClientArguments&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>argsArrayBuf&lt;span style="color:#5bc4bf">.&lt;/span>toArray&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> totalExpectedExecutors &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">YarnSparkHadoopUtil&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>getInitialTargetExecutorNumber&lt;span style="color:#5bc4bf">(&lt;/span>conf&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> client &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">Client&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>args&lt;span style="color:#5bc4bf">,&lt;/span> conf&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> bindToYarn&lt;span style="color:#5bc4bf">(&lt;/span>client&lt;span style="color:#5bc4bf">.&lt;/span>submitApplication&lt;span style="color:#5bc4bf">(),&lt;/span> &lt;span style="color:#fec418">None&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//………………
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>初始化&lt;code>Client&lt;/code>的时候，会创建YarnConfiguration，此时就会读取到Configuration里面配置的默认资源，包括&lt;code>yarn-site.xml&lt;/code>等；如果fatjar里面放的是外部集群的配置文件，那么对应的&lt;code>YarnClient&lt;/code>就可以连接到外部Yarn集群。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//org.apache.spark.deploy.yarn.Client
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">private&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">spark&lt;/span>&lt;span style="color:#5bc4bf">]&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">Client&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> args&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">ClientArguments&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> hadoopConf&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Configuration&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> sparkConf&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">SparkConf&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">extends&lt;/span> &lt;span style="color:#fec418">Logging&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//………………
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> yarnClient &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">YarnClient&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>createYarnClient
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> yarnConf &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">YarnConfiguration&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>hadoopConf&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>接着刚才说到&lt;code>SchedulerBackend&lt;/code>调用&lt;code>Client&lt;/code>的&lt;code>submitApplication&lt;/code>方法:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//org.apache.spark.deploy.yarn.Client#submitApplication
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">def&lt;/span> submitApplication&lt;span style="color:#5bc4bf">()&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">ApplicationId&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">var&lt;/span> appId&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">ApplicationId&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> launcherBackend&lt;span style="color:#5bc4bf">.&lt;/span>connect&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// Setup the credentials before doing anything else,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// so we have don&amp;#39;t have issues at any point.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> setupCredentials&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> yarnClient&lt;span style="color:#5bc4bf">.&lt;/span>init&lt;span style="color:#5bc4bf">(&lt;/span>yarnConf&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> yarnClient&lt;span style="color:#5bc4bf">.&lt;/span>start&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> logInfo&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Requesting a new application from cluster with %d NodeManagers&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">.&lt;/span>format&lt;span style="color:#5bc4bf">(&lt;/span>yarnClient&lt;span style="color:#5bc4bf">.&lt;/span>getYarnClusterMetrics&lt;span style="color:#5bc4bf">.&lt;/span>getNumNodeManagers&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// Get a new application from our RM
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">//新建一个Application
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> newApp &lt;span style="color:#815ba4">=&lt;/span> yarnClient&lt;span style="color:#5bc4bf">.&lt;/span>createApplication&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> newAppResponse &lt;span style="color:#815ba4">=&lt;/span> newApp&lt;span style="color:#5bc4bf">.&lt;/span>getNewApplicationResponse&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> appId &lt;span style="color:#815ba4">=&lt;/span> newAppResponse&lt;span style="color:#5bc4bf">.&lt;/span>getApplicationId&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">CallerContext&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;CLIENT&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> sparkConf&lt;span style="color:#5bc4bf">.&lt;/span>get&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">APP_CALLER_CONTEXT&lt;/span>&lt;span style="color:#5bc4bf">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">Option&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>appId&lt;span style="color:#5bc4bf">.&lt;/span>toString&lt;span style="color:#5bc4bf">)).&lt;/span>setCurrentContext&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// Verify whether the cluster has enough resources for our AM
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> verifyClusterResources&lt;span style="color:#5bc4bf">(&lt;/span>newAppResponse&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// Set up the appropriate contexts to launch our AM
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">//创建environment, java options以及启动AM的命令
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> containerContext &lt;span style="color:#815ba4">=&lt;/span> createContainerLaunchContext&lt;span style="color:#5bc4bf">(&lt;/span>newAppResponse&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//创建提交AM的Context，包括名字、队列、类型、内存、CPU及参数
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> appContext &lt;span style="color:#815ba4">=&lt;/span> createApplicationSubmissionContext&lt;span style="color:#5bc4bf">(&lt;/span>newApp&lt;span style="color:#5bc4bf">,&lt;/span> containerContext&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// Finally, submit and monitor the application
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> logInfo&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">s&amp;#34;Submitting application &lt;/span>&lt;span style="color:#f99b15">$appId&lt;/span>&lt;span style="color:#48b685"> to ResourceManager&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//向Yarn提交Application
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> yarnClient&lt;span style="color:#5bc4bf">.&lt;/span>submitApplication&lt;span style="color:#5bc4bf">(&lt;/span>appContext&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> launcherBackend&lt;span style="color:#5bc4bf">.&lt;/span>setAppId&lt;span style="color:#5bc4bf">(&lt;/span>appId&lt;span style="color:#5bc4bf">.&lt;/span>toString&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> reportLauncherState&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">SparkAppHandle&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#fec418">State&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#fec418">SUBMITTED&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> appId
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#815ba4">catch&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">case&lt;/span> e&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Throwable&lt;/span> &lt;span style="color:#5bc4bf">=&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>appId &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cleanupStagingDir&lt;span style="color:#5bc4bf">(&lt;/span>appId&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">throw&lt;/span> e
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中 createContainerLaunchContext 会创建environment, java options以及启动AM的命令等，也会收集本地资源（&lt;code>prepareLocalResources&lt;/code>方法），其中包括&lt;code>__spark_conf__.zip&lt;/code>，在&lt;code>createConfArchive&lt;/code>方法中处理，压缩了本地的一些配置文件：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">def&lt;/span> createConfArchive&lt;span style="color:#5bc4bf">()&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">File&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> hadoopConfFiles &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">HashMap&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">String&lt;/span>, &lt;span style="color:#fec418">File&lt;/span>&lt;span style="color:#5bc4bf">]()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// Uploading $SPARK_CONF_DIR/log4j.properties file to the distributed cache to make sure that
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// the executors will use the latest configurations instead of the default values. This is
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// required when user changes log4j.properties directly to set the log configurations. If
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// configuration file is provided through --files then executors will be taking configurations
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// from --files instead of $SPARK_CONF_DIR/log4j.properties.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// Also uploading metrics.properties to distributed cache if exists in classpath.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// If user specify this file using --files then executors will use the one
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// from --files instead.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">for&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span> prop &lt;span style="color:#815ba4">&amp;lt;-&lt;/span> &lt;span style="color:#fec418">Seq&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;log4j.properties&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;metrics.properties&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> url &lt;span style="color:#815ba4">&amp;lt;-&lt;/span> &lt;span style="color:#fec418">Option&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">Utils&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>getContextOrSparkClassLoader&lt;span style="color:#5bc4bf">.&lt;/span>getResource&lt;span style="color:#5bc4bf">(&lt;/span>prop&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> url&lt;span style="color:#5bc4bf">.&lt;/span>getProtocol &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#48b685">&amp;#34;file&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> hadoopConfFiles&lt;span style="color:#5bc4bf">(&lt;/span>prop&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">File&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>url&lt;span style="color:#5bc4bf">.&lt;/span>getPath&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">Seq&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;HADOOP_CONF_DIR&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;YARN_CONF_DIR&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">).&lt;/span>foreach &lt;span style="color:#5bc4bf">{&lt;/span> envKey &lt;span style="color:#815ba4">=&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sys&lt;span style="color:#5bc4bf">.&lt;/span>env&lt;span style="color:#5bc4bf">.&lt;/span>get&lt;span style="color:#5bc4bf">(&lt;/span>envKey&lt;span style="color:#5bc4bf">).&lt;/span>foreach &lt;span style="color:#5bc4bf">{&lt;/span> path &lt;span style="color:#815ba4">=&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> dir &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">File&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>path&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>dir&lt;span style="color:#5bc4bf">.&lt;/span>isDirectory&lt;span style="color:#5bc4bf">())&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> files &lt;span style="color:#815ba4">=&lt;/span> dir&lt;span style="color:#5bc4bf">.&lt;/span>listFiles&lt;span style="color:#5bc4bf">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>files &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> logWarning&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Failed to list files under directory &amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> dir&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#815ba4">else&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> files&lt;span style="color:#5bc4bf">.&lt;/span>foreach &lt;span style="color:#5bc4bf">{&lt;/span> file &lt;span style="color:#815ba4">=&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>file&lt;span style="color:#5bc4bf">.&lt;/span>isFile &lt;span style="color:#5bc4bf">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#5bc4bf">!&lt;/span>hadoopConfFiles&lt;span style="color:#5bc4bf">.&lt;/span>contains&lt;span style="color:#5bc4bf">(&lt;/span>file&lt;span style="color:#5bc4bf">.&lt;/span>getName&lt;span style="color:#5bc4bf">()))&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> hadoopConfFiles&lt;span style="color:#5bc4bf">(&lt;/span>file&lt;span style="color:#5bc4bf">.&lt;/span>getName&lt;span style="color:#5bc4bf">())&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> file
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> confArchive &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">File&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>createTempFile&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">LOCALIZED_CONF_DIR&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;.zip&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">File&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">Utils&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>getLocalDir&lt;span style="color:#5bc4bf">(&lt;/span>sparkConf&lt;span style="color:#5bc4bf">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> confStream &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ZipOutputStream&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">FileOutputStream&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>confArchive&lt;span style="color:#5bc4bf">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//后面就是把这些文件写入到zip包的代码，略
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到，除了本地的&lt;code>log4j.properties&lt;/code>和&lt;code>metrics.properties&lt;/code>配置文件以外，还会读取&lt;code>HADOOP_CONF_DIR&lt;/code>和&lt;code>YARN_CONF_DIR&lt;/code>环境变量，读取对应目录下的文件放入&lt;code>hadoopConfFiles&lt;/code>这个&lt;code>HashMap&lt;/code>中，而这里面的文件都会压缩到&lt;code>__spark_conf__.zip&lt;/code>中。&lt;br>
+再后续的代码就不分析了，可以参考网上其他文章。&lt;/p>
+&lt;h2 id="提交外部yarn集群的障碍">提交外部Yarn集群的障碍&lt;/h2>
+&lt;p>所以，如果执行spark应用程序的机器中配置了 &lt;em>HADOOP_CONF_DIR&lt;/em> 或 &lt;em>YARN_CONF_DIR&lt;/em> 环境变量（如HDP的节点安装了对应客户端都会配置上），在Spark提交任务到外部yarn集群的时候，就会将里面的配置文件压缩传输到外部集群的Executor节点，这样Executor的各种操作都会使用原集群的配置，连接不到正确的Yarn服务，最后也就导致任务执行失败。&lt;/p>
+&lt;h1 id="解决方案">解决方案&lt;/h1>
+&lt;p>所以解决整个提交外部集群的问题，有两个问题要处理：&lt;/p>
+&lt;ol>
+&lt;li>Spark应用代码使用外部集群的配置文件进行任务提交
+&lt;ol>
+&lt;li>一种方案是启动Spark应用后，创建&lt;code>SparkContext&lt;/code>之前，将外部集群的配置写入当前classpath的前面（如classpath是&lt;code>.:xxx.jar&lt;/code>，那么放在当前目录就可以）&lt;/li>
+&lt;li>另一种方案是启动Spark应用前，将外部集群的配置写入当前目录，并通过&lt;code>jar uvf&lt;/code>打入jar包中；当然只是针对当前问题的话，无需打入jar包&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>Spark准备executor的资源时，使用外部集群配置文件
+&lt;ol>
+&lt;li>一种方案是，创建&lt;code>SparkContext&lt;/code>之前，将&lt;code>HADOOP_CONF_DIR&lt;/code>和&lt;code>YARN_CONF_DIR&lt;/code>环境变量删除，提交任务后再恢复环境变量；这样不会把集群配置传给Executor，Executor使用的是fatjar包里面的配置文件，需要提前替换。&lt;/li>
+&lt;li>另一种方案是，将外部集群的配置写入一个目录，并在创建&lt;code>SparkContext&lt;/code>之前，将&lt;code>HADOOP_CONF_DIR&lt;/code>和&lt;code>YARN_CONF_DIR&lt;/code>环境变量改为那个目录；这样正确的配置会传给Executor使用。&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;p>结合起来最终的方案：&lt;/p>
+&lt;ol>
+&lt;li>外部集群的配置文件统一一个地方存储，可以直接存储在RDB。&lt;/li>
+&lt;li>启动Spark应用的时候，检查需要提交到的Yarn集群，如果是外部集群，那么：
+&lt;ol>
+&lt;li>下载外部集群的配置文件到当前目录，同时复制到一个子目录里面&lt;/li>
+&lt;li>将&lt;code>HADOOP_CONF_DIR&lt;/code>和&lt;code>YARN_CONF_DIR&lt;/code>环境变量改为那个子目录（不能用当前目录，因为当前目录包含fat-jar，根据代码jar包也会打包过去Executor）&lt;/li>
+&lt;li>正常创建&lt;code>SparkContext&lt;/code>&lt;/li>
+&lt;li>恢复环境变量&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;p>具体实现不外乎一些黑魔法（环境变量在JVM里面修改不了，但可以修改JVM用到的那个环境变量Map），再考虑下要不要放上来吧，反正这个最主要是思路和里面的坑。&lt;/p></description></item></channel></rss>
