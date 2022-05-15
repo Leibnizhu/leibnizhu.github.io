@@ -127,7 +127,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/flower.jpg" alt="Featured image of post Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用" />&lt;p>介绍在部署了Kerberos的安全Hadoop集群中, Sqoop,Hive,HBase,Kafka,Maxwell使用方法.&lt;/p>
-&lt;h1 id="sqoop使用">Sqoop使用&lt;/h1>
+&lt;h2 id="sqoop使用">Sqoop使用&lt;/h2>
 &lt;p>配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:&lt;/p>
 &lt;ol>
 &lt;li>分配sqoop的组, 执行&lt;code>usermod -a -G hdfs sqoop&lt;/code>加入到hdfs组, 使用&lt;code>groups sqoop&lt;/code>确认执行成功;&lt;/li>
@@ -137,7 +137,7 @@
 &lt;li>使用kinit命令切换到sqoop用户(在脚本中可以使用keytab切换)&lt;/li>
 &lt;li>执行sqoop命令&lt;/li>
 &lt;/ol>
-&lt;h1 id="spark访问hbase">Spark访问HBase&lt;/h1>
+&lt;h2 id="spark访问hbase">Spark访问HBase&lt;/h2>
 &lt;ol>
 &lt;li>进入cdh1, 创建Kerberos用户, 名为hbase; 导出keytab, 名为hbase.keytab, 保存到本地;&lt;/li>
 &lt;li>下载krb5.conf到本地.&lt;/li>
@@ -194,7 +194,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> resultList
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="spark访问hive">Spark访问Hive&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问hive">Spark访问Hive&lt;/h2>
 &lt;ol>
 &lt;li>Hive可以沿用hbase的Kerberos用户, 也可以新建一个Hive用户及其对应keytab文件.&lt;/li>
 &lt;li>本地测试请将集群的&lt;code>hive-site.xml&lt;/code>导出并保存在项目的&lt;code>src/main/resources/&lt;/code>目录下;&lt;/li>
@@ -220,7 +220,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sc&lt;span style="color:#5bc4bf">.&lt;/span>stop&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="spark访问kafka">Spark访问Kafka&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问kafka">Spark访问Kafka&lt;/h2>
 &lt;ol>
 &lt;li>进入Cloudera Manager的Kafka配置页面, 搜索&amp;rsquo;Inter Broker Protocol&amp;rsquo;, 更改为&amp;rsquo;SASL_PLAINTEXT';&lt;/li>
 &lt;li>重启Kafka配置;&lt;/li>
@@ -233,9 +233,9 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">useTicketCache&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">useKeyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">principal&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka@TURINGDI.COM&amp;#34;&lt;/span> &lt;span style="color:#776e71">#根据实际修改&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">serviceName&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka&amp;#34;&lt;/span> &lt;span style="color:#776e71"># 固定&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">serviceName&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka&amp;#34;&lt;/span> &lt;span style="color:#776e71">## 固定&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">client&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">keyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;/path/to/kafka.keytab&amp;#34;&lt;/span>; &lt;span style="color:#776e71"># keytab路径,节点和本地按实际路径填写&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">keyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;/path/to/kafka.keytab&amp;#34;&lt;/span>; &lt;span style="color:#776e71">## keytab路径,节点和本地按实际路径填写&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="5">
 &lt;li>cdh1中新建一个kafka.properties文件, 内容如下:&lt;/li>
@@ -287,7 +287,7 @@
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意修改其中的jass.conf路径, 并确保其中配置的keytab存在; 再执行相应的kafka命令.&lt;br>
 如果觉得麻烦, 也可以编辑&lt;code>/opt/cloudera/parcels/KAFKA-3.0.0-1.3.0.0.p0.40/lib/kafka/bin/kafka-run-class.sh&lt;/code>, 在&lt;code>exec $JAVA&lt;/code>后面增加:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-Djava.security.krb5.conf&lt;span style="color:#5bc4bf">=&lt;/span>/etc/krb5.conf -Djava.security.auth.login.config&lt;span style="color:#5bc4bf">=&lt;/span>/root/jaas.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="maxwell配置">Maxwell配置&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="maxwell配置">Maxwell配置&lt;/h2>
 &lt;ol>
 &lt;li>编辑${MAXWELL_HOME}/bin/maxwell, 在文件尾部附件的&lt;code>exec $JAVA $JAVA_OPTS&lt;/code>后面增加:&lt;/li>
 &lt;/ol>

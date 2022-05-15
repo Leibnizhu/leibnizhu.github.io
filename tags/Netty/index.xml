@@ -1865,19 +1865,19 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at io&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">gitlab&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">leibnizhu&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">sbnetty&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">TestWebApp&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">main&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>TestWebApp&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">java&lt;/span>&lt;span style="color:#5bc4bf">:&lt;/span>102&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">[&lt;/span>test&lt;span style="color:#5bc4bf">-&lt;/span>classes&lt;span style="color:#5bc4bf">/:&lt;/span>na&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Caused by&lt;span style="color:#5bc4bf">:&lt;/span> java&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">lang&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">NullPointerException&lt;/span>&lt;span style="color:#5bc4bf">:&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>因为SpringBoot在启动的时候，&lt;code>SpringApplication&lt;/code>会调用&lt;code>refresh(context)&lt;/code>方法进行初始化动作，而我们的context传入了null，当然报空指针异常了。&lt;br>
-我们将在下一篇文章再讨论怎么实现这个。&lt;/p></description></item><item><title>js跨域获取Cookie的一种新方法</title><link>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</link><pubDate>Thu, 12 Jan 2017 14:01:25 +0800</pubDate><guid>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</guid><description>&lt;h1 id="背景">背景&lt;/h1>
+我们将在下一篇文章再讨论怎么实现这个。&lt;/p></description></item><item><title>js跨域获取Cookie的一种新方法</title><link>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</link><pubDate>Thu, 12 Jan 2017 14:01:25 +0800</pubDate><guid>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</guid><description>&lt;h2 id="背景">背景&lt;/h2>
 &lt;p>同一个项目分配了多个域名，在其中一个域名（下称域名A）的一级域名上放了Cookie。&lt;br>
 使用其他域名(下面统称域名B*)去访问某些页面时，需要使用js读取域名A下的那个Cookie。&lt;/p>
-&lt;h1 id="已有的解决方案">已有的解决方案&lt;/h1>
+&lt;h2 id="已有的解决方案">已有的解决方案&lt;/h2>
 &lt;p>网上已经有一些解决方案，如：&lt;a class="link" href="https://m.th7.cn/show/22/201503/88209.htm" target="_blank" rel="noopener"
 >JS跨域（ajax跨域、iframe跨域）解决方法及原理详解（jsonp）&lt;/a>、&lt;a class="link" href="http://www.cnblogs.com/chris-shao/archive/2012/12/27/2835986.html" target="_blank" rel="noopener"
 >JS 获取跨域的cookie&lt;/a>。&lt;br>
 其中document.domain的方法已确认不可用于我的需求，iframe跨域可以实现，但是跨域后的页面在iframe中，此时js变量的作用域只在iframe中，需要通过一个中间元素的值或者属性来写入需要传递的值，比较麻烦；document.name的方法虽然可以跨域，但同时也跨页面了，处理起来要小心点。&lt;/p>
-&lt;h1 id="本文的解决方案">本文的解决方案&lt;/h1>
-&lt;h2 id="原理">原理&lt;/h2>
+&lt;h2 id="本文的解决方案">本文的解决方案&lt;/h2>
+&lt;h3 id="原理">原理&lt;/h3>
 &lt;p>在域名B*的页面上，js的确不能直接获取到域名A的cookie，但显然，域名B*的页面如果发请求到域名A，会带上域名A的Cookie。&lt;br>
 针对这一点，只要我们在域名A上面部署一个微服务，域名B*的页面发AJAX请求到这个服务，返回域名A的Cookie中我们感兴趣字段的值。域名B*的页面就能接收到域名A的Cookie，可以各种利用了。&lt;/p>
-&lt;h2 id="netty实现">Netty实现&lt;/h2>
+&lt;h3 id="netty实现">Netty实现&lt;/h3>
 &lt;p>域名A的服务器端选用Netty实现。实现代码很简单，这里只给出核心Handler部分代码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">RPCMissionHandler&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> SimpleChannelInboundHandler&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>FullHttpRequest&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> Logger LOG &lt;span style="color:#5bc4bf">=&lt;/span> Logger&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getLogger&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>RPCMissionHandler&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">class&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
@@ -1962,7 +1962,7 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>resp&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">headers&lt;/span>&lt;span style="color:#5bc4bf">().&lt;/span>&lt;span style="color:#06b6ef">set&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Access-Control-Allow-Methods&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;GET, POST&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>resp&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">headers&lt;/span>&lt;span style="color:#5bc4bf">().&lt;/span>&lt;span style="color:#06b6ef">set&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Access-Control-Allow-Credentials&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中referer就是域名B*。&lt;/p>
-&lt;h2 id="页面js调用">页面js调用&lt;/h2>
+&lt;h3 id="页面js调用">页面js调用&lt;/h3>
 &lt;p>js发AJAX请求这块就更简单了。唯一注意的是，我们这个Cookie字段可能在页面加载后一段时间才能获取到，所以这里设置了重试机制，获取不到ID的时候等待1秒后重新发送一次请求，一共最多请求5次。&lt;br>
 这里发送AJAX请求也涉及到一些跨域的配置，详见注释&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#06b6ef">$&lt;/span>(window).&lt;span style="color:#06b6ef">load&lt;/span>(&lt;span style="color:#815ba4">function&lt;/span>(){

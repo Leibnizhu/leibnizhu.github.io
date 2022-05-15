@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kettle on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Kettle/</link><description>Recent content in Kettle on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 15 May 2018 17:29:56 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Kettle/index.xml" rel="self" type="application/rss+xml"/><item><title>Kettle Java API处理Hadoop数据</title><link>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</link><pubDate>Tue, 15 May 2018 17:29:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/yyz.jpg" alt="Featured image of post Kettle Java API处理Hadoop数据" />&lt;h1 id="前言">前言&lt;/h1>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kettle on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Kettle/</link><description>Recent content in Kettle on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 15 May 2018 17:29:56 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Kettle/index.xml" rel="self" type="application/rss+xml"/><item><title>Kettle Java API处理Hadoop数据</title><link>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</link><pubDate>Tue, 15 May 2018 17:29:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/yyz.jpg" alt="Featured image of post Kettle Java API处理Hadoop数据" />&lt;h2 id="前言">前言&lt;/h2>
 &lt;p>最近因为数据处理的需求, 用到Kettle进行MySQL到HDFS的数据导入,而Kettle的GUI界面导入比较繁琐,不易于复用,所以考虑其Java API.&lt;br>
 但是,网上的资料实在少得可怜, 而官网的文档也仅仅给出了一个例子,而且是版本很旧的. 于是只能根据这个很旧的版本, 加上Maven仓库摸索, 再加上官方最新版API文档,慢慢摸出来.&lt;/p>
-&lt;h1 id="代码清单">代码清单&lt;/h1>
+&lt;h2 id="代码清单">代码清单&lt;/h2>
 &lt;p>最后的结果就是这篇文章, 废话也不想多说了,也懒得打字,就是普通的Maven项目,主要三个文件:&lt;/p>
 &lt;ol>
 &lt;li>&lt;code>pom.xml&lt;/code>: Kettle依赖的版本比较麻烦,这个是个坑;&lt;/li>
 &lt;li>一个Java示例文件, 放了一个&lt;code>MySQL =&amp;gt; MySQL&lt;/code> 和一个 &lt;code>MySQL =&amp;gt; HDFS&lt;/code> 的例子,详见注释;&lt;/li>
 &lt;li>Java里面写了一个自动读取数据源的方法, 把所有用到的数据源按下文给定的xml格式配置好,放到&lt;code>resources/db&lt;/code>下面即可被程序读取.&lt;/li>
 &lt;/ol>
-&lt;h1 id="目录结构">目录结构&lt;/h1>
+&lt;h2 id="目录结构">目录结构&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>├── pom.xml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>└── src
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    ├── main
@@ -29,8 +29,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    └── kettle
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    └── demo
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    └── AppTest.java
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="代码">代码&lt;/h1>
-&lt;h2 id="pomxml">pom.xml&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="代码">代码&lt;/h2>
+&lt;h3 id="pomxml">pom.xml&lt;/h3>
 &lt;p>给出核心的变量和依赖部分:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;properties&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;project.build.sourceEncoding&amp;gt;&lt;/span>UTF-8&lt;span style="color:#5bc4bf">&amp;lt;/project.build.sourceEncoding&amp;gt;&lt;/span>
@@ -175,7 +175,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;scope&amp;gt;&lt;/span>test&lt;span style="color:#5bc4bf">&amp;lt;/scope&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependencies&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="java的示例">Java的示例&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="java的示例">Java的示例&lt;/h3>
 &lt;p>包含&lt;code>MySQL =&amp;gt; MySQL&lt;/code>和&lt;code>MySQL =&amp;gt; HDFS&lt;/code> 的方法:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.kettle.demo&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -450,7 +450,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="存储数据库源配置的xml文件">存储数据库源配置的xml文件&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="存储数据库源配置的xml文件">存储数据库源配置的xml文件&lt;/h3>
 &lt;p>放在&lt;code>resources/db&lt;/code>下面:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;connection&amp;gt;&lt;/span>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Heaven's Door</title><link>https://leibnizhu.github.io/</link><description>Recent content on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 14 May 2022 20:33:58 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h1 id="背景">背景&lt;/h1>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Heaven's Door</title><link>https://leibnizhu.github.io/</link><description>Recent content on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 14 May 2022 20:33:58 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景&lt;/h2>
 &lt;p>去年写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2021/12/04/%e8%b7%a8Yarn%e9%9b%86%e7%be%a4%e6%8f%90%e4%ba%a4spark%e4%bb%bb%e5%8a%a1/" >跨Yarn集群提交spark任务&lt;/a> ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 &lt;code>*-site.xml&lt;/code> 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 &lt;code>*-site.xml&lt;/code> 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。&lt;/p>
 &lt;p>简单回顾下，主要做了两件事情：&lt;/p>
 &lt;ol>
@@ -6,8 +6,8 @@
 &lt;li>创建SparkContext前，&lt;code>HADOOP_CONF_DIR&lt;/code> 和 &lt;code>YARN_CONF_DIR&lt;/code> 环境变量改为外部集群 &lt;code>*-site.xml&lt;/code> 配置文件所在位置；由于启动java程序后不能直接修改环境变量，在实现上使用了黑魔法。&lt;/li>
 &lt;/ol>
 &lt;p>时隔半年终于重拾博客，显然又被坑了，没错，之前的方法在Spark2.4里行不通了。&lt;/p>
-&lt;h1 id="问题原因分析及解决方案">问题、原因分析、及解决方案&lt;/h1>
-&lt;h2 id="spark24中的报错">Spark2.4中的报错&lt;/h2>
+&lt;h2 id="问题原因分析及解决方案">问题、原因分析、及解决方案&lt;/h2>
+&lt;h3 id="spark24中的报错">Spark2.4中的报错&lt;/h3>
 &lt;p>在原来代码基础上，升级Spark为2.4.8，执行提交到外部集群的任务，提交到Yarn的AM报错如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Container id: container_e36_1650338235135_41710_02_000001
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Exit code: 1
@@ -43,7 +43,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Caused by: java.net.UnknownHostException: xxx
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ... 25 more
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中 &lt;code>xxx&lt;/code> 是外部集群的集群名（&lt;code>dfs.nameservices&lt;/code> 配置）。&lt;/p>
-&lt;h2 id="直接原因分析">直接原因分析&lt;/h2>
+&lt;h3 id="直接原因分析">直接原因分析&lt;/h3>
 &lt;p>仔细观察异常的调用栈，调用到了 &lt;code>NameNodeProxies.createNonHAProxy&lt;/code> ，而我们的集群是HA的，显然是读取到的配置不对了。&lt;/p>
 &lt;p>看到这个类，阅读过hadoop源码的应该都知道，这是创建 &lt;code>DFSClient&lt;/code> 的时候，会先读取 &lt;code>dfs.client.failover.proxy.provider.{hdfs路径对应host}&lt;/code> 配置（取值是一个 &lt;code>FailoverProxyProvider&lt;/code> 具体实现的全限定类名），反射出Class对象并实例化，然后创建对应的HAProxy；而如果配置为空，则认为NameNode没有开启HA，直接将hdfs路径当作普通host来进行读取，如果实际上这个host是一个HA的nameservices名，不存在这个host，则会报上面的错误。&lt;/p>
 &lt;p>所以可以确定，是AM读取不到正确的hdfs配置导致的。那么是为什么呢？&lt;/p>
@@ -86,7 +86,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120105&lt;/span> &lt;span style="color:#f99b15">12&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">8312&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__/hdfs-site.xml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>broken symlinks&lt;span style="color:#5bc4bf">(&lt;/span>find -L . -maxdepth &lt;span style="color:#f99b15">5&lt;/span> -type l -ls&lt;span style="color:#5bc4bf">)&lt;/span>:
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>./__spark_conf__/__hadoop_conf__/&lt;/code> 里面是外部集群配置文件，而 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 是spark应用的jar，里面已经有原集群的配置文件。按 &lt;code>CLASSPATH&lt;/code> 定义的顺序，&lt;code>Configuration&lt;/code> 读取默认资源 &lt;code>core-site.xml&lt;/code> 、 &lt;code>hdfs-site.xml&lt;/code> （由&lt;code>HdfsConfiguration&lt;/code>静态代码块加入）的时候，优先从 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 读取了，而真正要用的外部集群配置，由于在 &lt;code>CLASSPATH&lt;/code> 中位置较后，不会被加载到。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;h3 id="解决方案">解决方案&lt;/h3>
 &lt;p>知道问题的原因后，根据 &lt;code>CLASSPATH&lt;/code> 定义的顺序：&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>$PWD&lt;/code> 里面的文件无法控制，跳过&lt;/li>
@@ -128,15 +128,15 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>重新打包、运行任务，顺利执行。&lt;/p>
-&lt;h1 id="spark22-与-spark24-yarn-client-模式提交任务差异">Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异&lt;/h1>
-&lt;h2 id="am的classpath目录结构差异">AM的classpath、目录结构差异&lt;/h2>
+&lt;h2 id="spark22-与-spark24-yarn-client-模式提交任务差异">Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异&lt;/h2>
+&lt;h3 id="am的classpath目录结构差异">AM的classpath、目录结构差异&lt;/h3>
 &lt;p>问题解决了，那么为什么Spark2.2升级Spark2.4之后就有这样的问题呢？从上面的分析，不难猜测到是AM的 &lt;code>CLASSPATH&lt;/code> 变了。随便找一个Spark2.2提交的任务也可以看到：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">### launch_container.sh&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#### launch_container.sh&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">CLASSPATH&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_conf__:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_libs__/*:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 对比 Spark2.4的：&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 对比 Spark2.4的：&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#export CLASSPATH=&amp;#34;$PWD:$PWD/__spark_conf__:$PWD/__spark_libs__/*:$HADOOP_CONF_DIR:$HADOOP_CONF_DIR:$PWD/__spark_conf__/__hadoop_conf__&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">### directory.info&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#### directory.info&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>find -L . -maxdepth &lt;span style="color:#f99b15">5&lt;/span> -ls:
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">6554176&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> drwx--x--- &lt;span style="color:#f99b15">4&lt;/span> yarn hadoop &lt;span style="color:#f99b15">4096&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">6554177&lt;/span> &lt;span style="color:#f99b15">4&lt;/span> -rw-r--r-- &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">69&lt;/span> May &lt;span style="color:#f99b15">13&lt;/span> 11:31 ./container_tokens
@@ -171,7 +171,7 @@ class="gallery-image"
 data-flex-grow="237"
 data-flex-basis="569px"
 >&lt;/p>
-&lt;h2 id="spark源码里的体现">Spark源码里的体现&lt;/h2>
+&lt;h3 id="spark源码里的体现">Spark源码里的体现&lt;/h3>
 &lt;p>上篇博客里提到Spark的yarn-client模式是通过 &lt;code>YarnClientSchedulerBackend&lt;/code> 处理的。&lt;br>
 其 &lt;code>start()&lt;/code> 方法会调用 &lt;code>org.apache.spark.deploy.yarn.Client&lt;/code> 的 &lt;code>submitApplication()&lt;/code> 方法提交Yarn AM。&lt;br>
 &lt;code>submitApplication()&lt;/code> 调用 &lt;code>createContainerLaunchContext&lt;/code> 构造ContainerLaunchContext对应的上下文，构建的启动Yarn AM的任务命令cmds，里面比较重要的有两步:&lt;/p>
@@ -179,7 +179,7 @@ data-flex-basis="569px"
 &lt;li>调用 &lt;code>setupLaunchEnv()&lt;/code> 构造环境变量，其中我们关心的 &lt;code>CLASSPATH&lt;/code> 是在 &lt;code>populateClasspath()&lt;/code> 方法里处理的；&lt;/li>
 &lt;li>调用 &lt;code>prepareLocalResources()&lt;/code> 准备Yarn AM需要的一些资源，包括调用 &lt;code>createConfArchive()&lt;/code> 创建 &lt;code>__spark_conf__.zip&lt;/code> ，里面解压出来就是上面所讨论的AM 目录结构里面的 &lt;code>./__spark_conf__/&lt;/code> 目录&lt;/li>
 &lt;/ol>
-&lt;h3 id="populateclasspath">populateClasspath()&lt;/h3>
+&lt;h4 id="populateclasspath">populateClasspath()&lt;/h4>
 &lt;p>对比两个版本的 &lt;code>populateClasspath()&lt;/code> 方法，注意差异在最后：&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/populateClasspath.png"
 width="3624"
@@ -195,7 +195,7 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// files (such as configuration files for different services) that are not part of the
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// YARN cluster&amp;#39;s config.
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是为了防止将其他非Yarn集群配置的文件也引入了。&lt;/p>
-&lt;h3 id="createconfarchive">createConfArchive()&lt;/h3>
+&lt;h4 id="createconfarchive">createConfArchive()&lt;/h4>
 &lt;p>这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。&lt;/p>
 &lt;p>&lt;a class="link" href="https://issues.apache.org/jira/browse/SPARK-23630" target="_blank" rel="noopener"
 >SPARK-23630&lt;/a> 增加了一个用于测试的环境变量 &lt;code>SPARK_TEST_HADOOP_CONF_DIR&lt;/code> ，该环境变量指定的目录里面的配置文件也会被打进去 &lt;code>__spark_conf__.zip&lt;/code> 。&lt;/p>
@@ -226,14 +226,14 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>putNextEntry&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ZipEntry&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">SparkHadoopUtil&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#fec418">SPARK_HADOOP_CONF_FILE&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hadoopConf&lt;span style="color:#5bc4bf">.&lt;/span>writeXml&lt;span style="color:#5bc4bf">(&lt;/span>confStream&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>closeEntry&lt;span style="color:#5bc4bf">()&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>跨Yarn集群提交spark任务</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</link><pubDate>Sat, 04 Dec 2021 18:17:55 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/93990522.jpg" alt="Featured image of post 跨Yarn集群提交spark任务" />&lt;h1 id="背景">背景&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>跨Yarn集群提交spark任务</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</link><pubDate>Sat, 04 Dec 2021 18:17:55 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/93990522.jpg" alt="Featured image of post 跨Yarn集群提交spark任务" />&lt;h2 id="背景">背景&lt;/h2>
 &lt;p>之前写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2020/05/06/%e5%8a%a8%e6%80%81%e5%8a%a0%e8%bd%bdhive%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e7%9a%84%e6%96%b9%e6%a1%88/" >Spark动态加载hive配置的方案&lt;/a> ，当时是为了spark应用的fat-jar里面已经有Hadoop相关xml配置文件的情况下，将数据输出到不是该配置的Hadoop集群的方案。&lt;br>
 现在这个需求有点类似，没有走spark-submit提交任务，而是在spark应用里面通过创建&lt;code>SparkContext&lt;/code>的形式提交任务，而spark应用的fat-jar里面已经有Hadoop相关xml配置文件，在此情况下，想将Spakr任务提交到外部的Yarn集群（不是fat-jar里面配置文件对应的yarn集群）。&lt;/p>
-&lt;h1 id="思考一个问题">思考一个问题&lt;/h1>
+&lt;h2 id="思考一个问题">思考一个问题&lt;/h2>
 &lt;p>先思考一个问题，如果Spark应用的fat-jar里面有外部Yarn集群对应的配置文件(&lt;code>core-site.xml&lt;/code>，&lt;code>hdfs-site.xml&lt;/code>，&lt;code>yarn-site.xml&lt;/code>等)，此时Spark应用代码里面创建&lt;code>SparkContext&lt;/code>，是不是就一定能提交到那个集群里？&lt;br>
 可以做个实验，但实验不一定会cover到所有情况。&lt;br>
 直接给结论吧，不一定能提交过去，但自己做实验的话很可能还是能直接提交过去的，还是直接看代码吧（以&lt;code>yarn-client&lt;/code>模式为例）。&lt;/p>
-&lt;h2 id="spark-yarn-client-默认提交任务简析">Spark Yarn-client 默认提交任务简析&lt;/h2>
+&lt;h3 id="spark-yarn-client-默认提交任务简析">Spark Yarn-client 默认提交任务简析&lt;/h3>
 &lt;p>通过代码创建&lt;code>SparkContext&lt;/code>后，其动态代码块会根据启动模式创建&lt;code>SchedulerBackend&lt;/code>和&lt;code>TaskScheduler&lt;/code>并启动：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// org.apache.spark.SparkContext #501
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// Create and start the scheduler
@@ -365,9 +365,9 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到，除了本地的&lt;code>log4j.properties&lt;/code>和&lt;code>metrics.properties&lt;/code>配置文件以外，还会读取&lt;code>HADOOP_CONF_DIR&lt;/code>和&lt;code>YARN_CONF_DIR&lt;/code>环境变量，读取对应目录下的文件放入&lt;code>hadoopConfFiles&lt;/code>这个&lt;code>HashMap&lt;/code>中，而这里面的文件都会压缩到&lt;code>__spark_conf__.zip&lt;/code>中。&lt;br>
 再后续的代码就不分析了，可以参考网上其他文章。&lt;/p>
-&lt;h2 id="提交外部yarn集群的障碍">提交外部Yarn集群的障碍&lt;/h2>
+&lt;h3 id="提交外部yarn集群的障碍">提交外部Yarn集群的障碍&lt;/h3>
 &lt;p>所以，如果执行spark应用程序的机器中配置了 &lt;em>HADOOP_CONF_DIR&lt;/em> 或 &lt;em>YARN_CONF_DIR&lt;/em> 环境变量（如HDP的节点安装了对应客户端都会配置上），在Spark提交任务到外部yarn集群的时候，就会将里面的配置文件压缩传输到外部集群的Executor节点，这样Executor的各种操作都会使用原集群的配置，连接不到正确的Yarn服务，最后也就导致任务执行失败。&lt;/p>
-&lt;h1 id="解决方案">解决方案&lt;/h1>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
 &lt;p>所以解决整个提交外部集群的问题，有两个问题要处理：&lt;/p>
 &lt;ol>
 &lt;li>Spark应用代码使用外部集群的配置文件进行任务提交
@@ -1279,7 +1279,7 @@ data-flex-basis="250px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 以前的配置 --&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>《Scala实用指南》读书笔记(二)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</link><pubDate>Wed, 18 Jul 2018 16:54:47 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/nightstreet.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(二)" />&lt;h1 id="第8章-集合">第8章 集合&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>《Scala实用指南》读书笔记(二)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</link><pubDate>Wed, 18 Jul 2018 16:54:47 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/nightstreet.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(二)" />&lt;h2 id="第8章-集合">第8章 集合&lt;/h2>
 &lt;ul>
 &lt;li>Scala对元素较少的Set进行了优化,4个元素以内的Set有专门的实现类(&lt;code>Set0&lt;/code>,&lt;code>Set1&lt;/code>,&lt;code>Set2&lt;/code>,&lt;code>Set3&lt;/code>,&lt;code>Set4&lt;/code>),大于4个元素的使用HashSet实现&lt;/li>
 &lt;li>Set的方法(&lt;code>filter&lt;/code>,&lt;code>map&lt;/code>,&lt;code>foreach&lt;/code>这些就不说了):
@@ -1306,7 +1306,7 @@ data-flex-basis="250px"
 &lt;li>&lt;code> + - ! ~&lt;/code>作一元操作符时,也是调用的主语在操作符后面,分别映射到&lt;code>unary_+(),unary_-(),unary_!(),unary_~()&lt;/code>等方法的调用,即&lt;code>-a&lt;/code>调用&lt;code>a.unary_-()&lt;/code>等&lt;/li>
 &lt;li>for表达式:&lt;code>for([parrten &amp;lt;- generator; definition*&amp;gt;]+;filter;) [yield] expression&lt;/code>,可以加过滤条件,而yield也是可选的,有yield的时候返回一个值列表,没有yield的时候返回Unit&lt;/li>
 &lt;/ul>
-&lt;h1 id="第9章-模式匹配和正则表达式">第9章 模式匹配和正则表达式&lt;/h1>
+&lt;h2 id="第9章-模式匹配和正则表达式">第9章 模式匹配和正则表达式&lt;/h2>
 &lt;ul>
 &lt;li>匹配List的时候,可以只获取感兴趣的元素,剩下的用&lt;code>_*&lt;/code>省略, 如:&lt;/li>
 &lt;/ul>
@@ -1374,12 +1374,12 @@ data-flex-basis="250px"
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第10章-处理异常">第10章 处理异常&lt;/h1>
+&lt;h2 id="第10章-处理异常">第10章 处理异常&lt;/h2>
 &lt;ul>
 &lt;li>Java处理多个异常时,会检查多个异常的处理顺序,子类必须在前面,否则编译会出错(&lt;code>exception ***.*** has already been caught&lt;/code>),但scala对此不会警告,要自己注意(在catch块中使用case匹配的顺序)&lt;/li>
 &lt;li>这本书竟然没有讲到&lt;code>Try&lt;/code>类,吐槽一下&lt;/li>
 &lt;/ul>
-&lt;h1 id="第11章-递归">第11章 递归&lt;/h1>
+&lt;h2 id="第11章-递归">第11章 递归&lt;/h2>
 &lt;ul>
 &lt;li>尾递归优化(Tail Recursive Optimization): 不是尾递归的时候,递归调用在字节码对应&lt;code>invokespecial&lt;/code>指令,表明是递归调用,会产生新一层栈;如果写成尾递归, 递归调用时在字节码对应&lt;code>goto&lt;/code>指令,表明使用了迭代而非方法调用,放弃了当前的上下文&lt;/li>
 &lt;li>&lt;code>@scala.annotation.tailrec&lt;/code>注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质&lt;/li>
@@ -1391,7 +1391,7 @@ data-flex-basis="250px"
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第12章-惰性求值和并行集合">第12章 惰性求值和并行集合&lt;/h1>
+&lt;h2 id="第12章-惰性求值和并行集合">第12章 惰性求值和并行集合&lt;/h2>
 &lt;ul>
 &lt;li>使用关键字&lt;code>lazy&lt;/code>修饰变量,scala会推迟绑定变量和他的值,直到该值第一次被使用(才会去绑定)&lt;/li>
 &lt;li>如果变量绑定的计算有副作用,那么多个变量的绑定顺序机会对绑定的值有影响,此时就不能随便用惰性求值(&lt;code>lazy&lt;/code>)了,否则不可交换计算的结果将会得不可知&lt;/li>
@@ -1415,7 +1415,7 @@ data-flex-basis="250px"
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第13章-使用actor编程">第13章 使用Actor编程&lt;/h1>
+&lt;h2 id="第13章-使用actor编程">第13章 使用Actor编程&lt;/h2>
 &lt;ul>
 &lt;li>Actor帮助我们将共享的可变性转换成隔离的可变性(isolated mutability),如果一个任务可以有意义地分成几个子任务,分而治之,那么可以使用Actor模型来解决这个任务&lt;/li>
 &lt;li>&lt;code>AtomicLog&lt;/code>之类的类,虽然原子性保证了单个值的线程安全性,但并不能保证跨多个值的原子性,这些值可能同时发生变化&lt;/li>
@@ -1470,7 +1470,7 @@ data-flex-basis="250px"
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第14章-和java进行互操作">第14章 和Java进行互操作&lt;/h1>
+&lt;h2 id="第14章-和java进行互操作">第14章 和Java进行互操作&lt;/h2>
 &lt;ul>
 &lt;li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号&lt;code>`&lt;/code>括起来&lt;/li>
 &lt;li>没有方法实现的trait在字节码层面是简单的接口;如果想在scala中创建接口,只能创建没有方法实现的trait&lt;/li>
@@ -1484,7 +1484,7 @@ data-flex-basis="250px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">abstract&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">Bird&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@throws&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>classOf&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">NoFlyException&lt;/span>&lt;span style="color:#5bc4bf">])&lt;/span> &lt;span style="color:#815ba4">def&lt;/span> fly&lt;span style="color:#5bc4bf">()&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Unit&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>(结束)&lt;/p></description></item><item><title>《Scala实用指南》读书笔记(一)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</link><pubDate>Tue, 17 Jul 2018 15:14:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/summer2.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(一)" />&lt;h1 id="前言">前言&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>(结束)&lt;/p></description></item><item><title>《Scala实用指南》读书笔记(一)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</link><pubDate>Tue, 17 Jul 2018 15:14:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/summer2.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(一)" />&lt;h2 id="前言">前言&lt;/h2>
 &lt;p>好久没写博客了,在&lt;code>Kafka&lt;/code>源码的海洋里挣扎ing,休息的时候还刷&lt;code>Leetcode&lt;/code>玩儿,很多东西匆匆丢到&lt;code>OneNote&lt;/code>里了.&lt;br>
 最近花了一周时间看了品神翻译的《Scala实用指南》, 这本书应该主要是面向刚入Scala大门的Javaer的,前面讲Scala基础,后期还讲了下Akka和Scala具体的应用.&lt;br>
 我虽然写scala也有一段时间了,再看这本书还是觉得受益匪浅,有很多地方以前没有注意到的.&lt;br>
@@ -1499,12 +1499,12 @@ class="gallery-image"
 data-flex-grow="85"
 data-flex-basis="205px"
 >&lt;/p>
-&lt;h1 id="第2章-体验scala">第2章 体验Scala&lt;/h1>
+&lt;h2 id="第2章-体验scala">第2章 体验Scala&lt;/h2>
 &lt;ul>
 &lt;li>scala的REPL中, &lt;code>Ctrl+A&lt;/code>调到行首,&lt;code>Ctrl+E&lt;/code>调到行尾&lt;/li>
 &lt;li>&lt;code>scala &amp;lt;scala源文件&amp;gt;&lt;/code>命令可以在单独的JVM中运行scala代码,而实际上是自动合成Main类调用main()方法&lt;/li>
 &lt;/ul>
-&lt;h1 id="第3章-从java到scala">第3章 从Java到Scala&lt;/h1>
+&lt;h2 id="第3章-从java到scala">第3章 从Java到Scala&lt;/h2>
 &lt;ul>
 &lt;li>用&lt;code>val&lt;/code>定义所有字段,并只提供读不提供更新状态的方法,可以使一个类的实例不可变&lt;/li>
 &lt;li>&lt;code>1 to 3&lt;/code>,&lt;code>1 until 3&lt;/code>这类表达式其实是隐式转换,&lt;code>1&lt;/code>通过&lt;code>intWrapper()&lt;/code>方法转换为成富封装器(rich wrapper,这里具体是&lt;code>RichInt&lt;/code>类)再调用其&lt;code>to()&lt;/code>,&lt;code>until()&lt;/code>方法&lt;/li>
@@ -1553,7 +1553,7 @@ data-flex-basis="205px"
 &lt;li>scala的protected方法只有派生类可以访问,同包的非派生类不可访问,在派生类中也不可以通过基类实例来访问,只能是通过派生类的实例方法访问&lt;/li>
 &lt;li>scala中可以通过&lt;code>private[类名/包名/this]&lt;/code>和&lt;code>protected[类名/包名/this]&lt;/code>实现细粒度的权限控制,具体不表了&amp;hellip;&lt;/li>
 &lt;/ul>
-&lt;h1 id="第4章-处理对象">第4章 处理对象&lt;/h1>
+&lt;h2 id="第4章-处理对象">第4章 处理对象&lt;/h2>
 &lt;ul>
 &lt;li>定义类的时候,&lt;code>class A(var a:Int, val b:Int)&lt;/code>被称作主构造器(primary constructor),其中可变的参数a自动生成getter和setter,不可变的参数b自动生成getter方法,但这些getter setter方法不符合JavaBean标准,没有get/set前缀,可以通过在期望产生符合JavaBean规范的字段加上&lt;code>@scala.reflect.BeanProperty&lt;/code>注解来解决这个问题&lt;/li>
 &lt;li>scala中val修饰的属性编译后为&lt;code>private final&lt;/code>&lt;/li>
@@ -1573,7 +1573,7 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
 &lt;li>scala支持包对象,为单例对象,与包同名,用&lt;code>package object&lt;/code>关键字标记,当包中其他类&lt;code>import 包名._&lt;/code>时,可以直接引用包对象里面的方法;包对象可以存储该包公用的一些方法如工具方法,举例, scala包也有包对象,包含了很多类型别名和隐式类型转换.&lt;/li>
 &lt;/ul>
-&lt;h1 id="第5章-善用类型">第5章 善用类型&lt;/h1>
+&lt;h2 id="第5章-善用类型">第5章 善用类型&lt;/h2>
 &lt;ul>
 &lt;li>scala偏向于使用类型推断,但以下情况必须显式指定类型:1.定义没有初始值的类字段;2.定义函数或方法的参数;3.使用return或递归时,定义函数或方法返回类型;4.将变量定义为与推断出来类型不一样&lt;/li>
 &lt;li>&lt;code>Nothing&lt;/code>是所有类型的子类型, &lt;code>Any&lt;/code>是所有类型的基础类型,包含&lt;code>AnyRef&lt;/code>子类型(所有引用类型的基础类型,包含Java的&lt;code>Object&lt;/code>类的方法)和&lt;code>AnyVal&lt;/code>子类型(所有值类型Int,Double等的基础类型,映射到Java原始类型)&lt;/li>
@@ -1627,7 +1627,7 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">import&lt;/span> &lt;span style="color:#fec418">MyInterpolator._&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">val&lt;/span> name &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;Leibniz&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>println&lt;span style="color:#5bc4bf">(&lt;/span>my&lt;span style="color:#48b685">&amp;#34;&amp;#34;&amp;#34;My name is ${name}&amp;#34;&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#776e71">//调用我们自定义的插值器,返回 My name is #Leibniz#
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="第6章-函数值与闭包">第6章 函数值与闭包&lt;/h1>
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="第6章-函数值与闭包">第6章 函数值与闭包&lt;/h2>
 &lt;ul>
 &lt;li>柯里化: 一个有分组参数的函数,如&lt;code>f(a:A)(b:B):C&lt;/code>,使用&lt;code>f _&lt;/code>创建一个部分应用函数(此处类型为&lt;code>A =&amp;gt; (B =&amp;gt; C)&lt;/code>),可以用于创建可复用的临时便利函数;&lt;/li>
 &lt;li>多组参数的函数,如果有单独成组的函数参数,可以不使用小括号,直接用大括号,更直观,如&lt;code>f(a:Int)(g:A=&amp;gt;B)&lt;/code>可以这样调用:&lt;code>f(1) {a =&amp;gt; xxx(a)}&lt;/code>&lt;/li>
@@ -1635,7 +1635,7 @@ data-flex-basis="205px"
 &lt;li>scala自动将函数名视作函数值的引用&lt;/li>
 &lt;li>函数或代码块可能含有未绑定的变量,在调用前根据上下文绑定,形成闭包(closure);绑定的时候不会复制相应变量的值,实际上会绑定到变量本身,因此线程不安全&lt;/li>
 &lt;/ul>
-&lt;h1 id="第7章-特质">第7章 特质&lt;/h1>
+&lt;h2 id="第7章-特质">第7章 特质&lt;/h2>
 &lt;ul>
 &lt;li>在trait中定义并初始化的val/var变量，将会在混入了该trait的累的内部实现；定义并&lt;strong>未&lt;/strong>初始化的val/var变量被认为是抽象的,混入该trait的类需要实现他们&lt;/li>
 &lt;li>类混入trait的时候,如果类没用用&lt;code>extends&lt;/code>,则第一个&lt;code>trait&lt;/code>用&lt;code>extends&lt;/code>,后面的&lt;code>trait&lt;/code>用&lt;code>with&lt;/code>;如果类已经用&lt;code>extends&lt;/code>了,那么所有&lt;code>trait&lt;/code>都用&lt;code>with&lt;/code>来混入&lt;/li>
@@ -1657,17 +1657,17 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>println&lt;span style="color:#5bc4bf">(&lt;/span>app2&lt;span style="color:#5bc4bf">.&lt;/span>check&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#776e71">//根据混入的顺序,打印 House...Credit...Abstract check...
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
 &lt;li>如果基类的方法是抽象的,那么方法绑定必须推迟到某个具体的方法已知为止;同样是从右到左的顺序连接混入trait,这样可以避免方法冲突的问题&lt;/li>
-&lt;/ul></description></item><item><title>Kettle Java API处理Hadoop数据</title><link>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</link><pubDate>Tue, 15 May 2018 17:29:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/yyz.jpg" alt="Featured image of post Kettle Java API处理Hadoop数据" />&lt;h1 id="前言">前言&lt;/h1>
+&lt;/ul></description></item><item><title>Kettle Java API处理Hadoop数据</title><link>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</link><pubDate>Tue, 15 May 2018 17:29:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kettle-Java-API%E5%A4%84%E7%90%86Hadoop%E6%95%B0%E6%8D%AE/yyz.jpg" alt="Featured image of post Kettle Java API处理Hadoop数据" />&lt;h2 id="前言">前言&lt;/h2>
 &lt;p>最近因为数据处理的需求, 用到Kettle进行MySQL到HDFS的数据导入,而Kettle的GUI界面导入比较繁琐,不易于复用,所以考虑其Java API.&lt;br>
 但是,网上的资料实在少得可怜, 而官网的文档也仅仅给出了一个例子,而且是版本很旧的. 于是只能根据这个很旧的版本, 加上Maven仓库摸索, 再加上官方最新版API文档,慢慢摸出来.&lt;/p>
-&lt;h1 id="代码清单">代码清单&lt;/h1>
+&lt;h2 id="代码清单">代码清单&lt;/h2>
 &lt;p>最后的结果就是这篇文章, 废话也不想多说了,也懒得打字,就是普通的Maven项目,主要三个文件:&lt;/p>
 &lt;ol>
 &lt;li>&lt;code>pom.xml&lt;/code>: Kettle依赖的版本比较麻烦,这个是个坑;&lt;/li>
 &lt;li>一个Java示例文件, 放了一个&lt;code>MySQL =&amp;gt; MySQL&lt;/code> 和一个 &lt;code>MySQL =&amp;gt; HDFS&lt;/code> 的例子,详见注释;&lt;/li>
 &lt;li>Java里面写了一个自动读取数据源的方法, 把所有用到的数据源按下文给定的xml格式配置好,放到&lt;code>resources/db&lt;/code>下面即可被程序读取.&lt;/li>
 &lt;/ol>
-&lt;h1 id="目录结构">目录结构&lt;/h1>
+&lt;h2 id="目录结构">目录结构&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>├── pom.xml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>└── src
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    ├── main
@@ -1688,8 +1688,8 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    └── kettle
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    └── demo
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>    └── AppTest.java
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="代码">代码&lt;/h1>
-&lt;h2 id="pomxml">pom.xml&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="代码">代码&lt;/h2>
+&lt;h3 id="pomxml">pom.xml&lt;/h3>
 &lt;p>给出核心的变量和依赖部分:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;properties&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;project.build.sourceEncoding&amp;gt;&lt;/span>UTF-8&lt;span style="color:#5bc4bf">&amp;lt;/project.build.sourceEncoding&amp;gt;&lt;/span>
@@ -1834,7 +1834,7 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;scope&amp;gt;&lt;/span>test&lt;span style="color:#5bc4bf">&amp;lt;/scope&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependencies&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="java的示例">Java的示例&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="java的示例">Java的示例&lt;/h3>
 &lt;p>包含&lt;code>MySQL =&amp;gt; MySQL&lt;/code>和&lt;code>MySQL =&amp;gt; HDFS&lt;/code> 的方法:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.kettle.demo&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -2109,7 +2109,7 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="存储数据库源配置的xml文件">存储数据库源配置的xml文件&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="存储数据库源配置的xml文件">存储数据库源配置的xml文件&lt;/h3>
 &lt;p>放在&lt;code>resources/db&lt;/code>下面:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;connection&amp;gt;&lt;/span>
@@ -2174,7 +2174,7 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">def&lt;/span> topDocsToDocumentList&lt;span style="color:#5bc4bf">(&lt;/span>topDocs&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">TopDocs&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">List&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">Document&lt;/span>&lt;span style="color:#5bc4bf">]&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> topDocs&lt;span style="color:#5bc4bf">.&lt;/span>scoreDocs&lt;span style="color:#5bc4bf">.&lt;/span>map&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">this&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>getDocument&lt;span style="color:#5bc4bf">).&lt;/span>toList
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/flower.jpg" alt="Featured image of post Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用" />&lt;p>介绍在部署了Kerberos的安全Hadoop集群中, Sqoop,Hive,HBase,Kafka,Maxwell使用方法.&lt;/p>
-&lt;h1 id="sqoop使用">Sqoop使用&lt;/h1>
+&lt;h2 id="sqoop使用">Sqoop使用&lt;/h2>
 &lt;p>配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:&lt;/p>
 &lt;ol>
 &lt;li>分配sqoop的组, 执行&lt;code>usermod -a -G hdfs sqoop&lt;/code>加入到hdfs组, 使用&lt;code>groups sqoop&lt;/code>确认执行成功;&lt;/li>
@@ -2184,7 +2184,7 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;li>使用kinit命令切换到sqoop用户(在脚本中可以使用keytab切换)&lt;/li>
 &lt;li>执行sqoop命令&lt;/li>
 &lt;/ol>
-&lt;h1 id="spark访问hbase">Spark访问HBase&lt;/h1>
+&lt;h2 id="spark访问hbase">Spark访问HBase&lt;/h2>
 &lt;ol>
 &lt;li>进入cdh1, 创建Kerberos用户, 名为hbase; 导出keytab, 名为hbase.keytab, 保存到本地;&lt;/li>
 &lt;li>下载krb5.conf到本地.&lt;/li>
@@ -2241,7 +2241,7 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> resultList
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="spark访问hive">Spark访问Hive&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问hive">Spark访问Hive&lt;/h2>
 &lt;ol>
 &lt;li>Hive可以沿用hbase的Kerberos用户, 也可以新建一个Hive用户及其对应keytab文件.&lt;/li>
 &lt;li>本地测试请将集群的&lt;code>hive-site.xml&lt;/code>导出并保存在项目的&lt;code>src/main/resources/&lt;/code>目录下;&lt;/li>
@@ -2267,7 +2267,7 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sc&lt;span style="color:#5bc4bf">.&lt;/span>stop&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="spark访问kafka">Spark访问Kafka&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问kafka">Spark访问Kafka&lt;/h2>
 &lt;ol>
 &lt;li>进入Cloudera Manager的Kafka配置页面, 搜索&amp;rsquo;Inter Broker Protocol&amp;rsquo;, 更改为&amp;rsquo;SASL_PLAINTEXT';&lt;/li>
 &lt;li>重启Kafka配置;&lt;/li>
@@ -2280,9 +2280,9 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">useTicketCache&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">useKeyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">principal&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka@TURINGDI.COM&amp;#34;&lt;/span> &lt;span style="color:#776e71">#根据实际修改&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">serviceName&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka&amp;#34;&lt;/span> &lt;span style="color:#776e71"># 固定&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">serviceName&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka&amp;#34;&lt;/span> &lt;span style="color:#776e71">## 固定&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">client&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">keyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;/path/to/kafka.keytab&amp;#34;&lt;/span>; &lt;span style="color:#776e71"># keytab路径,节点和本地按实际路径填写&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">keyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;/path/to/kafka.keytab&amp;#34;&lt;/span>; &lt;span style="color:#776e71">## keytab路径,节点和本地按实际路径填写&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="5">
 &lt;li>cdh1中新建一个kafka.properties文件, 内容如下:&lt;/li>
@@ -2334,7 +2334,7 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意修改其中的jass.conf路径, 并确保其中配置的keytab存在; 再执行相应的kafka命令.&lt;br>
 如果觉得麻烦, 也可以编辑&lt;code>/opt/cloudera/parcels/KAFKA-3.0.0-1.3.0.0.p0.40/lib/kafka/bin/kafka-run-class.sh&lt;/code>, 在&lt;code>exec $JAVA&lt;/code>后面增加:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-Djava.security.krb5.conf&lt;span style="color:#5bc4bf">=&lt;/span>/etc/krb5.conf -Djava.security.auth.login.config&lt;span style="color:#5bc4bf">=&lt;/span>/root/jaas.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="maxwell配置">Maxwell配置&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="maxwell配置">Maxwell配置&lt;/h2>
 &lt;ol>
 &lt;li>编辑${MAXWELL_HOME}/bin/maxwell, 在文件尾部附件的&lt;code>exec $JAVA $JAVA_OPTS&lt;/code>后面增加:&lt;/li>
 &lt;/ol>
@@ -2352,22 +2352,22 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/ol>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>--config /path/to/config.properties
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Kerberos部署,配置与基础使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:33 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/room.jpg" alt="Featured image of post Kerberos部署,配置与基础使用" />&lt;p>下文以本地测试集群为例, 4节点(cdh1-4), cdh1为NameNode, cdh2-4为DataNode.&lt;/p>
-&lt;h1 id="基础概念">基础概念&lt;/h1>
+&lt;h2 id="基础概念">基础概念&lt;/h2>
 &lt;p>Kerberos principal用于在kerberos加密系统中标记一个唯一的身份。&lt;br>
 kerberos为kerberos principal分配tickets使其可以访问由kerberos加密的hadoop服务。&lt;br>
 对于hadoop，principals的格式为username/fully.qualified.domain.name@YOUR-REALM.COM.&lt;br>
 keytab是包含principals和加密principal key的文件。&lt;br>
 keytab文件对于每个host是唯一的，因为key中包含hostname。keytab文件用于不需要人工交互和保存纯文本密码，实现到kerberos上验证一个主机上的principal。&lt;br>
 因为服务器上可以访问keytab文件即可以以principal的身份通过kerberos的认证，所以，keytab文件应该被妥善保存，应该只有少数的用户可以访问。&lt;/p>
-&lt;h1 id="kdc服务安装及配置">KDC服务安装及配置&lt;/h1>
-&lt;h2 id="安装kdc服务">安装KDC服务&lt;/h2>
+&lt;h2 id="kdc服务安装及配置">KDC服务安装及配置&lt;/h2>
+&lt;h3 id="安装kdc服务">安装KDC服务&lt;/h3>
 &lt;p>选择NameNode节点(cdh1)安装KDC服务, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>yum -y install krb5-server krb5-libs krb5-auth-dialog krb5-workstation openldap-clients
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其他节点(cdh2-4)只安装Kerberos客户端, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>yum -y install krb5-libs krb5-workstation
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="配置kdc服务">配置KDC服务&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置kdc服务">配置KDC服务&lt;/h3>
 &lt;p>1.编辑/etc/krb5.conf:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># Configuration snippets may be placed in this directory as well&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## Configuration snippets may be placed in this directory as well&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>includedir /etc/krb5.conf.d/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">[&lt;/span>logging&lt;span style="color:#5bc4bf">]&lt;/span>
@@ -2413,18 +2413,18 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">admin_keytab&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> /var/kerberos/krb5kdc/kadm5.keytab
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">supported_enctypes&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal camellia256-cts:normal camellia128-cts:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="创建kerberos数据库">创建Kerberos数据库&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="创建kerberos数据库">创建Kerberos数据库&lt;/h3>
 &lt;p>在cdh1执行以下命令, 注意域名:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kdb5_util create –r TURINGDI.COM -s
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>按提示设置密码并重复密码.&lt;/p>
-&lt;h2 id="创建kerberos的管理账号">创建Kerberos的管理账号&lt;/h2>
+&lt;h3 id="创建kerberos的管理账号">创建Kerberos的管理账号&lt;/h3>
 &lt;p>在cdh1执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kadmin.local
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>依次输入:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>addprinc admin/admin@TURINGDI.COM
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 按提示设置管理账号的密码并重复密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 按提示设置管理账号的密码并重复密码&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>exit
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="配置服务自启动">配置服务自启动&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置服务自启动">配置服务自启动&lt;/h3>
 &lt;p>在cdh1执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>chkconfig krb5kdc on
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hkconfig kadmin on
@@ -2432,7 +2432,7 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>service kadmin start
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后尝试登陆Kerberos的管理员账号:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kinit admin/admin@TURINGDI.COM
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 3. 输入刚才设定的管理账号密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 3. 输入刚才设定的管理账号密码&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>klist
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>应该会输出类似:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>Ticket cache: FILE:/tmp/krb5cc_0
@@ -2442,7 +2442,7 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2018-03-06T16:48:23 2018-03-07T16:48:23 krbtgt/TURINGDI.COM@TURINGDI.COM
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> renew &lt;span style="color:#815ba4">until&lt;/span> 2018-03-13T16:48:23
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即配置成功.&lt;/p>
-&lt;h1 id="cdh集群启用kerberos">CDH集群启用Kerberos&lt;/h1>
+&lt;h2 id="cdh集群启用kerberos">CDH集群启用Kerberos&lt;/h2>
 &lt;ol>
 &lt;li>进入Cloudera Manager的“管理”-&amp;gt; “安全”界面:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/security.png"
@@ -2469,13 +2469,13 @@ data-flex-basis="328px"
 &lt;li>输入Cloudera Manager的Kerbers管理员账号，必须和之前创建的账号一致，点击&amp;quot;继续&amp;quot;.&lt;/li>
 &lt;li>最后点击&amp;quot;继续&amp;quot;, 勾选重启集群, 点击&amp;quot;继续&amp;quot;按钮, 等待配置重启集群.&lt;/li>
 &lt;/ol>
-&lt;h1 id="aes-256加密与jce">AES-256加密与JCE&lt;/h1>
+&lt;h2 id="aes-256加密与jce">AES-256加密与JCE&lt;/h2>
 &lt;p>对于使用centos5.6及以上的系统，默认使用AES-256来加密的。这就需要集群中的所有节点上安装JCE.&lt;br>
 打开&lt;a class="link" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html" target="_blank" rel="noopener"
 >http://www.oracle.com/technetwork/java/javase/downloads/index.html&lt;/a>, 下载jdk对应的JCE文件.&lt;br>
 解压后的文件放入&lt;code>${JAVA_HOME}/jre/lib/security/&lt;/code>中.&lt;/p>
-&lt;h1 id="kerberos的基础使用">Kerberos的基础使用&lt;/h1>
-&lt;h2 id="yarn配置">Yarn配置&lt;/h2>
+&lt;h2 id="kerberos的基础使用">Kerberos的基础使用&lt;/h2>
+&lt;h3 id="yarn配置">Yarn配置&lt;/h3>
 &lt;p>打开Cloudera Manager的Yarn配置页面, 搜索min.user, 修改为0, 然后按提示重启Yarn.&lt;br>
 使用Kerberos需要新建一些用户, 其id可能小于1000, 使用Yarn的默认配置可能会导致一些用户不能提交Yarn任务.&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/yarn.png"
@@ -2487,12 +2487,12 @@ class="gallery-image"
 data-flex-grow="179"
 data-flex-basis="430px"
 >&lt;/p>
-&lt;h2 id="导出keytab">导出keytab&lt;/h2>
+&lt;h3 id="导出keytab">导出keytab&lt;/h3>
 &lt;p>进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>xst -k /path/to/*.keytab -norandkey &amp;lt;principal&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中principal为需要导出keytab的用户名, 如hbase/cdh2, 注意-norandkey参数不可缺少, 否则可能会导致重新生成密码, 导致keytab失效.&lt;br>
 导出的keytab的效用等同账号密码, 请注意妥善保管.&lt;/p>
-&lt;h2 id="以某个kerberos用户登录">以某个Kerberos用户登录&lt;/h2>
+&lt;h3 id="以某个kerberos用户登录">以某个Kerberos用户登录&lt;/h3>
 &lt;p>两种方法:&lt;/p>
 &lt;ol>
 &lt;li>&lt;code>kinit 用户名@域名&lt;/code>, 输入密码;&lt;/li>
@@ -2500,12 +2500,12 @@ data-flex-basis="430px"
 &lt;/ol>
 &lt;p>后者无需输入密码, 适合在脚本中使用.&lt;br>
 一些组件对Kerberos的令牌有限制, 需要登录对应用户后才能使用, 包括HDFS的文件访问控制, 需要在Kerberos中建立对应的用户.&lt;/p>
-&lt;h2 id="创建kerberos用户">创建Kerberos用户&lt;/h2>
+&lt;h3 id="创建kerberos用户">创建Kerberos用户&lt;/h3>
 &lt;p>前面已经使用过了, 进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>addprinc 用户名@域名
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 按提示设置管理账号的密码并重复密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 按提示设置管理账号的密码并重复密码&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Sentry部署,配置与使用</title><link>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:22 +0800</pubDate><guid>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/summer.jpg" alt="Featured image of post Sentry部署,配置与使用" />&lt;p>最近在CDH集群部署Sentry和Kerberos遇到了不少坑, 把过程总结一下, 都放上来吧.&lt;/p>
-&lt;h1 id="sentry组件安装">Sentry组件安装&lt;/h1>
+&lt;h2 id="sentry组件安装">Sentry组件安装&lt;/h2>
 &lt;p>进入Cloudera Manager页面, 点击集群名右边的倒三角按钮, 选择&amp;quot;添加服务&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/add.png"
 width="844"
@@ -2540,8 +2540,8 @@ data-flex-basis="818px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">create&lt;/span> &lt;span style="color:#815ba4">database&lt;/span> sentry &lt;span style="color:#815ba4">default&lt;/span> character &lt;span style="color:#815ba4">set&lt;/span> utf8 &lt;span style="color:#815ba4">default&lt;/span> &lt;span style="color:#815ba4">collate&lt;/span> utf8_general_ci;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> sentry.&lt;span style="color:#5bc4bf">*&lt;/span> &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentry&amp;#39;&lt;/span>&lt;span style="color:#5bc4bf">@&lt;/span>&lt;span style="color:#48b685">&amp;#39;%&amp;#39;&lt;/span> identified &lt;span style="color:#815ba4">by&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentrypassword&amp;#39;&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>创建Sentry所需的数据库, 然后在Sentry安装页面中填上MySQL的地址账号密码, 点击继续, 等待安装和首次启动完毕.&lt;/p>
-&lt;h1 id="sentry及相关组件配置">Sentry及相关组件配置&lt;/h1>
-&lt;h2 id="hue配置">Hue配置&lt;/h2>
+&lt;h2 id="sentry及相关组件配置">Sentry及相关组件配置&lt;/h2>
+&lt;h3 id="hue配置">Hue配置&lt;/h3>
 &lt;p>进入Hue配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHue.png"
 width="970"
@@ -2552,7 +2552,7 @@ class="gallery-image"
 data-flex-grow="606"
 data-flex-basis="1455px"
 >&lt;/p>
-&lt;h1 id="hive配置">Hive配置&lt;/h1>
+&lt;h2 id="hive配置">Hive配置&lt;/h2>
 &lt;p>进入Hive配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHive1.png"
 width="946"
@@ -2583,7 +2583,7 @@ class="gallery-image"
 data-flex-grow="372"
 data-flex-basis="894px"
 >&lt;/p>
-&lt;h2 id="impala配置">Impala配置&lt;/h2>
+&lt;h3 id="impala配置">Impala配置&lt;/h3>
 &lt;p>注: 需要确认集群每个节点都安装了Impala Daemon服务;如果Impala启动时提示cannot read or execute the parent directory of dfs.domain.socket.path, 则HDFS配置的dfs.client.read.shortcircuit勾选上, 并创建dfs.domain.socket.path的目录.&lt;br>
 进入Impala配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setImpala.png"
@@ -2595,7 +2595,7 @@ class="gallery-image"
 data-flex-grow="560"
 data-flex-basis="1344px"
 >&lt;/p>
-&lt;h2 id="hdfs配置">HDFS配置&lt;/h2>
+&lt;h3 id="hdfs配置">HDFS配置&lt;/h3>
 &lt;p>进入HDFS配置, 找到&amp;quot;启用访问控制列表 dfs.namenode.acls.enabled&amp;quot;, 勾选:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHdfs.png"
 width="1032"
@@ -2606,7 +2606,7 @@ class="gallery-image"
 data-flex-grow="905"
 data-flex-basis="2172px"
 >&lt;/p>
-&lt;h2 id="重启集群">重启集群&lt;/h2>
+&lt;h3 id="重启集群">重启集群&lt;/h3>
 &lt;p>Cloudera Manager会提示过期配置需要重启组件, 点击黄色圆形箭头, 点击&amp;quot;重启过时服务&amp;quot;, 并等待重启完成:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/change.png"
 width="742"
@@ -2617,18 +2617,18 @@ class="gallery-image"
 data-flex-grow="61"
 data-flex-basis="148px"
 >&lt;/p>
-&lt;h1 id="hue用户权限配置">Hue用户权限配置&lt;/h1>
-&lt;h2 id="前提">前提&lt;/h2>
+&lt;h2 id="hue用户权限配置">Hue用户权限配置&lt;/h2>
+&lt;h3 id="前提">前提&lt;/h3>
 &lt;p>Hue的用户权限体系是: 每个用户属于一个或多个组, 每个组可以配置其Hue页面访问权限及Hive/Solr/HDFS数据访问权限, 数据的访问权限由角色定义, 而用户组和角色之间是多对多关系.&lt;br>
 Hue使用Sentry进行权限管理之后, 要求登录Hue的用户及其组需要在Sentry Server节点(以正式环境为例, 即gs01节点)Linux系统中存在对应的用户和组, 否则无法进行权限控制.&lt;br>
 目前已经在Hue创建了一个hdfs用户组(拥有最高权限), 包含用户admin及hdfs, 两者在gs01节点Linux系统中均存在. hdfs用户的存在主要考虑到Spark程序通过hue的oozie工作流提交时, 保证其执行权限.&lt;br>
 下文假定需要建立一个用户组hiveselect和用户hive1, 允许登录, 拥有部分hive表的select权限.&lt;/p>
-&lt;h2 id="创建linux用户">创建Linux用户&lt;/h2>
+&lt;h3 id="创建linux用户">创建Linux用户&lt;/h3>
 &lt;p>ssh登录gs01节点, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>groupadd hiveselect
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>useradd -f hiveselect hive1
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>P.S. 上面命令建立的用户是没有密码的, 需要密码或其他选项的请自行添加参数.&lt;/p>
-&lt;h2 id="创建hue用户">创建Hue用户&lt;/h2>
+&lt;h3 id="创建hue用户">创建Hue用户&lt;/h3>
 &lt;p>使用admin或hdfs用户登录Hue, 点击右上角用户名, 选择&amp;quot;Manage users&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/addUser.png"
 width="446"
@@ -2687,7 +2687,7 @@ class="gallery-image"
 data-flex-grow="116"
 data-flex-basis="280px"
 >&lt;/p>
-&lt;h2 id="配置角色权限">配置角色权限&lt;/h2>
+&lt;h3 id="配置角色权限">配置角色权限&lt;/h3>
 &lt;p>点击左上角≡按钮, 再点击&amp;quot;Security&amp;rdquo;, 选择Hive Tables选项卡, 进行Hive访问权限配置.&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/menu.png"
 width="554"
@@ -2709,7 +2709,7 @@ data-flex-grow="252"
 data-flex-basis="606px"
 >&lt;br>
 填写完毕之后, 点击Save按钮, 稍等片刻即可生效(按目前经验来看, 新增的组可能需要3-5分钟才能生效, 已经配置过的组修改访问权限的话几乎是立刻生效).&lt;/p>
-&lt;h2 id="hive最高权限">Hive最高权限&lt;/h2>
+&lt;h3 id="hive最高权限">Hive最高权限&lt;/h3>
 &lt;p>Hue中配置的Hive权限是针对表的读写权限的, 并没有涉及到建库建表的权限, 使用管理员用户可以赋予该权限, 进入hue
 的Hive编辑器, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> server server1 &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#815ba4">role&lt;/span> hue角色名;
@@ -7564,12 +7564,12 @@ JVM内存结构不光是只有堆内存和栈内存，实际情况要复杂很�
 &lt;li>申请内存后，进行初始化零值（可以在TLAB分配时进行）；&lt;/li>
 &lt;li>设置对象的对象头（Object Header）；&lt;/li>
 &lt;li>执行&amp;lt;init&amp;gt;方法。&lt;/li>
-&lt;/ol></description></item><item><title>调整VirtualBox CentOS虚拟机磁盘大小</title><link>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</link><pubDate>Wed, 10 May 2017 12:54:24 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/vbox.png" alt="Featured image of post 调整VirtualBox CentOS虚拟机磁盘大小" />&lt;h1 id="背景">背景&lt;/h1>
+&lt;/ol></description></item><item><title>调整VirtualBox CentOS虚拟机磁盘大小</title><link>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</link><pubDate>Wed, 10 May 2017 12:54:24 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/vbox.png" alt="Featured image of post 调整VirtualBox CentOS虚拟机磁盘大小" />&lt;h2 id="背景">背景&lt;/h2>
 &lt;p>昨天发现本地HDP集群的HBase连不上了，解决了这个问题后，又发现HBase同步脚本一直执行失败，进YARN看了下，几天前开始堆积了很多ACCEPT了的任务，但没一个在执行，先用&lt;code>hadoop job kill &lt;/code>干掉了旧的任务，重新执行脚本，还是不行，日志上面却没报错。&lt;br>
 于是进Ambari一看，HDFS的DataNode全都满了……看来要扩容了。&lt;br>
 集群是部署在几台VirtualBox的CentOS虚拟机上的（起始我一直想转移到Docker上，但一直没时间+懒）。网上关于VirtualBox虚拟机磁盘扩容的文章很多，试了下，很多是行不通的，而且不太完整，于是把今天的经验记下来吧。&lt;/p>
-&lt;h1 id="具体步骤">具体步骤&lt;/h1>
-&lt;h2 id="磁盘映像扩容">磁盘映像扩容&lt;/h2>
+&lt;h2 id="具体步骤">具体步骤&lt;/h2>
+&lt;h3 id="磁盘映像扩容">磁盘映像扩容&lt;/h3>
 &lt;p>下面的命令以名为CentOS05的虚拟机为例进行。&lt;br>
 关闭虚拟机。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage controlvm CentOS05 poweroff
@@ -7578,7 +7578,7 @@ JVM内存结构不光是只有堆内存和栈内存，实际情况要复杂很�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>vboxmanage clonehd CentOS05-disk1.vmdk CentOS05-disk1.vdi --format VDI
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再扩容，注意默认单位是MB：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage modifyhd CentOS05-disk1.vdi --resize &lt;span style="color:#f99b15">122880&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="修改虚拟机挂载磁盘">修改虚拟机挂载磁盘&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改虚拟机挂载磁盘">修改虚拟机挂载磁盘&lt;/h3>
 &lt;p>查看虚拟机原来配置&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage showvminfo CentOS05
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意类似以下的信息，包括名称（IDE），端口号，设备ID（如IDE(1,0)的端口号是1，设备号0），下面要用到：&lt;/p>
@@ -7604,7 +7604,7 @@ medium：允许指定DVD／软盘驱动器是完全断开的（none）或仅是�
 &lt;/blockquote>
 &lt;p>再次查看配置确认修改成功：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage showvminfo CentOS05
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="修改centos分区配置">修改CentOS分区配置&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改centos分区配置">修改CentOS分区配置&lt;/h3>
 &lt;p>因为在系统启动后根目录的卸载之类的动作旧就不能执行了，所以只能在LiveCD里面改，建议使用gparted图形化工具修改分区大小，比较简单，此处不表。&lt;br>
 修改好启动虚拟机：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage startvm CentOS05 --type headless
@@ -7693,7 +7693,7 @@ FREE&lt;/p>
 &lt;strong>出没于&lt;/strong>：广州&lt;br>
 &lt;strong>GitHub&lt;/strong>：&lt;a class="link" href="https://github.com/Leibnizhu" target="_blank" rel="noopener"
 >Leibnizhu·Github&lt;/a>&lt;br>
-&lt;strong>GitLab&lt;/strong>：基本只放私有项目&lt;/p></description></item><item><title>Spark快速统计树状关系各层数量的一种算法</title><link>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 26 Apr 2017 15:29:19 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</guid><description>&lt;h1 id="需求">需求&lt;/h1>
+&lt;strong>GitLab&lt;/strong>：基本只放私有项目&lt;/p></description></item><item><title>Spark快速统计树状关系各层数量的一种算法</title><link>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 26 Apr 2017 15:29:19 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</guid><description>&lt;h2 id="需求">需求&lt;/h2>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1.png"
 width="132"
 height="253"
@@ -7706,7 +7706,7 @@ data-flex-basis="125px"
 对于类似上图所示的树状结构数据，统计每个节点的总子孙数、每个节点在各层的子孙数。&lt;br>
 比如B的总子孙数就是7（D/E/F/G/H/I/J），F的一级子孙数为2（G/H），F的二级和三级子孙数都为1（分别对应I和J）。&lt;br>
 注：此处用字母代替节点ID，是为了与级别区分，方便描述和理解，实际的节点ID并非如此。&lt;/p>
-&lt;h2 id="数据结构">数据结构&lt;/h2>
+&lt;h3 id="数据结构">数据结构&lt;/h3>
 &lt;p>树状关系在采集初期，是通过Netty搭建的微服务保存在HBase中，再通过Spark定期计算，保存到关系型数据库MySQL中。在MySQL中的表结构及保存的数据如下（经过精简，只保留与本文相关的字段）：&lt;/p>
 &lt;table>
 &lt;thead>
@@ -7781,13 +7781,13 @@ data-flex-basis="125px"
 &lt;/tbody>
 &lt;/table>
 &lt;p>ID、父节点ID、等级这几个字段比较好理解，父链稍加思考也可以看出来是从根节点一直到当前节点的链，以减号分割，父链字段前后都有减号，方便like查询的精准性。&lt;/p>
-&lt;h2 id="难点">难点&lt;/h2>
+&lt;h3 id="难点">难点&lt;/h3>
 &lt;p>可以看出来，单纯计算我们需要的指标并不困难，比如总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到；而各级子孙数也是，父链条件结合等级的条件就能查出来。&lt;br>
 但这些查询都需要遍历整个树，而每个节点会产生一次查询，相当于复杂度是O(N^2)；而且每次需要查询MySQL，计算速度被IO开销限制，Spark批量计算的优势丝毫无存，可以预见计算是相当缓慢的。&lt;/p>
-&lt;h1 id="解决方案">解决方案&lt;/h1>
-&lt;h2 id="思路">思路&lt;/h2>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;h3 id="思路">思路&lt;/h3>
 &lt;p>父链这个字段是为了将数据保存到MySQL，方便数据分析员进行查询而作出的妥协，而我们可以从父链下手，减少计算时间复杂度。&lt;/p>
-&lt;h3 id="总子孙数">总子孙数&lt;/h3>
+&lt;h4 id="总子孙数">总子孙数&lt;/h4>
 &lt;p>上面的分析已经提到，总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到，而考虑到树中没有环路，也就是说一个节点在树中只出现一次，那么在父链中也只会出现一次；也就是说，在整棵树里，一个节点的ID在所有父链中出现多少次（每次对应一个子节点的父链），就有多少个子孙节点。&lt;br>
 在SQL中查询父链包含某节点ID用的是like操作，查询速度很慢，我们在Spark中可以进行优化：&lt;/p>
 &lt;ol>
@@ -7795,7 +7795,7 @@ data-flex-basis="125px"
 &lt;li>所有节点父链split的结果进行Word-Count，一个节点ID在父链split结果中出现多少次，意味着它有多少个总子孙数。&lt;/li>
 &lt;/ol>
 &lt;p>以开始的图为例，所有父链拆分后拿到的结果是：&lt;code>(A,A,A,B,A,B,A,B,A,B,F,A,B,F,A,B,F,G,A,B,F,G,I)&lt;/code>，进行Word-Count的结果（Spark中可以直接用countByValue方法）是&lt;code>((A,9),(B,7),(F,4),(G,2),(I,1))&lt;/code>。这里已经出来每个节点的总子孙数了，结果中不存在的节点就是总子孙数为0。&lt;/p>
-&lt;h3 id="各层子孙数">各层子孙数&lt;/h3>
+&lt;h4 id="各层子孙数">各层子孙数&lt;/h4>
 &lt;p>从总子孙数的计算中进行扩展就可以计算各层的子孙数了。&lt;/p>
 &lt;ol>
 &lt;li>在父链split的时候加上当前节点的等级构成RDD，以节点D为例，D的父链为-A-B-，级别为3，split后就是&lt;code>(A,3),(B,3)&lt;/code>;&lt;/li>
@@ -7832,7 +7832,7 @@ data-flex-basis="125px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>map掉无用的等级，再count得到：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>(A,3),(B,2),(F,1),(G,1)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即只有这些节点有二级子孙，二级子孙个数也拿到了。&lt;/p>
-&lt;h2 id="spark代码scala">Spark代码(scala)&lt;/h2>
+&lt;h3 id="spark代码scala">Spark代码(scala)&lt;/h3>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//全部MySQL数据读到RDD中，格式为(用户ID,(*,*,*,*,等级,父节点ID,父链,*))
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> rsRDD &lt;span style="color:#815ba4">=&lt;/span> sc&lt;span style="color:#5bc4bf">.&lt;/span>makeRDD&lt;span style="color:#5bc4bf">(&lt;/span>readAllMySQLData&lt;span style="color:#5bc4bf">()).&lt;/span>cache&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -7853,24 +7853,24 @@ data-flex-basis="125px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> secondShare &lt;span style="color:#815ba4">=&lt;/span> secondUser&lt;span style="color:#5bc4bf">.&lt;/span>join&lt;span style="color:#5bc4bf">(&lt;/span>secondList&lt;span style="color:#5bc4bf">).&lt;/span>filter&lt;span style="color:#5bc4bf">(&lt;/span>p &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> p&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_1 &lt;span style="color:#5bc4bf">==&lt;/span> p&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">.&lt;/span>_2&lt;span style="color:#5bc4bf">).&lt;/span>map&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">_&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>_1&lt;span style="color:#5bc4bf">).&lt;/span>countByValue&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">………………&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Docker中Gitlab的持续集成安装与配置</title><link>https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/</link><pubDate>Wed, 26 Apr 2017 15:02:26 +0800</pubDate><guid>https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/docker-gitlab.png" alt="Featured image of post Docker中Gitlab的持续集成安装与配置" />&lt;h1 id="安装gitlab-ci-runner">安装Gitlab-CI-Runner&lt;/h1>
-&lt;h2 id="下载">下载&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Docker中Gitlab的持续集成安装与配置</title><link>https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/</link><pubDate>Wed, 26 Apr 2017 15:02:26 +0800</pubDate><guid>https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Docker%E4%B8%ADGitlab%E7%9A%84%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/docker-gitlab.png" alt="Featured image of post Docker中Gitlab的持续集成安装与配置" />&lt;h2 id="安装gitlab-ci-runner">安装Gitlab-CI-Runner&lt;/h2>
+&lt;h3 id="下载">下载&lt;/h3>
 &lt;p>根据&lt;a class="link" href="https://gitlab.com/gitlab-org/gitlab-ci-multi-runner" target="_blank" rel="noopener"
 >官方的说法&lt;/a>，Gitlab-CI-Runner9.0以后的版本需要GitLab9.0以上版本支持，我们目前部署的GitLab是8.x，所以需要下载旧版。&lt;br>
 最新版：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo wget -O /usr/local/bin/gitlab-runner https://gitlab-ci-multi-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-ci-multi-runner-linux-amd64
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>旧版（如v1.11.0）：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo wget -O /usr/local/bin/gitlab-runner https://gitlab-ci-multi-runner-downloads.s3.amazonaws.com/v1.11.0/binaries/gitlab-ci-multi-runner-linux-amd64
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="安装配置">安装配置&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="安装配置">安装配置&lt;/h3>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo chmod +x /usr/local/bin/gitlab-runner
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo useradd --comment &lt;span style="color:#48b685">&amp;#39;GitLab Runner&amp;#39;&lt;/span> --create-home gitlab-runner --shell /bin/bash
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo gitlab-runner register
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>执行上面最后一句命令的时候，会要求输入网址和秘钥，此时打开Gitlab页面，进项目，右上角配置按钮-Runners，再按此时页面上给出的来填。&lt;br>
 还会要求输入名称和标签之类的信息，到最后会提示输入运行环境之类，我们Gitlab是在docker上，但Runner和Gitlab在同一个docker容器中的，就是在Gitlab调用的角度上来看，Runner并不是在docker中，所以运行环境那里选shell就行。&lt;/p>
-&lt;h2 id="运行">运行&lt;/h2>
+&lt;h3 id="运行">运行&lt;/h3>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo gitlab-runner install --user&lt;span style="color:#5bc4bf">=&lt;/span>gitlab-runner --working-directory&lt;span style="color:#5bc4bf">=&lt;/span>/home/gitlab-runner
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo gitlab-runner start
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="配置项目的ci脚本">配置项目的CI脚本&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="配置项目的ci脚本">配置项目的CI脚本&lt;/h2>
 &lt;p>在项目根目录创建文件.gitlab-ci.yml，写入CI执行的脚本，具体参考&lt;a class="link" href="http://docs.gitlab.com/ce/ci/yaml/README.html" target="_blank" rel="noopener"
 >官方文档&lt;/a>&lt;br>
 此处以最简单的maven打包部署tomcat为例：&lt;/p>
@@ -7898,7 +7898,7 @@ data-flex-basis="125px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> echo &lt;span style="color:#48b685">&amp;#34;No new war package...&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">fi&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这个脚本通过crontab定时每分钟执行，所以检查war包的修改时间与当前时间相差小于60秒就会复制war包到tomcat的webapps中。&lt;/p>
-&lt;h1 id="配置pipeline邮件通知">配置Pipeline邮件通知&lt;/h1>
+&lt;h2 id="配置pipeline邮件通知">配置Pipeline邮件通知&lt;/h2>
 &lt;p>Gitlab默认CI Pipeline任务成功失败都会发邮件通知，这样或许会困扰到大家，所以修改Gitlab的源码，只让部署不成功的时候才发邮件通知。&lt;br>
 进入docker，编辑&lt;code>/opt/gitlab/embedded/service/gitlab-rails/app/services/notification_service.rb&lt;/code>，在&lt;code>pipeline_finished&lt;/code>方法的开头添加&lt;code>return if pipeline.status == &amp;quot;success&amp;quot; &lt;/code>，如：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-ruby" data-lang="ruby">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">pipeline_finished&lt;/span>(pipeline, recipients &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">nil&lt;/span>)
@@ -7906,13 +7906,13 @@ data-flex-basis="125px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> email_template &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;pipeline_&lt;/span>&lt;span style="color:#f99b15">#{&lt;/span>pipeline&lt;span style="color:#5bc4bf">.&lt;/span>status&lt;span style="color:#f99b15">}&lt;/span>&lt;span style="color:#48b685">_email&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">…………………………&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>HBase外网同步脚本</title><link>https://leibnizhu.github.io/p/HBase%E5%A4%96%E7%BD%91%E5%90%8C%E6%AD%A5%E8%84%9A%E6%9C%AC/</link><pubDate>Sat, 22 Apr 2017 19:34:10 +0800</pubDate><guid>https://leibnizhu.github.io/p/HBase%E5%A4%96%E7%BD%91%E5%90%8C%E6%AD%A5%E8%84%9A%E6%9C%AC/</guid><description>&lt;h1 id="问题">问题&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>HBase外网同步脚本</title><link>https://leibnizhu.github.io/p/HBase%E5%A4%96%E7%BD%91%E5%90%8C%E6%AD%A5%E8%84%9A%E6%9C%AC/</link><pubDate>Sat, 22 Apr 2017 19:34:10 +0800</pubDate><guid>https://leibnizhu.github.io/p/HBase%E5%A4%96%E7%BD%91%E5%90%8C%E6%AD%A5%E8%84%9A%E6%9C%AC/</guid><description>&lt;h2 id="问题">问题&lt;/h2>
 &lt;p>我们用多台云服务器搭建了HDP的hadoop集群，为了方便测试，在本地用virtualbox虚拟机搭建了一个架构完全一样的集群。为了测试程序，训练模型，本地的集群的数据也需要与云服务器上集群的一样。&lt;br>
 MySQL数据库可以通过主从备份实时同步，而HBase数据在配置同步的过程中就遇到了问题，常规的方法无法完成同步。&lt;/p>
-&lt;h1 id="常规方法">常规方法&lt;/h1>
+&lt;h2 id="常规方法">常规方法&lt;/h2>
 &lt;p>HBase可以设置备份，然而只能在同一个内网，而我们不想搭建vpn。&lt;br>
 然后是借助sqoop之类的工具，我们尝试对zookeeper等相关使用的端口开启内网映射，然而还是无法从外网访问，检查了iptables，没发现问题，原因未知。&lt;/p>
-&lt;h1 id="最终方案">最终方案&lt;/h1>
+&lt;h2 id="最终方案">最终方案&lt;/h2>
 &lt;p>最后采用了最暴力的方案，就是使用HBase自带的export和import功能，把云端HBase整个表导出到文件再导入到本地集群HBase，缺点是慢，因为是通过mapReduce操作完成的，数据量大的时候尤其慢。而且不知为何，无法直接导出到本地文件系统，只能通过HDFS文件系统中转，也就是说，整个同步流程是：&lt;/p>
 &lt;ol>
 &lt;li>云端HBase数据库表export到云端HDFS&lt;/li>
@@ -7944,7 +7944,7 @@ MySQL数据库可以通过主从备份实时同步，而HBase数据在配置同�
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#48b685"> hadoop fs -put /home/hdfs/backup /test
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#48b685"> /usr/hdp/current/hbase-client/bin/hbase org.apache.hadoop.hbase.mapreduce.Driver import &amp;#39;SHARE_CHAIN&amp;#39; /backup/表名
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#48b685"> eeooff&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Scala实现64位的MurmurHash函数</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</link><pubDate>Thu, 19 Jan 2017 11:20:52 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</guid><description>&lt;h1 id="简介">简介&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Scala实现64位的MurmurHash函数</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</link><pubDate>Thu, 19 Jan 2017 11:20:52 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</guid><description>&lt;h2 id="简介">简介&lt;/h2>
 &lt;p>最近使用Spark的GraphX进行一些图计算，GraphX要求每个节点都有唯一的ID；但我们的数据并没有包含唯一的ID，所以需要使用Hash函数将每条数据的信息进行摘要生成唯一ID。&lt;br>
 Hash中，String自己的hashCode()自然是很烂的(字符串每个字符乘以质数再与之前hash相加，如此迭代)，MD5/SHA1之类的算法开销又比较大，Spark图运算的时候节点较多，hash的开销还是蛮可观的。&lt;br>
 经过搜索，发现了MurmurHash算法，具体参考 &lt;a class="link" href="https://zh.wikipedia.org/wiki/Murmur%E5%93%88%E5%B8%8C" target="_blank" rel="noopener"
@@ -7952,7 +7952,7 @@ Hash中，String自己的hashCode()自然是很烂的(字符串每个字符乘�
 Scala API自身是有MurmurHash算法的实现的（&lt;a class="link" href="http://www.scala-lang.org/api/current/scala/util/hashing/MurmurHash3$.html" target="_blank" rel="noopener"
 >scala.util.hashing.MurmurHash3&lt;/a>），但返回值是int，32位。对于海量数据而言，显然不够用，我们需要64位的。&lt;br>
 于是就写了个scala实现的64位MurmurHash函数，详见下文（没有测试过具体的碰撞性能）。&lt;/p>
-&lt;h1 id="scala实现">scala实现&lt;/h1>
+&lt;h2 id="scala实现">scala实现&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">object&lt;/span> &lt;span style="color:#fec418">MurmurHash64&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">def&lt;/span> stringHash&lt;span style="color:#5bc4bf">(&lt;/span>str&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">String&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Long&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> data &lt;span style="color:#815ba4">=&lt;/span> str&lt;span style="color:#5bc4bf">.&lt;/span>getBytes
@@ -8001,19 +8001,19 @@ Scala API自身是有MurmurHash算法的实现的（&lt;a class="link" href="htt
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> h
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>js跨域获取Cookie的一种新方法</title><link>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</link><pubDate>Thu, 12 Jan 2017 14:01:25 +0800</pubDate><guid>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</guid><description>&lt;h1 id="背景">背景&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>js跨域获取Cookie的一种新方法</title><link>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</link><pubDate>Thu, 12 Jan 2017 14:01:25 +0800</pubDate><guid>https://leibnizhu.github.io/p/js%E8%B7%A8%E5%9F%9F%E8%8E%B7%E5%8F%96Cookie%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B0%E6%96%B9%E6%B3%95/</guid><description>&lt;h2 id="背景">背景&lt;/h2>
 &lt;p>同一个项目分配了多个域名，在其中一个域名（下称域名A）的一级域名上放了Cookie。&lt;br>
 使用其他域名(下面统称域名B*)去访问某些页面时，需要使用js读取域名A下的那个Cookie。&lt;/p>
-&lt;h1 id="已有的解决方案">已有的解决方案&lt;/h1>
+&lt;h2 id="已有的解决方案">已有的解决方案&lt;/h2>
 &lt;p>网上已经有一些解决方案，如：&lt;a class="link" href="https://m.th7.cn/show/22/201503/88209.htm" target="_blank" rel="noopener"
 >JS跨域（ajax跨域、iframe跨域）解决方法及原理详解（jsonp）&lt;/a>、&lt;a class="link" href="http://www.cnblogs.com/chris-shao/archive/2012/12/27/2835986.html" target="_blank" rel="noopener"
 >JS 获取跨域的cookie&lt;/a>。&lt;br>
 其中document.domain的方法已确认不可用于我的需求，iframe跨域可以实现，但是跨域后的页面在iframe中，此时js变量的作用域只在iframe中，需要通过一个中间元素的值或者属性来写入需要传递的值，比较麻烦；document.name的方法虽然可以跨域，但同时也跨页面了，处理起来要小心点。&lt;/p>
-&lt;h1 id="本文的解决方案">本文的解决方案&lt;/h1>
-&lt;h2 id="原理">原理&lt;/h2>
+&lt;h2 id="本文的解决方案">本文的解决方案&lt;/h2>
+&lt;h3 id="原理">原理&lt;/h3>
 &lt;p>在域名B*的页面上，js的确不能直接获取到域名A的cookie，但显然，域名B*的页面如果发请求到域名A，会带上域名A的Cookie。&lt;br>
 针对这一点，只要我们在域名A上面部署一个微服务，域名B*的页面发AJAX请求到这个服务，返回域名A的Cookie中我们感兴趣字段的值。域名B*的页面就能接收到域名A的Cookie，可以各种利用了。&lt;/p>
-&lt;h2 id="netty实现">Netty实现&lt;/h2>
+&lt;h3 id="netty实现">Netty实现&lt;/h3>
 &lt;p>域名A的服务器端选用Netty实现。实现代码很简单，这里只给出核心Handler部分代码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">RPCMissionHandler&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> SimpleChannelInboundHandler&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>FullHttpRequest&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> Logger LOG &lt;span style="color:#5bc4bf">=&lt;/span> Logger&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getLogger&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>RPCMissionHandler&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">class&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
@@ -8098,7 +8098,7 @@ Scala API自身是有MurmurHash算法的实现的（&lt;a class="link" href="htt
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>resp&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">headers&lt;/span>&lt;span style="color:#5bc4bf">().&lt;/span>&lt;span style="color:#06b6ef">set&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Access-Control-Allow-Methods&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;GET, POST&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>resp&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">headers&lt;/span>&lt;span style="color:#5bc4bf">().&lt;/span>&lt;span style="color:#06b6ef">set&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Access-Control-Allow-Credentials&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中referer就是域名B*。&lt;/p>
-&lt;h2 id="页面js调用">页面js调用&lt;/h2>
+&lt;h3 id="页面js调用">页面js调用&lt;/h3>
 &lt;p>js发AJAX请求这块就更简单了。唯一注意的是，我们这个Cookie字段可能在页面加载后一段时间才能获取到，所以这里设置了重试机制，获取不到ID的时候等待1秒后重新发送一次请求，一共最多请求5次。&lt;br>
 这里发送AJAX请求也涉及到一些跨域的配置，详见注释&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#06b6ef">$&lt;/span>(window).&lt;span style="color:#06b6ef">load&lt;/span>(&lt;span style="color:#815ba4">function&lt;/span>(){
@@ -8121,16 +8121,16 @@ Scala API自身是有MurmurHash算法的实现的（&lt;a class="link" href="htt
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> });
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>});
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>HashMap源码阅读笔记</title><link>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sat, 24 Dec 2016 16:48:04 +0800</pubDate><guid>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;h1 id="put方法">put方法：&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>HashMap源码阅读笔记</title><link>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sat, 24 Dec 2016 16:48:04 +0800</pubDate><guid>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;h2 id="put方法">put方法：&lt;/h2>
 &lt;p>put方法调用私有方法&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>putVal&lt;span style="color:#5bc4bf">(&lt;/span>hash&lt;span style="color:#5bc4bf">(&lt;/span>key&lt;span style="color:#5bc4bf">),&lt;/span>key&lt;span style="color:#5bc4bf">,&lt;/span>value&lt;span style="color:#5bc4bf">,&lt;/span>&lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span>&lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="先去计算hash">先去计算hash。&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="先去计算hash">先去计算hash。&lt;/h3>
 &lt;p>key非空的时候返回：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>h&lt;span style="color:#5bc4bf">=&lt;/span>key&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">hashCode&lt;/span>&lt;span style="color:#5bc4bf">())^(&lt;/span>h&lt;span style="color:#5bc4bf">&amp;gt;&amp;gt;&amp;gt;&lt;/span>16&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即高16位不变，低16位与高16位做异或运算，因为目前的table长度n为2的幂，而计算下标的时候，是这样实现的(使用&amp;amp;位操作，而非%求余)：(n - 1) &amp;amp; hash 。设计者认为这方法很容易发生碰撞。在n - 1为15(0x1111)时，其实散列真正生效的只是低4bit的有效位，当然容易碰撞了。因此，综合考虑了速度、作用、质量，把高16bit和低16bit异或了一下。设计者还解释到因为现在大多数的hashCode的分布已经很不错了，就算是发生了碰撞也用O(logn)的tree去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table长度比较小时)，从而引起的碰撞。&lt;/p>
-&lt;h2 id="然后进入putval">然后进入putVal()。&lt;/h2>
+&lt;h3 id="然后进入putval">然后进入putVal()。&lt;/h3>
 &lt;p>首先判断table是否为空（null或长度为0），为空的话进行resize()。&lt;/p>
-&lt;h2 id="resize">resize()&lt;/h2>
+&lt;h3 id="resize">resize()&lt;/h3>
 &lt;p>如果原来table大小已经超过上限，则不resize，直接返回原来table；
 原来table大小不为0且未超上限则容量增倍，threshold（扩容阈值）也增倍；
 原来table大小为0，则大小设为DEFAULT_INITIAL_CAPACITY=16，threshold设为DEFAULT_LOAD_FACTOR*DEFAULT_INITIAL_CAPACITY=12。
@@ -8204,15 +8204,15 @@ data-flex-basis="422px"
 既省去了重新计算hash值的时间，而且由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。
 上面代码中else{//preserveorder之后的部分即完成了上述过程，将一个节点上的链表拆分成用loHead,loTail和hiHead,hiTail
 描述的两个链表，分别对应新表中位置不变的节点，和移动oldCap之后的节点。&lt;/p>
-&lt;h2 id="新建节点或更新value">新建节点或更新value&lt;/h2>
+&lt;h3 id="新建节点或更新value">新建节点或更新value&lt;/h3>
 &lt;p>然后判断当前hash值对应table的节点是否为空，为空的话直接新建节点即可：new Node&amp;lt;&amp;gt;(hash,key,value,null);最后一个参数是next，因为table原节点为空，为链表第一个元素，所以next设为null即可；
 如果hash值对应table节点不为空，则判断原节点和当前插入的数据key及value是否都一致，如果一致，证明是同一个节点，无需重新插入；
 否则进入table节点的链表，遍历，如果找到与待插入节点一样的节点，则直接退出，否则一直找到链表末端节点还没找到相同的，则增加新节点插入当前数据，如果当前链表长度大于TREEIFY_THRESHOLD-1，还需要进行treeifyBin()操作，将链表转换为红黑树，提高查询效率（O(n)变为O(logn)，JDK8之后引入的优化）。
 如果以上操作中找到待插入节点的key在map中已存在，则用新数据覆盖之，最后size++, 判断table尺寸，看是否需要进行resize()。&lt;/p>
-&lt;h1 id="get方法">get方法：&lt;/h1>
+&lt;h2 id="get方法">get方法：&lt;/h2>
 &lt;p>get时调用&lt;code>getNode(int hash, Object key)&lt;/code>方法。
 首先table为null或长度为0或对应hash位置的元素为null均返回null。
-否则先判断hash位置上的元素key和get方法的key相同，如果相同则直接返回hash位置的元素；否则判断hash位置节点是否为TreeNode，若是则调用getTreeNode方法进行处理并返回；对于非TreeNode节点，且hash位置节点的key不等于get方法dekey的话，则遍历hash位置节点的链表，直到找到key相同的节点并返回节点的value。&lt;/p></description></item><item><title>HtmlUnit爬虫使用代理时对HTTP请求头Proxy-Connection字段的探究</title><link>https://leibnizhu.github.io/p/HtmlUnit%E7%88%AC%E8%99%AB%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%97%B6%E5%AF%B9HTTP%E8%AF%B7%E6%B1%82%E5%A4%B4Proxy-Connection%E5%AD%97%E6%AE%B5%E7%9A%84%E6%8E%A2%E7%A9%B6/</link><pubDate>Sun, 04 Dec 2016 09:39:02 +0800</pubDate><guid>https://leibnizhu.github.io/p/HtmlUnit%E7%88%AC%E8%99%AB%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%97%B6%E5%AF%B9HTTP%E8%AF%B7%E6%B1%82%E5%A4%B4Proxy-Connection%E5%AD%97%E6%AE%B5%E7%9A%84%E6%8E%A2%E7%A9%B6/</guid><description>&lt;h1 id="背景">背景&lt;/h1>
+否则先判断hash位置上的元素key和get方法的key相同，如果相同则直接返回hash位置的元素；否则判断hash位置节点是否为TreeNode，若是则调用getTreeNode方法进行处理并返回；对于非TreeNode节点，且hash位置节点的key不等于get方法dekey的话，则遍历hash位置节点的链表，直到找到key相同的节点并返回节点的value。&lt;/p></description></item><item><title>HtmlUnit爬虫使用代理时对HTTP请求头Proxy-Connection字段的探究</title><link>https://leibnizhu.github.io/p/HtmlUnit%E7%88%AC%E8%99%AB%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%97%B6%E5%AF%B9HTTP%E8%AF%B7%E6%B1%82%E5%A4%B4Proxy-Connection%E5%AD%97%E6%AE%B5%E7%9A%84%E6%8E%A2%E7%A9%B6/</link><pubDate>Sun, 04 Dec 2016 09:39:02 +0800</pubDate><guid>https://leibnizhu.github.io/p/HtmlUnit%E7%88%AC%E8%99%AB%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%97%B6%E5%AF%B9HTTP%E8%AF%B7%E6%B1%82%E5%A4%B4Proxy-Connection%E5%AD%97%E6%AE%B5%E7%9A%84%E6%8E%A2%E7%A9%B6/</guid><description>&lt;h2 id="背景">背景&lt;/h2>
 &lt;p>最近给以前写的一个刷流量的爬虫/工具增加动态切换代理的功能。&lt;/p>
 &lt;p>这个工具基于Java开发，使用了HtmlUnit库模拟浏览器进行访问，并加载页面中所有的JS以触发第三方监控。其实可以抓第三方监控的请求，然后再直接模拟这些请求，但这样就缺乏通用性，即不同的网站需要单独针对抓请求分析，所以选择了直接模拟浏览器加载JS的方法。&lt;/p>
 &lt;p>而最近新需求要求增加使用代理模拟多地访问的功能，所以：&lt;/p>
@@ -8221,7 +8221,7 @@ data-flex-basis="422px"
 &lt;li>而后发现这样抓到的代理很少，一直维持50个左右可用的，而且经常返回403错误，不能满足刷流量工具的需求，所以购买了某收费代理；&lt;/li>
 &lt;li>在使用收费代理的过程中，发现通过很多宣称高可靠的代理进行访问时依然返回403错误码，结果是大量代理不可用。&lt;/li>
 &lt;/ol>
-&lt;h1 id="问题分析">问题分析&lt;/h1>
+&lt;h2 id="问题分析">问题分析&lt;/h2>
 &lt;p>首先，Python抓回来的代理是经过Python的Requests库检验的，确认可以通过其进行网页访问才放入数据库的；而购买的代理宣称高可靠的也是有自己的检测的，而且可以看到他们的检验时间跟我的使用时间一般只相差几分钟，应该不会有大量代理在这几分钟之内失效。&lt;/p>
 &lt;p>所以怀疑是HtmlUnit的问题。HtmlUnit库可以选择使用不同的浏览器类型/版本（根据官网文档，这些不同的浏览器的区别是JS的解析方法和User-Agent、HTTP请求头），我们首先尝试了所有HtmlUnit支持的浏览器类型/版本，发现还是有大量的代理在使用时返回403错误码。&lt;/p>
 &lt;p>再思考为什么会返回403，要么就是请求头有问题，要么我们的IP被封了。但我们的IP应该没干过什么坏事，不会轻易被列入黑名单吧，所以还是往请求头的方向去想，毕竟爬虫的话出问题也经常是因为请求头有问题，异于常规的访问。所以我们尝试了很多User-Agent，发现还是不行。&lt;/p>
@@ -8265,28 +8265,28 @@ Python的Requests库使用代理访问产生的HTTP请求包：&lt;/p>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">[&lt;/span>HTTP request 1/1&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到，Requests使用的User-Agent是python-requests，竟然也没被拦截，而HtmlUnit使用真实浏览器的User-Agent却返回403，看来跟User-Agent无关；事实上，我们尝试将HtmlUnit的User-Agent设置为与Requests一样，再去访问，一样得到403。&lt;/p>
 &lt;p>然后仔细看HTTP请求头，不难发现，唯一的区别在于python-requests使用了一个Connection的字段，这个大家都比较熟悉，是要求远程服务器启用长连接的；而HtmlUnit没有Connection字段，取而代之的是Proxy-Connection字段，明显与代理有关。那么问题出在这个HTTP请求头字段上面？？？&lt;/p>
-&lt;h1 id="proxy-connection是什么">Proxy-Connection是什么&lt;/h1>
+&lt;h2 id="proxy-connection是什么">Proxy-Connection是什么&lt;/h2>
 &lt;p>通过Google我们发现Proxy-Connection是为了兼容不同HTTP协议版本而产生的一个字段，可以参考这篇文章：&lt;br>
 &lt;a class="link" href="https://imququ.com/post/the-proxy-connection-header-in-http-request.html" target="_blank" rel="noopener"
 >Http 请求头中的 Proxy-Connection&lt;/a>&lt;br>
 大概意思就是如果使用代理服务的时候，还是发送Connection字段，那么一些旧的代理服务器不能处理这个字段而直接转发给目标服务器，最后目标服务器可能同意开启长连接，而代理服务器却没有正确地响应建立长连接，最后导致不能正常访问；所以才在使用代理的时候，使用Proxy-Connection替代Connection，让远程服务器区分对待。&lt;/p>
 &lt;p>总而言之，使用代理服务器的时候，请求头使用Proxy-Connection字段是符合HTTP协议的。也就是说其实HtmlUnit的处理是正确的，而Requests的处理反而是不符合HTTP协议的？&lt;/p>
-&lt;h1 id="htmlunit中去除proxy-connection字段">HtmlUnit中去除Proxy-Connection字段&lt;/h1>
+&lt;h2 id="htmlunit中去除proxy-connection字段">HtmlUnit中去除Proxy-Connection字段&lt;/h2>
 &lt;p>不管谁对谁错，就目前状况而言，似乎使用了Proxy-Connection就是会让代理服务器返回403，或许是因为这些代理服务器不希望开启长连接？（毕竟很多代理服务器隔一小段时间就要切换端口之类的，比较被人长时间占用），所以我们的目标变成使用HtmlUnit发送请求的时候去除HTTP请求头的Proxy-Connection字段。&lt;/p>
-&lt;h2 id="removerequestheader">removeRequestHeader()&lt;/h2>
+&lt;h3 id="removerequestheader">removeRequestHeader()&lt;/h3>
 &lt;p>HtmlUnit的核心类WebClient有方法&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>removeRequestHeader&lt;span style="color:#5bc4bf">(&lt;/span>String name&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以删除请求头的字段。不过经过尝试，调用了&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>removeRequestHeader&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Proxy-Connection&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>之后，发出的请求还是带有Proxy-Connection字段。&lt;/p>
-&lt;h2 id="webrequestremoveadditionalheader">WebRequest.removeAdditionalHeader()&lt;/h2>
+&lt;h3 id="webrequestremoveadditionalheader">WebRequest.removeAdditionalHeader()&lt;/h3>
 &lt;p>于是尝试别的方法，在访问页面的时候再删除请求头：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>WebRequest request &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> WebRequest&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> URL&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;**********&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">));&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>request&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">removeAdditionalHeader&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Proxy-Connection&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>request&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">setAdditionalHeader&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;Connection&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;Keep-Alive&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>HtmlPage page1 &lt;span style="color:#5bc4bf">=&lt;/span> webClient&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getPage&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>request&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>依然不行。&lt;/p>
-&lt;h2 id="查看源码">查看源码&lt;/h2>
+&lt;h3 id="查看源码">查看源码&lt;/h3>
 &lt;p>查看了HtmlUnit源码（在此不贴出来了），发现我们调用其方法处理Header，所处理的只不过是一个额外的Map，不管增加和删除都是在这个Map里面处理的，最后的Header是这个额外的Map和预定义的一些Header结合在一起。但是在源码中也没有发现Proxy-Connection字段的处理（如判断当前使用代理，则用Proxy-Connection字段取代Connection字段等逻辑）。&lt;/p>
 &lt;p>仔细观察，其实HtmlUnit底层是调用了JDK的&lt;strong>sun.net.www.protocol.http.HttpURLConnection&lt;/strong> 进行访问的，我们再看HttpURLConnection的源码，发现有两处：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">writeRequests&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#815ba4">throws&lt;/span> IOException &lt;span style="color:#5bc4bf">{&lt;/span>
@@ -8306,7 +8306,7 @@ Python的Requests库使用代理访问产生的HTTP请求包：&lt;/p>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">…………&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>原来是在这里面处理的！！！！&lt;/p>
-&lt;h2 id="编译rtjar">编译rt.jar&lt;/h2>
+&lt;h3 id="编译rtjar">编译rt.jar&lt;/h3>
 &lt;p>&lt;strong>sun.net.www.protocol.http.HttpURLConnection&lt;/strong> 是在JRE的rt.jar中的核心类，不能随便修改。
 所以我们提取出HttpURLConnection，反编译，注释掉Proxy-Connection相关语句，重新编译，替换rt.jar中的响应class文件：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/HtmlUnit%E7%88%AC%E8%99%AB%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%97%B6%E5%AF%B9HTTP%E8%AF%B7%E6%B1%82%E5%A4%B4Proxy-Connection%E5%AD%97%E6%AE%B5%E7%9A%84%E6%8E%A2%E7%A9%B6/1.png"
@@ -8319,7 +8319,7 @@ data-flex-grow="197"
 data-flex-basis="474px"
 >&lt;br>
 重新测试，发现发出的请求还是带有Proxy-Connection字段！！！！&lt;/p>
-&lt;h1 id="python验证">Python验证&lt;/h1>
+&lt;h2 id="python验证">Python验证&lt;/h2>
 &lt;p>从另一个角度来验证：对于HtmlUnit使用会返回403的代理，在Python的Requests中使用，并在HTTP请求头加上Proxy-Connection字段。Python代码比较简单，执行时输入需要验证的IP和端口就行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#coding:utf-8 &lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">requests&lt;/span>
@@ -8338,15 +8338,15 @@ data-flex-basis="474px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">~&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>果然，控制台输出“Access not allowed!”。将“headers=header”去掉之后就能正常输出页面内容。&lt;br>
 因此可以确认是Proxy-Connection字段导致的问题。&lt;/p>
-&lt;h1 id="目前结论">目前结论&lt;/h1>
+&lt;h2 id="目前结论">目前结论&lt;/h2>
 &lt;ol>
 &lt;li>对于某些代理服务器，使用时请求头不能有Proxy-Connection字段；&lt;/li>
 &lt;li>在家里跑这个工具，却基本没有返回403错误…………看来还有可能是办公室IP被列入黑名单了……&lt;/li>
 &lt;li>对于Java开发，要选择不适用sun的HttpUrlConnection的html测试工具/模拟浏览器了；看了Selenium的源码，没有用这个类，准备试下。&lt;/li>
-&lt;/ol></description></item><item><title>Spring Boot快速入门（四）——日志系统</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</link><pubDate>Sat, 26 Nov 2016 16:00:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</guid><description>&lt;h1 id="日志系统">日志系统&lt;/h1>
-&lt;h2 id="简介">简介&lt;/h2>
+&lt;/ol></description></item><item><title>Spring Boot快速入门（四）——日志系统</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</link><pubDate>Sat, 26 Nov 2016 16:00:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</guid><description>&lt;h2 id="日志系统">日志系统&lt;/h2>
+&lt;h3 id="简介">简介&lt;/h3>
 &lt;p>Spring Boot默认使用的Apache的Common Logging日志系统，但同时也提供了Java Util Logging, Log4J, Log4J2和Logback等日志系统的支持（无需额外增加依赖）。&lt;/p>
-&lt;h2 id="日志格式">日志格式&lt;/h2>
+&lt;h3 id="日志格式">日志格式&lt;/h3>
 &lt;p>Spring Boot默认输出的日志各列含义如下：&lt;/p>
 &lt;ul>
 &lt;li>日期和时间 - 精确到毫秒，且易于排序。&lt;/li>
@@ -8364,7 +8364,7 @@ data-flex-basis="474px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.698 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.e.ServletRegistrationBean : Mapping servlet: &lt;span style="color:#48b685">&amp;#39;dispatcherServlet&amp;#39;&lt;/span> to &lt;span style="color:#5bc4bf">[&lt;/span>/&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.702 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.embedded.FilterRegistrationBean : Mapping filter: &lt;span style="color:#48b685">&amp;#39;hiddenHttpMethodFilter&amp;#39;&lt;/span> to: &lt;span style="color:#5bc4bf">[&lt;/span>/*&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以在resources/application.properties中使用logging.pattern.console和logging.pattern.file属性进行配置。&lt;/p>
-&lt;h2 id="日志配置">日志配置&lt;/h2>
+&lt;h3 id="日志配置">日志配置&lt;/h3>
 &lt;p>可以在&lt;strong>resources/application.properties&lt;/strong> 中进行配置，如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>###日志配置###
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#日志输出级别
@@ -8380,7 +8380,7 @@ data-flex-basis="474px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36}[%line]=&amp;gt; %msg%n
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#定义输出到文件的样式（不支持JDK Logger）
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#logging.pattern.file=
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="日志api调用">日志API调用&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="日志api调用">日志API调用&lt;/h3>
 &lt;p>类似Log4j：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.Log&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.LogFactory&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
@@ -8393,7 +8393,7 @@ data-flex-basis="474px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#ef6155">……&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="其他相关网站">其他相关网站&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他相关网站">其他相关网站&lt;/h2>
 &lt;p>Spring Boot相关博客：&lt;br>
 &lt;a class="link" href="http://blog.didispace.com/categories/Spring-Boot/" target="_blank" rel="noopener"
 >http://blog.didispace.com/categories/Spring-Boot/&lt;/a>&lt;br>
@@ -8563,9 +8563,9 @@ data-flex-basis="1424px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.prefix&lt;span style="color:#5bc4bf">=&lt;/span>classpath:/templates/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Suffix that gets appended to view names when building a URL.&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.suffix&lt;span style="color:#5bc4bf">=&lt;/span>.html spring.thymeleaf.template-resolver-order&lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#776e71"># Order of the template resolver in the chain. spring.thymeleaf.view-names= # Comma-separated list of view names that can be resolved.&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</link><pubDate>Sat, 26 Nov 2016 15:59:05 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</guid><description>&lt;h1 id="使用spring-boot">使用Spring Boot&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</link><pubDate>Sat, 26 Nov 2016 15:59:05 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</guid><description>&lt;h2 id="使用spring-boot">使用Spring Boot&lt;/h2>
 &lt;h2 id="编写demo的rest风格controller">编写Demo的REST风格Controller&lt;/h2>
-&lt;h3 id="前言">前言&lt;/h3>
+&lt;h4 id="前言">前言&lt;/h4>
 &lt;p>在DMP项目中，我们创建了demo分支，其中的com.turingdi.dmp.demo包中存放着这个demo。
 这个demo实现一个简单的REST风格的API：&lt;/p>
 &lt;ul>
@@ -8575,7 +8575,7 @@ data-flex-basis="1424px"
 &lt;li>GET请求访问/demo/user/&amp;lt;用户ID&amp;gt;可查询到对应用户的信息JSON；&lt;/li>
 &lt;li>不使用上述HTTP方法访问的会返回错误。&lt;/li>
 &lt;/ul>
-&lt;h3 id="编写controller代码">编写Controller代码&lt;/h3>
+&lt;h4 id="编写controller代码">编写Controller代码&lt;/h4>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp.demo&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">io.swagger.annotations.ApiImplicitParam&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
@@ -8647,18 +8647,18 @@ data-flex-basis="523px"
 >&lt;/li>
 &lt;li>可以使用Swagger2快速构建RESTful API文档，并支持在线发送请求调试API：http://blog.didispace.com/springbootswagger2/。&lt;/li>
 &lt;/ul>
-&lt;h2 id="启动项目">启动项目&lt;/h2>
-&lt;h3 id="直接运行入口类">直接运行入口类&lt;/h3>
+&lt;h3 id="启动项目">启动项目&lt;/h3>
+&lt;h4 id="直接运行入口类">直接运行入口类&lt;/h4>
 &lt;p>在IDE中配置、直接运行入口类com.turingdi.dmp.DMPStarter。&lt;/p>
-&lt;h3 id="打包jar运行">打包jar运行&lt;/h3>
+&lt;h4 id="打包jar运行">打包jar运行&lt;/h4>
 &lt;p>使用mvn package命令进行打包，并使用以下命令执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>java -jar target/***.jar
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>由于我们的入口类加上了7.@SpringBootApplication注解，并在Maven中配置了spring-boot-maven-plugin插件，因此在打jar包的时候会自动设置jar包中的META-INF/MAINFEST.MF中配置好jar包的入口类，无需我们在pom.xml文件中额外配置。&lt;/p>
-&lt;h3 id="使用spring-boot的maven插件运行">使用Spring Boot的Maven插件运行&lt;/h3>
+&lt;h4 id="使用spring-boot的maven插件运行">使用Spring Boot的Maven插件运行&lt;/h4>
 &lt;p>执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> mvn spring-boot:run
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即可。这也是spring-boot-maven-plugin插件起到的作用。&lt;/p>
-&lt;h3 id="热交换">热交换&lt;/h3>
+&lt;h4 id="热交换">热交换&lt;/h4>
 &lt;p>由于Spring Boot在打包的时候将内置tomcat一并打包，所以我们无法直接更新项目文件让tomcat重新加载。Spring Boot提供了Spring Loaded实现热交换。
 在pom.xml中增加以下依赖即可:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
@@ -8667,11 +8667,11 @@ data-flex-basis="523px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;optional&amp;gt;&lt;/span>true&lt;span style="color:#5bc4bf">&amp;lt;/optional&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后项目运行时，更新源代码之后，重新编译（如IDEA中按快捷键Ctrl+F9）即可在控制台看到Spring Boot重新加载了新编译后的文件。&lt;/p></description></item><item><title>Spring Boot快速入门（一）——介绍与基础Demo</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</link><pubDate>Sat, 26 Nov 2016 15:58:33 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</guid><description>&lt;p>因为团队新项目需要，最近研究了一下Spring Boot + RESTful API + Thymeleaf，总结了一份文档，也放到博客里贡献。&lt;/p>
-&lt;h1 id="spring-boot概述">Spring Boot概述&lt;/h1>
-&lt;h2 id="简介">简介&lt;/h2>
+&lt;h2 id="spring-boot概述">Spring Boot概述&lt;/h2>
+&lt;h3 id="简介">简介&lt;/h3>
 &lt;p>Spring Boot简化了基于Spring的应用开发，你只需要&amp;quot;run&amp;quot;就能创建一个独立的，产品级别的Spring应用。我们为Spring平台及第三方库提供开箱即用的设置，这样你就可以有条不紊地开始。多数Spring Boot应用只需要很少的Spring配置。&lt;br>
 你可以使用Spring Boot创建Java应用，并使用java -jar启动它或采用传统的war部署方式。我们也提供了一个运行&amp;quot;spring脚本&amp;quot;的命令行工具。&lt;/p>
-&lt;h2 id="特性">特性&lt;/h2>
+&lt;h3 id="特性">特性&lt;/h3>
 &lt;p>Spring Boot主要的目标是：&lt;/p>
 &lt;ul>
 &lt;li>为所有Spring开发提供一个从根本上更快，且随处可得的入门体验。&lt;/li>
@@ -8679,7 +8679,7 @@ data-flex-basis="523px"
 &lt;li>提供一系列大型项目常用的非功能性特征，比如：内嵌服务器，安全，指标，健康检测，外部化配置。&lt;/li>
 &lt;li>绝对没有代码生成，也不需要XML配置。&lt;/li>
 &lt;/ul>
-&lt;h2 id="文档api">文档/API&lt;/h2>
+&lt;h3 id="文档api">文档/API&lt;/h3>
 &lt;p>目前Spring Boot最新的Release版本为1.4.2。&lt;br>
 官方文档：&lt;br>
 &lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/reference/htmlsingle/" target="_blank" rel="noopener"
@@ -8690,10 +8690,10 @@ data-flex-basis="523px"
 官方API：&lt;br>
 &lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/" target="_blank" rel="noopener"
 >http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/&lt;/a>&lt;/p>
-&lt;h1 id="使用spring-boot">使用Spring Boot&lt;/h1>
+&lt;h2 id="使用spring-boot">使用Spring Boot&lt;/h2>
 &lt;p>本文的Demo可从git@turing:DMPWeb.git的demo分支（未公开于互联网）下载。&lt;/p>
-&lt;h2 id="创建spring-boot项目">创建Spring Boot项目&lt;/h2>
-&lt;h3 id="intellij-idea">IntelliJ IDEA&lt;/h3>
+&lt;h3 id="创建spring-boot项目">创建Spring Boot项目&lt;/h3>
+&lt;h4 id="intellij-idea">IntelliJ IDEA&lt;/h4>
 &lt;ol>
 &lt;li>点击菜单File &amp;ndash;&amp;gt; New &amp;ndash;&amp;gt; Project；&lt;/li>
 &lt;li>弹出的窗口中，左边栏选择Spring Initializr，右边选择JDK版本（通过配置也可以运行在JDK6上，但建议JDK7以上，最好JDK8）和初始化服务的URL（按默认的https://start.spring.io 即可），点击Next；&lt;br>
@@ -8729,7 +8729,7 @@ data-flex-basis="374px"
 &lt;li>点击Next，等待IDEA下载并初始化项目。&lt;/li>
 &lt;/ol>
 &lt;p>注：其实IDEA这种创建Spring Boot的方法，相当于自己去访问https://start.spring.io ，按页面提示选择了版本、项目信息和插件依赖之后，下载zip，解压导入到IDEA项目中。只不过IDEA帮你完成了下载和解压导入项目这一步而已。&lt;/p>
-&lt;h3 id="通用的项目创建方法">通用的项目创建方法&lt;/h3>
+&lt;h4 id="通用的项目创建方法">通用的项目创建方法&lt;/h4>
 &lt;p>任意一个IDE（在此省略截图），选择新建Maven项目，普通项目即可，填写项目基本信息后，修改pom.xml文件：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;project&lt;/span> &lt;span style="color:#06b6ef">xmlns=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">xmlns:xsi=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span>
@@ -8799,8 +8799,8 @@ data-flex-basis="374px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/snapshots&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repository&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repositories&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="编写项目入口类">编写项目入口类&lt;/h2>
-&lt;h3 id="入口类的位置">入口类的位置&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="编写项目入口类">编写项目入口类&lt;/h3>
+&lt;h4 id="入口类的位置">入口类的位置&lt;/h4>
 &lt;p>Spring Boot官方文档建议将入口类（包含main方法的类）放在项目根包下，如com.turingdi.dmp.DMPStarter，下图是一个典型的Spring Boot项目结构，注意DMPStarter类在项目中的位置：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/4.png"
 width="212"
@@ -8812,7 +8812,7 @@ data-flex-grow="117"
 data-flex-basis="281px"
 >&lt;br>
 这样做的好处是使用@ComponentScan注解时可以使用默认value、无需额外指定扫描根包名的参数；而Spring Boot还提供了一个注解，包含了无参数的@ComponentScan注解及几个常用的注解，亦即在这样的项目结构下，入口类只需要一个注解即可。&lt;/p>
-&lt;h3 id="写入口类代码">写入口类代码&lt;/h3>
+&lt;h4 id="写入口类代码">写入口类代码&lt;/h4>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.boot.SpringApplication&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
@@ -8834,10 +8834,10 @@ main()方法中调用SpringApplication的run()静态方法来启动Spring Boot�
 &lt;li>运行CommandLineRunner bean。&lt;/li>
 &lt;/ol>
 &lt;p>参数中选择启动的带@SpringBootApplication注解的类，一般按上面的常规写法就可以，暂时无需深入理解。&lt;/p></description></item><item><title>Redis性能调优——Pipeline、主从复制、Lua脚本等</title><link>https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/</link><pubDate>Sat, 26 Nov 2016 14:01:02 +0800</pubDate><guid>https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/</guid><description>&lt;p>这篇也是组内分享的文档，整理了之前两篇Netty+Redis的文章，加入了一些Redis调优相关的命令和内容。&lt;/p>
-&lt;h1 id="redis性能瓶颈">Redis性能瓶颈&lt;/h1>
-&lt;h2 id="tcp连接">TCP连接&lt;/h2>
+&lt;h2 id="redis性能瓶颈">Redis性能瓶颈&lt;/h2>
+&lt;h3 id="tcp连接">TCP连接&lt;/h3>
 &lt;p>Redis协议基于TCP/IP协议，受限于TCP连接建立的速度（三次握手等），及网络中数据传输的速度。&lt;/p>
-&lt;h2 id="数据包大小">数据包大小&lt;/h2>
+&lt;h3 id="数据包大小">数据包大小&lt;/h3>
 &lt;p>Redis官方的一项测试显示，对于1k~10k以下的数据，Redis的吞吐量变化并不明显，吞吐量曲线在1k~10k左右出现拐点，如下图。&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Redis%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98Pipeline%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6Lua%E8%84%9A%E6%9C%AC%E7%AD%89/1.png"
 width="662"
@@ -8848,11 +8848,11 @@ class="gallery-image"
 data-flex-grow="143"
 data-flex-basis="344px"
 >&lt;/p>
-&lt;h2 id="单线程">单线程&lt;/h2>
+&lt;h3 id="单线程">单线程&lt;/h3>
 &lt;p>Redis服务器为C语言编写，使用异步非阻塞IO，目前坚持使用单线程（可能出于线程锁的效率考虑）。对于高并发访问+多核CPU场景而言，并不能充分使用CPU资源，可能发生某核心占用率很高，其他核心空闲，但Redis请求阻塞在队列中的情况。&lt;br>
 搭建Redis集群可以解决该问题，但集群节点间访问引起的网络IO延时又带来新的问题。&lt;/p>
-&lt;h1 id="redis性能监控测试">Redis性能监控/测试&lt;/h1>
-&lt;h2 id="info命令">info命令&lt;/h2>
+&lt;h2 id="redis性能监控测试">Redis性能监控/测试&lt;/h2>
+&lt;h3 id="info命令">info命令&lt;/h3>
 &lt;p>redis-cli中输入info可以显示当前Redis服务器的全部状态信息。这些信息按照内容被分成了很多部分，可以用额外的参数来单独获取，如下：&lt;/p>
 &lt;table>
 &lt;thead>
@@ -8904,7 +8904,7 @@ data-flex-basis="344px"
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h2 id="slowlog命令">slowlog命令&lt;/h2>
+&lt;h3 id="slowlog命令">slowlog命令&lt;/h3>
 &lt;p>redis.conf中配置：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> slowlog-log-slower-than &lt;span style="color:#f99b15">10000&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> slowlog-max-len &lt;span style="color:#f99b15">128&lt;/span>
@@ -8921,7 +8921,7 @@ data-flex-basis="733px"
 >&lt;br>
 每条语句有四个描述字段，分别表示慢日志序号（最新的记录被展示在最前面）、这条记录被记录时的时间戳、这条命令的响应时间（单位：us 微秒）、这条命令的内容。&lt;br>
 可以根据slowlog的记录优化对应的语句。&lt;/p>
-&lt;h2 id="bigkeys命令">bigkeys命令&lt;/h2>
+&lt;h3 id="bigkeys命令">bigkeys命令&lt;/h3>
 &lt;p>使用方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>redis-cli -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; --bigkeys
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这条命令会从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告，如下图：&lt;br>
@@ -8934,7 +8934,7 @@ class="gallery-image"
 data-flex-grow="104"
 data-flex-basis="250px"
 >&lt;/p>
-&lt;h2 id="latency命令">latency命令&lt;/h2>
+&lt;h3 id="latency命令">latency命令&lt;/h3>
 &lt;p>使用方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>redis-cli -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; --latency-history
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>redis-cli -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; --latency
@@ -8948,7 +8948,7 @@ class="gallery-image"
 data-flex-grow="490"
 data-flex-basis="1176px"
 >&lt;/p>
-&lt;h2 id="redis-benchmark测试">redis-benchmark测试&lt;/h2>
+&lt;h3 id="redis-benchmark测试">redis-benchmark测试&lt;/h3>
 &lt;p>使用方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>redis-benchmark -h &amp;lt;host&amp;gt; -p &amp;lt;port&amp;gt; -c &amp;lt;并发数&amp;gt; -n &amp;lt;请求次数&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>执行后，redis-benchmark会对各个命令分别进行测试，测试结果较长，在此截取部分如下：&lt;br>
@@ -8961,7 +8961,7 @@ class="gallery-image"
 data-flex-grow="162"
 data-flex-basis="390px"
 >&lt;/p>
-&lt;h2 id="第三方统计分析工具redis-stat">第三方统计分析工具redis-stat&lt;/h2>
+&lt;h3 id="第三方统计分析工具redis-stat">第三方统计分析工具redis-stat&lt;/h3>
 &lt;p>redis-stat采用ruby开发，利用redis-cli info 提供的原始数据，给用户提供基于文本列表或web图表方式展现的各种关键数据。
 redis-stat 开源网址: &lt;a class="link" href="https://github.com/junegunn/redis-stat" target="_blank" rel="noopener"
 >https://github.com/junegunn/redis-stat&lt;/a>&lt;br>
@@ -8974,8 +8974,8 @@ class="gallery-image"
 data-flex-grow="187"
 data-flex-basis="450px"
 >&lt;/p>
-&lt;h1 id="redis性能调优">Redis性能调优&lt;/h1>
-&lt;h2 id="使用pipeline">使用Pipeline&lt;/h2>
+&lt;h2 id="redis性能调优">Redis性能调优&lt;/h2>
+&lt;h3 id="使用pipeline">使用Pipeline&lt;/h3>
 &lt;p>对于Redis读写，有很大一部分的耗时是在网络IO上，尤其是Redis(集群)与应用不在一台服务器上时；此时，对于一些连续的操作，尽量使用pipeline批处理。若批量的命令使用到的key要求在执行过程中不被其他请求修改，则需要用redis事务，效率还是比pipeline低。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>Jedis jedis &lt;span style="color:#5bc4bf">=&lt;/span> RedisUtils&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getSingleJedis&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//获取Jedis连接
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>Pipeline pl &lt;span style="color:#5bc4bf">=&lt;/span> jedis&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">pipelined&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>&lt;span style="color:#776e71">//获取Pipeline
@@ -8987,7 +8987,7 @@ data-flex-basis="450px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>RedisUtils&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">close&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>pl&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//关闭Pipeline
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>RedisUtils&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">close&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>jedis&lt;span style="color:#5bc4bf">);&lt;/span>&lt;span style="color:#776e71">//关闭Jedis连接
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>要注意的是Pipeline一次传输的key或数据也不宜过多，参考本文1.2小节。&lt;/p>
-&lt;h2 id="使用lua脚本">使用Lua脚本&lt;/h2>
+&lt;h3 id="使用lua脚本">使用Lua脚本&lt;/h3>
 &lt;p>灵活利用Lua脚本，可减少Redis的网络IO。Redis支持在服务器上运行Lua脚本完成一些简单运算。Redis尽管对Lua脚本有很多限制，但的确能提高效率，对于一些Redis原生API不能满足的批量操作，比如读取多个key再进行简单计算，如果将这些key的值分别读取到本地，再进行计算，会发生多次网络IO，那么可以用上面的pipeline，而效率更高的方法是将这些计算写成Lua脚本。&lt;br>
 我们的RTB目前使用Lua脚本的流程如下：&lt;/p>
 &lt;ol>
@@ -9020,9 +9020,9 @@ data-flex-basis="450px"
 &lt;li>&lt;a class="link" href="http://wiki.jikexueyuan.com/project/redis/lua.html" target="_blank" rel="noopener"
 >http://wiki.jikexueyuan.com/project/redis/lua.html&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;h2 id="使用本地的redis">使用本地的Redis&lt;/h2>
+&lt;h3 id="使用本地的redis">使用本地的Redis&lt;/h3>
 &lt;p>Redis尽量放在本地，减少网络IO时间；对相应时间要求高的，尽量不要用云服务商提供的Redis服务，读写速度比不上本地的。&lt;/p>
-&lt;h2 id="主从复制读写分离">主从复制/读写分离&lt;/h2>
+&lt;h3 id="主从复制读写分离">主从复制/读写分离&lt;/h3>
 &lt;p>Redis放在本地，在服务器集群环境下就有数据同步的问题。之前尝试过很多方案，Redis自己的Ruby集群、Twitter的Twemproxy等等，都不适合RTB使用——这些集群更多地考虑可用性和数据分片、扩容性，但对一些多键操作支持很差，而且也有各种缺陷（如使用Redis自带的Ruby集群，至少3主3从，可以建好3主3从的集群之后，手动移动Slot到同一台主机，删除其他主机，变成1主3从，但这个集群一旦关闭就无法启动）。&lt;br>
 考虑到RTB使用的Redis读多写少，所以最后使用的方案是Redis自带的主从复制，集群的不同的服务器之间只需要一台主机作为Redis主机，其他服务器的Redis服务设置slaveof属性，作为其从机。此外，可以将从机的只读属性设为no，但往Slave写入的数据会在下一次同步的时候被Master的数据所覆盖——这样做的目的在于写入一些临时缓存变量。&lt;br>
 redis.conf配置如下：&lt;/p>
@@ -9043,16 +9043,16 @@ Linux系统中，可以使用：&lt;/p>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>…………
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /usr/local/redis/6665
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>taskset -c &lt;span style="color:#f99b15">5&lt;/span> redis-server redis.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="计算缓存">计算缓存&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="计算缓存">计算缓存&lt;/h3>
 &lt;p>Redis指令的优化及自定义计算缓存。利用SLOWLOG我们可以找到执行比较慢的命令，从而进行优化。&lt;br>
 比如RTB系统在测试一段时间之后，通过SLOWLOG命令得知耗时较长的都是用户人群标签的并集操作，而这个操作与请求的具体内容有关。所以后来设定了一个计算缓存，通过EXPIRE命令设置缓存的生命周期（随着时间推移，人群标签的计算结果是不一样的，需要定时更新），每次新的请求在计算这一步时，先查询缓存中是否存在计算结果，存在的话直接读取，不存在（全新的计算或旧的已过期）则重新计算并放入运算缓存。（详见com.turingdi.rtb.service.CampaignService）&lt;/p>
-&lt;h2 id="压缩key和value">压缩key和value&lt;/h2>
+&lt;h3 id="压缩key和value">压缩key和value&lt;/h3>
 &lt;p>在数据量大的情况下，压缩key和value的长度不管对存储还是网络传输都有利。&lt;/p></description></item><item><title>Nginx常用配置及负载均衡、动静分离</title><link>https://leibnizhu.github.io/p/Nginx%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%8F%8A%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/</link><pubDate>Sat, 26 Nov 2016 12:17:21 +0800</pubDate><guid>https://leibnizhu.github.io/p/Nginx%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%8F%8A%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/</guid><description>&lt;p>最近总结了一些技术文档，原本用于组内分享的，发到博客里备忘。&lt;/p>
-&lt;h1 id="nginx概述">Nginx概述&lt;/h1>
-&lt;h2 id="简介">简介&lt;/h2>
+&lt;h2 id="nginx概述">Nginx概述&lt;/h2>
+&lt;h3 id="简介">简介&lt;/h3>
 &lt;p>Nginx是一个自由、开源、高性能及轻量级的HTTP服务器及反转代理服务器，以其高性能、稳定、功能丰富、配置简单及占用系统资源少而著称。&lt;br>
 Nginx 超越 Apache 的高性能和稳定性，使得国内使用 Nginx 作为 Web 服务器的网站也越来越多。&lt;/p>
-&lt;h2 id="基础功能">基础功能&lt;/h2>
+&lt;h3 id="基础功能">基础功能&lt;/h3>
 &lt;ul>
 &lt;li>处理静态文件，索引文件以及自动索引；&lt;/li>
 &lt;li>反向代理加速(无缓存)，简单的负载均衡和容错；&lt;/li>
@@ -9060,7 +9060,7 @@ Nginx 超越 Apache 的高性能和稳定性，使得国内使用 Nginx 作为 W
 &lt;li>模块化的结构。过滤器包括gzipping, byte ranges, chunked responses, 以及 SSI-filter 。在SSI过滤器中，到同一个proxy或FastCGI的多个子请求并发处理；&lt;/li>
 &lt;li>SSL 和 TLS SNI 支持。&lt;/li>
 &lt;/ul>
-&lt;h2 id="优势">优势&lt;/h2>
+&lt;h3 id="优势">优势&lt;/h3>
 &lt;p>Nginx&lt;strong>专为性能优化而开发&lt;/strong>，性能是其最重要的考量, 实现上非常注重效率 。它支持内核Poll模型，能经受高负载的考验, 有报告表明能支持高达50,000个并发连接数。&lt;br>
 Nginx作为负载均衡服务器: Nginx 既可以在&lt;strong>内部直接支持 Rails 和 PHP 程序&lt;/strong>对外进行服务, 也可以&lt;strong>支持作为 HTTP代理服务器&lt;/strong>对外进行服务。&lt;br>
 Nginx&lt;strong>具有很高的稳定性&lt;/strong>。其它HTTP服务器，当遇到访问的峰值，或者有人恶意发起慢速连接时，也很可能会导致服务器物理内存耗尽频繁交换，失去响应，只能重启服务器。例如当前apache一旦上到200个以上进程，web响应速度就明显非常缓慢了。而Nginx采取了分阶段资源分配技术，使得它的CPU与内存占用率非常低。&lt;br>
@@ -9068,30 +9068,30 @@ nginx官方表示保持10,000个没有活动的连接，它只占2.5M内存，�
 Nginx&lt;strong>支持热部署&lt;/strong>。它的启动特别容易, 并且几乎可以做到7*24不间断运行，即使运行数个月也不需要重新启动。你还能够在不间断服务的情况下，对软件版本进行进行升级。&lt;br>
 Nginx采用C进行编写, 不论是&lt;strong>系统资源开销还是CPU使用效率&lt;/strong>都比 Perlbal 要好很多。&lt;/p>
 &lt;h1 id="nginx安装">Nginx安装&lt;/h1>
-&lt;h2 id="下载">下载&lt;/h2>
+&lt;h3 id="下载">下载&lt;/h3>
 &lt;p>到官网下载最新的稳定版：
 &lt;a class="link" href="http://nginx.org/en/download.html" target="_blank" rel="noopener"
 >nginx: download&lt;/a>&lt;/p>
-&lt;h2 id="环境准备">环境准备&lt;/h2>
+&lt;h3 id="环境准备">环境准备&lt;/h3>
 &lt;p>准备gcc等编译环境：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev make build-essential gcc
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="编译安装">编译安装&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="编译安装">编译安装&lt;/h3>
 &lt;p>将下载到的.tar.gz包解压，进入解压后的目录，输入以下命令进行编译：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>./configure
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>make
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo make install
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即可安装到/usr/local/nginx中。&lt;br>
 如果需要SSL，可安装OpenSSL，有些Linux发行版自带OpenSSL无需额外安装，需要安装的到OpenSSL官网下载.tar.gz包解压编译即可。&lt;/p>
-&lt;h2 id="启动关闭">启动&amp;amp;关闭&lt;/h2>
-&lt;h3 id="启动">启动&lt;/h3>
+&lt;h3 id="启动关闭">启动&amp;amp;关闭&lt;/h3>
+&lt;h4 id="启动">启动&lt;/h4>
 &lt;p>执行&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo /usr/local/nginx/sbin/nginx
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>启动Nginx。&lt;br>
 一般make install后会安装到PATH中，可以直接执行sudo nginx。
 执行nginx -v显示Nginx版本。&lt;/p>
-&lt;h3 id="重新加载配置文件">重新加载配置文件&lt;/h3>
+&lt;h4 id="重新加载配置文件">重新加载配置文件&lt;/h4>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo nginx -s reload
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="关闭">关闭&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="关闭">关闭&lt;/h4>
 &lt;p>Nginx没有提供关闭的方法，只能通过ps找到进程ID后，用kill命令关闭。&lt;br>
 如 强制退出 sudo kill-9 [PID]，或发送其他退出的指令如TERM。&lt;br>
 注：nginx包含worker和master两个进程，强制关闭时两者均需关闭：
@@ -9104,7 +9104,7 @@ class="gallery-image"
 data-flex-grow="932"
 data-flex-basis="2238px"
 >&lt;/p>
-&lt;h1 id="nginx配置">Nginx配置&lt;/h1>
+&lt;h2 id="nginx配置">Nginx配置&lt;/h2>
 &lt;p>下面以DSP业务平台的Nginx配置为例进行讲解：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#user nobody;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>worker_processes 1;
@@ -9163,53 +9163,53 @@ data-flex-basis="2238px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> location / &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#设置真实ip&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>proxy_set_header real_ip &lt;span style="color:#ef6155">$remote_addr&lt;/span>;
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># proxy_redirect off;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">## proxy_redirect off;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>proxy_pass http://cm:8080;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="基本配置">基本配置&lt;/h2>
-&lt;h3 id="user">user&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="基本配置">基本配置&lt;/h3>
+&lt;h4 id="user">user&lt;/h4>
 &lt;ul>
 &lt;li>语法: user user [group]&lt;/li>
 &lt;li>缺省值: nobody nobody&lt;br>
 指定Nginx Worker进程运行用户，默认是nobody帐号。&lt;/li>
 &lt;/ul>
-&lt;h3 id="error_log">error_log&lt;/h3>
+&lt;h4 id="error_log">error_log&lt;/h4>
 &lt;ul>
 &lt;li>语法: error_log file [ debug | info | notice | warn | error | crit ]&lt;/li>
 &lt;li>缺省值: ${prefix}/logs/error.log&lt;br>
 制定错误日志的存放位置和级别。&lt;/li>
 &lt;/ul>
-&lt;h3 id="worker_processes">worker_processes&lt;/h3>
+&lt;h4 id="worker_processes">worker_processes&lt;/h4>
 &lt;ul>
 &lt;li>语法: worker_processes number&lt;/li>
 &lt;li>缺省值: 1&lt;br>
 指定工作进程数。nginx可以使用多个worker进程。&lt;/li>
 &lt;/ul>
-&lt;h3 id="worker_cpu_affinity">worker_cpu_affinity&lt;/h3>
+&lt;h4 id="worker_cpu_affinity">worker_cpu_affinity&lt;/h4>
 &lt;ul>
 &lt;li>语法: 3.1.4.worker_cpu_affinity cpumask&lt;br>
 执行Nginx在哪个/些CPU上工作，默认由系统接管（可以在所有核心上运行）。&lt;br>
 如，有8个CPU线程（包括超线程），指定使用第0个CPU则配置为00000001，指定使用第7和第1个CPU线程则配置为10000010。&lt;/li>
 &lt;/ul>
-&lt;h2 id="event模块">Event模块&lt;/h2>
+&lt;h3 id="event模块">Event模块&lt;/h3>
 &lt;p>Nginx的默认配置中包含一个默认的Event模块，其中只包含worker_connections配置。&lt;/p>
 &lt;h3 id="worker_connections">worker_connections&lt;/h3>
 &lt;ul>
 &lt;li>语法：worker_connections number&lt;br>
 每个worker的最大连接数。通过worker_connections和worker_proceses可以计算出maxclients： max_clients = worker_processes * worker_connections。作为反向代理，max_clients为： max_clients = worker_processes * worker_connections/4，因为浏览器访问时会通过连接池建立多个连接。&lt;/li>
 &lt;/ul>
-&lt;h2 id="http模块">HTTP模块&lt;/h2>
+&lt;h3 id="http模块">HTTP模块&lt;/h3>
 &lt;p>Nginx最常用的是HTTP模块。&lt;/p>
-&lt;h3 id="基本配置-1">基本配置&lt;/h3>
+&lt;h4 id="基本配置-1">基本配置&lt;/h4>
 &lt;p>HTTP中大部分基本配置无需修改，除了：&lt;/p>
 &lt;ul>
 &lt;li>keepalive_timeout 1000;配置Keep-Alive的超时，单位为秒；&lt;/li>
 &lt;li>gzip on;配置是否开启Gzip压缩，开启后可以提高网站访问速度；&lt;/li>
 &lt;li>log_format 配置日志格式，access_log配置日志路径和使用的格式，在此不细述。&lt;/li>
 &lt;/ul>
-&lt;h3 id="server作用域">server作用域&lt;/h3>
+&lt;h4 id="server作用域">server作用域&lt;/h4>
 &lt;p>HTTP模块中最常配置的是server作用域。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>server &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> listen 80;
@@ -9220,18 +9220,18 @@ data-flex-basis="2238px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> proxy_pass http://cm:8080;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="listen">listen&lt;/h4>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h5 id="listen">listen&lt;/h5>
 &lt;ul>
 &lt;li>语法: listen address:port&lt;/li>
 &lt;li>默认值： listen 80&lt;/li>
 &lt;li>作用域: server
 指定当前虚拟机的监听端口。&lt;/li>
 &lt;/ul>
-&lt;h4 id="server_name">server_name&lt;/h4>
+&lt;h5 id="server_name">server_name&lt;/h5>
 &lt;p>当前server匹配的用户请求路径的主机名，主要用于配置基于名称的虚拟主机，支持通配符&lt;em>和正则表达式（以波浪线~起头）。&lt;br>
 server_name指令在接到请求后的匹配顺序分别为：准确的server_name匹配，以&lt;/em>通配符开始的字符串，以&lt;em>通配符结束的字符串、匹配正则表达式。nginx按以上顺序依次匹配，只要有一项匹配以后就会停止搜索。&lt;br>
 举例： 先后配置了两个server， server_name分别配置为cm.turing.asia和&lt;/em>.turing.asia，当用户请求cm.turing.asia时，访问第一个server，用户访问test.turing.asia时访问第二个server。&lt;/p>
-&lt;h4 id="location">location&lt;/h4>
+&lt;h5 id="location">location&lt;/h5>
 &lt;ul>
 &lt;li>语法：location 匹配字符串 { 操作语句 }&lt;/li>
 &lt;/ul>
@@ -9247,7 +9247,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;Host&lt;/span> &lt;span style="color:#06b6ef">name=&lt;/span>&lt;span style="color:#48b685">&amp;#34;cm&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">appBase=&lt;/span>&lt;span style="color:#48b685">&amp;#34;cmserv&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">unpackWARs=&lt;/span>&lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">autoDeploy=&lt;/span>&lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>　　&lt;span style="color:#5bc4bf">&amp;lt;Context&lt;/span> &lt;span style="color:#06b6ef">path=&lt;/span>&lt;span style="color:#48b685">&amp;#34;turingcm&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">docBase=&lt;/span>&lt;span style="color:#48b685">&amp;#34;turingcm&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">reloadable=&lt;/span>&lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">/&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/Host&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="负载均衡配置">负载均衡配置&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="负载均衡配置">负载均衡配置&lt;/h3>
 &lt;p>首先在HTTP模块中定义多台服务器构成的负载均衡：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>upstream rtb&lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> server 127.0.0.1:8080 &lt;span style="color:#ef6155">weight&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>5;
@@ -9257,7 +9257,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>每台服务器为一行，填写IP和端口，并在weight中填入负载均衡的权重（正整数，默认为1），注意分号。以上例子将该负载均衡配置命名为”rtb”。IP和端口后面填backup的表示备用服务器，当其他非backup的服务器均忙或宕机时，会分发请求到backup服务器上。&lt;br>
 然后在location中，配置&lt;strong>proxy_pass http://[负载均衡名];&lt;/strong> 即可，即该server和location定义的域名规则和访问路径规则匹配到的请求将按weight分发到以上几台服务器/服务中。&lt;/p>
-&lt;h2 id="动静分离">动静分离&lt;/h2>
+&lt;h3 id="动静分离">动静分离&lt;/h3>
 &lt;p>tomcat是一个比较全面的web容器，对静态网页的处理，应该是比较费资源的，特别是每次都要从磁盘读取静态页面，然后返回。这中间会消耗Tomcat的资源，可能会使那些动态页面解析性能影响。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>//静态资源
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>location ~ .*&lt;span style="color:#f99b15">\.&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid|doc|ppt|pdf|xls|mp3|wma&lt;span style="color:#5bc4bf">)&lt;/span>$ &lt;span style="color:#5bc4bf">{&lt;/span> //静态资源到nginx服务器下static获取
@@ -9394,7 +9394,7 @@ location的操作语句中：&lt;br>
 &lt;li>至于业务处理的线程池内，线程之间对数据库的访问应该还有进一步优化的空间。之前的一个设想是一个业务线程发起Redis访问的时候，把当前线程休眠，让其他线程进行数据库访问以外的业务处理（计算）；等待Redis响应后才苏醒，参与到其他线程之间对时间片的争夺。这样保证数据库IO是饱和的（应该也是业务逻辑处理中耗时最多的部分）。但还没实现。
 或者将所有数据库访问都放在一个任务队列中，也是通过Promise监听-通知的方法，实现数据库的异步访问。&lt;/li>
 &lt;/ol></description></item><item><title>Gitolite管理用户权限的Shell脚本</title><link>https://leibnizhu.github.io/p/Gitolite%E7%AE%A1%E7%90%86%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90%E7%9A%84Shell%E8%84%9A%E6%9C%AC/</link><pubDate>Wed, 20 Jul 2016 20:32:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/Gitolite%E7%AE%A1%E7%90%86%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90%E7%9A%84Shell%E8%84%9A%E6%9C%AC/</guid><description>&lt;p>最近给公司的git服务器从http协议升级为ssh协议的，同时增加了gitolite作为权限管理。但gitolite在增删用户公钥、增删用户对项目的权限、以及新增repository时的操作说不上繁杂但也是蛮机械的；又不想用gitlab之类重型的解决方案，所以选择了编写Shell脚本来实现。&lt;/p>
-&lt;h1 id="增加用户公钥的脚本">增加用户公钥的脚本&lt;/h1>
+&lt;h2 id="增加用户公钥的脚本">增加用户公钥的脚本&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>echo &lt;span style="color:#48b685">&amp;#34;增加/修改 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /home/git/gitolite-admin
@@ -9403,7 +9403,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;增加/修改 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="删除用户公钥的脚本">删除用户公钥的脚本&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="删除用户公钥的脚本">删除用户公钥的脚本&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>echo &lt;span style="color:#48b685">&amp;#34;删除 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /home/git/gitolite-admin
@@ -9412,7 +9412,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;删除 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="增加用户对指定代码仓库的读写权限">增加用户对指定代码仓库的读写权限&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="增加用户对指定代码仓库的读写权限">增加用户对指定代码仓库的读写权限&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#增加指定用户对指定代码仓库的读写权限&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为用户名，对应公钥pub文件的文件名&lt;/span>
@@ -9452,7 +9452,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;增加 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 对项目 &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685"> 的权限……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="删除用户对指定代码仓库的读写权限">删除用户对指定代码仓库的读写权限&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="删除用户对指定代码仓库的读写权限">删除用户对指定代码仓库的读写权限&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#删除指定用户对指定代码仓库的读写权限&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为用户名，对应公钥pub文件的文件名&lt;/span>
@@ -9492,7 +9492,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;删除 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 对项目 &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685"> 的权限……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="新增一个代码仓库并初始化其权限">新增一个代码仓库，并初始化其权限&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="新增一个代码仓库并初始化其权限">新增一个代码仓库，并初始化其权限&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#新增一个代码仓库并初始化权限管理文件&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为该项目初始分配的用户名，对应公钥pub文件的文件名&lt;/span>
@@ -9509,7 +9509,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git init --bare &lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685">.git&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#修改权限文件，增加默认管理员权限和初始化的用户权限&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;# &lt;/span>&lt;span style="color:#ef6155">$3&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;## &lt;/span>&lt;span style="color:#ef6155">$3&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;repo &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34; RW = &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> &amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34; RW+ = @admin&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
@@ -9527,12 +9527,12 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/target/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/bin/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;# filter eclipse file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;## filter eclipse file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;*.classpath&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;*.project&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/.settings/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;# filter IntelliJ IDEA file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;## filter IntelliJ IDEA file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;*.iml&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/.idea/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
@@ -9545,7 +9545,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;初始化项目的.gitignore文件，忽略常见无用文件&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;项目 &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685"> 创建成功&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="重命名项目并修改对应权限配置文件">重命名项目并修改对应权限配置文件&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="重命名项目并修改对应权限配置文件">重命名项目并修改对应权限配置文件&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#修改代码仓库的名字，同时更新权限配置文件&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为原repository名，对应/home/git/repositories下的文件夹名（不包含.git后缀）&lt;/span>
@@ -9570,10 +9570,10 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Bash on Windows开启Ubuntu unity和Xfce4桌面的方法</title><link>https://leibnizhu.github.io/p/Bash-on-Windows%E5%BC%80%E5%90%AFUbuntu-unity%E5%92%8CXfce4%E6%A1%8C%E9%9D%A2%E7%9A%84%E6%96%B9%E6%B3%95/</link><pubDate>Sat, 16 Jul 2016 17:09:46 +0800</pubDate><guid>https://leibnizhu.github.io/p/Bash-on-Windows%E5%BC%80%E5%90%AFUbuntu-unity%E5%92%8CXfce4%E6%A1%8C%E9%9D%A2%E7%9A%84%E6%96%B9%E6%B3%95/</guid><description>&lt;p>本文参照Github上的&lt;a class="link" href="https://github.com/Microsoft/BashOnWindows/issues/637" target="_blank" rel="noopener"
 >Run any Desktop Environment in WSL&lt;/a>、结合本人实际安装操作而编写。&lt;/p>
-&lt;h1 id="安装bash-on-windows">安装Bash on Windows&lt;/h1>
+&lt;h2 id="安装bash-on-windows">安装Bash on Windows&lt;/h2>
 &lt;p>首先安装Bash on Windows，可以参考 &lt;a class="link" href="https://linux.cn/article-7209-1.html" target="_blank" rel="noopener"
 >如何安装体验 Ubuntu on Windows&lt;/a> 一文。按照这篇文章安装的bash可以直接在开始菜单输入“bash”启动，但是不支持GUI程序的，所以有了本文。&lt;/p>
-&lt;h1 id="安装vcxsrv并启动xlaunch">安装VcXsrv并启动XLaunch&lt;/h1>
+&lt;h2 id="安装vcxsrv并启动xlaunch">安装VcXsrv并启动XLaunch&lt;/h2>
 &lt;p>在 SourceForge:&lt;a class="link" href="https://sourceforge.net/projects/vcxsrv/files/latest/download" target="_blank" rel="noopener"
 > https://sourceforge.net/projects/vcxsrv/files/latest/download&lt;/a> 下载安装程序并安装后，运行XLaunch，按下图配置后，一路点Next直至完成。&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/Bash-on-Windows%E5%BC%80%E5%90%AFUbuntu-unity%E5%92%8CXfce4%E6%A1%8C%E9%9D%A2%E7%9A%84%E6%96%B9%E6%B3%95/0.png"
@@ -9585,7 +9585,7 @@ class="gallery-image"
 data-flex-grow="123"
 data-flex-basis="295px"
 >&lt;/p>
-&lt;h1 id="安装-ubuntu-desktop-unity和ccsm并配置">安装 ubuntu-desktop, unity和ccsm并配置&lt;/h1>
+&lt;h2 id="安装-ubuntu-desktop-unity和ccsm并配置">安装 ubuntu-desktop, unity和ccsm并配置&lt;/h2>
 &lt;p>打开bash，输入：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt-get install ubuntu-desktop unity compizconfig-settings-manager
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再打开ccsm:&lt;/p>
@@ -9615,11 +9615,11 @@ class="gallery-image"
 data-flex-grow="161"
 data-flex-basis="388px"
 >&lt;/p>
-&lt;h1 id="配置bashrc和etcdbus-1sessionconf">配置~/.bashrc和/etc/dbus-1/session.conf&lt;/h1>
+&lt;h2 id="配置bashrc和etcdbus-1sessionconf">配置~/.bashrc和/etc/dbus-1/session.conf&lt;/h2>
 &lt;p>在bash输入以下命令：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;export DISPLAY=:0.0&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.bashrc
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo sed -i &lt;span style="color:#48b685">&amp;#39;s$&amp;lt;listen&amp;gt;.*&amp;lt;/listen&amp;gt;$&amp;lt;listen&amp;gt;tcp:host=localhost,port=0&amp;lt;/listen&amp;gt;$&amp;#39;&lt;/span> /etc/dbus-1/session.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="启动unity桌面">启动Unity桌面&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="启动unity桌面">启动Unity桌面&lt;/h2>
 &lt;p>在bash中输入：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>compiz
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>等待十几秒之后即可显示Ubuntu桌面。Enjoy it！&lt;/p>

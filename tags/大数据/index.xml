@@ -541,7 +541,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">error&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;给 JdkValueReader 进行 parseInteger() 和 parseLong() 的pack失败:&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> e&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getMessage&lt;/span>&lt;span style="color:#5bc4bf">(),&lt;/span> e&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>在此基础上还可以做成按配置动态patch等骚操作。最后编译运行，Pass。&lt;/p></description></item><item><title>Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/flower.jpg" alt="Featured image of post Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用" />&lt;p>介绍在部署了Kerberos的安全Hadoop集群中, Sqoop,Hive,HBase,Kafka,Maxwell使用方法.&lt;/p>
-&lt;h1 id="sqoop使用">Sqoop使用&lt;/h1>
+&lt;h2 id="sqoop使用">Sqoop使用&lt;/h2>
 &lt;p>配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:&lt;/p>
 &lt;ol>
 &lt;li>分配sqoop的组, 执行&lt;code>usermod -a -G hdfs sqoop&lt;/code>加入到hdfs组, 使用&lt;code>groups sqoop&lt;/code>确认执行成功;&lt;/li>
@@ -551,7 +551,7 @@
 &lt;li>使用kinit命令切换到sqoop用户(在脚本中可以使用keytab切换)&lt;/li>
 &lt;li>执行sqoop命令&lt;/li>
 &lt;/ol>
-&lt;h1 id="spark访问hbase">Spark访问HBase&lt;/h1>
+&lt;h2 id="spark访问hbase">Spark访问HBase&lt;/h2>
 &lt;ol>
 &lt;li>进入cdh1, 创建Kerberos用户, 名为hbase; 导出keytab, 名为hbase.keytab, 保存到本地;&lt;/li>
 &lt;li>下载krb5.conf到本地.&lt;/li>
@@ -608,7 +608,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> resultList
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="spark访问hive">Spark访问Hive&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问hive">Spark访问Hive&lt;/h2>
 &lt;ol>
 &lt;li>Hive可以沿用hbase的Kerberos用户, 也可以新建一个Hive用户及其对应keytab文件.&lt;/li>
 &lt;li>本地测试请将集群的&lt;code>hive-site.xml&lt;/code>导出并保存在项目的&lt;code>src/main/resources/&lt;/code>目录下;&lt;/li>
@@ -634,7 +634,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sc&lt;span style="color:#5bc4bf">.&lt;/span>stop&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="spark访问kafka">Spark访问Kafka&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问kafka">Spark访问Kafka&lt;/h2>
 &lt;ol>
 &lt;li>进入Cloudera Manager的Kafka配置页面, 搜索&amp;rsquo;Inter Broker Protocol&amp;rsquo;, 更改为&amp;rsquo;SASL_PLAINTEXT';&lt;/li>
 &lt;li>重启Kafka配置;&lt;/li>
@@ -647,9 +647,9 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">useTicketCache&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">useKeyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">principal&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka@TURINGDI.COM&amp;#34;&lt;/span> &lt;span style="color:#776e71">#根据实际修改&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">serviceName&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka&amp;#34;&lt;/span> &lt;span style="color:#776e71"># 固定&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">serviceName&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;kafka&amp;#34;&lt;/span> &lt;span style="color:#776e71">## 固定&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">client&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>true
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">keyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;/path/to/kafka.keytab&amp;#34;&lt;/span>; &lt;span style="color:#776e71"># keytab路径,节点和本地按实际路径填写&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">keyTab&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;/path/to/kafka.keytab&amp;#34;&lt;/span>; &lt;span style="color:#776e71">## keytab路径,节点和本地按实际路径填写&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="5">
 &lt;li>cdh1中新建一个kafka.properties文件, 内容如下:&lt;/li>
@@ -701,7 +701,7 @@
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意修改其中的jass.conf路径, 并确保其中配置的keytab存在; 再执行相应的kafka命令.&lt;br>
 如果觉得麻烦, 也可以编辑&lt;code>/opt/cloudera/parcels/KAFKA-3.0.0-1.3.0.0.p0.40/lib/kafka/bin/kafka-run-class.sh&lt;/code>, 在&lt;code>exec $JAVA&lt;/code>后面增加:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-Djava.security.krb5.conf&lt;span style="color:#5bc4bf">=&lt;/span>/etc/krb5.conf -Djava.security.auth.login.config&lt;span style="color:#5bc4bf">=&lt;/span>/root/jaas.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="maxwell配置">Maxwell配置&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="maxwell配置">Maxwell配置&lt;/h2>
 &lt;ol>
 &lt;li>编辑${MAXWELL_HOME}/bin/maxwell, 在文件尾部附件的&lt;code>exec $JAVA $JAVA_OPTS&lt;/code>后面增加:&lt;/li>
 &lt;/ol>
@@ -719,22 +719,22 @@
 &lt;/ol>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>--config /path/to/config.properties
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Kerberos部署,配置与基础使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:33 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/room.jpg" alt="Featured image of post Kerberos部署,配置与基础使用" />&lt;p>下文以本地测试集群为例, 4节点(cdh1-4), cdh1为NameNode, cdh2-4为DataNode.&lt;/p>
-&lt;h1 id="基础概念">基础概念&lt;/h1>
+&lt;h2 id="基础概念">基础概念&lt;/h2>
 &lt;p>Kerberos principal用于在kerberos加密系统中标记一个唯一的身份。&lt;br>
 kerberos为kerberos principal分配tickets使其可以访问由kerberos加密的hadoop服务。&lt;br>
 对于hadoop，principals的格式为username/fully.qualified.domain.name@YOUR-REALM.COM.&lt;br>
 keytab是包含principals和加密principal key的文件。&lt;br>
 keytab文件对于每个host是唯一的，因为key中包含hostname。keytab文件用于不需要人工交互和保存纯文本密码，实现到kerberos上验证一个主机上的principal。&lt;br>
 因为服务器上可以访问keytab文件即可以以principal的身份通过kerberos的认证，所以，keytab文件应该被妥善保存，应该只有少数的用户可以访问。&lt;/p>
-&lt;h1 id="kdc服务安装及配置">KDC服务安装及配置&lt;/h1>
-&lt;h2 id="安装kdc服务">安装KDC服务&lt;/h2>
+&lt;h2 id="kdc服务安装及配置">KDC服务安装及配置&lt;/h2>
+&lt;h3 id="安装kdc服务">安装KDC服务&lt;/h3>
 &lt;p>选择NameNode节点(cdh1)安装KDC服务, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>yum -y install krb5-server krb5-libs krb5-auth-dialog krb5-workstation openldap-clients
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其他节点(cdh2-4)只安装Kerberos客户端, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>yum -y install krb5-libs krb5-workstation
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="配置kdc服务">配置KDC服务&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置kdc服务">配置KDC服务&lt;/h3>
 &lt;p>1.编辑/etc/krb5.conf:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># Configuration snippets may be placed in this directory as well&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## Configuration snippets may be placed in this directory as well&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>includedir /etc/krb5.conf.d/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">[&lt;/span>logging&lt;span style="color:#5bc4bf">]&lt;/span>
@@ -780,18 +780,18 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">admin_keytab&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> /var/kerberos/krb5kdc/kadm5.keytab
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">supported_enctypes&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal camellia256-cts:normal camellia128-cts:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="创建kerberos数据库">创建Kerberos数据库&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="创建kerberos数据库">创建Kerberos数据库&lt;/h3>
 &lt;p>在cdh1执行以下命令, 注意域名:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kdb5_util create –r TURINGDI.COM -s
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>按提示设置密码并重复密码.&lt;/p>
-&lt;h2 id="创建kerberos的管理账号">创建Kerberos的管理账号&lt;/h2>
+&lt;h3 id="创建kerberos的管理账号">创建Kerberos的管理账号&lt;/h3>
 &lt;p>在cdh1执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kadmin.local
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>依次输入:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>addprinc admin/admin@TURINGDI.COM
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 按提示设置管理账号的密码并重复密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 按提示设置管理账号的密码并重复密码&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>exit
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="配置服务自启动">配置服务自启动&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置服务自启动">配置服务自启动&lt;/h3>
 &lt;p>在cdh1执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>chkconfig krb5kdc on
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hkconfig kadmin on
@@ -799,7 +799,7 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>service kadmin start
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后尝试登陆Kerberos的管理员账号:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kinit admin/admin@TURINGDI.COM
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 3. 输入刚才设定的管理账号密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 3. 输入刚才设定的管理账号密码&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>klist
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>应该会输出类似:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>Ticket cache: FILE:/tmp/krb5cc_0
@@ -809,7 +809,7 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2018-03-06T16:48:23 2018-03-07T16:48:23 krbtgt/TURINGDI.COM@TURINGDI.COM
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> renew &lt;span style="color:#815ba4">until&lt;/span> 2018-03-13T16:48:23
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即配置成功.&lt;/p>
-&lt;h1 id="cdh集群启用kerberos">CDH集群启用Kerberos&lt;/h1>
+&lt;h2 id="cdh集群启用kerberos">CDH集群启用Kerberos&lt;/h2>
 &lt;ol>
 &lt;li>进入Cloudera Manager的“管理”-&amp;gt; “安全”界面:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/security.png"
@@ -836,13 +836,13 @@ data-flex-basis="328px"
 &lt;li>输入Cloudera Manager的Kerbers管理员账号，必须和之前创建的账号一致，点击&amp;quot;继续&amp;quot;.&lt;/li>
 &lt;li>最后点击&amp;quot;继续&amp;quot;, 勾选重启集群, 点击&amp;quot;继续&amp;quot;按钮, 等待配置重启集群.&lt;/li>
 &lt;/ol>
-&lt;h1 id="aes-256加密与jce">AES-256加密与JCE&lt;/h1>
+&lt;h2 id="aes-256加密与jce">AES-256加密与JCE&lt;/h2>
 &lt;p>对于使用centos5.6及以上的系统，默认使用AES-256来加密的。这就需要集群中的所有节点上安装JCE.&lt;br>
 打开&lt;a class="link" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html" target="_blank" rel="noopener"
 >http://www.oracle.com/technetwork/java/javase/downloads/index.html&lt;/a>, 下载jdk对应的JCE文件.&lt;br>
 解压后的文件放入&lt;code>${JAVA_HOME}/jre/lib/security/&lt;/code>中.&lt;/p>
-&lt;h1 id="kerberos的基础使用">Kerberos的基础使用&lt;/h1>
-&lt;h2 id="yarn配置">Yarn配置&lt;/h2>
+&lt;h2 id="kerberos的基础使用">Kerberos的基础使用&lt;/h2>
+&lt;h3 id="yarn配置">Yarn配置&lt;/h3>
 &lt;p>打开Cloudera Manager的Yarn配置页面, 搜索min.user, 修改为0, 然后按提示重启Yarn.&lt;br>
 使用Kerberos需要新建一些用户, 其id可能小于1000, 使用Yarn的默认配置可能会导致一些用户不能提交Yarn任务.&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/yarn.png"
@@ -854,12 +854,12 @@ class="gallery-image"
 data-flex-grow="179"
 data-flex-basis="430px"
 >&lt;/p>
-&lt;h2 id="导出keytab">导出keytab&lt;/h2>
+&lt;h3 id="导出keytab">导出keytab&lt;/h3>
 &lt;p>进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>xst -k /path/to/*.keytab -norandkey &amp;lt;principal&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中principal为需要导出keytab的用户名, 如hbase/cdh2, 注意-norandkey参数不可缺少, 否则可能会导致重新生成密码, 导致keytab失效.&lt;br>
 导出的keytab的效用等同账号密码, 请注意妥善保管.&lt;/p>
-&lt;h2 id="以某个kerberos用户登录">以某个Kerberos用户登录&lt;/h2>
+&lt;h3 id="以某个kerberos用户登录">以某个Kerberos用户登录&lt;/h3>
 &lt;p>两种方法:&lt;/p>
 &lt;ol>
 &lt;li>&lt;code>kinit 用户名@域名&lt;/code>, 输入密码;&lt;/li>
@@ -867,12 +867,12 @@ data-flex-basis="430px"
 &lt;/ol>
 &lt;p>后者无需输入密码, 适合在脚本中使用.&lt;br>
 一些组件对Kerberos的令牌有限制, 需要登录对应用户后才能使用, 包括HDFS的文件访问控制, 需要在Kerberos中建立对应的用户.&lt;/p>
-&lt;h2 id="创建kerberos用户">创建Kerberos用户&lt;/h2>
+&lt;h3 id="创建kerberos用户">创建Kerberos用户&lt;/h3>
 &lt;p>前面已经使用过了, 进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>addprinc 用户名@域名
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 按提示设置管理账号的密码并重复密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 按提示设置管理账号的密码并重复密码&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Sentry部署,配置与使用</title><link>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:22 +0800</pubDate><guid>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/summer.jpg" alt="Featured image of post Sentry部署,配置与使用" />&lt;p>最近在CDH集群部署Sentry和Kerberos遇到了不少坑, 把过程总结一下, 都放上来吧.&lt;/p>
-&lt;h1 id="sentry组件安装">Sentry组件安装&lt;/h1>
+&lt;h2 id="sentry组件安装">Sentry组件安装&lt;/h2>
 &lt;p>进入Cloudera Manager页面, 点击集群名右边的倒三角按钮, 选择&amp;quot;添加服务&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/add.png"
 width="844"
@@ -907,8 +907,8 @@ data-flex-basis="818px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">create&lt;/span> &lt;span style="color:#815ba4">database&lt;/span> sentry &lt;span style="color:#815ba4">default&lt;/span> character &lt;span style="color:#815ba4">set&lt;/span> utf8 &lt;span style="color:#815ba4">default&lt;/span> &lt;span style="color:#815ba4">collate&lt;/span> utf8_general_ci;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> sentry.&lt;span style="color:#5bc4bf">*&lt;/span> &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentry&amp;#39;&lt;/span>&lt;span style="color:#5bc4bf">@&lt;/span>&lt;span style="color:#48b685">&amp;#39;%&amp;#39;&lt;/span> identified &lt;span style="color:#815ba4">by&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentrypassword&amp;#39;&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>创建Sentry所需的数据库, 然后在Sentry安装页面中填上MySQL的地址账号密码, 点击继续, 等待安装和首次启动完毕.&lt;/p>
-&lt;h1 id="sentry及相关组件配置">Sentry及相关组件配置&lt;/h1>
-&lt;h2 id="hue配置">Hue配置&lt;/h2>
+&lt;h2 id="sentry及相关组件配置">Sentry及相关组件配置&lt;/h2>
+&lt;h3 id="hue配置">Hue配置&lt;/h3>
 &lt;p>进入Hue配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHue.png"
 width="970"
@@ -919,7 +919,7 @@ class="gallery-image"
 data-flex-grow="606"
 data-flex-basis="1455px"
 >&lt;/p>
-&lt;h1 id="hive配置">Hive配置&lt;/h1>
+&lt;h2 id="hive配置">Hive配置&lt;/h2>
 &lt;p>进入Hive配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHive1.png"
 width="946"
@@ -950,7 +950,7 @@ class="gallery-image"
 data-flex-grow="372"
 data-flex-basis="894px"
 >&lt;/p>
-&lt;h2 id="impala配置">Impala配置&lt;/h2>
+&lt;h3 id="impala配置">Impala配置&lt;/h3>
 &lt;p>注: 需要确认集群每个节点都安装了Impala Daemon服务;如果Impala启动时提示cannot read or execute the parent directory of dfs.domain.socket.path, 则HDFS配置的dfs.client.read.shortcircuit勾选上, 并创建dfs.domain.socket.path的目录.&lt;br>
 进入Impala配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setImpala.png"
@@ -962,7 +962,7 @@ class="gallery-image"
 data-flex-grow="560"
 data-flex-basis="1344px"
 >&lt;/p>
-&lt;h2 id="hdfs配置">HDFS配置&lt;/h2>
+&lt;h3 id="hdfs配置">HDFS配置&lt;/h3>
 &lt;p>进入HDFS配置, 找到&amp;quot;启用访问控制列表 dfs.namenode.acls.enabled&amp;quot;, 勾选:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHdfs.png"
 width="1032"
@@ -973,7 +973,7 @@ class="gallery-image"
 data-flex-grow="905"
 data-flex-basis="2172px"
 >&lt;/p>
-&lt;h2 id="重启集群">重启集群&lt;/h2>
+&lt;h3 id="重启集群">重启集群&lt;/h3>
 &lt;p>Cloudera Manager会提示过期配置需要重启组件, 点击黄色圆形箭头, 点击&amp;quot;重启过时服务&amp;quot;, 并等待重启完成:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/change.png"
 width="742"
@@ -984,18 +984,18 @@ class="gallery-image"
 data-flex-grow="61"
 data-flex-basis="148px"
 >&lt;/p>
-&lt;h1 id="hue用户权限配置">Hue用户权限配置&lt;/h1>
-&lt;h2 id="前提">前提&lt;/h2>
+&lt;h2 id="hue用户权限配置">Hue用户权限配置&lt;/h2>
+&lt;h3 id="前提">前提&lt;/h3>
 &lt;p>Hue的用户权限体系是: 每个用户属于一个或多个组, 每个组可以配置其Hue页面访问权限及Hive/Solr/HDFS数据访问权限, 数据的访问权限由角色定义, 而用户组和角色之间是多对多关系.&lt;br>
 Hue使用Sentry进行权限管理之后, 要求登录Hue的用户及其组需要在Sentry Server节点(以正式环境为例, 即gs01节点)Linux系统中存在对应的用户和组, 否则无法进行权限控制.&lt;br>
 目前已经在Hue创建了一个hdfs用户组(拥有最高权限), 包含用户admin及hdfs, 两者在gs01节点Linux系统中均存在. hdfs用户的存在主要考虑到Spark程序通过hue的oozie工作流提交时, 保证其执行权限.&lt;br>
 下文假定需要建立一个用户组hiveselect和用户hive1, 允许登录, 拥有部分hive表的select权限.&lt;/p>
-&lt;h2 id="创建linux用户">创建Linux用户&lt;/h2>
+&lt;h3 id="创建linux用户">创建Linux用户&lt;/h3>
 &lt;p>ssh登录gs01节点, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>groupadd hiveselect
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>useradd -f hiveselect hive1
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>P.S. 上面命令建立的用户是没有密码的, 需要密码或其他选项的请自行添加参数.&lt;/p>
-&lt;h2 id="创建hue用户">创建Hue用户&lt;/h2>
+&lt;h3 id="创建hue用户">创建Hue用户&lt;/h3>
 &lt;p>使用admin或hdfs用户登录Hue, 点击右上角用户名, 选择&amp;quot;Manage users&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/addUser.png"
 width="446"
@@ -1054,7 +1054,7 @@ class="gallery-image"
 data-flex-grow="116"
 data-flex-basis="280px"
 >&lt;/p>
-&lt;h2 id="配置角色权限">配置角色权限&lt;/h2>
+&lt;h3 id="配置角色权限">配置角色权限&lt;/h3>
 &lt;p>点击左上角≡按钮, 再点击&amp;quot;Security&amp;rdquo;, 选择Hive Tables选项卡, 进行Hive访问权限配置.&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/menu.png"
 width="554"
@@ -1076,7 +1076,7 @@ data-flex-grow="252"
 data-flex-basis="606px"
 >&lt;br>
 填写完毕之后, 点击Save按钮, 稍等片刻即可生效(按目前经验来看, 新增的组可能需要3-5分钟才能生效, 已经配置过的组修改访问权限的话几乎是立刻生效).&lt;/p>
-&lt;h2 id="hive最高权限">Hive最高权限&lt;/h2>
+&lt;h3 id="hive最高权限">Hive最高权限&lt;/h3>
 &lt;p>Hue中配置的Hive权限是针对表的读写权限的, 并没有涉及到建库建表的权限, 使用管理员用户可以赋予该权限, 进入hue
 的Hive编辑器, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> server server1 &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#815ba4">role&lt;/span> hue角色名;

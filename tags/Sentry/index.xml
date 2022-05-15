@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Sentry on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Sentry/</link><description>Recent content in Sentry on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 07 Mar 2018 16:23:22 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Sentry/index.xml" rel="self" type="application/rss+xml"/><item><title>Sentry部署,配置与使用</title><link>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:22 +0800</pubDate><guid>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/summer.jpg" alt="Featured image of post Sentry部署,配置与使用" />&lt;p>最近在CDH集群部署Sentry和Kerberos遇到了不少坑, 把过程总结一下, 都放上来吧.&lt;/p>
-&lt;h1 id="sentry组件安装">Sentry组件安装&lt;/h1>
+&lt;h2 id="sentry组件安装">Sentry组件安装&lt;/h2>
 &lt;p>进入Cloudera Manager页面, 点击集群名右边的倒三角按钮, 选择&amp;quot;添加服务&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/add.png"
 width="844"
@@ -34,8 +34,8 @@ data-flex-basis="818px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">create&lt;/span> &lt;span style="color:#815ba4">database&lt;/span> sentry &lt;span style="color:#815ba4">default&lt;/span> character &lt;span style="color:#815ba4">set&lt;/span> utf8 &lt;span style="color:#815ba4">default&lt;/span> &lt;span style="color:#815ba4">collate&lt;/span> utf8_general_ci;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> sentry.&lt;span style="color:#5bc4bf">*&lt;/span> &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentry&amp;#39;&lt;/span>&lt;span style="color:#5bc4bf">@&lt;/span>&lt;span style="color:#48b685">&amp;#39;%&amp;#39;&lt;/span> identified &lt;span style="color:#815ba4">by&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentrypassword&amp;#39;&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>创建Sentry所需的数据库, 然后在Sentry安装页面中填上MySQL的地址账号密码, 点击继续, 等待安装和首次启动完毕.&lt;/p>
-&lt;h1 id="sentry及相关组件配置">Sentry及相关组件配置&lt;/h1>
-&lt;h2 id="hue配置">Hue配置&lt;/h2>
+&lt;h2 id="sentry及相关组件配置">Sentry及相关组件配置&lt;/h2>
+&lt;h3 id="hue配置">Hue配置&lt;/h3>
 &lt;p>进入Hue配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHue.png"
 width="970"
@@ -46,7 +46,7 @@ class="gallery-image"
 data-flex-grow="606"
 data-flex-basis="1455px"
 >&lt;/p>
-&lt;h1 id="hive配置">Hive配置&lt;/h1>
+&lt;h2 id="hive配置">Hive配置&lt;/h2>
 &lt;p>进入Hive配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHive1.png"
 width="946"
@@ -77,7 +77,7 @@ class="gallery-image"
 data-flex-grow="372"
 data-flex-basis="894px"
 >&lt;/p>
-&lt;h2 id="impala配置">Impala配置&lt;/h2>
+&lt;h3 id="impala配置">Impala配置&lt;/h3>
 &lt;p>注: 需要确认集群每个节点都安装了Impala Daemon服务;如果Impala启动时提示cannot read or execute the parent directory of dfs.domain.socket.path, 则HDFS配置的dfs.client.read.shortcircuit勾选上, 并创建dfs.domain.socket.path的目录.&lt;br>
 进入Impala配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setImpala.png"
@@ -89,7 +89,7 @@ class="gallery-image"
 data-flex-grow="560"
 data-flex-basis="1344px"
 >&lt;/p>
-&lt;h2 id="hdfs配置">HDFS配置&lt;/h2>
+&lt;h3 id="hdfs配置">HDFS配置&lt;/h3>
 &lt;p>进入HDFS配置, 找到&amp;quot;启用访问控制列表 dfs.namenode.acls.enabled&amp;quot;, 勾选:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHdfs.png"
 width="1032"
@@ -100,7 +100,7 @@ class="gallery-image"
 data-flex-grow="905"
 data-flex-basis="2172px"
 >&lt;/p>
-&lt;h2 id="重启集群">重启集群&lt;/h2>
+&lt;h3 id="重启集群">重启集群&lt;/h3>
 &lt;p>Cloudera Manager会提示过期配置需要重启组件, 点击黄色圆形箭头, 点击&amp;quot;重启过时服务&amp;quot;, 并等待重启完成:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/change.png"
 width="742"
@@ -111,18 +111,18 @@ class="gallery-image"
 data-flex-grow="61"
 data-flex-basis="148px"
 >&lt;/p>
-&lt;h1 id="hue用户权限配置">Hue用户权限配置&lt;/h1>
-&lt;h2 id="前提">前提&lt;/h2>
+&lt;h2 id="hue用户权限配置">Hue用户权限配置&lt;/h2>
+&lt;h3 id="前提">前提&lt;/h3>
 &lt;p>Hue的用户权限体系是: 每个用户属于一个或多个组, 每个组可以配置其Hue页面访问权限及Hive/Solr/HDFS数据访问权限, 数据的访问权限由角色定义, 而用户组和角色之间是多对多关系.&lt;br>
 Hue使用Sentry进行权限管理之后, 要求登录Hue的用户及其组需要在Sentry Server节点(以正式环境为例, 即gs01节点)Linux系统中存在对应的用户和组, 否则无法进行权限控制.&lt;br>
 目前已经在Hue创建了一个hdfs用户组(拥有最高权限), 包含用户admin及hdfs, 两者在gs01节点Linux系统中均存在. hdfs用户的存在主要考虑到Spark程序通过hue的oozie工作流提交时, 保证其执行权限.&lt;br>
 下文假定需要建立一个用户组hiveselect和用户hive1, 允许登录, 拥有部分hive表的select权限.&lt;/p>
-&lt;h2 id="创建linux用户">创建Linux用户&lt;/h2>
+&lt;h3 id="创建linux用户">创建Linux用户&lt;/h3>
 &lt;p>ssh登录gs01节点, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>groupadd hiveselect
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>useradd -f hiveselect hive1
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>P.S. 上面命令建立的用户是没有密码的, 需要密码或其他选项的请自行添加参数.&lt;/p>
-&lt;h2 id="创建hue用户">创建Hue用户&lt;/h2>
+&lt;h3 id="创建hue用户">创建Hue用户&lt;/h3>
 &lt;p>使用admin或hdfs用户登录Hue, 点击右上角用户名, 选择&amp;quot;Manage users&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/addUser.png"
 width="446"
@@ -181,7 +181,7 @@ class="gallery-image"
 data-flex-grow="116"
 data-flex-basis="280px"
 >&lt;/p>
-&lt;h2 id="配置角色权限">配置角色权限&lt;/h2>
+&lt;h3 id="配置角色权限">配置角色权限&lt;/h3>
 &lt;p>点击左上角≡按钮, 再点击&amp;quot;Security&amp;rdquo;, 选择Hive Tables选项卡, 进行Hive访问权限配置.&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/menu.png"
 width="554"
@@ -203,7 +203,7 @@ data-flex-grow="252"
 data-flex-basis="606px"
 >&lt;br>
 填写完毕之后, 点击Save按钮, 稍等片刻即可生效(按目前经验来看, 新增的组可能需要3-5分钟才能生效, 已经配置过的组修改访问权限的话几乎是立刻生效).&lt;/p>
-&lt;h2 id="hive最高权限">Hive最高权限&lt;/h2>
+&lt;h3 id="hive最高权限">Hive最高权限&lt;/h3>
 &lt;p>Hue中配置的Hive权限是针对表的读写权限的, 并没有涉及到建库建表的权限, 使用管理员用户可以赋予该权限, 进入hue
 的Hive编辑器, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> server server1 &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#815ba4">role&lt;/span> hue角色名;

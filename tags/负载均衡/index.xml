@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>负载均衡 on Heaven's Door</title><link>https://leibnizhu.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</link><description>Recent content in 负载均衡 on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 26 Nov 2016 12:17:21 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/index.xml" rel="self" type="application/rss+xml"/><item><title>Nginx常用配置及负载均衡、动静分离</title><link>https://leibnizhu.github.io/p/Nginx%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%8F%8A%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/</link><pubDate>Sat, 26 Nov 2016 12:17:21 +0800</pubDate><guid>https://leibnizhu.github.io/p/Nginx%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E5%8F%8A%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/</guid><description>&lt;p>最近总结了一些技术文档，原本用于组内分享的，发到博客里备忘。&lt;/p>
-&lt;h1 id="nginx概述">Nginx概述&lt;/h1>
-&lt;h2 id="简介">简介&lt;/h2>
+&lt;h2 id="nginx概述">Nginx概述&lt;/h2>
+&lt;h3 id="简介">简介&lt;/h3>
 &lt;p>Nginx是一个自由、开源、高性能及轻量级的HTTP服务器及反转代理服务器，以其高性能、稳定、功能丰富、配置简单及占用系统资源少而著称。&lt;br>
 Nginx 超越 Apache 的高性能和稳定性，使得国内使用 Nginx 作为 Web 服务器的网站也越来越多。&lt;/p>
-&lt;h2 id="基础功能">基础功能&lt;/h2>
+&lt;h3 id="基础功能">基础功能&lt;/h3>
 &lt;ul>
 &lt;li>处理静态文件，索引文件以及自动索引；&lt;/li>
 &lt;li>反向代理加速(无缓存)，简单的负载均衡和容错；&lt;/li>
@@ -11,7 +11,7 @@ Nginx 超越 Apache 的高性能和稳定性，使得国内使用 Nginx 作为 W
 &lt;li>模块化的结构。过滤器包括gzipping, byte ranges, chunked responses, 以及 SSI-filter 。在SSI过滤器中，到同一个proxy或FastCGI的多个子请求并发处理；&lt;/li>
 &lt;li>SSL 和 TLS SNI 支持。&lt;/li>
 &lt;/ul>
-&lt;h2 id="优势">优势&lt;/h2>
+&lt;h3 id="优势">优势&lt;/h3>
 &lt;p>Nginx&lt;strong>专为性能优化而开发&lt;/strong>，性能是其最重要的考量, 实现上非常注重效率 。它支持内核Poll模型，能经受高负载的考验, 有报告表明能支持高达50,000个并发连接数。&lt;br>
 Nginx作为负载均衡服务器: Nginx 既可以在&lt;strong>内部直接支持 Rails 和 PHP 程序&lt;/strong>对外进行服务, 也可以&lt;strong>支持作为 HTTP代理服务器&lt;/strong>对外进行服务。&lt;br>
 Nginx&lt;strong>具有很高的稳定性&lt;/strong>。其它HTTP服务器，当遇到访问的峰值，或者有人恶意发起慢速连接时，也很可能会导致服务器物理内存耗尽频繁交换，失去响应，只能重启服务器。例如当前apache一旦上到200个以上进程，web响应速度就明显非常缓慢了。而Nginx采取了分阶段资源分配技术，使得它的CPU与内存占用率非常低。&lt;br>
@@ -19,30 +19,30 @@ nginx官方表示保持10,000个没有活动的连接，它只占2.5M内存，�
 Nginx&lt;strong>支持热部署&lt;/strong>。它的启动特别容易, 并且几乎可以做到7*24不间断运行，即使运行数个月也不需要重新启动。你还能够在不间断服务的情况下，对软件版本进行进行升级。&lt;br>
 Nginx采用C进行编写, 不论是&lt;strong>系统资源开销还是CPU使用效率&lt;/strong>都比 Perlbal 要好很多。&lt;/p>
 &lt;h1 id="nginx安装">Nginx安装&lt;/h1>
-&lt;h2 id="下载">下载&lt;/h2>
+&lt;h3 id="下载">下载&lt;/h3>
 &lt;p>到官网下载最新的稳定版：
 &lt;a class="link" href="http://nginx.org/en/download.html" target="_blank" rel="noopener"
 >nginx: download&lt;/a>&lt;/p>
-&lt;h2 id="环境准备">环境准备&lt;/h2>
+&lt;h3 id="环境准备">环境准备&lt;/h3>
 &lt;p>准备gcc等编译环境：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev make build-essential gcc
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="编译安装">编译安装&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="编译安装">编译安装&lt;/h3>
 &lt;p>将下载到的.tar.gz包解压，进入解压后的目录，输入以下命令进行编译：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>./configure
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>make
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo make install
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即可安装到/usr/local/nginx中。&lt;br>
 如果需要SSL，可安装OpenSSL，有些Linux发行版自带OpenSSL无需额外安装，需要安装的到OpenSSL官网下载.tar.gz包解压编译即可。&lt;/p>
-&lt;h2 id="启动关闭">启动&amp;amp;关闭&lt;/h2>
-&lt;h3 id="启动">启动&lt;/h3>
+&lt;h3 id="启动关闭">启动&amp;amp;关闭&lt;/h3>
+&lt;h4 id="启动">启动&lt;/h4>
 &lt;p>执行&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo /usr/local/nginx/sbin/nginx
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>启动Nginx。&lt;br>
 一般make install后会安装到PATH中，可以直接执行sudo nginx。
 执行nginx -v显示Nginx版本。&lt;/p>
-&lt;h3 id="重新加载配置文件">重新加载配置文件&lt;/h3>
+&lt;h4 id="重新加载配置文件">重新加载配置文件&lt;/h4>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo nginx -s reload
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="关闭">关闭&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="关闭">关闭&lt;/h4>
 &lt;p>Nginx没有提供关闭的方法，只能通过ps找到进程ID后，用kill命令关闭。&lt;br>
 如 强制退出 sudo kill-9 [PID]，或发送其他退出的指令如TERM。&lt;br>
 注：nginx包含worker和master两个进程，强制关闭时两者均需关闭：
@@ -55,7 +55,7 @@ class="gallery-image"
 data-flex-grow="932"
 data-flex-basis="2238px"
 >&lt;/p>
-&lt;h1 id="nginx配置">Nginx配置&lt;/h1>
+&lt;h2 id="nginx配置">Nginx配置&lt;/h2>
 &lt;p>下面以DSP业务平台的Nginx配置为例进行讲解：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#user nobody;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>worker_processes 1;
@@ -114,53 +114,53 @@ data-flex-basis="2238px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> location / &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#设置真实ip&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>proxy_set_header real_ip &lt;span style="color:#ef6155">$remote_addr&lt;/span>;
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># proxy_redirect off;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">## proxy_redirect off;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>proxy_pass http://cm:8080;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="基本配置">基本配置&lt;/h2>
-&lt;h3 id="user">user&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="基本配置">基本配置&lt;/h3>
+&lt;h4 id="user">user&lt;/h4>
 &lt;ul>
 &lt;li>语法: user user [group]&lt;/li>
 &lt;li>缺省值: nobody nobody&lt;br>
 指定Nginx Worker进程运行用户，默认是nobody帐号。&lt;/li>
 &lt;/ul>
-&lt;h3 id="error_log">error_log&lt;/h3>
+&lt;h4 id="error_log">error_log&lt;/h4>
 &lt;ul>
 &lt;li>语法: error_log file [ debug | info | notice | warn | error | crit ]&lt;/li>
 &lt;li>缺省值: ${prefix}/logs/error.log&lt;br>
 制定错误日志的存放位置和级别。&lt;/li>
 &lt;/ul>
-&lt;h3 id="worker_processes">worker_processes&lt;/h3>
+&lt;h4 id="worker_processes">worker_processes&lt;/h4>
 &lt;ul>
 &lt;li>语法: worker_processes number&lt;/li>
 &lt;li>缺省值: 1&lt;br>
 指定工作进程数。nginx可以使用多个worker进程。&lt;/li>
 &lt;/ul>
-&lt;h3 id="worker_cpu_affinity">worker_cpu_affinity&lt;/h3>
+&lt;h4 id="worker_cpu_affinity">worker_cpu_affinity&lt;/h4>
 &lt;ul>
 &lt;li>语法: 3.1.4.worker_cpu_affinity cpumask&lt;br>
 执行Nginx在哪个/些CPU上工作，默认由系统接管（可以在所有核心上运行）。&lt;br>
 如，有8个CPU线程（包括超线程），指定使用第0个CPU则配置为00000001，指定使用第7和第1个CPU线程则配置为10000010。&lt;/li>
 &lt;/ul>
-&lt;h2 id="event模块">Event模块&lt;/h2>
+&lt;h3 id="event模块">Event模块&lt;/h3>
 &lt;p>Nginx的默认配置中包含一个默认的Event模块，其中只包含worker_connections配置。&lt;/p>
 &lt;h3 id="worker_connections">worker_connections&lt;/h3>
 &lt;ul>
 &lt;li>语法：worker_connections number&lt;br>
 每个worker的最大连接数。通过worker_connections和worker_proceses可以计算出maxclients： max_clients = worker_processes * worker_connections。作为反向代理，max_clients为： max_clients = worker_processes * worker_connections/4，因为浏览器访问时会通过连接池建立多个连接。&lt;/li>
 &lt;/ul>
-&lt;h2 id="http模块">HTTP模块&lt;/h2>
+&lt;h3 id="http模块">HTTP模块&lt;/h3>
 &lt;p>Nginx最常用的是HTTP模块。&lt;/p>
-&lt;h3 id="基本配置-1">基本配置&lt;/h3>
+&lt;h4 id="基本配置-1">基本配置&lt;/h4>
 &lt;p>HTTP中大部分基本配置无需修改，除了：&lt;/p>
 &lt;ul>
 &lt;li>keepalive_timeout 1000;配置Keep-Alive的超时，单位为秒；&lt;/li>
 &lt;li>gzip on;配置是否开启Gzip压缩，开启后可以提高网站访问速度；&lt;/li>
 &lt;li>log_format 配置日志格式，access_log配置日志路径和使用的格式，在此不细述。&lt;/li>
 &lt;/ul>
-&lt;h3 id="server作用域">server作用域&lt;/h3>
+&lt;h4 id="server作用域">server作用域&lt;/h4>
 &lt;p>HTTP模块中最常配置的是server作用域。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>server &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> listen 80;
@@ -171,18 +171,18 @@ data-flex-basis="2238px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> proxy_pass http://cm:8080;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="listen">listen&lt;/h4>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h5 id="listen">listen&lt;/h5>
 &lt;ul>
 &lt;li>语法: listen address:port&lt;/li>
 &lt;li>默认值： listen 80&lt;/li>
 &lt;li>作用域: server
 指定当前虚拟机的监听端口。&lt;/li>
 &lt;/ul>
-&lt;h4 id="server_name">server_name&lt;/h4>
+&lt;h5 id="server_name">server_name&lt;/h5>
 &lt;p>当前server匹配的用户请求路径的主机名，主要用于配置基于名称的虚拟主机，支持通配符&lt;em>和正则表达式（以波浪线~起头）。&lt;br>
 server_name指令在接到请求后的匹配顺序分别为：准确的server_name匹配，以&lt;/em>通配符开始的字符串，以&lt;em>通配符结束的字符串、匹配正则表达式。nginx按以上顺序依次匹配，只要有一项匹配以后就会停止搜索。&lt;br>
 举例： 先后配置了两个server， server_name分别配置为cm.turing.asia和&lt;/em>.turing.asia，当用户请求cm.turing.asia时，访问第一个server，用户访问test.turing.asia时访问第二个server。&lt;/p>
-&lt;h4 id="location">location&lt;/h4>
+&lt;h5 id="location">location&lt;/h5>
 &lt;ul>
 &lt;li>语法：location 匹配字符串 { 操作语句 }&lt;/li>
 &lt;/ul>
@@ -198,7 +198,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;Host&lt;/span> &lt;span style="color:#06b6ef">name=&lt;/span>&lt;span style="color:#48b685">&amp;#34;cm&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">appBase=&lt;/span>&lt;span style="color:#48b685">&amp;#34;cmserv&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">unpackWARs=&lt;/span>&lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">autoDeploy=&lt;/span>&lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>　　&lt;span style="color:#5bc4bf">&amp;lt;Context&lt;/span> &lt;span style="color:#06b6ef">path=&lt;/span>&lt;span style="color:#48b685">&amp;#34;turingcm&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">docBase=&lt;/span>&lt;span style="color:#48b685">&amp;#34;turingcm&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">reloadable=&lt;/span>&lt;span style="color:#48b685">&amp;#34;true&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">/&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/Host&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="负载均衡配置">负载均衡配置&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="负载均衡配置">负载均衡配置&lt;/h3>
 &lt;p>首先在HTTP模块中定义多台服务器构成的负载均衡：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>upstream rtb&lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> server 127.0.0.1:8080 &lt;span style="color:#ef6155">weight&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>5;
@@ -208,7 +208,7 @@ location的操作语句中：&lt;br>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>每台服务器为一行，填写IP和端口，并在weight中填入负载均衡的权重（正整数，默认为1），注意分号。以上例子将该负载均衡配置命名为”rtb”。IP和端口后面填backup的表示备用服务器，当其他非backup的服务器均忙或宕机时，会分发请求到backup服务器上。&lt;br>
 然后在location中，配置&lt;strong>proxy_pass http://[负载均衡名];&lt;/strong> 即可，即该server和location定义的域名规则和访问路径规则匹配到的请求将按weight分发到以上几台服务器/服务中。&lt;/p>
-&lt;h2 id="动静分离">动静分离&lt;/h2>
+&lt;h3 id="动静分离">动静分离&lt;/h3>
 &lt;p>tomcat是一个比较全面的web容器，对静态网页的处理，应该是比较费资源的，特别是每次都要从磁盘读取静态页面，然后返回。这中间会消耗Tomcat的资源，可能会使那些动态页面解析性能影响。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>//静态资源
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>location ~ .*&lt;span style="color:#f99b15">\.&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>js|css|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid|doc|ppt|pdf|xls|mp3|wma&lt;span style="color:#5bc4bf">)&lt;/span>$ &lt;span style="color:#5bc4bf">{&lt;/span> //静态资源到nginx服务器下static获取

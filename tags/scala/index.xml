@@ -55,7 +55,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 以前的配置 --&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>《Scala实用指南》读书笔记(二)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</link><pubDate>Wed, 18 Jul 2018 16:54:47 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/nightstreet.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(二)" />&lt;h1 id="第8章-集合">第8章 集合&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>《Scala实用指南》读书笔记(二)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</link><pubDate>Wed, 18 Jul 2018 16:54:47 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%BA%8C/nightstreet.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(二)" />&lt;h2 id="第8章-集合">第8章 集合&lt;/h2>
 &lt;ul>
 &lt;li>Scala对元素较少的Set进行了优化,4个元素以内的Set有专门的实现类(&lt;code>Set0&lt;/code>,&lt;code>Set1&lt;/code>,&lt;code>Set2&lt;/code>,&lt;code>Set3&lt;/code>,&lt;code>Set4&lt;/code>),大于4个元素的使用HashSet实现&lt;/li>
 &lt;li>Set的方法(&lt;code>filter&lt;/code>,&lt;code>map&lt;/code>,&lt;code>foreach&lt;/code>这些就不说了):
@@ -82,7 +82,7 @@
 &lt;li>&lt;code> + - ! ~&lt;/code>作一元操作符时,也是调用的主语在操作符后面,分别映射到&lt;code>unary_+(),unary_-(),unary_!(),unary_~()&lt;/code>等方法的调用,即&lt;code>-a&lt;/code>调用&lt;code>a.unary_-()&lt;/code>等&lt;/li>
 &lt;li>for表达式:&lt;code>for([parrten &amp;lt;- generator; definition*&amp;gt;]+;filter;) [yield] expression&lt;/code>,可以加过滤条件,而yield也是可选的,有yield的时候返回一个值列表,没有yield的时候返回Unit&lt;/li>
 &lt;/ul>
-&lt;h1 id="第9章-模式匹配和正则表达式">第9章 模式匹配和正则表达式&lt;/h1>
+&lt;h2 id="第9章-模式匹配和正则表达式">第9章 模式匹配和正则表达式&lt;/h2>
 &lt;ul>
 &lt;li>匹配List的时候,可以只获取感兴趣的元素,剩下的用&lt;code>_*&lt;/code>省略, 如:&lt;/li>
 &lt;/ul>
@@ -150,12 +150,12 @@
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第10章-处理异常">第10章 处理异常&lt;/h1>
+&lt;h2 id="第10章-处理异常">第10章 处理异常&lt;/h2>
 &lt;ul>
 &lt;li>Java处理多个异常时,会检查多个异常的处理顺序,子类必须在前面,否则编译会出错(&lt;code>exception ***.*** has already been caught&lt;/code>),但scala对此不会警告,要自己注意(在catch块中使用case匹配的顺序)&lt;/li>
 &lt;li>这本书竟然没有讲到&lt;code>Try&lt;/code>类,吐槽一下&lt;/li>
 &lt;/ul>
-&lt;h1 id="第11章-递归">第11章 递归&lt;/h1>
+&lt;h2 id="第11章-递归">第11章 递归&lt;/h2>
 &lt;ul>
 &lt;li>尾递归优化(Tail Recursive Optimization): 不是尾递归的时候,递归调用在字节码对应&lt;code>invokespecial&lt;/code>指令,表明是递归调用,会产生新一层栈;如果写成尾递归, 递归调用时在字节码对应&lt;code>goto&lt;/code>指令,表明使用了迭代而非方法调用,放弃了当前的上下文&lt;/li>
 &lt;li>&lt;code>@scala.annotation.tailrec&lt;/code>注解加载函数上,可以让scala检查是否使用了尾递归,如果非尾递归,会报错;该注解可选,主要是增加可读性,并在重构时保持尾递归性质&lt;/li>
@@ -167,7 +167,7 @@
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第12章-惰性求值和并行集合">第12章 惰性求值和并行集合&lt;/h1>
+&lt;h2 id="第12章-惰性求值和并行集合">第12章 惰性求值和并行集合&lt;/h2>
 &lt;ul>
 &lt;li>使用关键字&lt;code>lazy&lt;/code>修饰变量,scala会推迟绑定变量和他的值,直到该值第一次被使用(才会去绑定)&lt;/li>
 &lt;li>如果变量绑定的计算有副作用,那么多个变量的绑定顺序机会对绑定的值有影响,此时就不能随便用惰性求值(&lt;code>lazy&lt;/code>)了,否则不可交换计算的结果将会得不可知&lt;/li>
@@ -191,7 +191,7 @@
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第13章-使用actor编程">第13章 使用Actor编程&lt;/h1>
+&lt;h2 id="第13章-使用actor编程">第13章 使用Actor编程&lt;/h2>
 &lt;ul>
 &lt;li>Actor帮助我们将共享的可变性转换成隔离的可变性(isolated mutability),如果一个任务可以有意义地分成几个子任务,分而治之,那么可以使用Actor模型来解决这个任务&lt;/li>
 &lt;li>&lt;code>AtomicLog&lt;/code>之类的类,虽然原子性保证了单个值的线程安全性,但并不能保证跨多个值的原子性,这些值可能同时发生变化&lt;/li>
@@ -246,7 +246,7 @@
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;h1 id="第14章-和java进行互操作">第14章 和Java进行互操作&lt;/h1>
+&lt;h2 id="第14章-和java进行互操作">第14章 和Java进行互操作&lt;/h2>
 &lt;ul>
 &lt;li>scala使用Java类,当Java变量/方法名等于scala关键字冲突的时候,可以将受影响的变量/方法用反引号&lt;code>`&lt;/code>括起来&lt;/li>
 &lt;li>没有方法实现的trait在字节码层面是简单的接口;如果想在scala中创建接口,只能创建没有方法实现的trait&lt;/li>
@@ -260,7 +260,7 @@
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">abstract&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">Bird&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@throws&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>classOf&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">NoFlyException&lt;/span>&lt;span style="color:#5bc4bf">])&lt;/span> &lt;span style="color:#815ba4">def&lt;/span> fly&lt;span style="color:#5bc4bf">()&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Unit&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>(结束)&lt;/p></description></item><item><title>《Scala实用指南》读书笔记(一)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</link><pubDate>Tue, 17 Jul 2018 15:14:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/summer2.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(一)" />&lt;h1 id="前言">前言&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>(结束)&lt;/p></description></item><item><title>《Scala实用指南》读书笔记(一)</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</link><pubDate>Tue, 17 Jul 2018 15:14:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%94%A8%E6%8C%87%E5%8D%97%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/summer2.jpg" alt="Featured image of post 《Scala实用指南》读书笔记(一)" />&lt;h2 id="前言">前言&lt;/h2>
 &lt;p>好久没写博客了,在&lt;code>Kafka&lt;/code>源码的海洋里挣扎ing,休息的时候还刷&lt;code>Leetcode&lt;/code>玩儿,很多东西匆匆丢到&lt;code>OneNote&lt;/code>里了.&lt;br>
 最近花了一周时间看了品神翻译的《Scala实用指南》, 这本书应该主要是面向刚入Scala大门的Javaer的,前面讲Scala基础,后期还讲了下Akka和Scala具体的应用.&lt;br>
 我虽然写scala也有一段时间了,再看这本书还是觉得受益匪浅,有很多地方以前没有注意到的.&lt;br>
@@ -275,12 +275,12 @@ class="gallery-image"
 data-flex-grow="85"
 data-flex-basis="205px"
 >&lt;/p>
-&lt;h1 id="第2章-体验scala">第2章 体验Scala&lt;/h1>
+&lt;h2 id="第2章-体验scala">第2章 体验Scala&lt;/h2>
 &lt;ul>
 &lt;li>scala的REPL中, &lt;code>Ctrl+A&lt;/code>调到行首,&lt;code>Ctrl+E&lt;/code>调到行尾&lt;/li>
 &lt;li>&lt;code>scala &amp;lt;scala源文件&amp;gt;&lt;/code>命令可以在单独的JVM中运行scala代码,而实际上是自动合成Main类调用main()方法&lt;/li>
 &lt;/ul>
-&lt;h1 id="第3章-从java到scala">第3章 从Java到Scala&lt;/h1>
+&lt;h2 id="第3章-从java到scala">第3章 从Java到Scala&lt;/h2>
 &lt;ul>
 &lt;li>用&lt;code>val&lt;/code>定义所有字段,并只提供读不提供更新状态的方法,可以使一个类的实例不可变&lt;/li>
 &lt;li>&lt;code>1 to 3&lt;/code>,&lt;code>1 until 3&lt;/code>这类表达式其实是隐式转换,&lt;code>1&lt;/code>通过&lt;code>intWrapper()&lt;/code>方法转换为成富封装器(rich wrapper,这里具体是&lt;code>RichInt&lt;/code>类)再调用其&lt;code>to()&lt;/code>,&lt;code>until()&lt;/code>方法&lt;/li>
@@ -329,7 +329,7 @@ data-flex-basis="205px"
 &lt;li>scala的protected方法只有派生类可以访问,同包的非派生类不可访问,在派生类中也不可以通过基类实例来访问,只能是通过派生类的实例方法访问&lt;/li>
 &lt;li>scala中可以通过&lt;code>private[类名/包名/this]&lt;/code>和&lt;code>protected[类名/包名/this]&lt;/code>实现细粒度的权限控制,具体不表了&amp;hellip;&lt;/li>
 &lt;/ul>
-&lt;h1 id="第4章-处理对象">第4章 处理对象&lt;/h1>
+&lt;h2 id="第4章-处理对象">第4章 处理对象&lt;/h2>
 &lt;ul>
 &lt;li>定义类的时候,&lt;code>class A(var a:Int, val b:Int)&lt;/code>被称作主构造器(primary constructor),其中可变的参数a自动生成getter和setter,不可变的参数b自动生成getter方法,但这些getter setter方法不符合JavaBean标准,没有get/set前缀,可以通过在期望产生符合JavaBean规范的字段加上&lt;code>@scala.reflect.BeanProperty&lt;/code>注解来解决这个问题&lt;/li>
 &lt;li>scala中val修饰的属性编译后为&lt;code>private final&lt;/code>&lt;/li>
@@ -349,7 +349,7 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
 &lt;li>scala支持包对象,为单例对象,与包同名,用&lt;code>package object&lt;/code>关键字标记,当包中其他类&lt;code>import 包名._&lt;/code>时,可以直接引用包对象里面的方法;包对象可以存储该包公用的一些方法如工具方法,举例, scala包也有包对象,包含了很多类型别名和隐式类型转换.&lt;/li>
 &lt;/ul>
-&lt;h1 id="第5章-善用类型">第5章 善用类型&lt;/h1>
+&lt;h2 id="第5章-善用类型">第5章 善用类型&lt;/h2>
 &lt;ul>
 &lt;li>scala偏向于使用类型推断,但以下情况必须显式指定类型:1.定义没有初始值的类字段;2.定义函数或方法的参数;3.使用return或递归时,定义函数或方法返回类型;4.将变量定义为与推断出来类型不一样&lt;/li>
 &lt;li>&lt;code>Nothing&lt;/code>是所有类型的子类型, &lt;code>Any&lt;/code>是所有类型的基础类型,包含&lt;code>AnyRef&lt;/code>子类型(所有引用类型的基础类型,包含Java的&lt;code>Object&lt;/code>类的方法)和&lt;code>AnyVal&lt;/code>子类型(所有值类型Int,Double等的基础类型,映射到Java原始类型)&lt;/li>
@@ -403,7 +403,7 @@ data-flex-basis="205px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">import&lt;/span> &lt;span style="color:#fec418">MyInterpolator._&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">val&lt;/span> name &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;Leibniz&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>println&lt;span style="color:#5bc4bf">(&lt;/span>my&lt;span style="color:#48b685">&amp;#34;&amp;#34;&amp;#34;My name is ${name}&amp;#34;&amp;#34;&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#776e71">//调用我们自定义的插值器,返回 My name is #Leibniz#
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="第6章-函数值与闭包">第6章 函数值与闭包&lt;/h1>
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="第6章-函数值与闭包">第6章 函数值与闭包&lt;/h2>
 &lt;ul>
 &lt;li>柯里化: 一个有分组参数的函数,如&lt;code>f(a:A)(b:B):C&lt;/code>,使用&lt;code>f _&lt;/code>创建一个部分应用函数(此处类型为&lt;code>A =&amp;gt; (B =&amp;gt; C)&lt;/code>),可以用于创建可复用的临时便利函数;&lt;/li>
 &lt;li>多组参数的函数,如果有单独成组的函数参数,可以不使用小括号,直接用大括号,更直观,如&lt;code>f(a:Int)(g:A=&amp;gt;B)&lt;/code>可以这样调用:&lt;code>f(1) {a =&amp;gt; xxx(a)}&lt;/code>&lt;/li>
@@ -411,7 +411,7 @@ data-flex-basis="205px"
 &lt;li>scala自动将函数名视作函数值的引用&lt;/li>
 &lt;li>函数或代码块可能含有未绑定的变量,在调用前根据上下文绑定,形成闭包(closure);绑定的时候不会复制相应变量的值,实际上会绑定到变量本身,因此线程不安全&lt;/li>
 &lt;/ul>
-&lt;h1 id="第7章-特质">第7章 特质&lt;/h1>
+&lt;h2 id="第7章-特质">第7章 特质&lt;/h2>
 &lt;ul>
 &lt;li>在trait中定义并初始化的val/var变量，将会在混入了该trait的累的内部实现；定义并&lt;strong>未&lt;/strong>初始化的val/var变量被认为是抽象的,混入该trait的类需要实现他们&lt;/li>
 &lt;li>类混入trait的时候,如果类没用用&lt;code>extends&lt;/code>,则第一个&lt;code>trait&lt;/code>用&lt;code>extends&lt;/code>,后面的&lt;code>trait&lt;/code>用&lt;code>with&lt;/code>;如果类已经用&lt;code>extends&lt;/code>了,那么所有&lt;code>trait&lt;/code>都用&lt;code>with&lt;/code>来混入&lt;/li>
@@ -684,7 +684,7 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Scala实现64位的MurmurHash函数</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</link><pubDate>Thu, 19 Jan 2017 11:20:52 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</guid><description>&lt;h1 id="简介">简介&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Scala实现64位的MurmurHash函数</title><link>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</link><pubDate>Thu, 19 Jan 2017 11:20:52 +0800</pubDate><guid>https://leibnizhu.github.io/p/Scala%E5%AE%9E%E7%8E%B064%E4%BD%8D%E7%9A%84MurmurHash%E5%87%BD%E6%95%B0/</guid><description>&lt;h2 id="简介">简介&lt;/h2>
 &lt;p>最近使用Spark的GraphX进行一些图计算，GraphX要求每个节点都有唯一的ID；但我们的数据并没有包含唯一的ID，所以需要使用Hash函数将每条数据的信息进行摘要生成唯一ID。&lt;br>
 Hash中，String自己的hashCode()自然是很烂的(字符串每个字符乘以质数再与之前hash相加，如此迭代)，MD5/SHA1之类的算法开销又比较大，Spark图运算的时候节点较多，hash的开销还是蛮可观的。&lt;br>
 经过搜索，发现了MurmurHash算法，具体参考 &lt;a class="link" href="https://zh.wikipedia.org/wiki/Murmur%E5%93%88%E5%B8%8C" target="_blank" rel="noopener"
@@ -692,7 +692,7 @@ Hash中，String自己的hashCode()自然是很烂的(字符串每个字符乘�
 Scala API自身是有MurmurHash算法的实现的（&lt;a class="link" href="http://www.scala-lang.org/api/current/scala/util/hashing/MurmurHash3$.html" target="_blank" rel="noopener"
 >scala.util.hashing.MurmurHash3&lt;/a>），但返回值是int，32位。对于海量数据而言，显然不够用，我们需要64位的。&lt;br>
 于是就写了个scala实现的64位MurmurHash函数，详见下文（没有测试过具体的碰撞性能）。&lt;/p>
-&lt;h1 id="scala实现">scala实现&lt;/h1>
+&lt;h2 id="scala实现">scala实现&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">object&lt;/span> &lt;span style="color:#fec418">MurmurHash64&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">def&lt;/span> stringHash&lt;span style="color:#5bc4bf">(&lt;/span>str&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">String&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Long&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> data &lt;span style="color:#815ba4">=&lt;/span> str&lt;span style="color:#5bc4bf">.&lt;/span>getBytes

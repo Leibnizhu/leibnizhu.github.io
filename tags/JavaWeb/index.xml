@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JavaWeb on Heaven's Door</title><link>https://leibnizhu.github.io/tags/JavaWeb/</link><description>Recent content in JavaWeb on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 26 Nov 2016 16:00:08 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/JavaWeb/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring Boot快速入门（四）——日志系统</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</link><pubDate>Sat, 26 Nov 2016 16:00:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</guid><description>&lt;h1 id="日志系统">日志系统&lt;/h1>
-&lt;h2 id="简介">简介&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JavaWeb on Heaven's Door</title><link>https://leibnizhu.github.io/tags/JavaWeb/</link><description>Recent content in JavaWeb on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 26 Nov 2016 16:00:08 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/JavaWeb/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring Boot快速入门（四）——日志系统</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</link><pubDate>Sat, 26 Nov 2016 16:00:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</guid><description>&lt;h2 id="日志系统">日志系统&lt;/h2>
+&lt;h3 id="简介">简介&lt;/h3>
 &lt;p>Spring Boot默认使用的Apache的Common Logging日志系统，但同时也提供了Java Util Logging, Log4J, Log4J2和Logback等日志系统的支持（无需额外增加依赖）。&lt;/p>
-&lt;h2 id="日志格式">日志格式&lt;/h2>
+&lt;h3 id="日志格式">日志格式&lt;/h3>
 &lt;p>Spring Boot默认输出的日志各列含义如下：&lt;/p>
 &lt;ul>
 &lt;li>日期和时间 - 精确到毫秒，且易于排序。&lt;/li>
@@ -19,7 +19,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.698 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.e.ServletRegistrationBean : Mapping servlet: &lt;span style="color:#48b685">&amp;#39;dispatcherServlet&amp;#39;&lt;/span> to &lt;span style="color:#5bc4bf">[&lt;/span>/&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.702 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.embedded.FilterRegistrationBean : Mapping filter: &lt;span style="color:#48b685">&amp;#39;hiddenHttpMethodFilter&amp;#39;&lt;/span> to: &lt;span style="color:#5bc4bf">[&lt;/span>/*&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以在resources/application.properties中使用logging.pattern.console和logging.pattern.file属性进行配置。&lt;/p>
-&lt;h2 id="日志配置">日志配置&lt;/h2>
+&lt;h3 id="日志配置">日志配置&lt;/h3>
 &lt;p>可以在&lt;strong>resources/application.properties&lt;/strong> 中进行配置，如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>###日志配置###
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#日志输出级别
@@ -35,7 +35,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36}[%line]=&amp;gt; %msg%n
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#定义输出到文件的样式（不支持JDK Logger）
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#logging.pattern.file=
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="日志api调用">日志API调用&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="日志api调用">日志API调用&lt;/h3>
 &lt;p>类似Log4j：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.Log&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.LogFactory&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
@@ -48,7 +48,7 @@
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#ef6155">……&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="其他相关网站">其他相关网站&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他相关网站">其他相关网站&lt;/h2>
 &lt;p>Spring Boot相关博客：&lt;br>
 &lt;a class="link" href="http://blog.didispace.com/categories/Spring-Boot/" target="_blank" rel="noopener"
 >http://blog.didispace.com/categories/Spring-Boot/&lt;/a>&lt;br>
@@ -218,9 +218,9 @@ data-flex-basis="1424px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.prefix&lt;span style="color:#5bc4bf">=&lt;/span>classpath:/templates/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Suffix that gets appended to view names when building a URL.&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.suffix&lt;span style="color:#5bc4bf">=&lt;/span>.html spring.thymeleaf.template-resolver-order&lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#776e71"># Order of the template resolver in the chain. spring.thymeleaf.view-names= # Comma-separated list of view names that can be resolved.&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</link><pubDate>Sat, 26 Nov 2016 15:59:05 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</guid><description>&lt;h1 id="使用spring-boot">使用Spring Boot&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</link><pubDate>Sat, 26 Nov 2016 15:59:05 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</guid><description>&lt;h2 id="使用spring-boot">使用Spring Boot&lt;/h2>
 &lt;h2 id="编写demo的rest风格controller">编写Demo的REST风格Controller&lt;/h2>
-&lt;h3 id="前言">前言&lt;/h3>
+&lt;h4 id="前言">前言&lt;/h4>
 &lt;p>在DMP项目中，我们创建了demo分支，其中的com.turingdi.dmp.demo包中存放着这个demo。
 这个demo实现一个简单的REST风格的API：&lt;/p>
 &lt;ul>
@@ -230,7 +230,7 @@ data-flex-basis="1424px"
 &lt;li>GET请求访问/demo/user/&amp;lt;用户ID&amp;gt;可查询到对应用户的信息JSON；&lt;/li>
 &lt;li>不使用上述HTTP方法访问的会返回错误。&lt;/li>
 &lt;/ul>
-&lt;h3 id="编写controller代码">编写Controller代码&lt;/h3>
+&lt;h4 id="编写controller代码">编写Controller代码&lt;/h4>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp.demo&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">io.swagger.annotations.ApiImplicitParam&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
@@ -302,18 +302,18 @@ data-flex-basis="523px"
 >&lt;/li>
 &lt;li>可以使用Swagger2快速构建RESTful API文档，并支持在线发送请求调试API：http://blog.didispace.com/springbootswagger2/。&lt;/li>
 &lt;/ul>
-&lt;h2 id="启动项目">启动项目&lt;/h2>
-&lt;h3 id="直接运行入口类">直接运行入口类&lt;/h3>
+&lt;h3 id="启动项目">启动项目&lt;/h3>
+&lt;h4 id="直接运行入口类">直接运行入口类&lt;/h4>
 &lt;p>在IDE中配置、直接运行入口类com.turingdi.dmp.DMPStarter。&lt;/p>
-&lt;h3 id="打包jar运行">打包jar运行&lt;/h3>
+&lt;h4 id="打包jar运行">打包jar运行&lt;/h4>
 &lt;p>使用mvn package命令进行打包，并使用以下命令执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>java -jar target/***.jar
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>由于我们的入口类加上了7.@SpringBootApplication注解，并在Maven中配置了spring-boot-maven-plugin插件，因此在打jar包的时候会自动设置jar包中的META-INF/MAINFEST.MF中配置好jar包的入口类，无需我们在pom.xml文件中额外配置。&lt;/p>
-&lt;h3 id="使用spring-boot的maven插件运行">使用Spring Boot的Maven插件运行&lt;/h3>
+&lt;h4 id="使用spring-boot的maven插件运行">使用Spring Boot的Maven插件运行&lt;/h4>
 &lt;p>执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> mvn spring-boot:run
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即可。这也是spring-boot-maven-plugin插件起到的作用。&lt;/p>
-&lt;h3 id="热交换">热交换&lt;/h3>
+&lt;h4 id="热交换">热交换&lt;/h4>
 &lt;p>由于Spring Boot在打包的时候将内置tomcat一并打包，所以我们无法直接更新项目文件让tomcat重新加载。Spring Boot提供了Spring Loaded实现热交换。
 在pom.xml中增加以下依赖即可:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
@@ -322,11 +322,11 @@ data-flex-basis="523px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;optional&amp;gt;&lt;/span>true&lt;span style="color:#5bc4bf">&amp;lt;/optional&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后项目运行时，更新源代码之后，重新编译（如IDEA中按快捷键Ctrl+F9）即可在控制台看到Spring Boot重新加载了新编译后的文件。&lt;/p></description></item><item><title>Spring Boot快速入门（一）——介绍与基础Demo</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</link><pubDate>Sat, 26 Nov 2016 15:58:33 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</guid><description>&lt;p>因为团队新项目需要，最近研究了一下Spring Boot + RESTful API + Thymeleaf，总结了一份文档，也放到博客里贡献。&lt;/p>
-&lt;h1 id="spring-boot概述">Spring Boot概述&lt;/h1>
-&lt;h2 id="简介">简介&lt;/h2>
+&lt;h2 id="spring-boot概述">Spring Boot概述&lt;/h2>
+&lt;h3 id="简介">简介&lt;/h3>
 &lt;p>Spring Boot简化了基于Spring的应用开发，你只需要&amp;quot;run&amp;quot;就能创建一个独立的，产品级别的Spring应用。我们为Spring平台及第三方库提供开箱即用的设置，这样你就可以有条不紊地开始。多数Spring Boot应用只需要很少的Spring配置。&lt;br>
 你可以使用Spring Boot创建Java应用，并使用java -jar启动它或采用传统的war部署方式。我们也提供了一个运行&amp;quot;spring脚本&amp;quot;的命令行工具。&lt;/p>
-&lt;h2 id="特性">特性&lt;/h2>
+&lt;h3 id="特性">特性&lt;/h3>
 &lt;p>Spring Boot主要的目标是：&lt;/p>
 &lt;ul>
 &lt;li>为所有Spring开发提供一个从根本上更快，且随处可得的入门体验。&lt;/li>
@@ -334,7 +334,7 @@ data-flex-basis="523px"
 &lt;li>提供一系列大型项目常用的非功能性特征，比如：内嵌服务器，安全，指标，健康检测，外部化配置。&lt;/li>
 &lt;li>绝对没有代码生成，也不需要XML配置。&lt;/li>
 &lt;/ul>
-&lt;h2 id="文档api">文档/API&lt;/h2>
+&lt;h3 id="文档api">文档/API&lt;/h3>
 &lt;p>目前Spring Boot最新的Release版本为1.4.2。&lt;br>
 官方文档：&lt;br>
 &lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/reference/htmlsingle/" target="_blank" rel="noopener"
@@ -345,10 +345,10 @@ data-flex-basis="523px"
 官方API：&lt;br>
 &lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/" target="_blank" rel="noopener"
 >http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/&lt;/a>&lt;/p>
-&lt;h1 id="使用spring-boot">使用Spring Boot&lt;/h1>
+&lt;h2 id="使用spring-boot">使用Spring Boot&lt;/h2>
 &lt;p>本文的Demo可从git@turing:DMPWeb.git的demo分支（未公开于互联网）下载。&lt;/p>
-&lt;h2 id="创建spring-boot项目">创建Spring Boot项目&lt;/h2>
-&lt;h3 id="intellij-idea">IntelliJ IDEA&lt;/h3>
+&lt;h3 id="创建spring-boot项目">创建Spring Boot项目&lt;/h3>
+&lt;h4 id="intellij-idea">IntelliJ IDEA&lt;/h4>
 &lt;ol>
 &lt;li>点击菜单File &amp;ndash;&amp;gt; New &amp;ndash;&amp;gt; Project；&lt;/li>
 &lt;li>弹出的窗口中，左边栏选择Spring Initializr，右边选择JDK版本（通过配置也可以运行在JDK6上，但建议JDK7以上，最好JDK8）和初始化服务的URL（按默认的https://start.spring.io 即可），点击Next；&lt;br>
@@ -384,7 +384,7 @@ data-flex-basis="374px"
 &lt;li>点击Next，等待IDEA下载并初始化项目。&lt;/li>
 &lt;/ol>
 &lt;p>注：其实IDEA这种创建Spring Boot的方法，相当于自己去访问https://start.spring.io ，按页面提示选择了版本、项目信息和插件依赖之后，下载zip，解压导入到IDEA项目中。只不过IDEA帮你完成了下载和解压导入项目这一步而已。&lt;/p>
-&lt;h3 id="通用的项目创建方法">通用的项目创建方法&lt;/h3>
+&lt;h4 id="通用的项目创建方法">通用的项目创建方法&lt;/h4>
 &lt;p>任意一个IDE（在此省略截图），选择新建Maven项目，普通项目即可，填写项目基本信息后，修改pom.xml文件：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;project&lt;/span> &lt;span style="color:#06b6ef">xmlns=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">xmlns:xsi=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span>
@@ -454,8 +454,8 @@ data-flex-basis="374px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/snapshots&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repository&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repositories&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="编写项目入口类">编写项目入口类&lt;/h2>
-&lt;h3 id="入口类的位置">入口类的位置&lt;/h3>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="编写项目入口类">编写项目入口类&lt;/h3>
+&lt;h4 id="入口类的位置">入口类的位置&lt;/h4>
 &lt;p>Spring Boot官方文档建议将入口类（包含main方法的类）放在项目根包下，如com.turingdi.dmp.DMPStarter，下图是一个典型的Spring Boot项目结构，注意DMPStarter类在项目中的位置：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/4.png"
 width="212"
@@ -467,7 +467,7 @@ data-flex-grow="117"
 data-flex-basis="281px"
 >&lt;br>
 这样做的好处是使用@ComponentScan注解时可以使用默认value、无需额外指定扫描根包名的参数；而Spring Boot还提供了一个注解，包含了无参数的@ComponentScan注解及几个常用的注解，亦即在这样的项目结构下，入口类只需要一个注解即可。&lt;/p>
-&lt;h3 id="写入口类代码">写入口类代码&lt;/h3>
+&lt;h4 id="写入口类代码">写入口类代码&lt;/h4>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.boot.SpringApplication&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>

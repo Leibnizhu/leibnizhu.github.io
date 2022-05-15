@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>git on Heaven's Door</title><link>https://leibnizhu.github.io/tags/git/</link><description>Recent content in git on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 20 Jul 2016 20:32:32 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Gitolite管理用户权限的Shell脚本</title><link>https://leibnizhu.github.io/p/Gitolite%E7%AE%A1%E7%90%86%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90%E7%9A%84Shell%E8%84%9A%E6%9C%AC/</link><pubDate>Wed, 20 Jul 2016 20:32:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/Gitolite%E7%AE%A1%E7%90%86%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90%E7%9A%84Shell%E8%84%9A%E6%9C%AC/</guid><description>&lt;p>最近给公司的git服务器从http协议升级为ssh协议的，同时增加了gitolite作为权限管理。但gitolite在增删用户公钥、增删用户对项目的权限、以及新增repository时的操作说不上繁杂但也是蛮机械的；又不想用gitlab之类重型的解决方案，所以选择了编写Shell脚本来实现。&lt;/p>
-&lt;h1 id="增加用户公钥的脚本">增加用户公钥的脚本&lt;/h1>
+&lt;h2 id="增加用户公钥的脚本">增加用户公钥的脚本&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>echo &lt;span style="color:#48b685">&amp;#34;增加/修改 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /home/git/gitolite-admin
@@ -8,7 +8,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;增加/修改 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="删除用户公钥的脚本">删除用户公钥的脚本&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="删除用户公钥的脚本">删除用户公钥的脚本&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>echo &lt;span style="color:#48b685">&amp;#34;删除 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>cd /home/git/gitolite-admin
@@ -17,7 +17,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;删除 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 的公钥 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685">.pub……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="增加用户对指定代码仓库的读写权限">增加用户对指定代码仓库的读写权限&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="增加用户对指定代码仓库的读写权限">增加用户对指定代码仓库的读写权限&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#增加指定用户对指定代码仓库的读写权限&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为用户名，对应公钥pub文件的文件名&lt;/span>
@@ -57,7 +57,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;增加 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 对项目 &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685"> 的权限……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="删除用户对指定代码仓库的读写权限">删除用户对指定代码仓库的读写权限&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="删除用户对指定代码仓库的读写权限">删除用户对指定代码仓库的读写权限&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#删除指定用户对指定代码仓库的读写权限&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为用户名，对应公钥pub文件的文件名&lt;/span>
@@ -97,7 +97,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git add .
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;删除 &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> 对项目 &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685"> 的权限……&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="新增一个代码仓库并初始化其权限">新增一个代码仓库，并初始化其权限&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="新增一个代码仓库并初始化其权限">新增一个代码仓库，并初始化其权限&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#新增一个代码仓库并初始化权限管理文件&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为该项目初始分配的用户名，对应公钥pub文件的文件名&lt;/span>
@@ -114,7 +114,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git init --bare &lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685">.git&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#修改权限文件，增加默认管理员权限和初始化的用户权限&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;# &lt;/span>&lt;span style="color:#ef6155">$3&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;## &lt;/span>&lt;span style="color:#ef6155">$3&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;repo &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34; RW = &lt;/span>&lt;span style="color:#ef6155">$1&lt;/span>&lt;span style="color:#48b685"> &amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34; RW+ = @admin&amp;#34;&lt;/span> &amp;gt;&amp;gt; /home/git/gitolite-admin/conf/gitolite1.conf
@@ -132,12 +132,12 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/target/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/bin/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;# filter eclipse file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;## filter eclipse file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;*.classpath&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;*.project&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/.settings/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;# filter IntelliJ IDEA file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;## filter IntelliJ IDEA file&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;*.iml&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;/.idea/&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;&amp;#34;&lt;/span> &amp;gt;&amp;gt; .gitignore
@@ -150,7 +150,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git commit -m &lt;span style="color:#48b685">&amp;#34;初始化项目的.gitignore文件，忽略常见无用文件&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git push
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;项目 &lt;/span>&lt;span style="color:#ef6155">$2&lt;/span>&lt;span style="color:#48b685"> 创建成功&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="重命名项目并修改对应权限配置文件">重命名项目并修改对应权限配置文件&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="重命名项目并修改对应权限配置文件">重命名项目并修改对应权限配置文件&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#!/bin/bash
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#776e71">#修改代码仓库的名字，同时更新权限配置文件&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#第1个参数为原repository名，对应/home/git/repositories下的文件夹名（不包含.git后缀）&lt;/span>

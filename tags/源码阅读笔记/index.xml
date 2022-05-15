@@ -996,16 +996,16 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">lastIndexOf&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>String str&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> fromIndex&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">lastIndexOf&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">char&lt;/span>&lt;span style="color:#5bc4bf">[]&lt;/span> source&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> sourceOffset&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> sourceCount&lt;span style="color:#5bc4bf">,&lt;/span> String target&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> fromIndex&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">lastIndexOf&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">char&lt;/span>&lt;span style="color:#5bc4bf">[]&lt;/span> source&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> sourceOffset&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> sourceCount&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">char&lt;/span>&lt;span style="color:#5bc4bf">[]&lt;/span> target&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> targetOffset&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> targetCount&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">int&lt;/span> fromIndex&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>与indexOf()系列类似，只是查找的方向以及起始位置不一样了。&lt;/p></description></item><item><title>HashMap源码阅读笔记</title><link>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sat, 24 Dec 2016 16:48:04 +0800</pubDate><guid>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;h1 id="put方法">put方法：&lt;/h1>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>与indexOf()系列类似，只是查找的方向以及起始位置不一样了。&lt;/p></description></item><item><title>HashMap源码阅读笔记</title><link>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sat, 24 Dec 2016 16:48:04 +0800</pubDate><guid>https://leibnizhu.github.io/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;h2 id="put方法">put方法：&lt;/h2>
 &lt;p>put方法调用私有方法&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>putVal&lt;span style="color:#5bc4bf">(&lt;/span>hash&lt;span style="color:#5bc4bf">(&lt;/span>key&lt;span style="color:#5bc4bf">),&lt;/span>key&lt;span style="color:#5bc4bf">,&lt;/span>value&lt;span style="color:#5bc4bf">,&lt;/span>&lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span>&lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="先去计算hash">先去计算hash。&lt;/h2>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="先去计算hash">先去计算hash。&lt;/h3>
 &lt;p>key非空的时候返回：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>h&lt;span style="color:#5bc4bf">=&lt;/span>key&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">hashCode&lt;/span>&lt;span style="color:#5bc4bf">())^(&lt;/span>h&lt;span style="color:#5bc4bf">&amp;gt;&amp;gt;&amp;gt;&lt;/span>16&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即高16位不变，低16位与高16位做异或运算，因为目前的table长度n为2的幂，而计算下标的时候，是这样实现的(使用&amp;amp;位操作，而非%求余)：(n - 1) &amp;amp; hash 。设计者认为这方法很容易发生碰撞。在n - 1为15(0x1111)时，其实散列真正生效的只是低4bit的有效位，当然容易碰撞了。因此，综合考虑了速度、作用、质量，把高16bit和低16bit异或了一下。设计者还解释到因为现在大多数的hashCode的分布已经很不错了，就算是发生了碰撞也用O(logn)的tree去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table长度比较小时)，从而引起的碰撞。&lt;/p>
-&lt;h2 id="然后进入putval">然后进入putVal()。&lt;/h2>
+&lt;h3 id="然后进入putval">然后进入putVal()。&lt;/h3>
 &lt;p>首先判断table是否为空（null或长度为0），为空的话进行resize()。&lt;/p>
-&lt;h2 id="resize">resize()&lt;/h2>
+&lt;h3 id="resize">resize()&lt;/h3>
 &lt;p>如果原来table大小已经超过上限，则不resize，直接返回原来table；
 原来table大小不为0且未超上限则容量增倍，threshold（扩容阈值）也增倍；
 原来table大小为0，则大小设为DEFAULT_INITIAL_CAPACITY=16，threshold设为DEFAULT_LOAD_FACTOR*DEFAULT_INITIAL_CAPACITY=12。
@@ -1079,12 +1079,12 @@ data-flex-basis="422px"
 既省去了重新计算hash值的时间，而且由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。
 上面代码中else{//preserveorder之后的部分即完成了上述过程，将一个节点上的链表拆分成用loHead,loTail和hiHead,hiTail
 描述的两个链表，分别对应新表中位置不变的节点，和移动oldCap之后的节点。&lt;/p>
-&lt;h2 id="新建节点或更新value">新建节点或更新value&lt;/h2>
+&lt;h3 id="新建节点或更新value">新建节点或更新value&lt;/h3>
 &lt;p>然后判断当前hash值对应table的节点是否为空，为空的话直接新建节点即可：new Node&amp;lt;&amp;gt;(hash,key,value,null);最后一个参数是next，因为table原节点为空，为链表第一个元素，所以next设为null即可；
 如果hash值对应table节点不为空，则判断原节点和当前插入的数据key及value是否都一致，如果一致，证明是同一个节点，无需重新插入；
 否则进入table节点的链表，遍历，如果找到与待插入节点一样的节点，则直接退出，否则一直找到链表末端节点还没找到相同的，则增加新节点插入当前数据，如果当前链表长度大于TREEIFY_THRESHOLD-1，还需要进行treeifyBin()操作，将链表转换为红黑树，提高查询效率（O(n)变为O(logn)，JDK8之后引入的优化）。
 如果以上操作中找到待插入节点的key在map中已存在，则用新数据覆盖之，最后size++, 判断table尺寸，看是否需要进行resize()。&lt;/p>
-&lt;h1 id="get方法">get方法：&lt;/h1>
+&lt;h2 id="get方法">get方法：&lt;/h2>
 &lt;p>get时调用&lt;code>getNode(int hash, Object key)&lt;/code>方法。
 首先table为null或长度为0或对应hash位置的元素为null均返回null。
 否则先判断hash位置上的元素key和get方法的key相同，如果相同则直接返回hash位置的元素；否则判断hash位置节点是否为TreeNode，若是则调用getTreeNode方法进行处理并返回；对于非TreeNode节点，且hash位置节点的key不等于get方法dekey的话，则遍历hash位置节点的链表，直到找到key相同的节点并返回节点的value。&lt;/p></description></item></channel></rss>
