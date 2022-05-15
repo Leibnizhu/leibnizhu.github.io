@@ -22,16 +22,22 @@ image: thumbnail.jpg
 
 而Quarkus很好解决了这些问题。反观Spring，在启动速度、资源占用这块实在不尽人意，对k8s的支持也是很落后，对graalvm native- image也是起步落后。
 
-## 用不用Native？
+## 用不用Native？？-
 
 谈Quarkus绕不开native（native可执行文件的构建）。没办法，官方先来的，首页就是大大的native/jvm性能对比。  
 native实测是真的快（不到0.1s），内存占用也确实小（启动几十MB，跑一段时间稳定大概300MB附近，不过不同压力的不同类型服务也不能说明什么）。但有什么缺点？  
 
 1. **编译速度慢** ：一个比较简单的web服务，在我们CICD的机器上编译大概需要4min，如果是容器内multistage编译则时间更长，但直接编译对环境又有要求，所以还是最好有更强大的编译机器。
-2. **编译产物体积大** ：我们编译出来的二进制文件大约130-150MB，upx压缩后40MB以内；单看最后的docker镜像，如果用最小的基础镜像，大约整个镜像可以做到100MB以内，是挺小的；但是每次构建变更的layer，都是整个二进制文件的变更，也就是没次编译多了一个40MB的layer出来，体积相当可观。同样的服务，如果打jar，真正变更的只有不到1MB，pod拉镜像的速度会更快，对docker仓库的压力也更小。
-3. **开发多了不少注意事项** ：你要注意新引入的依赖是不是支持native的；所以可能需要json序列化反序列化的类记得加上 @RegisterForReflection 注解；如果是外部依赖的实体类，要编写一个什么json文件声明要处理…………本文不是Quarkus教程，就不详细展开了，总之，如果要native，最好整个服务都只用quarkus生态里面的依赖，否则你不知道什么时候就编译不了了。虽然quarkus的生态已经比较完善，但总有没cover到的地方，比如hadoop生态的sdk。
+2. **编译产物体积大** ：我们编译出来的二进制文件大约130-150MB，`upx` 压缩后40MB以内；单看最后的docker镜像，如果用最小的基础镜像，大约整个镜像可以做到100MB以内，是挺小的；但是每次构建变更的layer，都是整个二进制文件的变更，也就是没次编译多了一个40MB的layer出来，体积相当可观。同样的服务，如果打jar，真正变更的只有不到1MB，pod拉镜像的速度会更快，对docker仓库的压力也更小。
+3. **开发多了不少限制** ：你要注意新引入的依赖是不是支持native的；所以可能需要json序列化反序列化的类记得加上 `@RegisterForReflection` 注解；如果是外部依赖的实体类，要编写一个什么json文件声明要处理…………本文不是Quarkus教程，就不详细展开了，总之，如果要native，最好整个服务都只用quarkus生态里面的依赖，否则你不知道什么时候就编译不了了。虽然quarkus的生态已经比较完善，但总有没cover到的地方，比如hadoop生态的sdk。
 
 没错，我们quarkus native上了生产一两个月，运行良好，充分体现了native的优越性；但是，现在要加入hadoop这些，没办法，只能放弃，要么自己实现一整套hdfs client之类的，成本很高。
 
+## 响应式要上吗？
+
+官网说：
+
+> Unifies imperative and reactive
+> Combine both the familiar imperative code and the reactive style when developing applications.
 
 > 未完待续
