@@ -1,6 +1,6 @@
 ---
 title: Kettle Java API处理Hadoop数据
-date: 2018-05-15 17:29:56
+date: 2018-05-15T17:29:56+08:00
 tags:
 - Kettle
 - Hadoop

@@ -1,6 +1,6 @@
 ---
 title: ArrayList源码阅读笔记（JDK8）
-date: 2017-07-11 21:48:32
+date: 2017-07-11T21:48:32+08:00
 tags:
 - Java
 - ArrayList

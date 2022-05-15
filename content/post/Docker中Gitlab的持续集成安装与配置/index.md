@@ -1,6 +1,6 @@
 ---
 title: Docker中Gitlab的持续集成安装与配置
-date: 2017-04-26 15:02:26
+date: 2017-04-26T15:02:26+08:00
 tags:
 - Gitlab
 - 持续集成

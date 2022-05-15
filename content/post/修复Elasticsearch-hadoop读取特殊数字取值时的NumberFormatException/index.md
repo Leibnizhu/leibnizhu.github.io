@@ -1,6 +1,6 @@
 ---
 title: 修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException
-date: 2021-06-19 23:40:50
+date: 2021-06-19T23:40:50+08:00
 tags:
 - Elasticsearch
 - ES

@@ -1,6 +1,6 @@
 ---
 title: Bash on Windows开启Ubuntu unity和Xfce4桌面的方法
-date: 2016-07-16 17:09:46
+date: 2016-07-16T17:09:46+08:00
 tags: 
 - Bash on Windows
 ---

@@ -5,7 +5,7 @@ menu:
         weight: -90
         params:
             icon: user
-date: 2017-04-27 11:47:21
+date: 2017-04-27T11:47:21+08:00
 ---
 
 ## 关于我

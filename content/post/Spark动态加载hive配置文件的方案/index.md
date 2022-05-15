@@ -1,9 +1,11 @@
 ---
 title: Spark动态加载hive配置的方案
-date: 2020-05-06 13:10:28
+date: 2020-05-06T13:10:28+08:00
 tags:
 - Hive
 - 跨集群
+categories:
+    - Spark
 image: bg3.jpg
 ---
 一般来说，Spark写Hive，把`xxx-site.xml`系列配置文件打进jar包里，或`spark-submit`指定下file之类，new个`HiveContext`就完事了。  

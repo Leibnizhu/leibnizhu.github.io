@@ -1,6 +1,6 @@
 ---
 title: 跨Yarn集群提交spark任务
-date: 2021-12-04 18:17:55
+date: 2021-12-04T18:17:55+08:00
 tags:
 - Spark
 - Hadoop

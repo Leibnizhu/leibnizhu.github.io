@@ -1,6 +1,6 @@
 ---
 title: 《Scala实用指南》读书笔记(二)
-date: 2018-07-18 16:54:47
+date: 2018-07-18T16:54:47+08:00
 tags:
 - scala
 image: nightstreet.jpg

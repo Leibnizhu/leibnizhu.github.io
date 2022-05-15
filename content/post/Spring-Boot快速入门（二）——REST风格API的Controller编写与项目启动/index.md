@@ -1,6 +1,6 @@
 ---
 title: Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动
-date: 2016-11-26 15:59:05
+date: 2016-11-26T15:59:05+08:00
 tags:
 - Spring Boot
 - JavaWeb

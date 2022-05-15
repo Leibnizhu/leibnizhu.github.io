@@ -1,6 +1,6 @@
 ---
 title: Gitolite管理用户权限的Shell脚本
-date: 2016-07-20 20:32:32
+date: 2016-07-20T20:32:32+08:00
 tags:
 - git
 - gitolite

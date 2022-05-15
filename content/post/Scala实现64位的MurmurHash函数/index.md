@@ -1,6 +1,6 @@
 ---
 title: Scala实现64位的MurmurHash函数
-date: 2017-01-19 11:20:52
+date: 2017-01-19T11:20:52+08:00
 tags:
 - scala
 - hash函数

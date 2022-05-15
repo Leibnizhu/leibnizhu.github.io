@@ -1,6 +1,6 @@
 ---
 title: 解决Maxwell发送Kafka消息数据倾斜问题
-date: 2018-01-03 17:34:30
+date: 2018-01-03T17:34:30+08:00
 tags:
 - Kafka
 - Maxwell

@@ -1,6 +1,6 @@
 ---
 title: Lucene7获取所有有效文档
-date: 2018-05-15 16:38:41
+date: 2018-05-15T16:38:41+08:00
 tags:
 - lucene
 - scala

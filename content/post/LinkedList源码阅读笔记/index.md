@@ -1,6 +1,6 @@
 ---
 title: LinkedList源码阅读笔记（JDK8）
-date: 2017-07-31 14:35:06
+date: 2017-07-31T14:35:06+08:00
 tags:
 - Java
 - LinkedList

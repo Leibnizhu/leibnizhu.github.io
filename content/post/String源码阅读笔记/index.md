@@ -1,6 +1,6 @@
 ---
 title: String源码阅读笔记（JDK8）
-date: 2017-07-09 20:54:16
+date: 2017-07-09T20:54:16+08:00
 tags:
 - Java
 - String

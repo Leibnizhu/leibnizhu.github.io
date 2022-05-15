@@ -1,6 +1,6 @@
 ---
 title: 《Scala实用指南》读书笔记(一)
-date: 2018-07-17 15:14:37
+date: 2018-07-17T15:14:37+08:00
 tags:
 - scala
 image: summer2.jpg

@@ -1,6 +1,6 @@
 ---
 title: Spring Boot快速入门（三）——使用Thymeleaf模板引擎
-date: 2016-11-26 15:59:27
+date: 2016-11-26T15:59:27+08:00
 tags:
 - Spring Boot
 - JavaWeb

@@ -1,6 +1,6 @@
 ---
 title: 调整VirtualBox CentOS虚拟机磁盘大小
-date: 2017-05-10 12:54:24
+date: 2017-05-10T12:54:24+08:00
 tags:
 - VirtualBox
 - CentOS

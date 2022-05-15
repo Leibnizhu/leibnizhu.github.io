@@ -1,6 +1,6 @@
 ---
 title: 'Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用'
-date: 2018-03-07 16:23:56
+date: 2018-03-07T16:23:56+08:00
 tags:
 - Kerberos
 - Sqoop

@@ -1,6 +1,6 @@
 ---
 title: 发布项目到Maven中央仓库
-date: 2017-09-05 13:36:04
+date: 2017-09-05T13:36:04+08:00
 tags:
 - Maven
 image: melen.png

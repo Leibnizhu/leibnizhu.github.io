@@ -1,6 +1,6 @@
 ---
 title: Spring Boot快速入门（四）——日志系统
-date: 2016-11-26 16:00:08
+date: 2016-11-26T16:00:08+08:00
 tags:
 - Spring Boot
 - JavaWeb

@@ -1,6 +1,6 @@
 ---
 title: Scala项目发布的小坑
-date: 2018-08-01 15:05:44
+date: 2018-08-01T15:05:44+08:00
 tags:
 - Maven
 - Scala

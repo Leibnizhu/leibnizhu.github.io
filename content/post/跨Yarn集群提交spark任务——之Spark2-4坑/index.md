@@ -1,6 +1,6 @@
 ---
 title: 跨Yarn集群提交spark任务——之Spark2.4坑
-date: 2022-05-14 20:33:58
+date: 2022-05-14T20:33:58+08:00
 tags:
 - Spark
 - Hadoop
