@@ -8,8 +8,8 @@ tags:
 image: docker-gitlab.png
 ---
 
-# 安装Gitlab-CI-Runner
-## 下载
+## 安装Gitlab-CI-Runner
+### 下载
 根据[官方的说法](https://gitlab.com/gitlab-org/gitlab-ci-multi-runner)，Gitlab-CI-Runner9.0以后的版本需要GitLab9.0以上版本支持，我们目前部署的GitLab是8.x，所以需要下载旧版。  
 最新版：  
 ```bash
@@ -20,7 +20,7 @@ sudo wget -O /usr/local/bin/gitlab-runner https://gitlab-ci-multi-runner-downloa
 sudo wget -O /usr/local/bin/gitlab-runner https://gitlab-ci-multi-runner-downloads.s3.amazonaws.com/v1.11.0/binaries/gitlab-ci-multi-runner-linux-amd64
 ```
 
-## 安装配置
+### 安装配置
 ```bash
 sudo chmod +x /usr/local/bin/gitlab-runner
 sudo useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
@@ -29,13 +29,13 @@ sudo gitlab-runner register
 执行上面最后一句命令的时候，会要求输入网址和秘钥，此时打开Gitlab页面，进项目，右上角配置按钮-Runners，再按此时页面上给出的来填。  
 还会要求输入名称和标签之类的信息，到最后会提示输入运行环境之类，我们Gitlab是在docker上，但Runner和Gitlab在同一个docker容器中的，就是在Gitlab调用的角度上来看，Runner并不是在docker中，所以运行环境那里选shell就行。  
 
-## 运行
+### 运行
 ```bash
 sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
 sudo gitlab-runner start
 ```
 
-# 配置项目的CI脚本
+## 配置项目的CI脚本
 在项目根目录创建文件.gitlab-ci.yml，写入CI执行的脚本，具体参考[官方文档](http://docs.gitlab.com/ce/ci/yaml/README.html)  
 此处以最简单的maven打包部署tomcat为例：  
 ```yaml
@@ -67,7 +67,7 @@ fi
 ```
 这个脚本通过crontab定时每分钟执行，所以检查war包的修改时间与当前时间相差小于60秒就会复制war包到tomcat的webapps中。  
 
-# 配置Pipeline邮件通知
+## 配置Pipeline邮件通知
 Gitlab默认CI Pipeline任务成功失败都会发邮件通知，这样或许会困扰到大家，所以修改Gitlab的源码，只让部署不成功的时候才发邮件通知。  
 进入docker，编辑`/opt/gitlab/embedded/service/gitlab-rails/app/services/notification_service.rb`，在`pipeline_finished`方法的开头添加`return if pipeline.status == "success" `，如：
 ```ruby

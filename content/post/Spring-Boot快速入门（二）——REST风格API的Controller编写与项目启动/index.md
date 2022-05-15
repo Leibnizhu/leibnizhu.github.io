@@ -7,9 +7,9 @@ tags:
 - REST
 ---
 
-# 使用Spring Boot
+## 使用Spring Boot
 ##	编写Demo的REST风格Controller
-### 前言
+#### 前言
 在DMP项目中，我们创建了demo分支，其中的com.turingdi.dmp.demo包中存放着这个demo。
 这个demo实现一个简单的REST风格的API：
 - 在根页面显示“Hello World”
@@ -18,7 +18,7 @@ tags:
 - GET请求访问/demo/user/<用户ID>可查询到对应用户的信息JSON；
 - 不使用上述HTTP方法访问的会返回错误。
 
-### 编写Controller代码
+#### 编写Controller代码
 ```java
 package com.turingdi.dmp.demo;
 
@@ -82,25 +82,25 @@ public class UserController {
 ![](5.png)
 - 可以使用Swagger2快速构建RESTful API文档，并支持在线发送请求调试API：http://blog.didispace.com/springbootswagger2/。
 
-## 启动项目
-### 直接运行入口类
+### 启动项目
+#### 直接运行入口类
 在IDE中配置、直接运行入口类com.turingdi.dmp.DMPStarter。
 
-### 打包jar运行
+#### 打包jar运行
 使用mvn package命令进行打包，并使用以下命令执行：
 ```bash
 java -jar target/***.jar
 ```
 由于我们的入口类加上了7.@SpringBootApplication注解，并在Maven中配置了spring-boot-maven-plugin插件，因此在打jar包的时候会自动设置jar包中的META-INF/MAINFEST.MF中配置好jar包的入口类，无需我们在pom.xml文件中额外配置。
 
-### 使用Spring Boot的Maven插件运行
+#### 使用Spring Boot的Maven插件运行
 执行：
 ```bash
  mvn spring-boot:run
  ```
 即可。这也是spring-boot-maven-plugin插件起到的作用。
 
-### 热交换
+#### 热交换
 由于Spring Boot在打包的时候将内置tomcat一并打包，所以我们无法直接更新项目文件让tomcat重新加载。Spring Boot提供了Spring Loaded实现热交换。
 在pom.xml中增加以下依赖即可:
 ```xml

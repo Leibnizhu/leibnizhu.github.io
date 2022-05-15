@@ -5,22 +5,22 @@ tags:
 - HashMap
 - 源码阅读笔记
 ---
-# put方法：
+## put方法：
 put方法调用私有方法
 ```java
 putVal(hash(key),key,value,false,true); 
 ```
 
-## 先去计算hash。
+### 先去计算hash。
 key非空的时候返回：
 ```java
 h=key.hashCode())^(h>>>16)
 ```
 即高16位不变，低16位与高16位做异或运算，因为目前的table长度n为2的幂，而计算下标的时候，是这样实现的(使用&位操作，而非%求余)：(n - 1) & hash 。设计者认为这方法很容易发生碰撞。在n - 1为15(0x1111)时，其实散列真正生效的只是低4bit的有效位，当然容易碰撞了。因此，综合考虑了速度、作用、质量，把高16bit和低16bit异或了一下。设计者还解释到因为现在大多数的hashCode的分布已经很不错了，就算是发生了碰撞也用O(logn)的tree去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table长度比较小时)，从而引起的碰撞。
 
-## 然后进入putVal()。
+### 然后进入putVal()。
 首先判断table是否为空（null或长度为0），为空的话进行resize()。
-## resize()
+### resize()
 如果原来table大小已经超过上限，则不resize，直接返回原来table；
 原来table大小不为0且未超上限则容量增倍，threshold（扩容阈值）也增倍；
 原来table大小为0，则大小设为DEFAULT_INITIAL_CAPACITY=16，threshold设为DEFAULT_LOAD_FACTOR*DEFAULT_INITIAL_CAPACITY=12。
@@ -81,13 +81,13 @@ resize的时候，因为我们使用的是2次幂的扩展(指长度扩为原来
 上面代码中else{//preserveorder之后的部分即完成了上述过程，将一个节点上的链表拆分成用loHead,loTail和hiHead,hiTail
 描述的两个链表，分别对应新表中位置不变的节点，和移动oldCap之后的节点。
 
-## 新建节点或更新value
+### 新建节点或更新value
 然后判断当前hash值对应table的节点是否为空，为空的话直接新建节点即可：new Node<>(hash,key,value,null);最后一个参数是next，因为table原节点为空，为链表第一个元素，所以next设为null即可；
 如果hash值对应table节点不为空，则判断原节点和当前插入的数据key及value是否都一致，如果一致，证明是同一个节点，无需重新插入；
 否则进入table节点的链表，遍历，如果找到与待插入节点一样的节点，则直接退出，否则一直找到链表末端节点还没找到相同的，则增加新节点插入当前数据，如果当前链表长度大于TREEIFY_THRESHOLD-1，还需要进行treeifyBin()操作，将链表转换为红黑树，提高查询效率（O(n)变为O(logn)，JDK8之后引入的优化）。
 如果以上操作中找到待插入节点的key在map中已存在，则用新数据覆盖之，最后size++, 判断table尺寸，看是否需要进行resize()。
 
-# get方法：
+## get方法：
 get时调用```getNode(int hash, Object key)```方法。
 首先table为null或长度为0或对应hash位置的元素为null均返回null。
 否则先判断hash位置上的元素key和get方法的key相同，如果相同则直接返回hash位置的元素；否则判断hash位置节点是否为TreeNode，若是则调用getTreeNode方法进行处理并返回；对于非TreeNode节点，且hash位置节点的key不等于get方法dekey的话，则遍历hash位置节点的链表，直到找到key相同的节点并返回节点的value。

@@ -5,7 +5,7 @@ tags:
 - scala
 image: summer2.jpg
 ---
-# 前言
+## 前言
 好久没写博客了,在`Kafka`源码的海洋里挣扎ing,休息的时候还刷`Leetcode`玩儿,很多东西匆匆丢到`OneNote`里了.  
 最近花了一周时间看了品神翻译的《Scala实用指南》, 这本书应该主要是面向刚入Scala大门的Javaer的,前面讲Scala基础,后期还讲了下Akka和Scala具体的应用.  
 我虽然写scala也有一段时间了,再看这本书还是觉得受益匪浅,有很多地方以前没有注意到的.   
@@ -13,11 +13,11 @@ image: summer2.jpg
 P.S. 看书勘误找品神, 找到错误了发红包诶,我就领了一个冰可乐(等值)红包.  
 ![](hepin.png)  
 
-# 第2章 体验Scala
+## 第2章 体验Scala
 - scala的REPL中, `Ctrl+A`调到行首,`Ctrl+E`调到行尾
 - `scala <scala源文件>`命令可以在单独的JVM中运行scala代码,而实际上是自动合成Main类调用main()方法
 
-# 第3章 从Java到Scala
+## 第3章 从Java到Scala
 - 用`val`定义所有字段,并只提供读不提供更新状态的方法,可以使一个类的实例不可变
 - `1 to 3`,`1 until 3`这类表达式其实是隐式转换,`1`通过`intWrapper()`方法转换为成富封装器(rich wrapper,这里具体是`RichInt`类)再调用其`to()`,`until()`方法
 - Scala将`Scala.Int`视作Java基本类型int是纯粹的编译期转换
@@ -75,7 +75,7 @@ val str = """Leibniz said
 - scala的protected方法只有派生类可以访问,同包的非派生类不可访问,在派生类中也不可以通过基类实例来访问,只能是通过派生类的实例方法访问
 - scala中可以通过`private[类名/包名/this]`和`protected[类名/包名/this]`实现细粒度的权限控制,具体不表了...
 
-# 第4章 处理对象
+## 第4章 处理对象
 - 定义类的时候,`class A(var a:Int, val b:Int)`被称作主构造器(primary constructor),其中可变的参数a自动生成getter和setter,不可变的参数b自动生成getter方法,但这些getter setter方法不符合JavaBean标准,没有get/set前缀,可以通过在期望产生符合JavaBean规范的字段加上`@scala.reflect.BeanProperty`注解来解决这个问题
 - scala中val修饰的属性编译后为`private final`
 - 类中单独的代码会作为主构造器的一部分
@@ -95,7 +95,7 @@ object Currency extends Enumeration {
 ```
 - scala支持包对象,为单例对象,与包同名,用`package object`关键字标记,当包中其他类`import 包名._`时,可以直接引用包对象里面的方法;包对象可以存储该包公用的一些方法如工具方法,举例, scala包也有包对象,包含了很多类型别名和隐式类型转换.
 
-# 第5章 善用类型
+## 第5章 善用类型
 - scala偏向于使用类型推断,但以下情况必须显式指定类型:1.定义没有初始值的类字段;2.定义函数或方法的参数;3.使用return或递归时,定义函数或方法返回类型;4.将变量定义为与推断出来类型不一样
 - `Nothing`是所有类型的子类型, `Any`是所有类型的基础类型,包含`AnyRef`子类型(所有引用类型的基础类型,包含Java的`Object`类的方法)和`AnyVal`子类型(所有值类型Int,Double等的基础类型,映射到Java原始类型)
 - 使用有类型参数的类但不指定泛型类型的时候,就会使用Nothing作为类型参数,如果没有定义协变,那么任何有意义的类型都不能使用
@@ -153,14 +153,14 @@ val name = "Leibniz"
 println(my"""My name is ${name}""") //调用我们自定义的插值器,返回 My name is #Leibniz#
 ```
 
-# 第6章 函数值与闭包
+## 第6章 函数值与闭包
 - 柯里化: 一个有分组参数的函数,如`f(a:A)(b:B):C`,使用`f _`创建一个部分应用函数(此处类型为`A => (B => C)`),可以用于创建可复用的临时便利函数;
 - 多组参数的函数,如果有单独成组的函数参数,可以不使用小括号,直接用大括号,更直观,如`f(a:Int)(g:A=>B)`可以这样调用:`f(1) {a => xxx(a)}`
 - 用下划线代表函数值的参数时,如果无法判断类型,scala会报错,此时可以显式指定类型
 - scala自动将函数名视作函数值的引用
 - 函数或代码块可能含有未绑定的变量,在调用前根据上下文绑定,形成闭包(closure);绑定的时候不会复制相应变量的值,实际上会绑定到变量本身,因此线程不安全
 
-# 第7章 特质
+## 第7章 特质
 - 在trait中定义并初始化的val/var变量，将会在混入了该trait的累的内部实现；定义并**未**初始化的val/var变量被认为是抽象的,混入该trait的类需要实现他们
 - 类混入trait的时候,如果类没用用`extends`,则第一个`trait`用`extends`,后面的`trait`用`with`;如果类已经用`extends`了,那么所有`trait`都用`with`来混入
 - 混入了trait的类可以调用trait的方法, 其实例引用也可以多态为trait实例

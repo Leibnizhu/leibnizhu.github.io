@@ -6,17 +6,17 @@ tags:
 - Hadoop
 image: yyz.jpg
 ---
-# 前言
+## 前言
 最近因为数据处理的需求, 用到Kettle进行MySQL到HDFS的数据导入,而Kettle的GUI界面导入比较繁琐,不易于复用,所以考虑其Java API.  
 但是,网上的资料实在少得可怜, 而官网的文档也仅仅给出了一个例子,而且是版本很旧的.  于是只能根据这个很旧的版本, 加上Maven仓库摸索, 再加上官方最新版API文档,慢慢摸出来.  
 
-# 代码清单
+## 代码清单
 最后的结果就是这篇文章, 废话也不想多说了,也懒得打字,就是普通的Maven项目,主要三个文件:
 1. `pom.xml`: Kettle依赖的版本比较麻烦,这个是个坑;
 2. 一个Java示例文件, 放了一个`MySQL => MySQL` 和一个 `MySQL => HDFS` 的例子,详见注释;
 3. Java里面写了一个自动读取数据源的方法, 把所有用到的数据源按下文给定的xml格式配置好,放到`resources/db`下面即可被程序读取.
 
-# 目录结构
+## 目录结构
 ```bash
 ├── pom.xml
 └── src
@@ -39,8 +39,8 @@ image: yyz.jpg
                         └── demo
                             └── AppTest.java
 ```
-# 代码
-## pom.xml
+## 代码
+### pom.xml
 给出核心的变量和依赖部分:  
 ```xml
 <properties>
@@ -188,7 +188,7 @@ image: yyz.jpg
     </dependencies>
 ```
 
-## Java的示例
+### Java的示例
 包含`MySQL => MySQL`和`MySQL => HDFS` 的方法:  
 ```java
 package com.turingdi.kettle.demo;
@@ -466,7 +466,7 @@ public class App {
 }
 ```
 
-## 存储数据库源配置的xml文件
+### 存储数据库源配置的xml文件
 放在`resources/db`下面:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

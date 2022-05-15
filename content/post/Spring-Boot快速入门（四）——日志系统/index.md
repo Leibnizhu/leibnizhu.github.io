@@ -6,10 +6,10 @@ tags:
 - JavaWeb
 ---
 
-# 日志系统
-## 简介
+## 日志系统
+### 简介
 Spring Boot默认使用的Apache的Common Logging日志系统，但同时也提供了Java Util Logging, Log4J, Log4J2和Logback等日志系统的支持（无需额外增加依赖）。
-## 日志格式
+### 日志格式
 Spring Boot默认输出的日志各列含义如下：
 - 日期和时间 - 精确到毫秒，且易于排序。
 - 日志级别 - ERROR, WARN, INFO, DEBUG 或 TRACE。
@@ -29,7 +29,7 @@ Spring Boot默认输出的日志各列含义如下：
 ```
 可以在resources/application.properties中使用logging.pattern.console和logging.pattern.file属性进行配置。
 
-## 日志配置
+### 日志配置
 可以在**resources/application.properties** 中进行配置，如下：
 ```
 ###日志配置###
@@ -48,7 +48,7 @@ logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36}[%line]=> 
 #logging.pattern.file=
 ```
 
-## 日志API调用
+### 日志API调用
 类似Log4j：
 ```java
 	import org.apache.commons.logging.Log;
@@ -64,7 +64,7 @@ logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36}[%line]=> 
 	}
 ```
 
-# 其他相关网站
+## 其他相关网站
 Spring Boot相关博客：  
 http://blog.didispace.com/categories/Spring-Boot/  
 Thymeleaf相关博客：  

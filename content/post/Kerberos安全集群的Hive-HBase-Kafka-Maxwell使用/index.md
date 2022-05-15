@@ -13,7 +13,7 @@ tags:
 image: flower.jpg
 ---
 介绍在部署了Kerberos的安全Hadoop集群中, Sqoop,Hive,HBase,Kafka,Maxwell使用方法.  
-# Sqoop使用
+## Sqoop使用
 配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:  
 1. 分配sqoop的组, 执行`usermod -a -G hdfs sqoop`加入到hdfs组, 使用`groups sqoop`确认执行成功; 
 2. 进入Hue的用户管理界面, 新增sqoop用户, 在hdfs用户组中;
@@ -23,7 +23,7 @@ image: flower.jpg
 6. 执行sqoop命令
 
 
-# Spark访问HBase
+## Spark访问HBase
 1. 进入cdh1, 创建Kerberos用户, 名为hbase; 导出keytab, 名为hbase.keytab, 保存到本地;  
 2. 下载krb5.conf到本地.  
 3. 创建测试类, 并执行, 代码如下:
@@ -81,7 +81,7 @@ object KerberosHBaseTest {
 }
 ```
 
-# Spark访问Hive
+## Spark访问Hive
 1. Hive可以沿用hbase的Kerberos用户, 也可以新建一个Hive用户及其对应keytab文件.  
 2. 本地测试请将集群的`hive-site.xml`导出并保存在项目的`src/main/resources/`目录下;
 3. 编写Spark测试程序:  
@@ -108,7 +108,7 @@ object KerberosHiveTest {
 }
 ```
 
-# Spark访问Kafka
+## Spark访问Kafka
 1. 进入Cloudera Manager的Kafka配置页面, 搜索'Inter Broker Protocol', 更改为'SASL_PLAINTEXT';
 2. 重启Kafka配置;
 3. 进入cdh1, 创建Kerberos用户, 名为kafka; 导出keytab, 名为kafka.keytab, 并保存到本地(测试用);
@@ -120,9 +120,9 @@ KafkaClient {
   useTicketCache=true
   useKeyTab=true
   principal="kafka@TURINGDI.COM" #根据实际修改
-  serviceName="kafka" # 固定
+  serviceName="kafka" ## 固定
   client=true
-  keyTab="/path/to/kafka.keytab"; # keytab路径,节点和本地按实际路径填写
+  keyTab="/path/to/kafka.keytab"; ## keytab路径,节点和本地按实际路径填写
 };
 ```
 5. cdh1中新建一个kafka.properties文件, 内容如下: 
@@ -178,7 +178,7 @@ export KAFKA_OPTS="-Djava.security.krb5.conf=/etc/krb5.conf -Djava.security.auth
 -Djava.security.krb5.conf=/etc/krb5.conf -Djava.security.auth.login.config=/root/jaas.conf
 ```
 
-# Maxwell配置
+## Maxwell配置
 1. 编辑${MAXWELL_HOME}/bin/maxwell, 在文件尾部附件的`exec $JAVA $JAVA_OPTS`后面增加:  
 ```bash
 -Djava.security.krb5.conf=/etc/krb5.conf -Djava.security.auth.login.config=/root/jaas.conf

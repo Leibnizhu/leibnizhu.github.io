@@ -11,7 +11,7 @@ categories:
 image: blackcat.jpeg
 ---
 
-# 背景
+## 背景
 
 去年写过一篇 [跨Yarn集群提交spark任务](/2021/12/04/跨Yarn集群提交spark任务/) ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 `*-site.xml` 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 `*-site.xml` 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。
 
@@ -22,9 +22,9 @@ image: blackcat.jpeg
 
 时隔半年终于重拾博客，显然又被坑了，没错，之前的方法在Spark2.4里行不通了。
 
-# 问题、原因分析、及解决方案
+## 问题、原因分析、及解决方案
 
-## Spark2.4中的报错
+### Spark2.4中的报错
 
 在原来代码基础上，升级Spark为2.4.8，执行提交到外部集群的任务，提交到Yarn的AM报错如下：
 
@@ -66,7 +66,7 @@ Caused by: java.net.UnknownHostException: xxx
 
 其中 `xxx` 是外部集群的集群名（`dfs.nameservices` 配置）。
 
-## 直接原因分析
+### 直接原因分析
 仔细观察异常的调用栈，调用到了 `NameNodeProxies.createNonHAProxy` ，而我们的集群是HA的，显然是读取到的配置不对了。
 
 看到这个类，阅读过hadoop源码的应该都知道，这是创建 `DFSClient` 的时候，会先读取 `dfs.client.failover.proxy.provider.{hdfs路径对应host}` 配置（取值是一个 `FailoverProxyProvider` 具体实现的全限定类名），反射出Class对象并实例化，然后创建对应的HAProxy；而如果配置为空，则认为NameNode没有开启HA，直接将hdfs路径当作普通host来进行读取，如果实际上这个host是一个HA的nameservices名，不存在这个host，则会报上面的错误。
@@ -121,7 +121,7 @@ broken symlinks(find -L . -maxdepth 5 -type l -ls):
 
 `./__spark_conf__/__hadoop_conf__/` 里面是外部集群配置文件，而 `./__spark_libs__/mySparkApp.jar` 是spark应用的jar，里面已经有原集群的配置文件。按 `CLASSPATH` 定义的顺序，`Configuration` 读取默认资源 `core-site.xml` 、 `hdfs-site.xml` （由`HdfsConfiguration`静态代码块加入）的时候，优先从 `./__spark_libs__/mySparkApp.jar` 读取了，而真正要用的外部集群配置，由于在 `CLASSPATH` 中位置较后，不会被加载到。
 
-## 解决方案
+### 解决方案
 
 知道问题的原因后，根据 `CLASSPATH` 定义的顺序：
 
@@ -172,19 +172,19 @@ spark应用jar包里不要放任何 `*-site.xml` 配置文件
 
 重新打包、运行任务，顺利执行。
 
-# Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异
+## Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异
 
-## AM的classpath、目录结构差异
+### AM的classpath、目录结构差异
 
 问题解决了，那么为什么Spark2.2升级Spark2.4之后就有这样的问题呢？从上面的分析，不难猜测到是AM的 `CLASSPATH` 变了。随便找一个Spark2.2提交的任务也可以看到：
 
 ```bash
-### launch_container.sh
+#### launch_container.sh
 export CLASSPATH="$PWD:$PWD/__spark_conf__:$PWD/__spark_libs__/*:$HADOOP_CONF_DIR:$HADOOP_CONF_DIR"
-# 对比 Spark2.4的：
+## 对比 Spark2.4的：
 #export CLASSPATH="$PWD:$PWD/__spark_conf__:$PWD/__spark_libs__/*:$HADOOP_CONF_DIR:$HADOOP_CONF_DIR:$PWD/__spark_conf__/__hadoop_conf__"
 
-### directory.info
+#### directory.info
 find -L . -maxdepth 5 -ls:
 6554176    4 drwx--x---   4 yarn     hadoop       4096 May 13 11:31 .
 6554177    4 -rw-r--r--   1 yarn     hadoop         69 May 13 11:31 ./container_tokens
@@ -213,7 +213,7 @@ find -L . -maxdepth 5 -ls:
 
 ![](spark_dir.png)
 
-## Spark源码里的体现
+### Spark源码里的体现
 
 上篇博客里提到Spark的yarn-client模式是通过 `YarnClientSchedulerBackend` 处理的。  
 其 `start()` 方法会调用 `org.apache.spark.deploy.yarn.Client` 的 `submitApplication()` 方法提交Yarn AM。  
@@ -222,7 +222,7 @@ find -L . -maxdepth 5 -ls:
 1. 调用 `setupLaunchEnv()` 构造环境变量，其中我们关心的 `CLASSPATH` 是在 `populateClasspath()` 方法里处理的；
 2. 调用 `prepareLocalResources()` 准备Yarn AM需要的一些资源，包括调用 `createConfArchive()` 创建 `__spark_conf__.zip` ，里面解压出来就是上面所讨论的AM 目录结构里面的 `./__spark_conf__/` 目录
 
-### populateClasspath()
+#### populateClasspath()
 
 对比两个版本的 `populateClasspath()` 方法，注意差异在最后：  
 
@@ -238,7 +238,7 @@ find -L . -maxdepth 5 -ls:
 
 是为了防止将其他非Yarn集群配置的文件也引入了。
 
-### createConfArchive()
+#### createConfArchive()
 
 这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。
 

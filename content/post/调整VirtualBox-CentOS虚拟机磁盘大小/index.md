@@ -7,13 +7,13 @@ tags:
 image: vbox.png
 ---
 
-# 背景
+## 背景
 昨天发现本地HDP集群的HBase连不上了，解决了这个问题后，又发现HBase同步脚本一直执行失败，进YARN看了下，几天前开始堆积了很多ACCEPT了的任务，但没一个在执行，先用```hadoop job kill ```干掉了旧的任务，重新执行脚本，还是不行，日志上面却没报错。  
 于是进Ambari一看，HDFS的DataNode全都满了……看来要扩容了。  
 集群是部署在几台VirtualBox的CentOS虚拟机上的（起始我一直想转移到Docker上，但一直没时间+懒）。网上关于VirtualBox虚拟机磁盘扩容的文章很多，试了下，很多是行不通的，而且不太完整，于是把今天的经验记下来吧。
 
-# 具体步骤
-## 磁盘映像扩容
+## 具体步骤
+### 磁盘映像扩容
 下面的命令以名为CentOS05的虚拟机为例进行。  
 关闭虚拟机。
 ```bash
@@ -29,7 +29,7 @@ vboxmanage clonehd CentOS05-disk1.vmdk CentOS05-disk1.vdi --format VDI
 vboxmanage modifyhd CentOS05-disk1.vdi --resize 122880
 ```
 
-## 修改虚拟机挂载磁盘
+### 修改虚拟机挂载磁盘
 查看虚拟机原来配置
 ```bash
 VBoxManage showvminfo CentOS05
@@ -60,7 +60,7 @@ medium：允许指定DVD／软盘驱动器是完全断开的（none）或仅是�
 VBoxManage showvminfo CentOS05
 ```
 
-## 修改CentOS分区配置
+### 修改CentOS分区配置
 因为在系统启动后根目录的卸载之类的动作旧就不能执行了，所以只能在LiveCD里面改，建议使用gparted图形化工具修改分区大小，比较简单，此处不表。  
 修改好启动虚拟机：
 ```bash

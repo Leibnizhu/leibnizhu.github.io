@@ -10,16 +10,16 @@ categories:
     - Spark
 image: 93990522.jpg
 ---
-# 背景
+## 背景
 之前写过一篇 [Spark动态加载hive配置的方案](/2020/05/06/动态加载hive配置文件的方案/) ，当时是为了spark应用的fat-jar里面已经有Hadoop相关xml配置文件的情况下，将数据输出到不是该配置的Hadoop集群的方案。  
 现在这个需求有点类似，没有走spark-submit提交任务，而是在spark应用里面通过创建`SparkContext`的形式提交任务，而spark应用的fat-jar里面已经有Hadoop相关xml配置文件，在此情况下，想将Spakr任务提交到外部的Yarn集群（不是fat-jar里面配置文件对应的yarn集群）。  
 
-# 思考一个问题
+## 思考一个问题
 先思考一个问题，如果Spark应用的fat-jar里面有外部Yarn集群对应的配置文件(`core-site.xml`，`hdfs-site.xml`，`yarn-site.xml`等)，此时Spark应用代码里面创建`SparkContext`，是不是就一定能提交到那个集群里？  
 可以做个实验，但实验不一定会cover到所有情况。  
 直接给结论吧，不一定能提交过去，但自己做实验的话很可能还是能直接提交过去的，还是直接看代码吧（以`yarn-client`模式为例）。  
 
-## Spark Yarn-client 默认提交任务简析
+### Spark Yarn-client 默认提交任务简析
 通过代码创建`SparkContext`后，其动态代码块会根据启动模式创建`SchedulerBackend`和`TaskScheduler`并启动：  
 ```scala
 // org.apache.spark.SparkContext #501
@@ -161,11 +161,11 @@ private[spark] class Client(
 ```
 可以看到，除了本地的`log4j.properties`和`metrics.properties`配置文件以外，还会读取`HADOOP_CONF_DIR`和`YARN_CONF_DIR`环境变量，读取对应目录下的文件放入`hadoopConfFiles`这个`HashMap`中，而这里面的文件都会压缩到`__spark_conf__.zip`中。  
 再后续的代码就不分析了，可以参考网上其他文章。  
-## 提交外部Yarn集群的障碍
+### 提交外部Yarn集群的障碍
 所以，如果执行spark应用程序的机器中配置了 *HADOOP_CONF_DIR* 或 *YARN_CONF_DIR* 环境变量（如HDP的节点安装了对应客户端都会配置上），在Spark提交任务到外部yarn集群的时候，就会将里面的配置文件压缩传输到外部集群的Executor节点，这样Executor的各种操作都会使用原集群的配置，连接不到正确的Yarn服务，最后也就导致任务执行失败。  
 
 
-# 解决方案
+## 解决方案
 所以解决整个提交外部集群的问题，有两个问题要处理：
 1. Spark应用代码使用外部集群的配置文件进行任务提交
    1. 一种方案是启动Spark应用后，创建`SparkContext`之前，将外部集群的配置写入当前classpath的前面（如classpath是`.:xxx.jar`，那么放在当前目录就可以）

@@ -9,7 +9,7 @@ tags:
 ---
 最近给公司的git服务器从http协议升级为ssh协议的，同时增加了gitolite作为权限管理。但gitolite在增删用户公钥、增删用户对项目的权限、以及新增repository时的操作说不上繁杂但也是蛮机械的；又不想用gitlab之类重型的解决方案，所以选择了编写Shell脚本来实现。
 
-# 增加用户公钥的脚本
+## 增加用户公钥的脚本
 ```bash
 #!/bin/bash
 echo "增加/修改 $1 的公钥 $1.pub……"
@@ -21,7 +21,7 @@ git commit -m "增加/修改 $1 的公钥 $1.pub……"
 git push
 ```
 
-# 删除用户公钥的脚本
+## 删除用户公钥的脚本
 ```bash
 #!/bin/bash
 echo "删除 $1 的公钥 $1.pub……"
@@ -33,7 +33,7 @@ git commit -m "删除 $1 的公钥 $1.pub……"
 git push
 ```
 
-# 增加用户对指定代码仓库的读写权限
+## 增加用户对指定代码仓库的读写权限
 ```bash
 #!/bin/bash
 #增加指定用户对指定代码仓库的读写权限
@@ -76,7 +76,7 @@ git commit -m "增加 $1 对项目 $2 的权限……"
 git push
 ```
 
-# 删除用户对指定代码仓库的读写权限
+## 删除用户对指定代码仓库的读写权限
 ```bash
 #!/bin/bash
 #删除指定用户对指定代码仓库的读写权限
@@ -119,7 +119,7 @@ git commit -m "删除 $1 对项目 $2 的权限……"
 git push
 ```
 
-# 新增一个代码仓库，并初始化其权限
+## 新增一个代码仓库，并初始化其权限
 ```bash
 #!/bin/bash
 #新增一个代码仓库并初始化权限管理文件
@@ -137,7 +137,7 @@ echo "no exists"
 git init --bare "$2.git"
 
 #修改权限文件，增加默认管理员权限和初始化的用户权限
-echo  "# $3" >> /home/git/gitolite-admin/conf/gitolite1.conf
+echo  "## $3" >> /home/git/gitolite-admin/conf/gitolite1.conf
 echo  "repo	$2" >> /home/git/gitolite-admin/conf/gitolite1.conf
 echo  "	RW = $1 " >> /home/git/gitolite-admin/conf/gitolite1.conf
 echo  "	RW+ = @admin" >> /home/git/gitolite-admin/conf/gitolite1.conf
@@ -155,12 +155,12 @@ echo "/build/" >> .gitignore
 echo "/target/" >> .gitignore
 echo "/bin/" >> .gitignore
 echo "" >> .gitignore
-echo "# filter eclipse file" >> .gitignore
+echo "## filter eclipse file" >> .gitignore
 echo "*.classpath" >> .gitignore
 echo "*.project" >> .gitignore
 echo "/.settings/" >> .gitignore
 echo "" >> .gitignore
-echo "# filter IntelliJ IDEA file" >> .gitignore
+echo "## filter IntelliJ IDEA file" >> .gitignore
 echo "*.iml" >> .gitignore
 echo "/.idea/" >> .gitignore
 echo "" >> .gitignore
@@ -175,7 +175,7 @@ git push
 echo "项目 $2 创建成功"
 ```
 
-# 重命名项目并修改对应权限配置文件
+## 重命名项目并修改对应权限配置文件
 ```bash
 #!/bin/bash
 #修改代码仓库的名字，同时更新权限配置文件

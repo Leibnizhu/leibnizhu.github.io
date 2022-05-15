@@ -10,19 +10,19 @@ tags:
 
 最近总结了一些技术文档，原本用于组内分享的，发到博客里备忘。
 
-# Nginx概述
-## 简介
+## Nginx概述
+### 简介
 Nginx是一个自由、开源、高性能及轻量级的HTTP服务器及反转代理服务器，以其高性能、稳定、功能丰富、配置简单及占用系统资源少而著称。  
 Nginx 超越 Apache 的高性能和稳定性，使得国内使用 Nginx 作为 Web 服务器的网站也越来越多。
 
-## 基础功能
+### 基础功能
 + 处理静态文件，索引文件以及自动索引；
 + 反向代理加速(无缓存)，简单的负载均衡和容错；
 + FastCGI，简单的负载均衡和容错；
 + 模块化的结构。过滤器包括gzipping, byte ranges, chunked responses, 以及 SSI-filter 。在SSI过滤器中，到同一个proxy或FastCGI的多个子请求并发处理；
 + SSL 和 TLS SNI 支持。
 
-## 优势
+### 优势
 Nginx**专为性能优化而开发**，性能是其最重要的考量, 实现上非常注重效率 。它支持内核Poll模型，能经受高负载的考验, 有报告表明能支持高达50,000个并发连接数。  
 Nginx作为负载均衡服务器: Nginx 既可以在**内部直接支持 Rails 和 PHP 程序**对外进行服务, 也可以**支持作为 HTTP代理服务器**对外进行服务。  
 Nginx**具有很高的稳定性**。其它HTTP服务器，当遇到访问的峰值，或者有人恶意发起慢速连接时，也很可能会导致服务器物理内存耗尽频繁交换，失去响应，只能重启服务器。例如当前apache一旦上到200个以上进程，web响应速度就明显非常缓慢了。而Nginx采取了分阶段资源分配技术，使得它的CPU与内存占用率非常低。  
@@ -31,16 +31,16 @@ Nginx**支持热部署**。它的启动特别容易, 并且几乎可以做到7*2
 Nginx采用C进行编写, 不论是**系统资源开销还是CPU使用效率**都比 Perlbal 要好很多。
 
 #	Nginx安装
-## 下载
+### 下载
 到官网下载最新的稳定版：
 [nginx: download](http://nginx.org/en/download.html)
 
-## 环境准备
+### 环境准备
 准备gcc等编译环境：
 ```bash
 sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev make build-essential gcc
 ```
-## 编译安装
+### 编译安装
 将下载到的.tar.gz包解压，进入解压后的目录，输入以下命令进行编译：
 ```bash
 ./configure
@@ -49,8 +49,8 @@ sudo make install
 ```
 即可安装到/usr/local/nginx中。  
 如果需要SSL，可安装OpenSSL，有些Linux发行版自带OpenSSL无需额外安装，需要安装的到OpenSSL官网下载.tar.gz包解压编译即可。
-## 启动&关闭
-### 启动
+### 启动&关闭
+#### 启动
 执行
 ```bash
 sudo /usr/local/nginx/sbin/nginx
@@ -58,17 +58,17 @@ sudo /usr/local/nginx/sbin/nginx
 启动Nginx。  
 一般make install后会安装到PATH中，可以直接执行sudo nginx。
 执行nginx -v显示Nginx版本。
-### 重新加载配置文件
+#### 重新加载配置文件
 ```bash
 sudo nginx -s reload
 ```
-### 关闭
+#### 关闭
 Nginx没有提供关闭的方法，只能通过ps找到进程ID后，用kill命令关闭。  
 如 强制退出 sudo kill-9 [PID]，或发送其他退出的指令如TERM。  
 注：nginx包含worker和master两个进程，强制关闭时两者均需关闭：
 ![](process.png)
 
-# Nginx配置
+## Nginx配置
 下面以DSP业务平台的Nginx配置为例进行讲解：
 ```bash
 #user  nobody;
@@ -128,49 +128,49 @@ proxy_pass http://tag:8080;
   location / {
 #设置真实ip
 proxy_set_header real_ip $remote_addr;
- #  proxy_redirect off;
+ ##  proxy_redirect off;
 proxy_pass http://cm:8080;
   }
  }
 }
 ```
 
-## 基本配置
-### user
+### 基本配置
+#### user
 + 语法: user user [group]  
 + 缺省值: nobody nobody  
 指定Nginx Worker进程运行用户，默认是nobody帐号。
 
-### error_log
+#### error_log
 + 语法: error_log file [ debug | info | notice | warn | error | crit ]  
 + 缺省值: ${prefix}/logs/error.log  
 制定错误日志的存放位置和级别。
 
-### worker_processes
+#### worker_processes
 + 语法: worker_processes number  
 + 缺省值: 1  
 指定工作进程数。nginx可以使用多个worker进程。
 
-### worker_cpu_affinity
+#### worker_cpu_affinity
 + 语法: 3.1.4.worker_cpu_affinity cpumask  
 执行Nginx在哪个/些CPU上工作，默认由系统接管（可以在所有核心上运行）。  
 如，有8个CPU线程（包括超线程），指定使用第0个CPU则配置为00000001，指定使用第7和第1个CPU线程则配置为10000010。
 
-## Event模块
+### Event模块
 Nginx的默认配置中包含一个默认的Event模块，其中只包含worker_connections配置。
 ###	worker_connections
 + 语法：worker_connections number  
 每个worker的最大连接数。通过worker_connections和worker_proceses可以计算出maxclients： max_clients = worker_processes * worker_connections。作为反向代理，max_clients为： max_clients = worker_processes * worker_connections/4，因为浏览器访问时会通过连接池建立多个连接。
 
-## HTTP模块
+### HTTP模块
 Nginx最常用的是HTTP模块。
-### 基本配置
+#### 基本配置
 HTTP中大部分基本配置无需修改，除了：
 + keepalive_timeout  1000;配置Keep-Alive的超时，单位为秒；
 + gzip  on;配置是否开启Gzip压缩，开启后可以提高网站访问速度；
 + log_format 配置日志格式，access_log配置日志路径和使用的格式，在此不细述。
 
-### server作用域
+#### server作用域
 HTTP模块中最常配置的是server作用域。
 ```bash
 server {
@@ -184,18 +184,18 @@ server {
 }
 ```
 
-#### listen
+##### listen
 + 语法: listen address:port
 + 默认值： listen 80
 + 作用域: server
 指定当前虚拟机的监听端口。
 
-#### server_name
+##### server_name
 当前server匹配的用户请求路径的主机名，主要用于配置基于名称的虚拟主机，支持通配符*和正则表达式（以波浪线~起头）。  
 server_name指令在接到请求后的匹配顺序分别为：准确的server_name匹配，以*通配符开始的字符串，以*通配符结束的字符串、匹配正则表达式。nginx按以上顺序依次匹配，只要有一项匹配以后就会停止搜索。  
 举例： 先后配置了两个server， server_name分别配置为cm.turing.asia和*.turing.asia，当用户请求cm.turing.asia时，访问第一个server，用户访问test.turing.asia时访问第二个server。
 
-#### location
+##### location
 + 语法：location 匹配字符串 { 操作语句 }  
 
 一个server中可以有多个location，用于匹配请求路径。  
@@ -214,7 +214,7 @@ location中还可以使用if语句结合正则表达式进行请求的判断，�
 </Host>
 ```
 
-## 负载均衡配置
+### 负载均衡配置
 首先在HTTP模块中定义多台服务器构成的负载均衡：  
 ```bash
 upstream rtb{
@@ -227,7 +227,7 @@ upstream rtb{
 每台服务器为一行，填写IP和端口，并在weight中填入负载均衡的权重（正整数，默认为1），注意分号。以上例子将该负载均衡配置命名为”rtb”。IP和端口后面填backup的表示备用服务器，当其他非backup的服务器均忙或宕机时，会分发请求到backup服务器上。  
 然后在location中，配置**proxy_pass http://[负载均衡名];** 即可，即该server和location定义的域名规则和访问路径规则匹配到的请求将按weight分发到以上几台服务器/服务中。
 
-## 动静分离
+### 动静分离
 tomcat是一个比较全面的web容器，对静态网页的处理，应该是比较费资源的，特别是每次都要从磁盘读取静态页面，然后返回。这中间会消耗Tomcat的资源，可能会使那些动态页面解析性能影响。  
 ```bash
 //静态资源    

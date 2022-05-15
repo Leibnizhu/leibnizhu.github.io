@@ -9,7 +9,7 @@ image: room.jpg
 ---
 
 下文以本地测试集群为例, 4节点(cdh1-4), cdh1为NameNode, cdh2-4为DataNode.  
-# 基础概念
+## 基础概念
 Kerberos principal用于在kerberos加密系统中标记一个唯一的身份。  
 kerberos为kerberos principal分配tickets使其可以访问由kerberos加密的hadoop服务。  
 对于hadoop，principals的格式为username/fully.qualified.domain.name@YOUR-REALM.COM.  
@@ -17,8 +17,8 @@ keytab是包含principals和加密principal key的文件。
 keytab文件对于每个host是唯一的，因为key中包含hostname。keytab文件用于不需要人工交互和保存纯文本密码，实现到kerberos上验证一个主机上的principal。  
 因为服务器上可以访问keytab文件即可以以principal的身份通过kerberos的认证，所以，keytab文件应该被妥善保存，应该只有少数的用户可以访问。  
 
-# KDC服务安装及配置
-## 安装KDC服务
+## KDC服务安装及配置
+### 安装KDC服务
 选择NameNode节点(cdh1)安装KDC服务, 执行:  
 ```bash
 yum -y install krb5-server krb5-libs krb5-auth-dialog krb5-workstation openldap-clients
@@ -27,11 +27,11 @@ yum -y install krb5-server krb5-libs krb5-auth-dialog krb5-workstation openldap-
 ```bash
 yum -y install krb5-libs krb5-workstation
 ```
-## 配置KDC服务
+### 配置KDC服务
 1.编辑/etc/krb5.conf:  
 
 ```bash
-# Configuration snippets may be placed in this directory as well
+## Configuration snippets may be placed in this directory as well
 includedir /etc/krb5.conf.d/
 
 [logging]
@@ -85,13 +85,13 @@ TURINGDI.COM = {
 }
 ```
 
-## 创建Kerberos数据库
+### 创建Kerberos数据库
  在cdh1执行以下命令, 注意域名:  
  ```bash
  kdb5_util create –r TURINGDI.COM -s
  ```
 按提示设置密码并重复密码.  
-## 创建Kerberos的管理账号
+### 创建Kerberos的管理账号
 在cdh1执行:  
 ```bash
 kadmin.local
@@ -99,10 +99,10 @@ kadmin.local
 依次输入:  
 ```bash
 addprinc admin/admin@TURINGDI.COM
-# 按提示设置管理账号的密码并重复密码
+## 按提示设置管理账号的密码并重复密码
 exit
 ```
-## 配置服务自启动
+### 配置服务自启动
 在cdh1执行:  
 ```bash
 chkconfig krb5kdc on
@@ -113,7 +113,7 @@ service kadmin start
 然后尝试登陆Kerberos的管理员账号:  
 ```bash
 kinit admin/admin@TURINGDI.COM
-# 3. 输入刚才设定的管理账号密码
+## 3. 输入刚才设定的管理账号密码
 klist
 ```
 应该会输出类似:
@@ -127,7 +127,7 @@ Valid starting       Expires              Service principal
 ```
 即配置成功. 
 
-# CDH集群启用Kerberos
+## CDH集群启用Kerberos
 1. 进入Cloudera Manager的“管理”-> “安全”界面:  
 ![](security.png)
 2. 点击"启用Kerberos"按钮, 确保列出的所有检查项都已完成并勾选, 点击"继续"按钮:  
@@ -137,24 +137,24 @@ Valid starting       Expires              Service principal
 5. 输入Cloudera Manager的Kerbers管理员账号，必须和之前创建的账号一致，点击"继续".  
 6. 最后点击"继续", 勾选重启集群, 点击"继续"按钮, 等待配置重启集群.  
 
-# AES-256加密与JCE
+## AES-256加密与JCE
 对于使用centos5.6及以上的系统，默认使用AES-256来加密的。这就需要集群中的所有节点上安装JCE.  
 打开[http://www.oracle.com/technetwork/java/javase/downloads/index.html](http://www.oracle.com/technetwork/java/javase/downloads/index.html), 下载jdk对应的JCE文件.  
 解压后的文件放入`${JAVA_HOME}/jre/lib/security/`中. 
 
-# Kerberos的基础使用
-## Yarn配置
+## Kerberos的基础使用
+### Yarn配置
 打开Cloudera Manager的Yarn配置页面, 搜索min.user, 修改为0, 然后按提示重启Yarn.  
 使用Kerberos需要新建一些用户, 其id可能小于1000, 使用Yarn的默认配置可能会导致一些用户不能提交Yarn任务.  
 ![](yarn.png)
-## 导出keytab
+### 导出keytab
 进入cdh1, 输入`kadmin.local`, 输入以下命令:
 ```bash
 xst -k /path/to/*.keytab -norandkey <principal>
 ```
 其中principal为需要导出keytab的用户名, 如hbase/cdh2, 注意-norandkey参数不可缺少, 否则可能会导致重新生成密码, 导致keytab失效.  
 导出的keytab的效用等同账号密码, 请注意妥善保管.
-## 以某个Kerberos用户登录
+### 以某个Kerberos用户登录
 两种方法:  
 1. `kinit 用户名@域名`, 输入密码;
 2. `kinit 用户名@域名 -k -t 对应keytab文件`
@@ -162,9 +162,9 @@ xst -k /path/to/*.keytab -norandkey <principal>
 后者无需输入密码, 适合在脚本中使用.  
 一些组件对Kerberos的令牌有限制, 需要登录对应用户后才能使用, 包括HDFS的文件访问控制, 需要在Kerberos中建立对应的用户.  
 
-## 创建Kerberos用户
+### 创建Kerberos用户
 前面已经使用过了, 进入cdh1, 输入`kadmin.local`, 输入以下命令:
 ```bash
 addprinc 用户名@域名
-# 按提示设置管理账号的密码并重复密码
+## 按提示设置管理账号的密码并重复密码
 ```

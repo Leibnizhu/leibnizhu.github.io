@@ -7,20 +7,20 @@ tags:
 - 跨域
 ---
 
-# 背景
+## 背景
 同一个项目分配了多个域名，在其中一个域名（下称域名A）的一级域名上放了Cookie。  
 使用其他域名(下面统称域名B\*)去访问某些页面时，需要使用js读取域名A下的那个Cookie。
 
-# 已有的解决方案
+## 已有的解决方案
 网上已经有一些解决方案，如：[JS跨域（ajax跨域、iframe跨域）解决方法及原理详解（jsonp）](https://m.th7.cn/show/22/201503/88209.htm)、[JS 获取跨域的cookie](http://www.cnblogs.com/chris-shao/archive/2012/12/27/2835986.html)。  
 其中document.domain的方法已确认不可用于我的需求，iframe跨域可以实现，但是跨域后的页面在iframe中，此时js变量的作用域只在iframe中，需要通过一个中间元素的值或者属性来写入需要传递的值，比较麻烦；document.name的方法虽然可以跨域，但同时也跨页面了，处理起来要小心点。  
 
-# 本文的解决方案
-## 原理
+## 本文的解决方案
+### 原理
 在域名B\*的页面上，js的确不能直接获取到域名A的cookie，但显然，域名B\*的页面如果发请求到域名A，会带上域名A的Cookie。  
 针对这一点，只要我们在域名A上面部署一个微服务，域名B\*的页面发AJAX请求到这个服务，返回域名A的Cookie中我们感兴趣字段的值。域名B\*的页面就能接收到域名A的Cookie，可以各种利用了。
 
-## Netty实现
+### Netty实现
 域名A的服务器端选用Netty实现。实现代码很简单，这里只给出核心Handler部分代码：
 ```java
 public class RPCMissionHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -111,7 +111,7 @@ resp.headers().set("Access-Control-Allow-Credentials", "true");
 ```
 其中referer就是域名B\*。
 
-## 页面js调用
+### 页面js调用
 js发AJAX请求这块就更简单了。唯一注意的是，我们这个Cookie字段可能在页面加载后一段时间才能获取到，所以这里设置了重试机制，获取不到ID的时候等待1秒后重新发送一次请求，一共最多请求5次。  
 这里发送AJAX请求也涉及到一些跨域的配置，详见注释
 ```javascript

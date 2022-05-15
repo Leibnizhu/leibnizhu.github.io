@@ -5,17 +5,17 @@ tags:
 - Bash on Windows
 ---
 本文参照Github上的[Run any Desktop Environment in WSL](https://github.com/Microsoft/BashOnWindows/issues/637)、结合本人实际安装操作而编写。
-# 安装Bash on Windows
+## 安装Bash on Windows
 
 首先安装Bash on Windows，可以参考 [如何安装体验 Ubuntu on Windows](https://linux.cn/article-7209-1.html) 一文。按照这篇文章安装的bash可以直接在开始菜单输入“bash”启动，但是不支持GUI程序的，所以有了本文。
 
 
-# 安装VcXsrv并启动XLaunch
+## 安装VcXsrv并启动XLaunch
 在 SourceForge:[ https://sourceforge.net/projects/vcxsrv/files/latest/download](https://sourceforge.net/projects/vcxsrv/files/latest/download) 下载安装程序并安装后，运行XLaunch，按下图配置后，一路点Next直至完成。
 
 ![](0.png)
 
-# 安装 ubuntu-desktop, unity和ccsm并配置
+## 安装 ubuntu-desktop, unity和ccsm并配置
 打开bash，输入：
 ```bash
 sudo apt-get install ubuntu-desktop unity compizconfig-settings-manager
@@ -40,14 +40,14 @@ unity --reset-icons
 
 ![](2.png)
 
-# 配置~/.bashrc和/etc/dbus-1/session.conf
+## 配置~/.bashrc和/etc/dbus-1/session.conf
 在bash输入以下命令：
 ```bash
 echo "export DISPLAY=:0.0" >> ~/.bashrc
 sudo sed -i 's$<listen>.*</listen>$<listen>tcp:host=localhost,port=0</listen>$' /etc/dbus-1/session.conf
 ```
 
-# 启动Unity桌面
+## 启动Unity桌面
 在bash中输入：
 ```bash
 compiz
