@@ -34,7 +34,7 @@ params:
         - post
     featuredImageField: image
     rssFullContent: true
-    favicon:
+    favicon: favicon.jpg
 
     footer:
         since: 2016
