@@ -26,6 +26,14 @@ native实测是真的快（不到0.1s），内存占用也确实小（启动几�
 &lt;p>Unifies imperative and reactive
 Combine both the familiar imperative code and the reactive style when developing applications.&lt;/p>
 &lt;/blockquote>
+&lt;p>真的有那么Unify吗？未必哦。&lt;br>
+这里说的 &lt;code>Unifies imperative and reactive&lt;/code> 是指：&lt;/p>
+&lt;ul>
+&lt;li>Quarkus core基于Vert.X实现，是响应式的，这也是它能unify命令式和响应式的关键原因，也是各个扩展能自行选择命令式实现和响应式实现的原因&lt;/li>
+&lt;li>Quarkus在Vert.X基础上做了一个路由层来兼容两种实现，像HTTP请求这种直接通过路由层、如果是响应式代码，直接在I/O线程上执行；命令式代码则丢到Worker线程执行（就要做上下文切换了）；至于Quarkus怎么知道是什么实现，就看方法注解以及签名了，具体不展开&lt;/li>
+&lt;li>也就是说，至少在http接口这一层面，开发者可以选择用命令式还是响应式编程实现，另外定时任务、Eventbus之类也是支持的&lt;/li>
+&lt;li>但到了ORM层只能有一个选择。&lt;/li>
+&lt;/ul>
 &lt;blockquote>
 &lt;p>未完待续&lt;/p>
 &lt;/blockquote></description></item><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景&lt;/h2>
