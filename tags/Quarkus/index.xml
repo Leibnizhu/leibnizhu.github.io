@@ -32,8 +32,28 @@ Combine both the familiar imperative code and the reactive style when developing
 &lt;li>Quarkus core基于Vert.X实现，是响应式的，这也是它能unify命令式和响应式的关键原因，也是各个扩展能自行选择命令式实现和响应式实现的原因&lt;/li>
 &lt;li>Quarkus在Vert.X基础上做了一个路由层来兼容两种实现，像HTTP请求这种直接通过路由层、如果是响应式代码，直接在I/O线程上执行；命令式代码则丢到Worker线程执行（就要做上下文切换了）；至于Quarkus怎么知道是什么实现，就看方法注解以及签名了，具体不展开&lt;/li>
 &lt;li>也就是说，至少在http接口这一层面，开发者可以选择用命令式还是响应式编程实现，另外定时任务、Eventbus之类也是支持的&lt;/li>
-&lt;li>但到了ORM层只能有一个选择。&lt;/li>
+&lt;li>但到了ORM层只能有一个选择，是的， &lt;code>Hibernate&lt;/code> 和 &lt;code>Hibernate-reactive&lt;/code> 显然不能共存。&lt;/li>
 &lt;/ul>
+&lt;p>如果选了 &lt;code>Hibernate-reactive&lt;/code> 那么意味你的dao都是返回Uni或Multi，这会一直传递出去（除非await结果）。&lt;br>
+另外，像 &lt;code>resteasy&lt;/code> 用了reative的话，filter这些在I/O线程运行，不能阻塞，如果里面用到redis client之类也要改Reactive RedisClient。&lt;br>
+总而言之，选了Reactive，多少是有 &lt;strong>传递性&lt;/strong> 的，很多地方要跟着改。&lt;br>
+在我们的项目里，也开了个分支彻底改了Reactive，发现在一些地方支持还不是很好，比如 ：&lt;/p>
+&lt;ul>
+&lt;li>@Scheduler 方法里面开Panache的多表事务会报错&lt;/li>
+&lt;li>&lt;code>Hibernate-reactive&lt;/code> 不支持 OneToMany ManyToOne 等的懒加载，必须在HQL用 &lt;code>join fetch&lt;/code> 声明拉外表（就不是lazy了）&lt;/li>
+&lt;li>………………&lt;/li>
+&lt;/ul>
+&lt;p>最后，基于以下考虑，放弃了reactive：&lt;/p>
+&lt;ol>
+&lt;li>老代码迁移，不可能dao全部改reactive，况且dao层还会往外传递reactive&lt;/li>
+&lt;li>quarkus reactive 本身限制，比如上面列的一些点&lt;/li>
+&lt;li>团队接受、理解Reactive的成本&lt;/li>
+&lt;li>&lt;a class="link" href="https://openjdk.java.net/jeps/425" target="_blank" rel="noopener"
+>virtual thread&lt;/a> 已经进入 jdk19 preview了，到下个LTS，jdk21，quarkus应该已经跟进支持，到时切过去就是。&lt;/li>
+&lt;/ol>
+&lt;p>从长远来看，趋势应该是开发者只要写同步代码，不用管实际执行，通过虚拟线程压榨线程性能，大部分需求不需要在代码层面通过类似reactive这样的pattern提高性能。&lt;br>
+不过话说回来，reactive也不只是为了压榨线程性能，具体就不展开了。&lt;br>
+&lt;strong>有一说一，Quarkus 的 mutiny对比RxJava之类，好用不是一点两点，接口设计相当优秀，值得学习&lt;/strong>。&lt;/p>
 &lt;blockquote>
 &lt;p>未完待续&lt;/p>
 &lt;/blockquote></description></item></channel></rss>
