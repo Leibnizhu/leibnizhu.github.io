@@ -11,7 +11,7 @@
 &lt;li>配合GitOps持续集成、持续交付&lt;/li>
 &lt;/ol>
 &lt;p>而Quarkus很好解决了这些问题。反观Spring，在启动速度、资源占用这块实在不尽人意，对k8s的支持也是很落后，对graalvm native- image也是起步落后。&lt;/p>
-&lt;h2 id="用不用native-">用不用Native？？-&lt;/h2>
+&lt;h2 id="用不用native">用不用Native??&lt;/h2>
 &lt;p>谈Quarkus绕不开native（native可执行文件的构建）。没办法，官方先来的，首页就是大大的native/jvm性能对比。&lt;br>
 native实测是真的快（不到0.1s），内存占用也确实小（启动几十MB，跑一段时间稳定大概300MB附近，不过不同压力的不同类型服务也不能说明什么）。但有什么缺点？&lt;/p>
 &lt;ol>
@@ -20,7 +20,7 @@ native实测是真的快（不到0.1s），内存占用也确实小（启动几�
 &lt;li>&lt;strong>开发多了不少限制&lt;/strong> ：你要注意新引入的依赖是不是支持native的；所以可能需要json序列化反序列化的类记得加上 &lt;code>@RegisterForReflection&lt;/code> 注解；如果是外部依赖的实体类，要编写一个什么json文件声明要处理…………本文不是Quarkus教程，就不详细展开了，总之，如果要native，最好整个服务都只用quarkus生态里面的依赖，否则你不知道什么时候就编译不了了。虽然quarkus的生态已经比较完善，但总有没cover到的地方，比如hadoop生态的sdk。&lt;/li>
 &lt;/ol>
 &lt;p>没错，我们quarkus native上了生产一两个月，运行良好，充分体现了native的优越性；但是，现在要加入hadoop这些，没办法，只能放弃，要么自己实现一整套hdfs client之类的，成本很高。&lt;/p>
-&lt;h2 id="响应式要上吗">响应式要上吗？&lt;/h2>
+&lt;h2 id="响应式要上吗">响应式要上吗?&lt;/h2>
 &lt;p>官网说：&lt;/p>
 &lt;blockquote>
 &lt;p>Unifies imperative and reactive
@@ -39,7 +39,8 @@ Combine both the familiar imperative code and the reactive style when developing
 总而言之，选了Reactive，多少是有 &lt;strong>传递性&lt;/strong> 的，很多地方要跟着改。&lt;br>
 在我们的项目里，也开了个分支彻底改了Reactive，发现在一些地方支持还不是很好，比如 ：&lt;/p>
 &lt;ul>
-&lt;li>@Scheduler 方法里面开Panache的多表事务会报错&lt;/li>
+&lt;li>&lt;code>@Scheduled&lt;/code> 方法里面开Panache的多表事务会报错&lt;/li>
+&lt;li>EventBus的 &lt;code>@ConsumeEvent&lt;/code> 注释的方法，同上&lt;/li>
 &lt;li>&lt;code>Hibernate-reactive&lt;/code> 不支持 OneToMany ManyToOne 等的懒加载，必须在HQL用 &lt;code>join fetch&lt;/code> 声明拉外表（就不是lazy了）&lt;/li>
 &lt;li>………………&lt;/li>
 &lt;/ul>
@@ -52,11 +53,47 @@ Combine both the familiar imperative code and the reactive style when developing
 >virtual thread&lt;/a> 已经进入 jdk19 preview了，到下个LTS，jdk21，quarkus应该已经跟进支持，到时切过去就是。&lt;/li>
 &lt;/ol>
 &lt;p>从长远来看，趋势应该是开发者只要写同步代码，不用管实际执行，通过虚拟线程压榨线程性能，大部分需求不需要在代码层面通过类似reactive这样的pattern提高性能。&lt;br>
-不过话说回来，reactive也不只是为了压榨线程性能，具体就不展开了。&lt;br>
-&lt;strong>有一说一，Quarkus 的 mutiny对比RxJava之类，好用不是一点两点，接口设计相当优秀，值得学习&lt;/strong>。&lt;/p>
+当然不是说有了Loom、reactive就没用了，只是说在压榨线程性能这一点上，可以交给loom；而我们用reactive也不只是为了性能，具体就不展开了，可以看看 &lt;a class="link" href="https://www.reactivemanifesto.org/" target="_blank" rel="noopener"
+>The Reactive Manifesto&lt;/a>。&lt;/p>
 &lt;blockquote>
-&lt;p>未完待续&lt;/p>
-&lt;/blockquote></description></item><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景&lt;/h2>
+&lt;p>&lt;strong>有一说一，Quarkus 的 mutiny对比RxJava之类，好用不是一点两点，接口设计相当优秀，值得学习。&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="其他">其他&lt;/h2>
+&lt;h3 id="openapi">OpenAPI&lt;/h3>
+&lt;p>回顾下使用OpenAPI的目的：&lt;/p>
+&lt;ol>
+&lt;li>接口标准&lt;/li>
+&lt;li>提供给其他业务方/前端访问文档&lt;/li>
+&lt;li>提供给其他业务方自己按需生成SDK使用&lt;/li>
+&lt;/ol>
+&lt;p>第1点是OpenAPI本身的特性，第2点Quarkus可以集成。&lt;br>
+Quarkus对OpenAPI的支持可以见 &lt;a class="link" href="https://quarkus.io/guides/openapi-swaggerui" target="_blank" rel="noopener"
+>官网Guides&lt;/a> ，说几个点：&lt;/p>
+&lt;ol>
+&lt;li>支持按代码生成OpenAPI定义&lt;/li>
+&lt;li>支持按代码生成Swagger-UI界面（后者默认是dev模式才有，可以通过 &lt;code>quarkus.swagger-ui.always-include=true&lt;/code> 开启非dev模式下可用）&lt;/li>
+&lt;li>支持放一个自己写的OpenAPI定义文件，作为上面1、2点生成的一部分；但，Quarkus要求openapi定义文件必须放在固定路径下，如&lt;code>resources/META-INF/openapi.yml&lt;/code>
+等几个指定路径，具体参见 &lt;a class="link" href="https://quarkus.io/guides/openapi-swaggerui#open-document-paths" target="_blank" rel="noopener"
+>Using OpenAPI And Swagger UI&lt;/a> 。&lt;/li>
+&lt;/ol>
+&lt;p>第3点会带来一些不便，比如，OpenAPI spec文件在另一个项目，deploy到maven仓库，Quarkus的项目去依赖的时候，就要求它按这个目录来，如果OpenAPI spec是外部的项目，就不好控制了。&lt;/p>
+&lt;h3 id="restclient">RestClient&lt;/h3>
+&lt;p>Quarkus的 &lt;a class="link" href="https://quarkus.io/guides/rest-client-reactive" target="_blank" rel="noopener"
+>RestClient&lt;/a> 基本功能是完备的，配合 &lt;code>quarkus-smallrye-fault-tolerance&lt;/code> 可以做一些重试啊、Fallback啊、熔断啊之类的操作。&lt;br>
+但有两个点要吐槽下：&lt;/p>
+&lt;ol>
+&lt;li>RestClient是可以通过 &lt;code>@RegisterClientHeaders&lt;/code> 注册一个请求header的处理器的；但这个处理器的生命周期是restclient自己管的，给一个输入的header，你可以往里加header之类，实际上能操作的空间的很小，一般就是只能加一些固定的header。所以很多时候只能在接口方法加 &lt;code>@HeaderParam&lt;/code> 的参数，如果又有一些固定的header处理逻辑，要么就写一层Facade，要么就在接口里做个default方法处理下。&lt;/li>
+&lt;li>接口的异常处理定义比较弱，基本只能通过Interceptor、或者异常捕获；比如想根据响应http status code有不同处理，获取响应header这种，就比较麻烦。&lt;/li>
+&lt;/ol>
+&lt;h3 id="multipart">Multipart&lt;/h3>
+&lt;p>有一点比较坑的，&lt;code>@MultipartForm&lt;/code> 注解有俩：&lt;/p>
+&lt;ul>
+&lt;li>org.jboss.resteasy.annotations.providers.multipart.MultipartForm&lt;/li>
+&lt;li>org.jboss.resteasy.reactive.MultipartForm&lt;/li>
+&lt;/ul>
+&lt;p>还都是resteasy下的，注意哈，用第一个才行的，resteasy-multipart-provider 里面的。&lt;/p>
+&lt;h3 id="redisclient">RedisClient&lt;/h3>
+&lt;p>好几个方法，如 &lt;code>io.quarkus.redis.client.RedisClient#del&lt;/code> ，没用变长参数，用的是List接收参数。 算是有点不方便吧。&lt;/p></description></item><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景&lt;/h2>
 &lt;p>去年写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2021/12/04/%e8%b7%a8Yarn%e9%9b%86%e7%be%a4%e6%8f%90%e4%ba%a4spark%e4%bb%bb%e5%8a%a1/" >跨Yarn集群提交spark任务&lt;/a> ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 &lt;code>*-site.xml&lt;/code> 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 &lt;code>*-site.xml&lt;/code> 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。&lt;/p>
 &lt;p>简单回顾下，主要做了两件事情：&lt;/p>
 &lt;ol>
