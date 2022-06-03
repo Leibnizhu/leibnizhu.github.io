@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hive on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Hive/</link><description>Recent content in Hive on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 06 May 2020 13:10:28 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Hive/index.xml" rel="self" type="application/rss+xml"/><item><title>Spark动态加载hive配置的方案</title><link>https://leibnizhu.github.io/p/Spark%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BDhive%E9%85%8D%E7%BD%AE%E7%9A%84%E6%96%B9%E6%A1%88/</link><pubDate>Wed, 06 May 2020 13:10:28 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BDhive%E9%85%8D%E7%BD%AE%E7%9A%84%E6%96%B9%E6%A1%88/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Spark%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BDhive%E9%85%8D%E7%BD%AE%E7%9A%84%E6%96%B9%E6%A1%88/bg3.jpg" alt="Featured image of post Spark动态加载hive配置的方案" />&lt;p>一般来说，Spark写Hive，把&lt;code>xxx-site.xml&lt;/code>系列配置文件打进jar包里，或&lt;code>spark-submit&lt;/code>指定下file之类，new个&lt;code>HiveContext&lt;/code>就完事了。&lt;br>
 要写外部集群，也不外乎是换对应的&lt;code>xxx-site.xml&lt;/code>，改改&lt;code>thrift&lt;/code>服务地址啥的，不费劲。&lt;br>
 好了，本文结束。&lt;br>
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
-&lt;!-- raw HTML omitted -->
+&lt;br/>
+&lt;br/>
+&lt;br/>
+&lt;br/>
+&lt;br/>
+&lt;br/>
+&lt;br/>
+&lt;br/>
+&lt;br/>
 不对，擅长断更的我不会为此特意写篇博客。&lt;br>
 现在的场景是，每次Spark任务启动的时候才能拿到外部Hive集群的配置信息（别问我为什么，问就是中台的需求，很多集群，java应用启动后才能去读到任务配置，反射组装RDD并执行，Hive配置？lazy的，到写入的时候才会去拿）。&lt;br>
 这个过程踩了不少坑，试了几种方案，直接说结论吧。&lt;/p>

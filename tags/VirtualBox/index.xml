@@ -34,7 +34,7 @@ IDE (1, 0): Empty&lt;/p>
 port：介质将被连接／断开／修改的端口号。必须。
 device：介质将被连接／断开／修改的设备号。必须。
 type：定义 介质将被连接／断开／修改的驱动器类型。
-medium：允许指定DVD／软盘驱动器是完全断开的（none）或仅是需要被连接的空的DVD／软盘驱动器（emptydrive）。如果指定了uuid，filename或host:&lt;!-- raw HTML omitted -->，将连接到存储控制器的指定端口和设备号。&lt;/p>
+medium：允许指定DVD／软盘驱动器是完全断开的（none）或仅是需要被连接的空的DVD／软盘驱动器（emptydrive）。如果指定了uuid，filename或host:&lt;drive>，将连接到存储控制器的指定端口和设备号。&lt;/p>
 &lt;/blockquote>
 &lt;p>再次查看配置确认修改成功：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage showvminfo CentOS05
