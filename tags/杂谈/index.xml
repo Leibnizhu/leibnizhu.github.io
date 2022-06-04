@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>杂谈 on Heaven's Door</title><link>https://leibnizhu.github.io/tags/%E6%9D%82%E8%B0%88/</link><description>Recent content in 杂谈 on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 03 Jun 2022 22:19:59 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/%E6%9D%82%E8%B0%88/index.xml" rel="self" type="application/rss+xml"/><item><title>换电脑了</title><link>https://leibnizhu.github.io/p/%E6%8D%A2%E7%94%B5%E8%84%91%E4%BA%86/</link><pubDate>Fri, 03 Jun 2022 22:19:59 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%8D%A2%E7%94%B5%E8%84%91%E4%BA%86/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%8D%A2%E7%94%B5%E8%84%91%E4%BA%86/thumbnail.jpg" alt="Featured image of post 换电脑了" />&lt;p>记录一下。&lt;br>
+2016款15寸MBP，购于2017年，定制加了内存、CPU、SSD。&lt;/p>
+&lt;p align="center">
+&lt;img src="mbp15.png" width="600" />
+&lt;/p>
+&lt;p>大概是去年年初的时候霍尔感应器坏了，感应不到开盖动作，开盖后按键盘可以恢复休眠，但屏幕亮不了————其实屏幕也是有显示的，但是没背光，打着手电勉强能看到是有显示的；要用磁铁在喇叭附近吸一下才能亮屏。&lt;br>
+到了去年4月就彻底罢工，磁铁不再管用，铷磁铁也不行，要亮屏必须强制重启才能亮屏。&lt;br>
+Apple Store对这种问题的解决方案是换主板，几千块，修是不会给你修的。最后找人直接换了霍尔感应器，复活了。&lt;/p>
+&lt;p>上周，5月26号开始发现电脑有在开着盖的前提下自己灭屏的情况，折腾下就又好了。次日上午，复现，反复开合盖又可以了。到下午，彻底亮不了屏，重启也不行，也是没背光，看起来像是背光直接坏了。借了个显示器外接凑合用了一下午。&lt;/p>
+&lt;p>回家翻出XPS13装了一下软件凑合用着先，不得不说真是不习惯Windows，不过也是勉强能用了。&lt;/p>
+&lt;p>所以有仨方案：&lt;/p>
+&lt;ol>
+&lt;li>修MBP，代价未知，预后未知；加上之前风扇也一直有问题（响声特别大，不是积灰那种声音，是准备起飞那种；&lt;/li>
+&lt;li>继续用XPS13，能给我用的时间大概还有两个月，过了一周适应期也能凑合用起来；&lt;/li>
+&lt;li>换新MBP，看了下官网，发货要到7月份了。&lt;/li>
+&lt;/ol>
+&lt;p>到29号的时候，忽然想到看看官翻，可以马上发货，但只有14寸丐中丐版本。14寸是我想要的，但16G内存有点……再思考了一下，其实16G也够平常上班写写代码了，24期免息走起。&lt;/p>
+&lt;p>官翻发货是真的快，第二天发货，顺丰，再隔了一天就到了。&lt;/p>
+&lt;p align="center">
+&lt;img src="order.png" width="400" />
+&lt;/p>
+&lt;p>开箱，开机，插上移动硬盘TimeMachine恢复，很快就恢复了生产力，嗷嗷的。&lt;br>
+说下体验：&lt;/p>
+&lt;ol>
+&lt;li>屏幕没得说，mbp屏幕一直很OK的，这次miniLED 120Hz的体验是更好了；其他的触摸板之类的也是，一如既往。&lt;/li>
+&lt;li>这代的mbp不用蝴蝶键盘了，不过我其实还挺喜欢蝴蝶二代的，放膝盖上敲特别有感觉；当然了，新的这个手感也还可以。嗯虽然手里有Filco Minila Air红轴和RealForce 87u十周年纪念静音版，但平时还是用笔记本自己键盘比较多。&lt;/li>
+&lt;li>续航和散热，杠杠的，看了下监控，其实很多时候都没开风扇，比如只是看看网页、vscode写写文档、代码，不编译的时候。&lt;/li>
+&lt;li>magesafe充电也回来了，好评；读卡器回归，不过我用不上。&lt;/li>
+&lt;li>编译速度肉眼可见快了很多（当然，只是跟我的老mbp比）&lt;/li>
+&lt;li>外放，用网抑云的时候偶尔会爆音，原因未明，网上也有类似的情况： &lt;a class="link" href="https://discussionschinese.apple.com/thread/253662950" target="_blank" rel="noopener"
+>问：macbook pro 14寸 音响破音&lt;/a> ，网页看视频开外放则不会，奇怪。&lt;/li>
+&lt;li>外观：比2016款是丑了很多，不过也标志着mac团队从设计主导往技术/实用主导的变化吧&lt;/li>
+&lt;/ol>
+&lt;p align="center">
+&lt;img src="mbp14.png" width="600" />
+&lt;/p>
+&lt;p>关于刘海：&lt;br>
+目前的系统导航栏图标太多被挤到刘海里面之后是显示不了的，只能通过command+拖拽图标进刘海里面，才能把刘海里面的图标挤回来。&lt;br>
+还有一种方案是装某些折叠导航栏的app，比如 bartender（收费软件），也可以用 &lt;a class="link" href="https://github.com/dwarvesf/hidden" target="_blank" rel="noopener"
+>Hidden Bar&lt;/a> ，免费，前面链接是github地址。安装后只保留用得多的一些图标，其他统统折叠起来————对，只是为了保证要用的时候能找到，展开后要找刘海里的图标还是靠挤。&lt;/p></description></item></channel></rss>
