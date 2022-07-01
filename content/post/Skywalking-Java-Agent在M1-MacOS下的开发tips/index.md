@@ -9,13 +9,11 @@ tags:
 image: platform.jpg
 ---
 
-Skywalking Java Agent的开发与测试在官网文档已经有详尽的介绍包括（但不限于）：
+Skywalking Java Agent的开发与测试在官网文档已经有详尽的介绍，包括（但不限于）：
 
-- [How to build a project](https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-build.md)
-- [Compiling Guidance](https://skywalking.apache.org/docs/skywalking-java/latest/en/contribution/compiling/)
-- [Plugin automatic test framework](https://skywalking.apache.org/docs/skywalking-java/latest/en/setup/service-agent/java-agent/plugin-test/)
-- [Apache SkyWalking release guide](https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-release.md)
-- [Java Agent Release Guidance](https://skywalking.apache.org/docs/skywalking-java/latest/en/contribution/release-java-agent/)
+- 编译： [Compiling Guidance](https://skywalking.apache.org/docs/skywalking-java/latest/en/contribution/compiling/) ，及 [How to build a project](https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-build.md)
+- 编写testcase并运行： [Plugin automatic test framework](https://skywalking.apache.org/docs/skywalking-java/latest/en/setup/service-agent/java-agent/plugin-test/)
+- 发布： [Apache SkyWalking release guide](https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-release.md)，及 [Java Agent Release Guidance](https://skywalking.apache.org/docs/skywalking-java/latest/en/contribution/release-java-agent/) 
 
 但在M1芯片的MacOS中，还是有一些需要调整的地方，在此简单记录一下。
 
