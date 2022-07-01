@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Skywalking on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Skywalking/</link><description>Recent content in Skywalking on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 30 Jun 2022 21:10:28 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Skywalking/index.xml" rel="self" type="application/rss+xml"/><item><title>Skywalking Java Agent在M1芯片MacOS下的开发tips</title><link>https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/</link><pubDate>Thu, 30 Jun 2022 21:10:28 +0800</pubDate><guid>https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/platform.jpg" alt="Featured image of post Skywalking Java Agent在M1芯片MacOS下的开发tips" />&lt;p>Skywalking Java Agent的开发与测试在官网文档已经有详尽的介绍包括（但不限于）：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-build.md" target="_blank" rel="noopener"
+>How to build a project&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://skywalking.apache.org/docs/skywalking-java/latest/en/contribution/compiling/" target="_blank" rel="noopener"
+>Compiling Guidance&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://skywalking.apache.org/docs/skywalking-java/latest/en/setup/service-agent/java-agent/plugin-test/" target="_blank" rel="noopener"
+>Plugin automatic test framework&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-release.md" target="_blank" rel="noopener"
+>Apache SkyWalking release guide&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://skywalking.apache.org/docs/skywalking-java/latest/en/contribution/release-java-agent/" target="_blank" rel="noopener"
+>Java Agent Release Guidance&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>但在M1芯片的MacOS中，还是有一些需要调整的地方，在此简单记录一下。&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>编译过程需要clone其他仓库等一些网络操作，请先保障网络畅通；若直连网速不佳，请先备好梯子并配置到终端，如：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">ALL_PROXY&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>socks5://127.0.0.1:1080
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git config --global http.proxy socks5://127.0.0.1:1080
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git config --global https.proxy socks5://127.0.0.1:1080
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>clone完 &lt;a class="link" href="https://github.com/apache/skywalking-java" target="_blank" rel="noopener"
+>skywalking-java&lt;/a> 后，先初始化git子模块，&lt;a class="link" href="https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-build.md" target="_blank" rel="noopener"
+>官方文档&lt;/a> 也有说到：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>git submodule init
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>git submodule update
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>编译过程会下载 &lt;code>protobuf&lt;/code>， 而目前没有M1对应的版本，请在 &lt;code>test/plugin/agent-test-tools/bin/fetch-code.sh&lt;/code> 增加 &lt;code>-Dos.detected.classifier=osx-x86_64&lt;/code> ，具体位置大约在32行：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$ROOT_DIR&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>/../../../../mvnw -B package -DskipTests -Dos.detected.classifier&lt;span style="color:#5bc4bf">=&lt;/span>osx-x86_64
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>启动Docker&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>测试用到 &lt;code>docker-maven-plugin&lt;/code> 起docker容器，这插件可能还没支持 macOS aarch64，无法使用 unix socket，导致在 M1 使用 &lt;code>docker-maven-plugin&lt;/code> 构建镜像报错，如：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-mysql" data-lang="mysql">&lt;span style="display:flex;">&lt;span>could &lt;span style="color:#815ba4">not&lt;/span> get native definition &lt;span style="color:#815ba4">for&lt;/span> type &lt;span style="color:#5bc4bf">`&lt;/span>POINTER&lt;span style="color:#5bc4bf">`&lt;/span>, original error message follows: java.lang.UnsatisfiedLinkError: Unable &lt;span style="color:#815ba4">to&lt;/span> execute &lt;span style="color:#815ba4">or&lt;/span> &lt;span style="color:#815ba4">load&lt;/span> jffi &lt;span style="color:#815ba4">binary&lt;/span> stub &lt;span style="color:#815ba4">from&lt;/span> &lt;span style="color:#5bc4bf">`/&lt;/span>var&lt;span style="color:#5bc4bf">/&lt;/span>folders&lt;span style="color:#5bc4bf">/&lt;/span>c0&lt;span style="color:#5bc4bf">/&lt;/span>xxxxxx&lt;span style="color:#5bc4bf">/&lt;/span>T&lt;span style="color:#5bc4bf">/`&lt;/span>. &lt;span style="color:#fec418">Set&lt;/span> &lt;span style="color:#5bc4bf">`&lt;/span>TMPDIR&lt;span style="color:#5bc4bf">`&lt;/span> &lt;span style="color:#815ba4">or&lt;/span> Java property &lt;span style="color:#5bc4bf">`&lt;/span>java.io.tmpdir&lt;span style="color:#5bc4bf">`&lt;/span> &lt;span style="color:#815ba4">to&lt;/span> a &lt;span style="color:#815ba4">read&lt;/span>&lt;span style="color:#5bc4bf">/&lt;/span>&lt;span style="color:#815ba4">write&lt;/span> path that &lt;span style="color:#815ba4">is&lt;/span> &lt;span style="color:#815ba4">not&lt;/span> mounted &lt;span style="color:#48b685">&amp;#34;noexec&amp;#34;&lt;/span>.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>[ERROR] &lt;span style="color:#5bc4bf">/&lt;/span>xxxxx&lt;span style="color:#5bc4bf">/&lt;/span>skywalking&lt;span style="color:#5bc4bf">-&lt;/span>java&lt;span style="color:#5bc4bf">/&lt;/span>xxxx.dylib: &lt;span style="color:#06b6ef">dlopen&lt;/span>(&lt;span style="color:#5bc4bf">/&lt;/span>xxxxx&lt;span style="color:#5bc4bf">/&lt;/span>skywalking&lt;span style="color:#5bc4bf">-&lt;/span>java&lt;span style="color:#5bc4bf">/&lt;/span>xxxxx.dylib, &lt;span style="color:#f99b15">0&lt;/span>x0001): tried: &lt;span style="color:#48b685">&amp;#39;/xxxxx/skywalking-java/xxxxx.dylib&amp;#39;&lt;/span> (fat file, but missing compatible &lt;span style="color:#06b6ef">architecture&lt;/span> (have &lt;span style="color:#48b685">&amp;#39;i386,x86_64&amp;#39;&lt;/span>, need &lt;span style="color:#48b685">&amp;#39;arm64e&amp;#39;&lt;/span>))
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>需要通过 &lt;code>socat&lt;/code> 来桥接，具体操作：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 安装socat&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>brew install socat
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 将 unix socket 代理到 tcp 端口&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>nohup socat TCP-LISTEN:2375,range&lt;span style="color:#5bc4bf">=&lt;/span>127.0.0.1/32,reuseaddr,fork UNIX-CLIENT:/var/run/docker.sock &amp;amp;&amp;gt; /dev/null &amp;amp;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"># 设置环境变量为socat桥接的tcp端口&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">DOCKER_HOST&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>tcp://127.0.0.1:2375
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>执行测试拉取docker镜像时，tomcat没有m1的版本，参考 &lt;a class="link" href="https://dmp.fabric8.io/#build-configuration" target="_blank" rel="noopener"
+>&lt;code>docker-maven-plugin&lt;/code> 的配置文档&lt;/a> 在 &lt;code>test/plugin/containers/jvm-container/pom.xml&lt;/code> 加入 &lt;code>createImageOptions&lt;/code> 参数（请注意，&lt;code>docker-maven-plugin&lt;/code> 的0.39.0版本才有这个参数）：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugins&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;plugin&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>io.fabric8&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>docker-maven-plugin&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 关键点1: 插件版本 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>0.40.0&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;images&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;image&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;name&amp;gt;&lt;/span>skywalking/agent-test-jvm:${container_image_version}&lt;span style="color:#5bc4bf">&amp;lt;/name&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;build&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 关键点2: 通过 createImageOptions 配置docker镜像选用的平台 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;createImageOptions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;platform&amp;gt;&lt;/span>linux/x86_64&lt;span style="color:#5bc4bf">&amp;lt;/platform&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/createImageOptions&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;from&amp;gt;&lt;/span>${base_image_java}&lt;span style="color:#5bc4bf">&amp;lt;/from&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;workdir&amp;gt;&lt;/span>/usr/local/skywalking/scenario&lt;span style="color:#5bc4bf">&amp;lt;/workdir&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;assembly&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 以下省略 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;p>到此为止，就可以使用：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>bash ./test/plugin/run.sh -f &lt;span style="color:#f99b15">${&lt;/span>&lt;span style="color:#ef6155">scenario_name&lt;/span>&lt;span style="color:#f99b15">}&lt;/span>&lt;span style="color:#48b685">`&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>来执行测试了。&lt;/p></description></item></channel></rss>
