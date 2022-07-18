@@ -1,4 +1,97 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Heaven's Door</title><link>https://leibnizhu.github.io/</link><description>Recent content on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 30 Jun 2022 21:10:28 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Skywalking Java Agent在M1芯片MacOS下的开发tips</title><link>https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/</link><pubDate>Thu, 30 Jun 2022 21:10:28 +0800</pubDate><guid>https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/platform.jpg" alt="Featured image of post Skywalking Java Agent在M1芯片MacOS下的开发tips" />&lt;p>Skywalking Java Agent的开发与测试在官网文档已经有详尽的介绍，包括（但不限于）：&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Heaven's Door</title><link>https://leibnizhu.github.io/</link><description>Recent content on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 18 Jul 2022 12:58:35 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Quarkus服务接入Skywalking链路跟踪</title><link>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</link><pubDate>Mon, 18 Jul 2022 12:58:35 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/bus.jpg" alt="Featured image of post Quarkus服务接入Skywalking链路跟踪" />&lt;h2 id="quarkus对可观测性的支持情况">Quarkus对可观测性的支持情况&lt;/h2>
+&lt;p>Quarkus在可观测性方面支持了 &lt;a class="link" href="https://opentracing.io/" target="_blank" rel="noopener"
+>OpenTracing&lt;/a> 和 &lt;a class="link" href="https://opentelemetry.io/" target="_blank" rel="noopener"
+>OpenTelemetry&lt;/a> 。如果要对使用Quarkus开发的服务接入Skywalking做链路跟踪：&lt;/p>
+&lt;ul>
+&lt;li>Skywalking支持OpenTelemetry，但只是在 &lt;a class="link" href="https://skywalking.apache.org/docs/main/latest/en/setup/backend/opentelemetry-receiver/" target="_blank" rel="noopener"
+>metric部分&lt;/a> 支持了。至于为什么，可以看看PR &lt;a class="link" href="https://github.com/apache/skywalking/issues/7374" target="_blank" rel="noopener"
+>What does opentelemetry mean?&lt;/a> 里面的讨(nu)论(chi)。&lt;/li>
+&lt;li>Skywalking兼容Opentracing协议。但Quarkus目前对OpenTracing的支持是针对Jaeger的，而Skywalking是用GRpc通信的，不能直接对接。&lt;/li>
+&lt;/ul>
+&lt;p>所以摆在面前的路有两条：&lt;/p>
+&lt;ol>
+&lt;li>模仿 &lt;a class="link" href="https://github.com/smallrye/smallrye-opentracing" target="_blank" rel="noopener"
+>quarkus-smallrye-opentracing&lt;/a> （已deprecated），基于Provider，写一套用于拦截Quarkus请求打span等的插件。&lt;/li>
+&lt;li>使用Skywalking Java Agent 传统姿势，但要注意各个组件的支持情况。&lt;/li>
+&lt;/ol>
+&lt;p>第一条路工作量是未知的，可行性也未知。还是选简单点的第二条路吧。&lt;/p>
+&lt;h2 id="skywalking对quarkus常用组件的支持情况">Skywalking对Quarkus常用组件的支持情况&lt;/h2>
+&lt;p>先简单盘点一下Skywalking Java Agent对Quarkus做web服务常用组件的支持情况：&lt;/p>
+&lt;ul>
+&lt;li>core: 使用了 &lt;code>Vert.X-core&lt;/code>， 支持3.x 和 4.x。&lt;/li>
+&lt;li>Http server: 使用了 &lt;code>RestEasy&lt;/code>， 已支持 3.x。Quarkus用的是 4.x&lt;/li>
+&lt;li>Http client : RestClient，最终使用的是 &lt;code>Apache httpcomponent HttpClient&lt;/code> ，已支持。&lt;/li>
+&lt;li>ORM:
+&lt;ul>
+&lt;li>&lt;code>Hibernate&lt;/code>：不支持。&lt;/li>
+&lt;li>&lt;code>MyBatis&lt;/code>: 支持 3.4.x -&amp;gt; 3.5.x&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Redis: 使用了 &lt;code>vertx-redis&lt;/code>，Vertx是自己用NetSocket实现了redis的协议，目前还不支持。&lt;/li>
+&lt;/ul>
+&lt;p>可以看到，目前redis client、http Server、Hibernate还不支持。&lt;/p>
+&lt;p>注：详细请参考官方的 &lt;a class="link" href="https://skywalking.apache.org/docs/skywalking-java/latest/en/setup/service-agent/java-agent/supported-list/" target="_blank" rel="noopener"
+>支持列表&lt;/a> 。&lt;/p>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;h3 id="resteasy-4x">RestEasy 4.x&lt;/h3>
+&lt;p>这个我提了 &lt;a class="link" href="https://github.com/apache/skywalking-java/pull/265" target="_blank" rel="noopener"
+>PR&lt;/a>，已 &lt;a class="link" href="https://github.com/apache/skywalking-java/commit/a60a61b83de7d7daed1a4bb1d2953ce1bc3f4fa4" target="_blank" rel="noopener"
+>合入main分支&lt;/a>，等8.12.0版本发布就行，或者先下载 &lt;a class="link" href="https://github.com/apache/skywalking-java/commits/main" target="_blank" rel="noopener"
+>main分支源码&lt;/a>、自行打包用着。&lt;/p>
+&lt;p>在实操中，请移除掉 RestEasy 3.x 的插件，以免冲突。如在sidecar中执行：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>rm /skywalking/agent/plugins/resteasy-server-3.x*
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="hibernate">Hibernate&lt;/h3>
+&lt;p>ORM虽然不支持 &lt;code>Hibernate&lt;/code>，但支持具体的jdbc驱动（如Mysql、PostgreSql等），其实是可以追踪到数据库读写的，只是少了ORM这一层而已，关系不大。&lt;/p>
+&lt;h3 id="vertx相关">Vert.X相关&lt;/h3>
+&lt;p>什么？Vert.X-core不是支持了吗？&lt;/p>
+&lt;p>正因为支持了才有问题！&lt;/p>
+&lt;h4 id="skywalking如何支持vertx的">Skywalking如何支持Vert.X的&lt;/h4>
+&lt;p>我们可以先看看Skywalking的 &lt;a class="link" href="https://github.com/apache/skywalking-java/tree/main/apm-sniffer/apm-sdk-plugin/vertx-plugins/vertx-core-4.x-plugin" target="_blank" rel="noopener"
+>&lt;code>vertx-core-4.x-plugin&lt;/code>&lt;/a> 源码，跟踪原理很简单，它对 &lt;code>VertxBuilder&lt;/code> 进行了增强，在VertxImpl实例化时注入了 &lt;code>SWVertxTracer&lt;/code> 作为Vertx的tracer，也就是说利用了vertx的tracer机制。&lt;/p>
+&lt;p>这样做的原因很简单，Vertx大量用到了EventLoop线程和Worker线程的切换，如果直接像其他的Skywalking插件一样，直接增强处理的方法，那么调用 &lt;code>ContextManager.getOrCreate()&lt;/code> 的时候，由于线程切换，是拿不到上一个span使用的 &lt;code>TracerContext&lt;/code> （保存在ThreadLocal里）的，也就是每个操作都成了独立的TracerContext，那么就无法将span串起来，也就无法实现追踪。所以直接利用Vert.X自己提供的tracer机制，Vert.X各个组件在触发一些事件（如Http服务接受到请求，Http客户端接受到响应）时，就会调用 &lt;code>VertxTracer&lt;/code> 的对应方法，记录事件，在这个过程中，Vertx是允许带一个Payload的，对于 &lt;code>vertx-core-4.x-plugin&lt;/code> 插件，这个Payload就是 Skywalking的 &lt;code>AbstractSpan&lt;/code> ，这样就可以在Vert.X内部实现绕开ThreadLocal的线程限制、进行追踪了。&lt;/p>
+&lt;h4 id="skywalking对vertx的支持与quarkus的关系">Skywalking对Vert.X的支持、与Quarkus的关系&lt;/h4>
+&lt;p>那么问题在哪呢？&lt;/p>
+&lt;p>问题就在于，这样的机制决定了，只有在Vert.X体系里的才会被追踪到，看看前面列的那些组件，RestEasy、HttpClient、JDBC Driver这些都不在Vert.X控制下的，他们产生的Span和Vert.X是无法关联起来的。&lt;/p>
+&lt;p>我们再看看目前 &lt;code>vertx-core-4.x-plugin&lt;/code> 实际支持的Vert.X组件，从 &lt;a class="link" href="https://github.com/apache/skywalking-java/blob/main/apm-sniffer/apm-sdk-plugin/vertx-plugins/vertx-core-4.x-plugin/src/main/java/org/apache/skywalking/apm/plugin/vertx4/SWVertxTracer.java" target="_blank" rel="noopener"
+>源码&lt;/a> 来看，实际支持了HTTP服务、HTTP客户端，以及EventBus（包括本地的和分布式的）。&lt;/p>
+&lt;p>一个个看：&lt;/p>
+&lt;ul>
+&lt;li>HTTP服务，Quarkus在Vert.X-core之上用了 &lt;code>RestEasy&lt;/code> 做路由，其实是无需再在Vert.X里面追踪的。&lt;/li>
+&lt;li>HTTP客户端，前面说了，目前用的是 &lt;code>Apache httpcomponent HttpClient&lt;/code> ，也是不用管的。&lt;/li>
+&lt;li>Eventbus，Quarkus确实用了Vert.X-core的EventBus，这个好像没啥办法&lt;/li>
+&lt;li>Redis Client，目前 &lt;code>vertx-core-4.x-plugin&lt;/code> 不支持，Quarkus用到，有兴趣的朋友可以考虑实现一个、提个PR&lt;/li>
+&lt;/ul>
+&lt;p>问题捋完了，方案就是个取舍的问题了。&lt;/p>
+&lt;ul>
+&lt;li>艰难的道路——全面支持Vert.X
+&lt;ul>
+&lt;li>应用里的RestClient改成Vert.X的Http client&lt;/li>
+&lt;li>扩展 &lt;code>vertx-core-4.x-plugin&lt;/code> ，增加Redis请求响应的处理&lt;/li>
+&lt;li>考虑如何支持 JDBC Driver 的追踪&lt;/li>
+&lt;li>对于Quarkus其他组件，随缘了，或者想办法把VertxTracer和正常的基于TreadLocal的TracerContext关联起来？&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>世上无难事、只要肯放弃之路
+&lt;ul>
+&lt;li>排除掉 &lt;code>vertx-core-4.x-plugin&lt;/code> ，放弃EventBus和Redis Client的追踪&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>我选择放弃，在sidecar里面执行：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>rm /skywalking/agent/plugins/apm-vertx-core-*
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="总结">总结&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>RestEasy 4.x 将在Skywalking 8.12.0里面支持，如有需要可提前自行编译&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>放弃EventBus和Redis Client的追踪，下次一定.jpg&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>sidecar里面记得排除不必要的plugin：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>rm /skywalking/agent/plugins/apm-vertx-core-* /skywalking/agent/plugins/resteasy-server-3.x*
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;/ol></description></item><item><title>Skywalking Java Agent在M1芯片MacOS下的开发tips</title><link>https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/</link><pubDate>Thu, 30 Jun 2022 21:10:28 +0800</pubDate><guid>https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Skywalking-Java-Agent%E5%9C%A8M1%E8%8A%AF%E7%89%87MacOS%E4%B8%8B%E7%9A%84%E5%BC%80%E5%8F%91tips/platform.jpg" alt="Featured image of post Skywalking Java Agent在M1芯片MacOS下的开发tips" />&lt;p>Skywalking Java Agent的开发与测试在官网文档已经有详尽的介绍，包括（但不限于）：&lt;/p>
 &lt;ul>
 &lt;li>编译： &lt;a class="link" href="https://skywalking.apache.org/docs/skywalking-java/latest/en/contribution/compiling/" target="_blank" rel="noopener"
 >Compiling Guidance&lt;/a> ，及 &lt;a class="link" href="https://github.com/apache/skywalking/blob/master/docs/en/guides/How-to-build.md" target="_blank" rel="noopener"
