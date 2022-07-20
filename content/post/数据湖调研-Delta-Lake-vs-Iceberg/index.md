@@ -1,6 +1,12 @@
 ---
 title: "数据湖调研：Delta Lake vs Iceberg"
 date: 2022-07-20T10:03:41+08:00
+tags:
+- DeltaLake
+- LakeHouse
+- IceBerg
+- DataLake
+- 数据湖
 ---
 
 ## Delta Lake
@@ -98,12 +104,61 @@ Delta Lake应运而生，它是一个云对象存储上的ACID表存储层。核
 
 后面是具体的存储格式和访问协议，篇幅太长，不展开了。
 
-### 基本概念与使用
+### DeltaLake基本概念与使用
 
 [官方文档](https://docs.delta.io/latest/delta-intro.html)
- 
+
+注意到上文所说的事务日志放在对象存储的同一位置，就是在表的目录下，有个 `_delta_log` 子目录，一个版本对应里面一个json，记录了事务操作，Time Travel显然也是基于此。
+
 ## Iceberg
 
+### 设计理念
+
 Meetup视频： [Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers](https://www.youtube.com/watch?v=N4gAi_zpN88)，也可以看 [演讲稿](https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/)。
+
+#### Table Format?
+
+> A good way to define a table format is a way to organize a dataset’s files to present them as a single “table”.<br/>
+> Another somewhat simpler definition from a user’s perspective is a way to answer the question “what data is in this table?”.<br/>
+> A single answer to that question allows multiple people, groups, and tools to interact with data in the table at the same time, whether they’re writing to the table or reading from the table.
+
+`Table Format` 是表的抽象，将数据集文件组合起来，以单个“表”的形式呈现，允许人和工具与表数据高效交互。
+
+#### Table Format简史
+
+**Hadoop刀耕火种**：直撸HDFS，用户必须清楚如何将问题转化为MR模型并用java编码，数据也没有schema，用户必须熟知他处理的文件的实际schema。
+
+**Hive**：针对Hadoop第一个问题，用SQL替代之；针对Hadoop第二个问题，用metastore记录schema。Hive从此成为了事实上的Table Format标准。Hive的Table Format我们比较熟知，就不细述了，更多优点也不说了，看视频有。说下缺点：
+
+- 修改数据太低效，尤其分区很大，修改里面的少量数据、或频繁更改
+- 无法安全地更改多个分区的数据，Hive只保证单个分区的事务一致性
+- 在实际操作中，多个作业同时修改一个数据集是不安全的
+- 对于大型表，即便只是列出所有目录也要耗费很多时间
+- 为了利用分区优化查询，用户必须知道物理的分区布局（比如按年、月、日分区）
+- Hive表的统计信息往往是过时的，可能导致优化器选择效率低的计划
+- 在云存储中性能不佳。Hive表一个分区中的所有数据都具有相同的目录前缀，利用不到云存储不同前缀的分流
+
+**Iceberg**：Netflix发现，解决Hive Table Format问题的关键是放弃在文件夹级别跟踪表数据，改为在文件级别跟踪。修改之后，还能做到：
+
+- 保证表视图的正确性和一致性
+- 实现更快的查询计划和执行
+- 用户无需了解数据的物理布局（如分区）
+- 实现更好、更安全的表进化（table evolution，即表schema变更）
+
+#### What is Iceberg
+
+| ✅ Iceberg 是……                                        | ❌ Iceberg不是…… |
+|-------------------------------------------------------|---------------|
+| Table Format定义                                      | 存储引擎        |
+| 遵循Iceberg Table Format定义与表进行交互的一套API及库 | 执行引擎        |
+|                                                       | 一套服务        |
+
+#### Iceberg Table Format
+
+![](iceberg1.png)
+
+### Iceberg基本概念与使用
+
+[官方文档](https://iceberg.apache.org/spark-quickstart/)
 
 ## Delta Lake vs Iceberg
