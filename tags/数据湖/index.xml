@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>数据湖 on Heaven's Door</title><link>https://leibnizhu.github.io/tags/%E6%95%B0%E6%8D%AE%E6%B9%96/</link><description>Recent content in 数据湖 on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 20 Jul 2022 10:03:41 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/%E6%95%B0%E6%8D%AE%E6%B9%96/index.xml" rel="self" type="application/rss+xml"/><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
+&lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
+&lt;h3 id="lakehouse论文">Lakehouse论文&lt;/h3>
+&lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"
+>Lakehouse: A New Generation of Open Platforms that Unify Data Warehousing and Advanced Analytics&lt;/a>。&lt;/p>
+&lt;p>这篇论文主要讲了传统的数仓和数据湖模型的缺陷，在此基础上提出湖仓一体的LakeHouse模型，并阐述了LakeHouse的一些设计细节。下面挑一些要点来讲讲。&lt;/p>
+&lt;p>LakeHouse是Databricks提出的一种将在未来几年取代传统数仓结构的架构。传统数仓将业务数据库数据收集到集中式的数仓，在写入时针对下游BI消费对schema进行优化；然而传统数仓将计算与存储耦合，且对非结构化数据支持不佳。于是出现了数据湖，以开放格式（如Parquet、ORC）存储在低成本的存储系统（如S3），湖中的数据ETL到下游数仓，再提供给BI使用。但这样的两层结构带来了一下问题：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>可靠性&lt;/strong>：难以维持数据湖与下游数仓的数据一致性&lt;/li>
+&lt;li>&lt;strong>数据不及时&lt;/strong>：需要两次ETL才到BI，对于传统数仓而言，甚至是开历史倒车&lt;/li>
+&lt;li>&lt;strong>对高级分析支持不佳&lt;/strong>：机器学习Tensorflow、PyTorch等，需要通过非SQL处理大量数据，无法通过JDBC/ODBC高效运行&lt;/li>
+&lt;li>&lt;strong>总成本高&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>于是噔噔瞪瞪，LakeHouse出来了：基于开放文件格式（如ORC/Parquet）的低成本存储，同时提供数仓的管理功能、传统DBMS的管理特性（如ACID事务、版本控制、审计、索引、缓存等）、及for高级分析（如机器学习）的高速I/O，的高性能系统。同时在设计上适应可存储计算隔离的云计算环境。LakeHouse解决了以下关键问题：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>可靠的数据管理&lt;/strong>：传统数据湖只是管理了一堆半结构化文件，在事务、回滚等方面的能力太差。&lt;/li>
+&lt;li>&lt;strong>支持机器学习&lt;/strong>：支持DataFrame API；而ML系统可以直接读取数据湖的格式，很多也支持DataFrame&lt;/li>
+&lt;li>&lt;strong>SQL查询性能&lt;/strong>：归功于过去对ORC/Parquet做SQL查询的性能优化经验&lt;/li>
+&lt;/ul>
+&lt;p>下面是这三代数仓/数据湖结构对比：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse1.png"
+width="2100"
+height="836"
+srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse1_hua80d5848797b05fbcec254ae3a94cf3f_794557_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse1_hua80d5848797b05fbcec254ae3a94cf3f_794557_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="251"
+data-flex-basis="602px"
+>&lt;/p>
+&lt;p>下面是LakeHouse架构和实现要点。&lt;/p>
+&lt;p>&lt;strong>元数据层&lt;/strong>：&lt;/p>
+&lt;p>LakeHouse设计理念是使用标准文件格式以低成本存储，在存储的顶层设计实现传统的元数据层，可提高抽象级别、实现ACID事务、版本控制等特性。DeltaLake &lt;em>&lt;strong>以Parquet格式在数据湖本身的存储上存放事务日志&lt;/strong>&lt;/em> ，可以存储哪些对象属于表的信息：&lt;/p>
+&lt;ul>
+&lt;li>实践证明这套设计在性能类似或更优于原始Parquet/ORC的同时，提供了事务等管理功能&lt;/li>
+&lt;li>元数据层同时可以保证数据质量，如强制schema（schema enforcement）可以保障新增数据必须匹配已有schema，并提供了API允许配置数据约束（如某列数据需要满足枚举要求）。&lt;/li>
+&lt;li>元数据层可实施ACL、日志审计等功能&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>SQL性能优化&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>缓存：热数据缓存到更快的存储设备，如SSD、RAM&lt;/li>
+&lt;li>辅助数据：Lakehouse虽然使用了公开的文件格式（Parquet/ORC），但可以通过辅助数据帮助优化查询速度，如构建索引、维护统计信息。DeltaLake在上面提到的事务日志中维护列的最大最小值信息，方便查询时跳过；并实现了基于布龙过滤器的索引&lt;/li>
+&lt;li>数据布局优化：在Parquet格式不变的基础上，还是有优化空间，如记录排序，让数据聚拢便于读取。DeltaLake使用Z-order和Hilbert曲线对记录排序。&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>针对高级分析的优化&lt;/strong>：&lt;/p>
+&lt;p>通过声明式的DataFrame API加速高级分析。DataFrame API在DeltaLake的位置：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse2.png"
+width="1046"
+height="788"
+srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse2_hu29e2705cbf93e41a5d284ca61a497d45_214685_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse2_hu29e2705cbf93e41a5d284ca61a497d45_214685_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="132"
+data-flex-basis="318px"
+>&lt;/p>
+&lt;p>下图是Spark MLlib中执行声明式的DataFrame API。用户的DataFrame调用是lazy的，执行时Spark引擎获取执行计划，传给DeltaLake的库，后者读取元数据层，优化查询执行。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse3.png"
+width="1030"
+height="568"
+srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse3_hu9da49551a80d03814825ede3c8f48533_95914_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse3_hu9da49551a80d03814825ede3c8f48533_95914_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="181"
+data-flex-basis="435px"
+>&lt;/p>
+&lt;h3 id="delta-lake白皮书">Delta Lake白皮书&lt;/h3>
+&lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/08/p975-armbrust.pdf" target="_blank" rel="noopener"
+>Delta Lake: High-Performance ACID Table Storage over Cloud Object Stores&lt;/a> 。&lt;/p>
+&lt;p>&lt;strong>纯Parquet/ORC的缺陷&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>多对象更新不是原子的，所以查询之间没有隔离；回滚写操作也很困难：如果更新查询崩溃，则表处于损坏状态。&lt;/li>
+&lt;li>元数据操作的成本很高&lt;/li>
+&lt;li>大多数企业数据集是不断更新的，因此它们需要一个原子性的写入解决方案&lt;/li>
+&lt;/ul>
+&lt;p>Delta Lake应运而生，它是一个云对象存储上的ACID表存储层。核心思想：&lt;/p>
+&lt;ul>
+&lt;li>用ACID方式在云对象中存储日志（write-ahead），以纪录哪些对象是Delta表的一部分&lt;/li>
+&lt;li>日志还包含元数据，例如每个数据文件的最小/最大统计信息，用于查询优化。&lt;/li>
+&lt;li>将所有元数据都存在底层对象存储中，并且使用针对对象存储的乐观并发协议实现事务，意味着不需要运行服务器来维护Delta表的状态&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>特性&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>Time travel&lt;/li>
+&lt;li>UPSERT, DELETE and MERGE operations&lt;/li>
+&lt;li>Efficient streamingI/O&lt;/li>
+&lt;li>Caching&lt;/li>
+&lt;li>Data layout optimization&lt;/li>
+&lt;li>Schema evolution&lt;/li>
+&lt;li>Audit logging&lt;/li>
+&lt;/ul>
+&lt;p>使用DeltaLake的例子：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/deltalake1.png"
+width="1008"
+height="1166"
+srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/deltalake1_hu4e9ebd4c418f2361977445627d1a6903_285704_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/deltalake1_hu4e9ebd4c418f2361977445627d1a6903_285704_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>&lt;/p>
+&lt;p>&lt;strong>旧世界的桎梏&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>对象存储API：云对象存储的API太慢太麻烦云云&lt;/li>
+&lt;li>一致性保证：云对象存储为每个键提供了最终的一致性，并且没有跨键的一致性保证；对现有对象的更新可能不会立即对其他客户端可见&lt;/li>
+&lt;li>性能问题&lt;/li>
+&lt;li>目前有三种表存储方式：
+&lt;ul>
+&lt;li>文件目录：将表存储为对象的集合，基于一个或多个属性将记录“分区”到目录中。比如Hive。主要问题是存在性能和一致性问题&lt;/li>
+&lt;li>自定义存储引擎：在一个单独的、高度一致的服务中管理元数据本身。比如Snowflake。需要运行一个高可用性的服务来管理元数据，这可能很开销很大；而且表的所有I/O操作都需要联系元数据服务，这会增加其资源成本，降低性能和可用性；现有计算引擎的连接器需要更多的开发对接工作。&lt;/li>
+&lt;li>噔噔瞪瞪，&lt;em>&lt;strong>对象存储中的元数据&lt;/strong>&lt;/em> ：DeltaLake将事务日志和元数据直接存储在云对象存储中，并在对象存储操作上使用一组协议来实现序列化&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>后面是具体的存储格式和访问协议，篇幅太长，不展开了。&lt;/p>
+&lt;h3 id="deltalake基本概念与使用">DeltaLake基本概念与使用&lt;/h3>
+&lt;p>&lt;a class="link" href="https://docs.delta.io/latest/delta-intro.html" target="_blank" rel="noopener"
+>官方文档&lt;/a>&lt;/p>
+&lt;p>注意到上文所说的事务日志放在对象存储的同一位置，就是在表的目录下，有个 &lt;code>_delta_log&lt;/code> 子目录，一个版本对应里面一个json，记录了事务操作，Time Travel显然也是基于此。&lt;/p>
+&lt;h2 id="iceberg">Iceberg&lt;/h2>
+&lt;h3 id="设计理念">设计理念&lt;/h3>
+&lt;p>Meetup视频： &lt;a class="link" href="https://www.youtube.com/watch?v=N4gAi_zpN88" target="_blank" rel="noopener"
+>Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers&lt;/a>，也可以看 &lt;a class="link" href="https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/" target="_blank" rel="noopener"
+>演讲稿&lt;/a>。&lt;/p>
+&lt;h4 id="table-format">Table Format?&lt;/h4>
+&lt;blockquote>
+&lt;p>A good way to define a table format is a way to organize a dataset’s files to present them as a single “table”.&lt;br/>
+Another somewhat simpler definition from a user’s perspective is a way to answer the question “what data is in this table?”.&lt;br/>
+A single answer to that question allows multiple people, groups, and tools to interact with data in the table at the same time, whether they’re writing to the table or reading from the table.&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;code>Table Format&lt;/code> 是表的抽象，将数据集文件组合起来，以单个“表”的形式呈现，允许人和工具与表数据高效交互。&lt;/p>
+&lt;h4 id="table-format简史">Table Format简史&lt;/h4>
+&lt;p>&lt;strong>Hadoop刀耕火种&lt;/strong>：直撸HDFS，用户必须清楚如何将问题转化为MR模型并用java编码，数据也没有schema，用户必须熟知他处理的文件的实际schema。&lt;/p>
+&lt;p>&lt;strong>Hive&lt;/strong>：针对Hadoop第一个问题，用SQL替代之；针对Hadoop第二个问题，用metastore记录schema。Hive从此成为了事实上的Table Format标准。Hive的Table Format我们比较熟知，就不细述了，更多优点也不说了，看视频有。说下缺点：&lt;/p>
+&lt;ul>
+&lt;li>修改数据太低效，尤其分区很大，修改里面的少量数据、或频繁更改&lt;/li>
+&lt;li>无法安全地更改多个分区的数据，Hive只保证单个分区的事务一致性&lt;/li>
+&lt;li>在实际操作中，多个作业同时修改一个数据集是不安全的&lt;/li>
+&lt;li>对于大型表，即便只是列出所有目录也要耗费很多时间&lt;/li>
+&lt;li>为了利用分区优化查询，用户必须知道物理的分区布局（比如按年、月、日分区）&lt;/li>
+&lt;li>Hive表的统计信息往往是过时的，可能导致优化器选择效率低的计划&lt;/li>
+&lt;li>在云存储中性能不佳。Hive表一个分区中的所有数据都具有相同的目录前缀，利用不到云存储不同前缀的分流&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Iceberg&lt;/strong>：Netflix发现，解决Hive Table Format问题的关键是放弃在文件夹级别跟踪表数据，改为在文件级别跟踪。修改之后，还能做到：&lt;/p>
+&lt;ul>
+&lt;li>保证表视图的正确性和一致性&lt;/li>
+&lt;li>实现更快的查询计划和执行&lt;/li>
+&lt;li>用户无需了解数据的物理布局（如分区）&lt;/li>
+&lt;li>实现更好、更安全的表进化（table evolution，即表schema变更）&lt;/li>
+&lt;/ul>
+&lt;h4 id="what-is-iceberg">What is Iceberg&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>✅ Iceberg 是……&lt;/th>
+&lt;th>❌ Iceberg不是……&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Table Format定义&lt;/td>
+&lt;td>存储引擎&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>遵循Iceberg Table Format定义与表进行交互的一套API及库&lt;/td>
+&lt;td>执行引擎&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>一套服务&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="iceberg-table-format">Iceberg Table Format&lt;/h4>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1.png"
+width="1230"
+height="1282"
+srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1_hu60d45ae1d07beb91112bb0d0d565fdfb_134710_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1_hu60d45ae1d07beb91112bb0d0d565fdfb_134710_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="95"
+data-flex-basis="230px"
+>&lt;/p>
+&lt;h3 id="iceberg基本概念与使用">Iceberg基本概念与使用&lt;/h3>
+&lt;p>&lt;a class="link" href="https://iceberg.apache.org/spark-quickstart/" target="_blank" rel="noopener"
+>官方文档&lt;/a>&lt;/p>
+&lt;h2 id="delta-lake-vs-iceberg">Delta Lake vs Iceberg&lt;/h2></description></item></channel></rss>

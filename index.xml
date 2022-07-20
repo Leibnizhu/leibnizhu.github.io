@@ -111,13 +111,77 @@ data-flex-basis="207px"
 &lt;/li>
 &lt;/ul>
 &lt;p>后面是具体的存储格式和访问协议，篇幅太长，不展开了。&lt;/p>
-&lt;h3 id="基本概念与使用">基本概念与使用&lt;/h3>
+&lt;h3 id="deltalake基本概念与使用">DeltaLake基本概念与使用&lt;/h3>
 &lt;p>&lt;a class="link" href="https://docs.delta.io/latest/delta-intro.html" target="_blank" rel="noopener"
 >官方文档&lt;/a>&lt;/p>
+&lt;p>注意到上文所说的事务日志放在对象存储的同一位置，就是在表的目录下，有个 &lt;code>_delta_log&lt;/code> 子目录，一个版本对应里面一个json，记录了事务操作，Time Travel显然也是基于此。&lt;/p>
 &lt;h2 id="iceberg">Iceberg&lt;/h2>
+&lt;h3 id="设计理念">设计理念&lt;/h3>
 &lt;p>Meetup视频： &lt;a class="link" href="https://www.youtube.com/watch?v=N4gAi_zpN88" target="_blank" rel="noopener"
 >Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers&lt;/a>，也可以看 &lt;a class="link" href="https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/" target="_blank" rel="noopener"
 >演讲稿&lt;/a>。&lt;/p>
+&lt;h4 id="table-format">Table Format?&lt;/h4>
+&lt;blockquote>
+&lt;p>A good way to define a table format is a way to organize a dataset’s files to present them as a single “table”.&lt;br/>
+Another somewhat simpler definition from a user’s perspective is a way to answer the question “what data is in this table?”.&lt;br/>
+A single answer to that question allows multiple people, groups, and tools to interact with data in the table at the same time, whether they’re writing to the table or reading from the table.&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;code>Table Format&lt;/code> 是表的抽象，将数据集文件组合起来，以单个“表”的形式呈现，允许人和工具与表数据高效交互。&lt;/p>
+&lt;h4 id="table-format简史">Table Format简史&lt;/h4>
+&lt;p>&lt;strong>Hadoop刀耕火种&lt;/strong>：直撸HDFS，用户必须清楚如何将问题转化为MR模型并用java编码，数据也没有schema，用户必须熟知他处理的文件的实际schema。&lt;/p>
+&lt;p>&lt;strong>Hive&lt;/strong>：针对Hadoop第一个问题，用SQL替代之；针对Hadoop第二个问题，用metastore记录schema。Hive从此成为了事实上的Table Format标准。Hive的Table Format我们比较熟知，就不细述了，更多优点也不说了，看视频有。说下缺点：&lt;/p>
+&lt;ul>
+&lt;li>修改数据太低效，尤其分区很大，修改里面的少量数据、或频繁更改&lt;/li>
+&lt;li>无法安全地更改多个分区的数据，Hive只保证单个分区的事务一致性&lt;/li>
+&lt;li>在实际操作中，多个作业同时修改一个数据集是不安全的&lt;/li>
+&lt;li>对于大型表，即便只是列出所有目录也要耗费很多时间&lt;/li>
+&lt;li>为了利用分区优化查询，用户必须知道物理的分区布局（比如按年、月、日分区）&lt;/li>
+&lt;li>Hive表的统计信息往往是过时的，可能导致优化器选择效率低的计划&lt;/li>
+&lt;li>在云存储中性能不佳。Hive表一个分区中的所有数据都具有相同的目录前缀，利用不到云存储不同前缀的分流&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Iceberg&lt;/strong>：Netflix发现，解决Hive Table Format问题的关键是放弃在文件夹级别跟踪表数据，改为在文件级别跟踪。修改之后，还能做到：&lt;/p>
+&lt;ul>
+&lt;li>保证表视图的正确性和一致性&lt;/li>
+&lt;li>实现更快的查询计划和执行&lt;/li>
+&lt;li>用户无需了解数据的物理布局（如分区）&lt;/li>
+&lt;li>实现更好、更安全的表进化（table evolution，即表schema变更）&lt;/li>
+&lt;/ul>
+&lt;h4 id="what-is-iceberg">What is Iceberg&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>✅ Iceberg 是……&lt;/th>
+&lt;th>❌ Iceberg不是……&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Table Format定义&lt;/td>
+&lt;td>存储引擎&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>遵循Iceberg Table Format定义与表进行交互的一套API及库&lt;/td>
+&lt;td>执行引擎&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>一套服务&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="iceberg-table-format">Iceberg Table Format&lt;/h4>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1.png"
+width="1230"
+height="1282"
+srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1_hu60d45ae1d07beb91112bb0d0d565fdfb_134710_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1_hu60d45ae1d07beb91112bb0d0d565fdfb_134710_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="95"
+data-flex-basis="230px"
+>&lt;/p>
+&lt;h3 id="iceberg基本概念与使用">Iceberg基本概念与使用&lt;/h3>
+&lt;p>&lt;a class="link" href="https://iceberg.apache.org/spark-quickstart/" target="_blank" rel="noopener"
+>官方文档&lt;/a>&lt;/p>
 &lt;h2 id="delta-lake-vs-iceberg">Delta Lake vs Iceberg&lt;/h2></description></item><item><title>Quarkus服务接入Skywalking链路跟踪</title><link>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</link><pubDate>Mon, 18 Jul 2022 12:58:35 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/bus.jpg" alt="Featured image of post Quarkus服务接入Skywalking链路跟踪" />&lt;h2 id="quarkus对可观测性的支持情况">Quarkus对可观测性的支持情况&lt;/h2>
 &lt;p>Quarkus在可观测性方面支持了 &lt;a class="link" href="https://opentracing.io/" target="_blank" rel="noopener"
 >OpenTracing&lt;/a> 和 &lt;a class="link" href="https://opentelemetry.io/" target="_blank" rel="noopener"
