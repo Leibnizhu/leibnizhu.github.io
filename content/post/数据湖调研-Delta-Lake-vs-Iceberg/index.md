@@ -1,7 +1,6 @@
 ---
 title: "数据湖调研：Delta Lake vs Iceberg"
 date: 2022-07-20T10:03:41+08:00
-draft: true
 ---
 
 ## Delta Lake
@@ -35,7 +34,7 @@ LakeHouse是Databricks提出的一种将在未来几年取代传统数仓结构�
 
  **元数据层**：
 
-LakeHouse设计理念是使用标准文件格式以低成本存储，在存储的顶层设计实现传统的元数据层，可提高抽象级别、实现ACID事务、版本控制等特性。DeltaLake _以Parquet格式在数据湖本身的存储上存放事务日志_ ，可以存储哪些对象属于表的信息：
+LakeHouse设计理念是使用标准文件格式以低成本存储，在存储的顶层设计实现传统的元数据层，可提高抽象级别、实现ACID事务、版本控制等特性。DeltaLake _**以Parquet格式在数据湖本身的存储上存放事务日志**_ ，可以存储哪些对象属于表的信息：
 
 - 实践证明这套设计在性能类似或更优于原始Parquet/ORC的同时，提供了事务等管理功能
 - 元数据层同时可以保证数据质量，如强制schema（schema enforcement）可以保障新增数据必须匹配已有schema，并提供了API允许配置数据约束（如某列数据需要满足枚举要求）。
@@ -87,12 +86,24 @@ Delta Lake应运而生，它是一个云对象存储上的ACID表存储层。核
 
 ![](deltalake1.png)
 
+**旧世界的桎梏**：
+
+- 对象存储API：云对象存储的API太慢太麻烦云云
+- 一致性保证：云对象存储为每个键提供了最终的一致性，并且没有跨键的一致性保证；对现有对象的更新可能不会立即对其他客户端可见
+- 性能问题
+- 目前有三种表存储方式：
+  - 文件目录：将表存储为对象的集合，基于一个或多个属性将记录“分区”到目录中。比如Hive。主要问题是存在性能和一致性问题
+  - 自定义存储引擎：在一个单独的、高度一致的服务中管理元数据本身。比如Snowflake。需要运行一个高可用性的服务来管理元数据，这可能很开销很大；而且表的所有I/O操作都需要联系元数据服务，这会增加其资源成本，降低性能和可用性；现有计算引擎的连接器需要更多的开发对接工作。
+  - 噔噔瞪瞪，_**对象存储中的元数据**_ ：DeltaLake将事务日志和元数据直接存储在云对象存储中，并在对象存储操作上使用一组协议来实现序列化
+
+后面是具体的存储格式和访问协议，篇幅太长，不展开了。
+
 ### 基本概念与使用
 
 [官方文档](https://docs.delta.io/latest/delta-intro.html)
  
 ## Iceberg
 
-[Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers](https://www.youtube.com/watch?v=N4gAi_zpN88)
+Meetup视频： [Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers](https://www.youtube.com/watch?v=N4gAi_zpN88)，也可以看 [演讲稿](https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/)。
 
 ## Delta Lake vs Iceberg
