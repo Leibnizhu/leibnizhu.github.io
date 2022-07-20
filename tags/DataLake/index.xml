@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataLake on Heaven's Door</title><link>https://leibnizhu.github.io/tags/DataLake/</link><description>Recent content in DataLake on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 20 Jul 2022 10:03:41 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/DataLake/index.xml" rel="self" type="application/rss+xml"/><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataLake on Heaven's Door</title><link>https://leibnizhu.github.io/tags/DataLake/</link><description>Recent content in DataLake on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 20 Jul 2022 10:03:41 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/DataLake/index.xml" rel="self" type="application/rss+xml"/><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
 &lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
 &lt;h3 id="lakehouse论文">Lakehouse论文&lt;/h3>
 &lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"
@@ -110,7 +110,7 @@ data-flex-basis="207px"
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
-&lt;p>后面是具体的存储格式和访问协议，篇幅太长，不展开了。&lt;/p>
+&lt;p>后面是具体的存储格式和访问协议，篇幅太长，不展开了。后面再补吧。&lt;/p>
 &lt;h3 id="deltalake基本概念与使用">DeltaLake基本概念与使用&lt;/h3>
 &lt;p>&lt;a class="link" href="https://docs.delta.io/latest/delta-intro.html" target="_blank" rel="noopener"
 >官方文档&lt;/a>&lt;/p>
@@ -170,6 +170,7 @@ A single answer to that question allows multiple people, groups, and tools to in
 &lt;/tbody>
 &lt;/table>
 &lt;h4 id="iceberg-table-format">Iceberg Table Format&lt;/h4>
+&lt;p>&lt;strong>架构&lt;/strong>：&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1.png"
 width="1230"
 height="1282"
@@ -179,7 +180,25 @@ class="gallery-image"
 data-flex-grow="95"
 data-flex-basis="230px"
 >&lt;/p>
-&lt;h3 id="iceberg基本概念与使用">Iceberg基本概念与使用&lt;/h3>
+&lt;p>分了三层：&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>Iceberg catalog&lt;/code> ：记录各个表当前元数据指针的位置。&lt;code>Iceberg catalog&lt;/code> 要求元数据指针的实现支持原子性的更新操作。实际的存储方式取决于具体使用的存储：
+&lt;ol>
+&lt;li>HDFS：元数据文件夹中有一个名为 &lt;code>version-hint.text&lt;/code> 的文件，其内容是当前元数据文件的版本号&lt;/li>
+&lt;li>Hive metastore：metastore的表对象用表属性记录当前元数据文件的位置&lt;/li>
+&lt;li>Nessie：Nessie保存了当前元数据文件的位置&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;code>metadata layer&lt;/code>，具体又包括：
+&lt;ol>
+&lt;li>&lt;code>metadata file&lt;/code>：存储表的元信息，包括表的schema、分区信息、所有快照信息、及当前快照等等,json格式。查询过程：按 &lt;code>current-snapshot-id&lt;/code> 在 &lt;code>snapshots&lt;/code> 找到对应快照，读取其 &lt;code>manifest-list&lt;/code> 属性，打开 &lt;code>manifest lists&lt;/code>。&lt;/li>
+&lt;li>&lt;code>manifest list&lt;/code>：&lt;code>manifest files&lt;/code> 的列表，每一行是构成该快照的一个 &lt;code>manifest file&lt;/code> 的信息，包括 &lt;code>manifest file&lt;/code> 位置、所属分区、分区列的最大最小值等。查询时可以在此阶段进行一些优化，例如使用行计数或使用分区信息过滤数据。&lt;/li>
+&lt;li>&lt;code>manifest file&lt;/code>：记录数据文件以及有关每个文件的其他详细信息和统计信息，可用于优化查询，而且这些信息是在写入操作期间更新的，比Hive记录的统计信息的更准确、更新。Iceberg 与文件格式无关，因此清单文件还指定了数据文件的文件格式，例如 Parquet、ORC 或 Avro&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;code>data layer&lt;/code> ：实际存储的文件&lt;/li>
+&lt;/ol>
+&lt;h3 id="iceberg基本使用">Iceberg基本使用&lt;/h3>
 &lt;p>&lt;a class="link" href="https://iceberg.apache.org/spark-quickstart/" target="_blank" rel="noopener"
 >官方文档&lt;/a>&lt;/p>
 &lt;h2 id="delta-lake-vs-iceberg">Delta Lake vs Iceberg&lt;/h2></description></item></channel></rss>
