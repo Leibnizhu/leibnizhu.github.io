@@ -7,6 +7,7 @@ tags:
 - IceBerg
 - DataLake
 - 数据湖
+image: magician.jpg
 ---
 
 ## Delta Lake
@@ -102,7 +103,7 @@ Delta Lake应运而生，它是一个云对象存储上的ACID表存储层。核
   - 自定义存储引擎：在一个单独的、高度一致的服务中管理元数据本身。比如Snowflake。需要运行一个高可用性的服务来管理元数据，这可能很开销很大；而且表的所有I/O操作都需要联系元数据服务，这会增加其资源成本，降低性能和可用性；现有计算引擎的连接器需要更多的开发对接工作。
   - 噔噔瞪瞪，_**对象存储中的元数据**_ ：DeltaLake将事务日志和元数据直接存储在云对象存储中，并在对象存储操作上使用一组协议来实现序列化
 
-后面是具体的存储格式和访问协议，篇幅太长，不展开了。
+后面是具体的存储格式和访问协议，篇幅太长，不展开了。后面再补吧。
 
 ### DeltaLake基本概念与使用
 
@@ -155,9 +156,23 @@ Meetup视频： [Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectu
 
 #### Iceberg Table Format
 
+**架构**：
+
 ![](iceberg1.png)
 
-### Iceberg基本概念与使用
+分了三层：
+
+1. `Iceberg catalog` ：记录各个表当前元数据指针的位置。`Iceberg catalog` 要求元数据指针的实现支持原子性的更新操作。实际的存储方式取决于具体使用的存储：
+    1. HDFS：元数据文件夹中有一个名为 `version-hint.text` 的文件，其内容是当前元数据文件的版本号
+    2. Hive metastore：metastore的表对象用表属性记录当前元数据文件的位置
+    3. Nessie：Nessie保存了当前元数据文件的位置
+2. `metadata layer`，具体又包括：
+    1. `metadata file`：存储表的元信息，包括表的schema、分区信息、所有快照信息、及当前快照等等,json格式。查询过程：按 `current-snapshot-id` 在 `snapshots` 找到对应快照，读取其 `manifest-list` 属性，打开 `manifest lists`。
+    2. `manifest list`：`manifest files` 的列表，每一行是构成该快照的一个 `manifest file` 的信息，包括 `manifest file` 位置、所属分区、分区列的最大最小值等。查询时可以在此阶段进行一些优化，例如使用行计数或使用分区信息过滤数据。
+    3. `manifest file`：记录数据文件以及有关每个文件的其他详细信息和统计信息，可用于优化查询，而且这些信息是在写入操作期间更新的，比Hive记录的统计信息的更准确、更新。Iceberg 与文件格式无关，因此清单文件还指定了数据文件的文件格式，例如 Parquet、ORC 或 Avro
+3. `data layer` ：实际存储的文件
+
+### Iceberg基本使用
 
 [官方文档](https://iceberg.apache.org/spark-quickstart/)
 
