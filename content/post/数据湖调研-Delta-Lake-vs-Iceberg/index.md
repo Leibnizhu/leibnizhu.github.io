@@ -51,7 +51,7 @@ LakeHouse设计理念是使用标准文件格式以低成本存储，在存储�
 
 - 缓存：热数据缓存到更快的存储设备，如SSD、RAM
 - 辅助数据：Lakehouse虽然使用了公开的文件格式（Parquet/ORC），但可以通过辅助数据帮助优化查询速度，如构建索引、维护统计信息。DeltaLake在上面提到的事务日志中维护列的最大最小值信息，方便查询时跳过；并实现了基于布龙过滤器的索引
-- 数据布局优化：在Parquet格式不变的基础上，还是有优化空间，如记录排序，让数据聚拢便于读取。DeltaLake使用Z-order和Hilbert曲线对记录排序。
+- 数据布局优化：在Parquet格式不变的基础上，还是有优化空间，如记录排序，让数据聚拢便于读取。DeltaLake使用Z-order和Hilbert曲线对记录排序以在读取时更好地进行文件修剪。
 
 **针对高级分析的优化**：
 
@@ -216,10 +216,38 @@ Compaction是后台的异步进程，负责将一组小文件合并压缩成少�
 
 ### Iceberg基本使用
 
-目前有 Spark、Flink、Pig、MR等集成
+目前有 Spark、Flink、PrestoDB、Hive、Impala等集成。
 
-[官方文档](https://iceberg.apache.org/spark-quickstart/)
+[Quick Start](https://iceberg.apache.org/spark-quickstart/)
+
+[官方文档](https://iceberg.apache.org/docs/latest/)
 
 [从Hive迁移到Iceberg](https://www.dremio.com/subsurface/migrating-a-hive-table-to-an-iceberg-table-hands-on-tutorial/)
 
 ## Delta Lake vs Iceberg
+
+从上面的介绍可以看出，DeltaLake和Iceberg的着重点不太一样。DataLake着眼于数仓/数据湖的架构优化、对流批一体的支持，而Iceberg站在了更高的抽象级别，定义TableFormat，制定标准和核心API，提供多种实现。另一个值得注意的是DeltaLake跟Spark的绑定，及其社区版与商业版的区别（Databricks拥有自己的Delta Lake 专有分支，该分支具有仅在Databricks平台上可用的功能，Spark也是）。
+
+### 对比表
+
+| |Iceberg|Hudi|Delta Lake|
+|---|---|---|---|
+|ACID事务|√|√|√|
+|分区演进|[分区演进](https://iceberg.apache.org/docs/latest/partitioning/) 支持更改分区方案；<br/>[分区转换](https://iceberg.apache.org/spec/#partition-transforms) 可对时间戳字段以年、月、日、小时粒度隐式分区|× [Generated Columns](https://docs.databricks.com/delta/delta-batch.html#deltausegeneratedcolumns)可以实现类似隐式分区的功能，但目前是Public Preview状态|× [Data Skipping](https://hudi.apache.org/releases/release-0.11.0/#data-skipping-with-metadata-table)可以实现类似隐式分区的功能|
+|Schema演进|增/删/改/重命名/重排列|删/改名/重排只在Spark中支持|2.0.0之前只支持增加列、列重命名、更新列、重排序，[2.0.0](https://github.com/delta-io/delta/releases/tag/v2.0.0)(2022-07-21发布)开始支持删除列|
+|Time-Travel(表版本管理)|√ 通过快照实现|√|√ 每个Delta文件都代表了表对上一版本的更改，[默认保留30天](https://docs.delta.io/latest/delta-batch.html#data-retention)|
+|项目级别|Apache顶级项目|Apache顶级项目|Linux基金会项目（Databricks TSC）|
+|社区活跃度<br/>(截至2022/03/28)| 240贡献者<br/>2241已合并PR<br/>275未关闭PR|252贡献者<br/>2880已合并PR<br/>160未关闭PR|145贡献者<br/>16已合并PR<br/>43未关闭PR|
+|兼容读取的工具|Apache Hive, Dremio Sonar, Apache Flink, Apache Spark, Presto, Trino, Athena, Snowflake, Databricks Spark, Apache Impala, Apache Drill|Apache Hive, Apache Flink, Apache Spark, Presto, Trino, Athena, Databricks Spark, Redshift, Apache Impala, BigQuery|Apache Hive, Dremio Sonar, Apache Flink, Databricks Spark, Apache Spark, Databricks SQL Analytics, Trino, Presto, Snowflake, Redshift, Apache Beam, Athena|
+|兼容写入的工具|Apache Hive, Dremio Sonar, Apache Flink, Apache Spark, Trino, Athena, Databricks Spark, Debezium|Apache Flink, Apache Spark, Databricks Spark, Debezium, Kafka Connect|OSS Delta Lake: Trino, Apache Spark, Databricks Spark Apache Flink, Debezium.Databricks Delta Lake: Databricks Spark, Kafka Connect|
+|文件格式支持|Parquet<br/>ORC<br/>Avro|Parquet<br/>ORC|Parquet|
+
+#### 社区活跃度
+
+![社区活跃度](community1.jpeg)
+
+此外值得注意的是，DeltaLake有81%的提交来自Databricks自己，而Iceberg的提交前5名提交是：Netfix 18.7%，Apple 17.1%，AWS 10.4%，Tabular 8.3%,Dremio 5.5%。
+
+另外，整个DeltaLake项目，无论是对Issue的反应处理/回答、提PR、[RoadMap](https://github.com/delta-io/delta/issues/920) 的Issue，基本都是Databrick的员工，因此，DeltaLake相对而言没那么开放，不那么社区驱动：
+
+![提交比例](community2.png)
