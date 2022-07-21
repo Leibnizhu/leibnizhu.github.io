@@ -23,6 +23,7 @@ width="2100"
 height="836"
 srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse1_hua80d5848797b05fbcec254ae3a94cf3f_794557_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse1_hua80d5848797b05fbcec254ae3a94cf3f_794557_1024x0_resize_box_3.png 1024w"
 loading="lazy"
+alt="三代数仓/数据湖结构对比"
 class="gallery-image"
 data-flex-grow="251"
 data-flex-basis="602px"
@@ -48,16 +49,18 @@ width="1046"
 height="788"
 srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse2_hu29e2705cbf93e41a5d284ca61a497d45_214685_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse2_hu29e2705cbf93e41a5d284ca61a497d45_214685_1024x0_resize_box_3.png 1024w"
 loading="lazy"
+alt="DataFrame API在DeltaLake的位置"
 class="gallery-image"
 data-flex-grow="132"
 data-flex-basis="318px"
 >&lt;/p>
-&lt;p>下图是Spark MLlib中执行声明式的DataFrame API。用户的DataFrame调用是lazy的，执行时Spark引擎获取执行计划，传给DeltaLake的库，后者读取元数据层，优化查询执行。&lt;/p>
+&lt;p>下图是Spark MLlib中执行声明式的DataFrame API。用户的DataFrame调用是lazy的，执行时Spark引擎获取执行计划，传给DeltaLake的库，后者读取元数据层，根据缓存、索引、统计信息等进行优化查询，最后执行。&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse3.png"
 width="1030"
 height="568"
 srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse3_hu9da49551a80d03814825ede3c8f48533_95914_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/lakehouse3_hu9da49551a80d03814825ede3c8f48533_95914_1024x0_resize_box_3.png 1024w"
 loading="lazy"
+alt="DeltaLake的DataFrame查询优化"
 class="gallery-image"
 data-flex-grow="181"
 data-flex-basis="435px"
@@ -93,6 +96,7 @@ width="1008"
 height="1166"
 srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/deltalake1_hu4e9ebd4c418f2361977445627d1a6903_285704_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/deltalake1_hu4e9ebd4c418f2361977445627d1a6903_285704_1024x0_resize_box_3.png 1024w"
 loading="lazy"
+alt="使用DeltaLake的例子"
 class="gallery-image"
 data-flex-grow="86"
 data-flex-basis="207px"
@@ -120,6 +124,29 @@ data-flex-basis="207px"
 &lt;p>Meetup视频： &lt;a class="link" href="https://www.youtube.com/watch?v=N4gAi_zpN88" target="_blank" rel="noopener"
 >Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers&lt;/a>，也可以看 &lt;a class="link" href="https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/" target="_blank" rel="noopener"
 >演讲稿&lt;/a>。&lt;/p>
+&lt;h4 id="what-is-iceberg">What is Iceberg&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>✅ Iceberg 是……&lt;/th>
+&lt;th>❌ Iceberg不是……&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Table Format定义&lt;/td>
+&lt;td>存储引擎&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>遵循Iceberg Table Format定义与表进行交互的一套API及库&lt;/td>
+&lt;td>执行引擎&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>一套服务&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
 &lt;h4 id="table-format">Table Format?&lt;/h4>
 &lt;blockquote>
 &lt;p>A good way to define a table format is a way to organize a dataset’s files to present them as a single “table”.&lt;br/>
@@ -146,36 +173,14 @@ A single answer to that question allows multiple people, groups, and tools to in
 &lt;li>用户无需了解数据的物理布局（如分区）&lt;/li>
 &lt;li>实现更好、更安全的表进化（table evolution，即表schema变更）&lt;/li>
 &lt;/ul>
-&lt;h4 id="what-is-iceberg">What is Iceberg&lt;/h4>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>✅ Iceberg 是……&lt;/th>
-&lt;th>❌ Iceberg不是……&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>Table Format定义&lt;/td>
-&lt;td>存储引擎&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>遵循Iceberg Table Format定义与表进行交互的一套API及库&lt;/td>
-&lt;td>执行引擎&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;/td>
-&lt;td>一套服务&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h4 id="iceberg-table-format">Iceberg Table Format&lt;/h4>
-&lt;p>&lt;strong>架构&lt;/strong>：&lt;/p>
+&lt;h4 id="iceberg-table-format定义">Iceberg Table Format定义&lt;/h4>
+&lt;p>&lt;strong>Iceberg Table Format架构&lt;/strong>：&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1.png"
 width="1230"
 height="1282"
 srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1_hu60d45ae1d07beb91112bb0d0d565fdfb_134710_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1_hu60d45ae1d07beb91112bb0d0d565fdfb_134710_1024x0_resize_box_3.png 1024w"
 loading="lazy"
+alt="Iceberg Table Format架构"
 class="gallery-image"
 data-flex-grow="95"
 data-flex-basis="230px"
@@ -198,9 +203,59 @@ data-flex-basis="230px"
 &lt;/li>
 &lt;li>&lt;code>data layer&lt;/code> ：实际存储的文件&lt;/li>
 &lt;/ol>
+&lt;p>日常表操作在Iceberg Table Format中的体现：&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>CREATE TABLE xxx&lt;/code>：创建metadata file，里面有快照s0（但不指向任何manifest list），表的当前元数据指针指向该metadata file&lt;/li>
+&lt;li>&lt;code>INSERT INTO xxx&lt;/code>：
+&lt;ol>
+&lt;li>创建数据文件（Parquet或其他格式）&lt;/li>
+&lt;li>创建manifest file，指向该数据文件&lt;/li>
+&lt;li>创建manifest list，指向该manifest file&lt;/li>
+&lt;li>创建新的metadata file，带有快照s1和s0，&lt;code>current-snapshot-id&lt;/code> 是s1&lt;/li>
+&lt;li>表的当前元数据指针指向新的metadata file&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;code>MERGE INTO xxx USING ... ON ... WHEN MATCHED THEN UPDATE ... WHEN NOT MATCHED THEN INSERT...&lt;/code>：upsert的操作，步骤比较多：
+&lt;ol>
+&lt;li>找出满足 &lt;code>USING ... ON ...&lt;/code> 条件的数据，读取查询引擎，执行 &lt;code>UPDATE&lt;/code> 子句的更新，写入新的数据文件（不满足条件的也写入了，也就是 &lt;code>copy-on-write&lt;/code> 策略；此外还有&lt;code>merge-on-read&lt;/code> 策略）&lt;/li>
+&lt;li>读取不满足 &lt;code>ON&lt;/code> 条件的外部表数据，写入另一个数据文件&lt;/li>
+&lt;li>创建manifest file，指向新建的两个数据文件&lt;/li>
+&lt;li>创建manifest list，指向该manifest file&lt;/li>
+&lt;li>创建新的metadata file，带有快照s2、s1和s0，&lt;code>current-snapshot-id&lt;/code> 是s2&lt;/li>
+&lt;li>表的当前元数据指针指向新的metadata file&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;code>SELECT * FROM xxx&lt;/code>：
+&lt;ol>
+&lt;li>查询Iceberg catalog，获取表的当前云数据指针&lt;/li>
+&lt;li>读取当前元数据指针指向的metadata file，获取当前快照的manifest list地址&lt;/li>
+&lt;li>读取manifest list，获取manifest file地址&lt;/li>
+&lt;li>读取manifest file，获取所有数据文件的地址&lt;/li>
+&lt;li>读取所有数据文件、返回&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;strong>隐式分区查询&lt;/strong> ：前面说到的，Hive的分区查询经常需要用户熟知分区物理布局，Iceberg对此进行了优化，实际操作是：a)读取 &lt;code>metadata file&lt;/code>，获取要查询的snapshot的分区信息（有哪些字段，当前查询的是否包含在内），b)读取 &lt;code>manifest file&lt;/code>，读取里面记录的所有数据文件的分区字段信息，与用户的查询条件做对比，找出要读取的数据文件，c)最后只读取这些数据文件&lt;/li>
+&lt;li>&lt;strong>Time Travel&lt;/strong>：其实就是表级版本控制，语法是 &lt;code>SELECT * FROM xxx AS OF '日期'&lt;/code>，实际操作是：打开当前 &lt;code>metadata file&lt;/code>，在 &lt;code>snapshots&lt;/code> 数组查找满足查询版本日期的snapshot，后面就是正常流程（&lt;code>manifest list&lt;/code> -&amp;gt; &lt;code>manifest file&lt;/code> -&amp;gt; 数据文件）。&lt;/li>
+&lt;/ol>
+&lt;p>注意 &lt;strong>Time Travel&lt;/strong>，Iceberg保留了旧版本的数据，也提供了异步后台进程去清理这些旧snapshot（垃圾回收GC）。用户可以配置GC策略，这里就是存储空间的衡量了。&lt;/p>
+&lt;h4 id="小文件压缩compaction">小文件压缩（Compaction）&lt;/h4>
+&lt;p>Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。压缩操作的输入输出可以是不同的文件格式。&lt;/p>
+&lt;p>但Iceberg只是提供了File Format及其API和库，实际的Compaction操作由集成了Iceberg的其他工具/引擎负责调度、执行。&lt;/p>
+&lt;h4 id="iceberg-table-format优势">Iceberg Table Format优势&lt;/h4>
+&lt;ul>
+&lt;li>事务的快照隔离：乐观锁&lt;/li>
+&lt;li>更快的执行计划和执行速度：写入数据时更新统计信息、文件级跟踪统计信息&lt;/li>
+&lt;li>对物理布局做抽象，对用户暴露逻辑视图&lt;/li>
+&lt;li>所有引擎都能立即看到变化：写入时更新&lt;/li>
+&lt;li>事件监听器：允许在Iceberg表上发生事件时通知其他服务&lt;/li>
+&lt;li>有效地对数据集进行较小的更新：文件级别跟踪数据&lt;/li>
+&lt;/ul>
 &lt;h3 id="iceberg基本使用">Iceberg基本使用&lt;/h3>
+&lt;p>目前有 Spark、Flink、Pig、MR等集成&lt;/p>
 &lt;p>&lt;a class="link" href="https://iceberg.apache.org/spark-quickstart/" target="_blank" rel="noopener"
 >官方文档&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://www.dremio.com/subsurface/migrating-a-hive-table-to-an-iceberg-table-hands-on-tutorial/" target="_blank" rel="noopener"
+>从Hive迁移到Iceberg&lt;/a>&lt;/p>
 &lt;h2 id="delta-lake-vs-iceberg">Delta Lake vs Iceberg&lt;/h2></description></item><item><title>Quarkus服务接入Skywalking链路跟踪</title><link>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</link><pubDate>Mon, 18 Jul 2022 12:58:35 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/bus.jpg" alt="Featured image of post Quarkus服务接入Skywalking链路跟踪" />&lt;h2 id="quarkus对可观测性的支持情况">Quarkus对可观测性的支持情况&lt;/h2>
 &lt;p>Quarkus在可观测性方面支持了 &lt;a class="link" href="https://opentracing.io/" target="_blank" rel="noopener"
 >OpenTracing&lt;/a> 和 &lt;a class="link" href="https://opentelemetry.io/" target="_blank" rel="noopener"
