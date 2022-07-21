@@ -199,9 +199,9 @@ Meetup视频： [Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectu
 
 注意 **Time Travel**，Iceberg保留了旧版本的数据，也提供了异步后台进程去清理这些旧snapshot（垃圾回收GC）。用户可以配置GC策略，这里就是存储空间的衡量了。
 
-#### 小文件压缩（Compaction）
+#### 小文件合并（Compaction）
 
-Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。压缩操作的输入输出可以是不同的文件格式。
+Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。合并操作的输入输出可以是不同的文件格式。
 
 但Iceberg只是提供了File Format及其API和库，实际的Compaction操作由集成了Iceberg的其他工具/引擎负责调度、执行。
 
@@ -226,7 +226,14 @@ Compaction是后台的异步进程，负责将一组小文件合并压缩成少�
 
 ## Delta Lake vs Iceberg
 
-从上面的介绍可以看出，DeltaLake和Iceberg的着重点不太一样。DataLake着眼于数仓/数据湖的架构优化、对流批一体的支持，而Iceberg站在了更高的抽象级别，定义TableFormat，制定标准和核心API，提供多种实现。另一个值得注意的是DeltaLake跟Spark的绑定，及其社区版与商业版的区别（Databricks拥有自己的Delta Lake 专有分支，该分支具有仅在Databricks平台上可用的功能，Spark也是）。
+### 解决的痛点
+
+从上面的介绍可以看出，DeltaLake和Iceberg的着重点不太一样。DataLake着眼于数仓/数据湖的架构优化、对流批一体的支持，而Iceberg站在了更高的抽象级别，定义TableFormat，制定标准和核心API，提供多种实现。
+
+|DeltaLake|Iceberg|
+|--|--|
+|• 快速upsert/delete数据<br/>• Schema限制<br/>• ACID事务<br/>• 多版本控制<br/>• 小文件Compaction<br/>• 支持流批读写|• ACID事务<br/>• 多版本控制<br/>• 抽象、通用、优雅<br/>• 灵活的元数据管理<br/>• 元数据性能(文件粒度跟踪)<br/>• 隐式分区、分区演进|
+
 
 ### 对比表
 
@@ -242,7 +249,7 @@ Compaction是后台的异步进程，负责将一组小文件合并压缩成少�
 |兼容写入的工具|Apache Hive, Dremio Sonar, Apache Flink, Apache Spark, Trino, Athena, Databricks Spark, Debezium|Apache Flink, Apache Spark, Databricks Spark, Debezium, Kafka Connect|OSS Delta Lake: Trino, Apache Spark, Databricks Spark Apache Flink, Debezium.Databricks Delta Lake: Databricks Spark, Kafka Connect|
 |文件格式支持|Parquet<br/>ORC<br/>Avro|Parquet<br/>ORC|Parquet|
 
-#### 社区活跃度
+### 社区活跃度
 
 ![社区活跃度](community1.jpeg)
 
@@ -251,3 +258,5 @@ Compaction是后台的异步进程，负责将一组小文件合并压缩成少�
 另外，整个DeltaLake项目，无论是对Issue的反应处理/回答、提PR、[RoadMap](https://github.com/delta-io/delta/issues/920) 的Issue，基本都是Databrick的员工，因此，DeltaLake相对而言没那么开放，不那么社区驱动：
 
 ![提交比例](community2.png)
+
+另一个值得注意的是DeltaLake跟Spark的绑定，及其社区版与商业版的区别（Databricks拥有自己的Delta Lake 专有分支，该分支具有仅在Databricks平台上可用的功能，Spark也是）。
