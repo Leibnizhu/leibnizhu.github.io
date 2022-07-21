@@ -238,8 +238,8 @@ data-flex-basis="230px"
 &lt;li>&lt;strong>Time Travel&lt;/strong>：其实就是表级版本控制，语法是 &lt;code>SELECT * FROM xxx AS OF '日期'&lt;/code>，实际操作是：打开当前 &lt;code>metadata file&lt;/code>，在 &lt;code>snapshots&lt;/code> 数组查找满足查询版本日期的snapshot，后面就是正常流程（&lt;code>manifest list&lt;/code> -&amp;gt; &lt;code>manifest file&lt;/code> -&amp;gt; 数据文件）。&lt;/li>
 &lt;/ol>
 &lt;p>注意 &lt;strong>Time Travel&lt;/strong>，Iceberg保留了旧版本的数据，也提供了异步后台进程去清理这些旧snapshot（垃圾回收GC）。用户可以配置GC策略，这里就是存储空间的衡量了。&lt;/p>
-&lt;h4 id="小文件压缩compaction">小文件压缩（Compaction）&lt;/h4>
-&lt;p>Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。压缩操作的输入输出可以是不同的文件格式。&lt;/p>
+&lt;h4 id="小文件合并compaction">小文件合并（Compaction）&lt;/h4>
+&lt;p>Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。合并操作的输入输出可以是不同的文件格式。&lt;/p>
 &lt;p>但Iceberg只是提供了File Format及其API和库，实际的Compaction操作由集成了Iceberg的其他工具/引擎负责调度、执行。&lt;/p>
 &lt;h4 id="iceberg-table-format优势">Iceberg Table Format优势&lt;/h4>
 &lt;ul>
@@ -259,7 +259,22 @@ data-flex-basis="230px"
 &lt;p>&lt;a class="link" href="https://www.dremio.com/subsurface/migrating-a-hive-table-to-an-iceberg-table-hands-on-tutorial/" target="_blank" rel="noopener"
 >从Hive迁移到Iceberg&lt;/a>&lt;/p>
 &lt;h2 id="delta-lake-vs-iceberg">Delta Lake vs Iceberg&lt;/h2>
-&lt;p>从上面的介绍可以看出，DeltaLake和Iceberg的着重点不太一样。DataLake着眼于数仓/数据湖的架构优化、对流批一体的支持，而Iceberg站在了更高的抽象级别，定义TableFormat，制定标准和核心API，提供多种实现。另一个值得注意的是DeltaLake跟Spark的绑定，及其社区版与商业版的区别（Databricks拥有自己的Delta Lake 专有分支，该分支具有仅在Databricks平台上可用的功能，Spark也是）。&lt;/p>
+&lt;h3 id="解决的痛点">解决的痛点&lt;/h3>
+&lt;p>从上面的介绍可以看出，DeltaLake和Iceberg的着重点不太一样。DataLake着眼于数仓/数据湖的架构优化、对流批一体的支持，而Iceberg站在了更高的抽象级别，定义TableFormat，制定标准和核心API，提供多种实现。&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>DeltaLake&lt;/th>
+&lt;th>Iceberg&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>• 快速upsert/delete数据&lt;br/>• Schema限制&lt;br/>• ACID事务&lt;br/>• 多版本控制&lt;br/>• 小文件Compaction&lt;br/>• 支持流批读写&lt;/td>
+&lt;td>• ACID事务&lt;br/>• 多版本控制&lt;br/>• 抽象、通用、优雅&lt;br/>• 灵活的元数据管理&lt;br/>• 元数据性能(文件粒度跟踪)&lt;br/>• 隐式分区、分区演进&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
 &lt;h3 id="对比表">对比表&lt;/h3>
 &lt;table>
 &lt;thead>
@@ -333,7 +348,7 @@ data-flex-basis="230px"
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h4 id="社区活跃度">社区活跃度&lt;/h4>
+&lt;h3 id="社区活跃度">社区活跃度&lt;/h3>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/community1.jpeg"
 width="653"
 height="386"
@@ -356,7 +371,8 @@ alt="提交比例"
 class="gallery-image"
 data-flex-grow="285"
 data-flex-basis="685px"
->&lt;/p></description></item><item><title>Quarkus服务接入Skywalking链路跟踪</title><link>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</link><pubDate>Mon, 18 Jul 2022 12:58:35 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/bus.jpg" alt="Featured image of post Quarkus服务接入Skywalking链路跟踪" />&lt;h2 id="quarkus对可观测性的支持情况">Quarkus对可观测性的支持情况&lt;/h2>
+>&lt;/p>
+&lt;p>另一个值得注意的是DeltaLake跟Spark的绑定，及其社区版与商业版的区别（Databricks拥有自己的Delta Lake 专有分支，该分支具有仅在Databricks平台上可用的功能，Spark也是）。&lt;/p></description></item><item><title>Quarkus服务接入Skywalking链路跟踪</title><link>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</link><pubDate>Mon, 18 Jul 2022 12:58:35 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/bus.jpg" alt="Featured image of post Quarkus服务接入Skywalking链路跟踪" />&lt;h2 id="quarkus对可观测性的支持情况">Quarkus对可观测性的支持情况&lt;/h2>
 &lt;p>Quarkus在可观测性方面支持了 &lt;a class="link" href="https://opentracing.io/" target="_blank" rel="noopener"
 >OpenTracing&lt;/a> 和 &lt;a class="link" href="https://opentelemetry.io/" target="_blank" rel="noopener"
 >OpenTelemetry&lt;/a> 。如果要对使用Quarkus开发的服务接入Skywalking做链路跟踪：&lt;/p>
