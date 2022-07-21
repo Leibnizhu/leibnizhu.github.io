@@ -35,7 +35,7 @@ LakeHouse是Databricks提出的一种将在未来几年取代传统数仓结构�
 
 下面是这三代数仓/数据湖结构对比：
 
-![](lakehouse1.png)
+![三代数仓/数据湖结构对比](lakehouse1.png)
 
 下面是LakeHouse架构和实现要点。
 
@@ -57,11 +57,11 @@ LakeHouse设计理念是使用标准文件格式以低成本存储，在存储�
 
 通过声明式的DataFrame API加速高级分析。DataFrame API在DeltaLake的位置：
 
-![](lakehouse2.png)
+![DataFrame API在DeltaLake的位置](lakehouse2.png)
 
-下图是Spark MLlib中执行声明式的DataFrame API。用户的DataFrame调用是lazy的，执行时Spark引擎获取执行计划，传给DeltaLake的库，后者读取元数据层，优化查询执行。
+下图是Spark MLlib中执行声明式的DataFrame API。用户的DataFrame调用是lazy的，执行时Spark引擎获取执行计划，传给DeltaLake的库，后者读取元数据层，根据缓存、索引、统计信息等进行优化查询，最后执行。
 
-![](lakehouse3.png)
+![DeltaLake的DataFrame查询优化](lakehouse3.png)
 
 ### Delta Lake白皮书
 
@@ -91,7 +91,7 @@ Delta Lake应运而生，它是一个云对象存储上的ACID表存储层。核
 
 使用DeltaLake的例子：
 
-![](deltalake1.png)
+![使用DeltaLake的例子](deltalake1.png)
 
 **旧世界的桎梏**：
 
@@ -116,6 +116,14 @@ Delta Lake应运而生，它是一个云对象存储上的ACID表存储层。核
 ### 设计理念
 
 Meetup视频： [Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers](https://www.youtube.com/watch?v=N4gAi_zpN88)，也可以看 [演讲稿](https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/)。
+
+#### What is Iceberg
+
+| ✅ Iceberg 是……                                        | ❌ Iceberg不是…… |
+|-------------------------------------------------------|---------------|
+| Table Format定义                                      | 存储引擎        |
+| 遵循Iceberg Table Format定义与表进行交互的一套API及库 | 执行引擎        |
+|                                                       | 一套服务        |
 
 #### Table Format?
 
@@ -146,19 +154,11 @@ Meetup视频： [Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectu
 - 用户无需了解数据的物理布局（如分区）
 - 实现更好、更安全的表进化（table evolution，即表schema变更）
 
-#### What is Iceberg
+#### Iceberg Table Format定义
 
-| ✅ Iceberg 是……                                        | ❌ Iceberg不是…… |
-|-------------------------------------------------------|---------------|
-| Table Format定义                                      | 存储引擎        |
-| 遵循Iceberg Table Format定义与表进行交互的一套API及库 | 执行引擎        |
-|                                                       | 一套服务        |
+**Iceberg Table Format架构**：
 
-#### Iceberg Table Format
-
-**架构**：
-
-![](iceberg1.png)
+![Iceberg Table Format架构](iceberg1.png)
 
 分了三层：
 
@@ -172,8 +172,54 @@ Meetup视频： [Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectu
     3. `manifest file`：记录数据文件以及有关每个文件的其他详细信息和统计信息，可用于优化查询，而且这些信息是在写入操作期间更新的，比Hive记录的统计信息的更准确、更新。Iceberg 与文件格式无关，因此清单文件还指定了数据文件的文件格式，例如 Parquet、ORC 或 Avro
 3. `data layer` ：实际存储的文件
 
+日常表操作在Iceberg Table Format中的体现：
+
+1. `CREATE TABLE xxx`：创建metadata file，里面有快照s0（但不指向任何manifest list），表的当前元数据指针指向该metadata file
+2. `INSERT INTO xxx`：
+    1. 创建数据文件（Parquet或其他格式）
+    2. 创建manifest file，指向该数据文件
+    3. 创建manifest list，指向该manifest file
+    4. 创建新的metadata file，带有快照s1和s0，`current-snapshot-id` 是s1
+    5. 表的当前元数据指针指向新的metadata file
+3. `MERGE INTO xxx USING ... ON ... WHEN MATCHED THEN UPDATE ... WHEN NOT MATCHED THEN INSERT...`：upsert的操作，步骤比较多：
+    1. 找出满足 `USING ... ON ...` 条件的数据，读取查询引擎，执行 `UPDATE` 子句的更新，写入新的数据文件（不满足条件的也写入了，也就是 `copy-on-write` 策略；此外还有`merge-on-read` 策略）
+    2. 读取不满足 `ON` 条件的外部表数据，写入另一个数据文件
+    3. 创建manifest file，指向新建的两个数据文件
+    4. 创建manifest list，指向该manifest file
+    5. 创建新的metadata file，带有快照s2、s1和s0，`current-snapshot-id` 是s2
+    6. 表的当前元数据指针指向新的metadata file
+4. `SELECT * FROM xxx`：
+    1. 查询Iceberg catalog，获取表的当前云数据指针
+    2. 读取当前元数据指针指向的metadata file，获取当前快照的manifest list地址
+    3. 读取manifest list，获取manifest file地址
+    4. 读取manifest file，获取所有数据文件的地址
+    5. 读取所有数据文件、返回
+5. **隐式分区查询** ：前面说到的，Hive的分区查询经常需要用户熟知分区物理布局，Iceberg对此进行了优化，实际操作是：a)读取 `metadata file`，获取要查询的snapshot的分区信息（有哪些字段，当前查询的是否包含在内），b)读取 `manifest file`，读取里面记录的所有数据文件的分区字段信息，与用户的查询条件做对比，找出要读取的数据文件，c)最后只读取这些数据文件
+6. **Time Travel**：其实就是表级版本控制，语法是 `SELECT * FROM xxx AS OF '日期'`，实际操作是：打开当前 `metadata file`，在 `snapshots` 数组查找满足查询版本日期的snapshot，后面就是正常流程（`manifest list` -> `manifest file` -> 数据文件）。
+
+注意 **Time Travel**，Iceberg保留了旧版本的数据，也提供了异步后台进程去清理这些旧snapshot（垃圾回收GC）。用户可以配置GC策略，这里就是存储空间的衡量了。
+
+#### 小文件压缩（Compaction）
+
+Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。压缩操作的输入输出可以是不同的文件格式。
+
+但Iceberg只是提供了File Format及其API和库，实际的Compaction操作由集成了Iceberg的其他工具/引擎负责调度、执行。
+
+#### Iceberg Table Format优势
+
+- 事务的快照隔离：乐观锁
+- 更快的执行计划和执行速度：写入数据时更新统计信息、文件级跟踪统计信息
+- 对物理布局做抽象，对用户暴露逻辑视图
+- 所有引擎都能立即看到变化：写入时更新
+- 事件监听器：允许在Iceberg表上发生事件时通知其他服务
+- 有效地对数据集进行较小的更新：文件级别跟踪数据
+
 ### Iceberg基本使用
 
+目前有 Spark、Flink、Pig、MR等集成
+
 [官方文档](https://iceberg.apache.org/spark-quickstart/)
+
+[从Hive迁移到Iceberg](https://www.dremio.com/subsurface/migrating-a-hive-table-to-an-iceberg-table-hands-on-tutorial/)
 
 ## Delta Lake vs Iceberg
