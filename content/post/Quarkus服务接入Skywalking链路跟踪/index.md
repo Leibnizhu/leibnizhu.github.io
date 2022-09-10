@@ -43,6 +43,8 @@ Quarkus在可观测性方面支持了 [OpenTracing](https://opentracing.io/) 和
 
 这个我提了 [PR](https://github.com/apache/skywalking-java/pull/265)，已 [合入main分支](https://github.com/apache/skywalking-java/commit/a60a61b83de7d7daed1a4bb1d2953ce1bc3f4fa4)，等8.12.0版本发布就行，或者先下载 [main分支源码](https://github.com/apache/skywalking-java/commits/main)、自行打包用着。
 
+**2022-09-10更新** 8.12.0 版本已经release：[Releases v8.12.0](https://github.com/apache/skywalking-java/releases/tag/v8.12.0)，可直接使用
+
 在实操中，请移除掉 RestEasy 3.x 的插件，以免冲突。如在sidecar中执行：
 
 ```bash
@@ -98,7 +100,7 @@ rm /skywalking/agent/plugins/apm-vertx-core-*
 
 ## 总结
 
-1. RestEasy 4.x 将在Skywalking 8.12.0里面支持，如有需要可提前自行编译
+1. RestEasy 4.x 将在Skywalking 8.12.0里面支持，如有需要可提前自行编译（**2022-09-10更新** 2022-09-03已release）
 2. 放弃EventBus和Redis Client的追踪，下次一定.jpg
 3. sidecar里面记得排除不必要的plugin：
 
