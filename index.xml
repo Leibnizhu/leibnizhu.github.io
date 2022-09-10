@@ -412,6 +412,8 @@ data-flex-basis="685px"
 >PR&lt;/a>，已 &lt;a class="link" href="https://github.com/apache/skywalking-java/commit/a60a61b83de7d7daed1a4bb1d2953ce1bc3f4fa4" target="_blank" rel="noopener"
 >合入main分支&lt;/a>，等8.12.0版本发布就行，或者先下载 &lt;a class="link" href="https://github.com/apache/skywalking-java/commits/main" target="_blank" rel="noopener"
 >main分支源码&lt;/a>、自行打包用着。&lt;/p>
+&lt;p>&lt;strong>2022-09-10更新&lt;/strong> 8.12.0 版本已经release：&lt;a class="link" href="https://github.com/apache/skywalking-java/releases/tag/v8.12.0" target="_blank" rel="noopener"
+>Releases v8.12.0&lt;/a>，可直接使用&lt;/p>
 &lt;p>在实操中，请移除掉 RestEasy 3.x 的插件，以免冲突。如在sidecar中执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>rm /skywalking/agent/plugins/resteasy-server-3.x*
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="hibernate">Hibernate&lt;/h3>
@@ -456,7 +458,7 @@ data-flex-basis="685px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="总结">总结&lt;/h2>
 &lt;ol>
 &lt;li>
-&lt;p>RestEasy 4.x 将在Skywalking 8.12.0里面支持，如有需要可提前自行编译&lt;/p>
+&lt;p>RestEasy 4.x 将在Skywalking 8.12.0里面支持，如有需要可提前自行编译（&lt;strong>2022-09-10更新&lt;/strong> 2022-09-03已release）&lt;/p>
 &lt;/li>
 &lt;li>
 &lt;p>放弃EventBus和Redis Client的追踪，下次一定.jpg&lt;/p>
