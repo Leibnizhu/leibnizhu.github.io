@@ -1,7 +1,6 @@
 ---
 title: "Dagster快速入门"
 date: 2022-08-26T15:21:08+08:00
-draft: true
 ---
 
 ## 环境准备
