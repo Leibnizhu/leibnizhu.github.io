@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 26 Aug 2022 15:21:08 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Dagster快速入门</title><link>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</link><pubDate>Fri, 26 Aug 2022 15:21:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</guid><description>&lt;p>dagster是 &lt;a class="link" href="https://octolis.com/blog/modern-stack-data" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 26 Aug 2022 15:21:08 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Dagster快速入门</title><link>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</link><pubDate>Fri, 26 Aug 2022 15:21:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/thumbnail.jpg" alt="Featured image of post Dagster快速入门" />&lt;p>dagster是 &lt;a class="link" href="https://octolis.com/blog/modern-stack-data" target="_blank" rel="noopener"
 >MDS&lt;/a> 中推荐使用的调度组件。Dagster的官方文档已经挺完善挺人性化的了，但为了公司内推广，还是写一篇快速入门的文档吧。&lt;/p>
 &lt;h2 id="准备工作">准备工作&lt;/h2>
 &lt;h3 id="环境准备">环境准备&lt;/h3>
@@ -98,8 +98,18 @@ DataFrame是定义完了，DataFrame保存到哪里？又是从哪里读的？&l
 &lt;/blockquote>
 &lt;h3 id="io-manager">IO Manager&lt;/h3>
 &lt;p>Asset只定义了数据资产的来源依赖与自身定义，关注的是数据的业务逻辑。&lt;br>
-在传统的ETL工具或工作流工具里，数据的读写和处理逻辑是在同一个任务/工作流里定义的，而在Dagster中，数据的读写和处理逻辑是解耦的，处理逻辑在Asset定义了，而读写在 &lt;strong>IO Manager&lt;/strong> 中定义。&lt;br>
-IO Manager有一些官方的实现，也可以自己实现。&lt;br>
+在传统的ETL工具或工作流工具里，数据的读写和处理逻辑是在同一个任务/工作流里定义的，而在Dagster中，数据的读写和处理逻辑是解耦的，处理逻辑在Asset定义了，而读写在 &lt;strong>IO Manager&lt;/strong> 中定义。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/io-manager.png"
+width="683"
+height="410"
+srcset="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/io-manager_hub795264ee94acdfaa51c31cb7b58fba3_61032_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/io-manager_hub795264ee94acdfaa51c31cb7b58fba3_61032_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="IO Manager"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="399px"
+>&lt;/p>
+&lt;p>IO Manager有一些官方的实现，也可以自己实现。&lt;br>
 具体来说是继承 &lt;code>dagster.IOManager&lt;/code>，实现 &lt;code>handle_output&lt;/code>（数据输出） 和 &lt;code>load_input&lt;/code>（数据读取） 方法。&lt;br>
 而每个Asset使用哪个IO Manager，则是在 &lt;code>@asset&lt;/code> 注解的 &lt;code>io_manager_key&lt;/code> 属性中设置，如：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">MyIOManager&lt;/span>(IOManager):
@@ -122,7 +132,9 @@ IO Manager有一些官方的实现，也可以自己实现。&lt;br>
 >IO Managers&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/io-management/unconnected-inputs" target="_blank" rel="noopener"
 >Unconnected Inputs&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
+&lt;/ul>
+&lt;h3 id="op--graph--job">Op &amp;amp;&amp;amp; Graph &amp;amp;&amp;amp; Job&lt;/h3>
+&lt;p>//TODO&lt;/p></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
 &lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
 &lt;h3 id="lakehouse论文">Lakehouse论文&lt;/h3>
 &lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"
