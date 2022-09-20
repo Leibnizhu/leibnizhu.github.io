@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Heaven's Door</title><link>https://leibnizhu.github.io/</link><description>Recent content on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 26 Aug 2022 15:21:08 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Dagster快速入门</title><link>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</link><pubDate>Fri, 26 Aug 2022 15:21:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</guid><description>&lt;h2 id="环境准备">环境准备&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Heaven's Door</title><link>https://leibnizhu.github.io/</link><description>Recent content on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 26 Aug 2022 15:21:08 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Dagster快速入门</title><link>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</link><pubDate>Fri, 26 Aug 2022 15:21:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</guid><description>&lt;p>dagster是 &lt;a class="link" href="https://octolis.com/blog/modern-stack-data" target="_blank" rel="noopener"
+>MDS&lt;/a> 中推荐使用的调度组件。Dagster的官方文档已经挺完善挺人性化的了，但为了公司内推广，还是写一篇快速入门的文档吧。&lt;/p>
+&lt;h2 id="准备工作">准备工作&lt;/h2>
+&lt;h3 id="环境准备">环境准备&lt;/h3>
 &lt;p>首先，Dagster需要Python环境和pip：&lt;/p>
 &lt;ul>
 &lt;li>&lt;a class="link" href="https://www.python.org/downloads/" target="_blank" rel="noopener"
@@ -7,7 +10,119 @@
 &lt;li>&lt;a class="link" href="https://pip.pypa.io/en/stable/installation/" target="_blank" rel="noopener"
 >pip安装&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;p>TODO&lt;/p></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
+&lt;p>使用pip安装：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>pip install dagster
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="创建第一个项目">创建第一个项目&lt;/h3>
+&lt;p>执行以下命令创建一个简单的dagster项目：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>dagster project scaffold --name my-dagster-project
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>也可以使用官方例子创建项目，请参见： &lt;a class="link" href="https://docs.dagster.io/getting-started/create-new-project" target="_blank" rel="noopener"
+>Create a New Project&lt;/a> 。&lt;/p>
+&lt;p>随后执行以下命令安装依赖：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>cd my-dagster-project
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>pip install -e &lt;span style="color:#48b685">&amp;#34;.[dev]&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>最后执行下述命令启动一个dagster服务：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>dagit
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到控制台打印出类似：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>To persist information across sessions, set the environment variable DAGSTER_HOME to a directory to use.
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>0it &lt;span style="color:#5bc4bf">[&lt;/span>00:00, ?it/s&lt;span style="color:#5bc4bf">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>0it &lt;span style="color:#5bc4bf">[&lt;/span>00:00, ?it/s&lt;span style="color:#5bc4bf">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2022-09-20 15:39:59 +0800 - dagit - INFO - Serving dagit on http://127.0.0.1:3000 in process &lt;span style="color:#f99b15">37014&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即可在浏览器打开 http://127.0.0.1:3000 进入dagster页面。&lt;/p>
+&lt;h2 id="快速理解dagster基本概念">快速理解dagster基本概念&lt;/h2>
+&lt;h3 id="命令">命令&lt;/h3>
+&lt;p>dagster提供了两个命令：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;code>dagster&lt;/code>&lt;/strong>: 核心CLI程序，可以用于执行单个job、查询asset、debug等，具体可通过 &lt;code>dagster -h&lt;/code> 查询。&lt;/li>
+&lt;li>&lt;strong>&lt;code>dagit&lt;/code>&lt;/strong>: dagster的UI服务，前面小节已经使用到了。&lt;/li>
+&lt;/ul>
+&lt;h3 id="asset">Asset&lt;/h3>
+&lt;p>在传统的工作流/DAG调度工具里，我们面向执行的任务编写(代码)/(通过UI)编辑工作流，关注的是一个个任务的流转。&lt;br>
+而这里定义的任务，对于数据处理而言，一般是读取一个数据源，经过处理后，写入另一个数据源。&lt;br>
+我们知道一个任务处理了哪个数据源、输出了什么数据源，只能通过任务命名、或阅读任务的代码/注释/文档。&lt;br>
+如果想知道这些用到的数据源之间的血缘关系，则需要调度工具支持+任务中声明输入输出的数据，或者在任务中调用第三方血缘关系管理的服务。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/task.png"
+width="928"
+height="300"
+srcset="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/task_hu879e739db9db7af54c6a5a2bb86d56e4_34001_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/task_hu879e739db9db7af54c6a5a2bb86d56e4_34001_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="任务视角"
+class="gallery-image"
+data-flex-grow="309"
+data-flex-basis="742px"
+>&lt;/p>
+&lt;p>对于单纯的执行而言，这无疑是直观的。但如果从数仓建设的角度来看，这是很不人性化的：我们只能看到一步步做了什么，不能直观地看到数仓每一层的数据流转、依赖。&lt;/p>
+&lt;p>而 &lt;strong>Dagster&lt;/strong>，提供了调度工作流的另一个视角： &lt;strong>数据资产视角&lt;/strong> ，去审视数仓的数据流，从而声明式定义工作流。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/asset.png"
+width="1090"
+height="304"
+srcset="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/asset_hu8fb7be1c597c1a79d19d3321c2e71cc6_34194_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/asset_hu8fb7be1c597c1a79d19d3321c2e71cc6_34194_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="数据资产视角"
+class="gallery-image"
+data-flex-grow="358"
+data-flex-basis="860px"
+>&lt;/p>
+&lt;p>也就是说，在dagster里面，不再关注需要写什么任务，而是捋清到底有哪些数据资产，以及这些数据资产之间的关系。&lt;br>
+然后在代码里声明：&lt;/p>
+&lt;ul>
+&lt;li>数据资产：&lt;code>@asset&lt;/code> 注解&lt;/li>
+&lt;li>这个数据资产依赖什么上游的数据资产：&lt;code>@asset&lt;/code> 注解的 &lt;code>ins&lt;/code> 或 &lt;code>non_argument_deps&lt;/code> 属性&lt;/li>
+&lt;li>如何利用上游的数据资产产生当前数据资产：在 &lt;code>@asset&lt;/code> 声明的方法里通过py代码实现，比如依赖的DataFrame，在方法代码里用DataFrame API，编写业务逻辑，定义return 一个新的DataFrame&lt;/li>
+&lt;/ul>
+&lt;p>就可以了。&lt;br>
+当你把数据资产都定义完，可以通过 &lt;code>define_asset_job&lt;/code> 方法，将选定的数据资产，按依赖关系自动构建出DAG工作流（dagster称之为 &lt;strong>job&lt;/strong>），然后就可以执行了。&lt;/p>
+&lt;p>关于 asset 的定义和使用更多信息，请参考官方文档：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/assets/defining-an-asset" target="_blank" rel="noopener"
+>A First Asset&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/assets/asset-graph" target="_blank" rel="noopener"
+>Building Graphs of Assets&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/assets/non-argument-deps" target="_blank" rel="noopener"
+>Assets without Arguments and Return Values&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/assets/testing-assets" target="_blank" rel="noopener"
+>Testing Assets&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/assets/software-defined-assets" target="_blank" rel="noopener"
+>Software-Defined Assets&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/assets/asset-materializations" target="_blank" rel="noopener"
+>Asset Materializations&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/assets/asset-observations" target="_blank" rel="noopener"
+>Asset Observations&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/assets/multi-assets" target="_blank" rel="noopener"
+>Multi-Assets&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>等。&lt;/p>
+&lt;blockquote>
+&lt;p>说到这里，好像缺了什么？&lt;br>
+DataFrame是定义完了，DataFrame保存到哪里？又是从哪里读的？&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="io-manager">IO Manager&lt;/h3>
+&lt;p>Asset只定义了数据资产的来源依赖与自身定义，关注的是数据的业务逻辑。&lt;br>
+在传统的ETL工具或工作流工具里，数据的读写和处理逻辑是在同一个任务/工作流里定义的，而在Dagster中，数据的读写和处理逻辑是解耦的，处理逻辑在Asset定义了，而读写在 &lt;strong>IO Manager&lt;/strong> 中定义。&lt;br>
+IO Manager有一些官方的实现，也可以自己实现。&lt;br>
+具体来说是继承 &lt;code>dagster.IOManager&lt;/code>，实现 &lt;code>handle_output&lt;/code>（数据输出） 和 &lt;code>load_input&lt;/code>（数据读取） 方法。&lt;br>
+而每个Asset使用哪个IO Manager，则是在 &lt;code>@asset&lt;/code> 注解的 &lt;code>io_manager_key&lt;/code> 属性中设置，如：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">MyIOManager&lt;/span>(IOManager):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">handle_output&lt;/span>(self, context, obj):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">pass&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">load_input&lt;/span>(self, context):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">pass&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@io_manager&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">my_io_manager&lt;/span>(init_context):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> MyIOManager()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@asset&lt;/span>(io_manager_key&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;my_io_manager&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">my_op&lt;/span>():
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">pass&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>具体请参见官方文档：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/io-management/io-managers" target="_blank" rel="noopener"
+>IO Managers&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/io-management/unconnected-inputs" target="_blank" rel="noopener"
+>Unconnected Inputs&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
 &lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
 &lt;h3 id="lakehouse论文">Lakehouse论文&lt;/h3>
 &lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"
