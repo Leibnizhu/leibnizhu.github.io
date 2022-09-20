@@ -1,6 +1,7 @@
 ---
 title: "Dagster快速入门"
 date: 2022-08-26T15:21:08+08:00
+image: thumbnail.jpg
 ---
 
 dagster是 [MDS](https://octolis.com/blog/modern-stack-data) 中推荐使用的调度组件。Dagster的官方文档已经挺完善挺人性化的了，但为了公司内推广，还是写一篇快速入门的文档吧。
@@ -109,6 +110,9 @@ dagster提供了两个命令：
 
 Asset只定义了数据资产的来源依赖与自身定义，关注的是数据的业务逻辑。  
 在传统的ETL工具或工作流工具里，数据的读写和处理逻辑是在同一个任务/工作流里定义的，而在Dagster中，数据的读写和处理逻辑是解耦的，处理逻辑在Asset定义了，而读写在 **IO Manager** 中定义。  
+
+![IO Manager](io-manager.png)
+
 IO Manager有一些官方的实现，也可以自己实现。  
 具体来说是继承 `dagster.IOManager`，实现 `handle_output`（数据输出） 和 `load_input`（数据读取） 方法。  
 而每个Asset使用哪个IO Manager，则是在 `@asset` 注解的 `io_manager_key` 属性中设置，如：  
@@ -134,3 +138,7 @@ def my_op():
 
 - [IO Managers](https://docs.dagster.io/concepts/io-management/io-managers)
 - [Unconnected Inputs](https://docs.dagster.io/concepts/io-management/unconnected-inputs)
+
+### Op && Graph && Job
+
+//TODO
