@@ -29,3 +29,22 @@ assets/jsconfig.json
 .DS_Store
 **/.DS_Store
 .idea
+
+# Project dependencies
+.cache
+*.pyc
+node_modules
+yarn-error.log
+
+/public
+# Build directory
+/build
+.sass-cache/
+_posts/
+_site/
+
+.mypy_cache
+
+/.vscode
+
+config.yaml
