@@ -208,12 +208,12 @@ menu:
           weight: -60
           params:
               icon: brand-gmail
-        - identifier: Running
-          name: Running
-          url: https://leibnizhu.github.io/running
-          weight: -40
-          params:
-              icon: run
+#        - identifier: Running
+#          name: Running
+#          url: https://leibnizhu.github.io/running
+#          weight: -40
+#          params:
+#              icon: run
 
 related:
     includeNewer: true
