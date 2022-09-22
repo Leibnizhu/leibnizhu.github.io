@@ -141,4 +141,43 @@ def my_op():
 
 ### Op && Graph && Job
 
-//TODO
+**Op**（不是那个OP）是dagster最基础的计算单元，包括asset物化的时候，dagster也是包装成op进行执行的。  
+Op也定义了（一个或多个）输入和输出，也可通过IO Manager做存储管理，也可以使用job级别的 resource 定义。  
+还可以通过 `@op` 注解的 `config_schema` 定义执行时需要的op_config配置。  
+
+关于 Op 的文档：
+
+- [Writing, Executing a Single-Op Job](https://docs.dagster.io/tutorial/ops-jobs/single-op-job)
+- [Connecting Ops In Jobs](https://docs.dagster.io/tutorial/ops-jobs/connecting-ops)
+- [Testing Ops and Jobs](https://docs.dagster.io/tutorial/ops-jobs/testable)
+- [Ops](https://docs.dagster.io/concepts/ops-jobs-graphs/ops)
+- [Op Events and Exceptions](https://docs.dagster.io/concepts/ops-jobs-graphs/op-events)
+- [Op Hooks](https://docs.dagster.io/concepts/ops-jobs-graphs/op-hooks)
+- [Op Retries](https://docs.dagster.io/concepts/ops-jobs-graphs/op-retries)
+
+**Graph** 可以将多个op或Graph组成DAG————"或Graph"，也就是说支持graph的嵌套。  
+graph的定义是通过python代码的入参依赖构建的，如官方的例子：
+
+```python
+from dagster import graph, op
+
+@op
+def return_one(context) -> int:
+    return 1
+
+@op
+def add_one(context, number: int) -> int:
+    return number + 1
+
+@graph
+def linear():
+    add_one(add_one(add_one(return_one())))
+```
+
+关于 Graph 的文档：
+
+- [Graphs](https://docs.dagster.io/concepts/ops-jobs-graphs/graphs)
+- [Nesting Graphs](https://docs.dagster.io/concepts/ops-jobs-graphs/nesting-graphs)
+- [Dynamic Graphs](https://docs.dagster.io/concepts/ops-jobs-graphs/dynamic-graphs)
+
+**Job** 是Dagster的执行和监控单元，Job由Graph或Op（通过Python代码）连接而成。  
