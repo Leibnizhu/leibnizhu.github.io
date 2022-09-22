@@ -1,5 +1,5 @@
 ---
-title: "Workouts"
+title: "锻炼记录"
 menu:
     main:
         weight: -80
