@@ -30,7 +30,7 @@ HotSpot的算法实现 以下是HotSpot中垃圾回收的几个关键点技术�
 在HotSpot里面，通过一个叫OopMap的数据结构来维护哪些地方存放着对象引用，记录栈上本地变量与堆中对象的引用关系，方便枚举GC Root。
 安全点 并不是所有指令都会生成/改变OopMap，这样效率太低。线程必须到达安全点（SafePoint）才会生成OopMap，然后开始GC。安全点的选定是以“有让程序长时间执行的特征”的原则进行的（如方法调用，循环跳转，异常跳转等）。
 考虑多线程，必须所有线程都跑到安全点才能开始GC。方法有二：
-抢先式中断：GC时先中断所有线程，对于还没跑到安全点的线程，让其恢复并等它跑到安全点上再停。——商业JVM几乎没有这样实现的； 主动式中断：GC需要中断线程时，设置一个标志，各个线程执行时，跑到安全点的时候轮询这个标志，发现标志为真的时候自己中断挂起。 安全区域 线程执行的时候，可能很久都不会跑到安全点（比如执行了Thread.Sleep()的情况），导致GC不能马上执行。因此引入安全区域的概念（Safe Region），表示这段代码片段中引用关系不会发生变化。"><title>《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</title><link rel=canonical href=https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/><link rel=stylesheet href=/scss/style.min.ac77dcf8b111b51da39a92990f431923f210f3876d85798a2125667f96dc33a4.css><meta property="og:title" content="《深入理解Java虚拟机》 学习笔记(二)——垃圾回收"><meta property="og:description" content="JVM笔记系列索引
+抢先式中断：GC时先中断所有线程，对于还没跑到安全点的线程，让其恢复并等它跑到安全点上再停。——商业JVM几乎没有这样实现的； 主动式中断：GC需要中断线程时，设置一个标志，各个线程执行时，跑到安全点的时候轮询这个标志，发现标志为真的时候自己中断挂起。 安全区域 线程执行的时候，可能很久都不会跑到安全点（比如执行了Thread.Sleep()的情况），导致GC不能马上执行。因此引入安全区域的概念（Safe Region），表示这段代码片段中引用关系不会发生变化。"><title>《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</title><link rel=canonical href=https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/><link rel=stylesheet href=/scss/style.min.23e1d8e9a6160c668989a401c0af6c7e300683648c9edcf1dec562b9b0efc7b4.css><meta property="og:title" content="《深入理解Java虚拟机》 学习笔记(二)——垃圾回收"><meta property="og:description" content="JVM笔记系列索引
 《深入理解Java虚拟机》 学习笔记(一)——JVM内存结构
 《深入理解Java虚拟机》 学习笔记(二)——垃圾回收
 《深入理解Java虚拟机》 学习笔记(三)——类文件结构

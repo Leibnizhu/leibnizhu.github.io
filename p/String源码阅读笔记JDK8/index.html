@@ -6,7 +6,7 @@ String(char value[], int offset, int count); 先判断offset和count与value的�
 String(int[] codePoints, int offset, int count); 类似上面，判断完之后，再遍历codePoints排除非法int，最后遍历codePoints强转char[]，赋值给value属性。
 String(byte bytes[], int offset, int length, String charsetName); 检查参数没有越界后，调用StringCoding.decode()生成char[]赋值给value属性。
 String(byte bytes[], int offset, int length, Charset charset); 类似上面，只是代表编码的参数改了类型。
-String(byte bytes[], String charsetName); String(byte bytes[], Charset charset); String(byte bytes[], int offset, int length); String(byte bytes[]); 分别调用上面两个构造方法。"><title>String源码阅读笔记（JDK8）</title><link rel=canonical href=https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/><link rel=stylesheet href=/scss/style.min.ac77dcf8b111b51da39a92990f431923f210f3876d85798a2125667f96dc33a4.css><meta property="og:title" content="String源码阅读笔记（JDK8）"><meta property="og:description" content="String源码阅读笔记 成员变量 value，存放String数据，不可变。
+String(byte bytes[], String charsetName); String(byte bytes[], Charset charset); String(byte bytes[], int offset, int length); String(byte bytes[]); 分别调用上面两个构造方法。"><title>String源码阅读笔记（JDK8）</title><link rel=canonical href=https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/><link rel=stylesheet href=/scss/style.min.23e1d8e9a6160c668989a401c0af6c7e300683648c9edcf1dec562b9b0efc7b4.css><meta property="og:title" content="String源码阅读笔记（JDK8）"><meta property="og:description" content="String源码阅读笔记 成员变量 value，存放String数据，不可变。
 private final char value[]; hash，存放String的哈希值
 private int hash; // Default to 0 构造器部分 String(String original); 将参数的value和hash复制给当前对象。
 String(char value[]); 调用Arrays.copyOf()复制到value属性中。

@@ -142,7 +142,51 @@ data-flex-basis="399px"
 >Unconnected Inputs&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;h3 id="op--graph--job">Op &amp;amp;&amp;amp; Graph &amp;amp;&amp;amp; Job&lt;/h3>
-&lt;p>//TODO&lt;/p></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
+&lt;p>&lt;strong>Op&lt;/strong>（不是那个OP）是dagster最基础的计算单元，包括asset物化的时候，dagster也是包装成op进行执行的。&lt;br>
+Op也定义了（一个或多个）输入和输出，也可通过IO Manager做存储管理，也可以使用job级别的 resource 定义。&lt;br>
+还可以通过 &lt;code>@op&lt;/code> 注解的 &lt;code>config_schema&lt;/code> 定义执行时需要的op_config配置。&lt;/p>
+&lt;p>关于 Op 的文档：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/ops-jobs/single-op-job" target="_blank" rel="noopener"
+>Writing, Executing a Single-Op Job&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/ops-jobs/connecting-ops" target="_blank" rel="noopener"
+>Connecting Ops In Jobs&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/ops-jobs/testable" target="_blank" rel="noopener"
+>Testing Ops and Jobs&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/ops" target="_blank" rel="noopener"
+>Ops&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/op-events" target="_blank" rel="noopener"
+>Op Events and Exceptions&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/op-hooks" target="_blank" rel="noopener"
+>Op Hooks&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/op-retries" target="_blank" rel="noopener"
+>Op Retries&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Graph&lt;/strong> 可以将多个op或Graph组成DAG————&amp;ldquo;或Graph&amp;rdquo;，也就是说支持graph的嵌套。&lt;br>
+graph的定义是通过python代码的入参依赖构建的，如官方的例子：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">from&lt;/span> &lt;span style="color:#fec418">dagster&lt;/span> &lt;span style="color:#5bc4bf">import&lt;/span> graph, op
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@op&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">return_one&lt;/span>(context) &lt;span style="color:#5bc4bf">-&amp;gt;&lt;/span> int:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#f99b15">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@op&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">add_one&lt;/span>(context, number: int) &lt;span style="color:#5bc4bf">-&amp;gt;&lt;/span> int:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> number &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#f99b15">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@graph&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> &lt;span style="color:#06b6ef">linear&lt;/span>():
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> add_one(add_one(add_one(return_one())))
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>关于 Graph 的文档：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/graphs" target="_blank" rel="noopener"
+>Graphs&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/nesting-graphs" target="_blank" rel="noopener"
+>Nesting Graphs&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/dynamic-graphs" target="_blank" rel="noopener"
+>Dynamic Graphs&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Job&lt;/strong> 是Dagster的执行和监控单元，Job由Graph或Op（通过Python代码）连接而成。&lt;/p></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
 &lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
 &lt;h3 id="lakehouse论文">Lakehouse论文&lt;/h3>
 &lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"

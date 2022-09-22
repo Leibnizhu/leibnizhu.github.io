@@ -10,7 +10,7 @@ Unifies imperative and reactive Combine both the familiar imperative code and th
 真的有那么Unify吗？未必哦。
 这里说的 Unifies imperative and reactive 是指：
 Quarkus core基于Vert.X实现，是响应式的，这也是它能unify命令式和响应式的关键原因，也是各个扩展能自行选择命令式实现和响应式实现的原因 Quarkus在Vert.X基础上做了一个路由层来兼容两种实现，像HTTP请求这种直接通过路由层、如果是响应式代码，直接在I/O线程上执行；命令式代码则丢到Worker线程执行（就要做上下文切换了）；至于Quarkus怎么知道是什么实现，就看方法注解以及签名了，具体不展开 也就是说，至少在http接口这一层面，开发者可以选择用命令式还是响应式编程实现，另外定时任务、Eventbus之类也是支持的 但到了ORM层只能有一个选择，是的， Hibernate 和 Hibernate-reactive 显然不能共存。 如果选了 Hibernate-reactive 那么意味你的dao都是返回Uni或Multi，这会一直传递出去（除非await结果）。
-另外，像 resteasy 用了reative的话，filter这些在I/O线程运行，不能阻塞，如果里面用到redis client之类也要改Reactive RedisClient。"><title>关于Quarkus的碎碎念</title><link rel=canonical href=https://leibnizhu.github.io/p/%E5%85%B3%E4%BA%8EQuarkus%E7%9A%84%E7%A2%8E%E7%A2%8E%E5%BF%B5/><link rel=stylesheet href=/scss/style.min.ac77dcf8b111b51da39a92990f431923f210f3876d85798a2125667f96dc33a4.css><meta property="og:title" content="关于Quarkus的碎碎念"><meta property="og:description" content="最近把一个老项目迁到了Quarkus，想谈谈一些感想和想-法。
+另外，像 resteasy 用了reative的话，filter这些在I/O线程运行，不能阻塞，如果里面用到redis client之类也要改Reactive RedisClient。"><title>关于Quarkus的碎碎念</title><link rel=canonical href=https://leibnizhu.github.io/p/%E5%85%B3%E4%BA%8EQuarkus%E7%9A%84%E7%A2%8E%E7%A2%8E%E5%BF%B5/><link rel=stylesheet href=/scss/style.min.23e1d8e9a6160c668989a401c0af6c7e300683648c9edcf1dec562b9b0efc7b4.css><meta property="og:title" content="关于Quarkus的碎碎念"><meta property="og:description" content="最近把一个老项目迁到了Quarkus，想谈谈一些感想和想-法。
 Why Quarkus??? 答案很简单，for 云原生。在 官网 也可以看到Quarkus的宣传点也是围绕云原生进行的。
 云原生的实现大概有这些要点：
 应用/架构设计遵循 12-Factor 服务容器化，最好框架层面就有支持 启动速度快，资源占用少，便于伸缩。这里又包括镜像大小、layer设计、应用本身启动速度等因素。 配合GitOps持续集成、持续交付 而Quarkus很好解决了这些问题。反观Spring，在启动速度、资源占用这块实在不尽人意，对k8s的支持也是很落后，对graalvm native- image也是起步落后。
