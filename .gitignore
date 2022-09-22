@@ -36,15 +36,14 @@ assets/jsconfig.json
 node_modules
 yarn-error.log
 
-/public
 # Build directory
-/build
+build
 .sass-cache/
 _posts/
 _site/
 
 .mypy_cache
 
-/.vscode
+.vscode
 
 config.yaml
