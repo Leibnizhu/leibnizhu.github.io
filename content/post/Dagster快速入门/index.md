@@ -6,6 +6,8 @@ image: thumbnail.jpg
 
 dagster是 [MDS](https://octolis.com/blog/modern-stack-data) 中推荐使用的调度组件。Dagster的官方文档已经挺完善挺人性化的了，但为了公司内推广，还是写一篇快速入门的文档吧。
 
+除了文档，官方youtube也可以看看，比如 [Dagster Day 2022](https://www.youtube.com/watch?v=70c84LDZuzQ) 对dagster有整体的介绍。
+
 ## 准备工作
 
 ### 环境准备
@@ -141,6 +143,8 @@ def my_op():
 
 ### Op && Graph && Job
 
+#### 概念简介
+
 **Op**（不是那个OP）是dagster最基础的计算单元，包括asset物化的时候，dagster也是包装成op进行执行的。  
 Op也定义了（一个或多个）输入和输出，也可通过IO Manager做存储管理，也可以使用job级别的 resource 定义。  
 还可以通过 `@op` 注解的 `config_schema` 定义执行时需要的op_config配置。  
@@ -180,4 +184,23 @@ def linear():
 - [Nesting Graphs](https://docs.dagster.io/concepts/ops-jobs-graphs/nesting-graphs)
 - [Dynamic Graphs](https://docs.dagster.io/concepts/ops-jobs-graphs/dynamic-graphs)
 
-**Job** 是Dagster的执行和监控单元，Job由Graph或Op（通过Python代码）连接而成。  
+**Job** 是Dagster的执行和监控单元，Job由Graph或Op（通过Python代码）连接而成。类比到传统调度服务，就是整个工作流了。  
+Job的定义方式与Graph类似，也是在Python代码中通过入参或注解实现依赖。
+
+关于 Job 的文档：
+
+- [Connecting Ops In Jobs](https://docs.dagster.io/tutorial/ops-jobs/connecting-ops)
+- [Testing Ops and Jobs](https://docs.dagster.io/tutorial/ops-jobs/testable)
+- [Jobs](https://docs.dagster.io/concepts/ops-jobs-graphs/jobs)
+- [Job Execution](https://docs.dagster.io/concepts/ops-jobs-graphs/job-execution)
+- [Job Metadata & Run Tags](https://docs.dagster.io/concepts/ops-jobs-graphs/metadata-tags)
+
+#### 几者转换 & 常用方法
+
+其实也不是互相转换，主要是转成Job的。我们在代码里定义了asset、op、graph这些，是可以直接定义为一个job的。具体：
+
+- [`dagster.load_assets_from_modules`](https://docs.dagster.io/_apidocs/assets#dagster.load_assets_from_modules) ：可以从指定的Python module中加载所有定义的asset，可以简化 repository 的配置。类似的还有 `load_assets_from_current_module`、`load_assets_from_package_module`、`load_assets_from_package_name` 等方法。
+- [`dagster.define_asset_job`](https://docs.dagster.io/_apidocs/assets#dagster.define_asset_job) ： 可以将一系列的asset的物化动作作为一个job，可以通过 `selection` 属性选择所需的asset。
+- [`dagster.GraphDefinition.to_job`](https://docs.dagster.io/_apidocs/graphs#dagster.GraphDefinition.to_job) ：可以将Graph定义（用Graph的方法名调用）转换为一个Job
+- [`dagster_dbt.load_assets_from_dbt_project`](https://docs.dagster.io/_apidocs/libraries/dagster-dbt#assets) ：从dbt项目的模型定义加载asset，需要依赖 `dagster-dbt`
+- [`dagster_dbt.dbt_run_op`](https://docs.dagster.io/_apidocs/libraries/dagster-dbt#dagster_dbt.dbt_run_op) ：利用resource里面定义的dbt资源，产生一个 `dbt run` 的op
