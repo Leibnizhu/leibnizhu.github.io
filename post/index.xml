@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 26 Aug 2022 15:21:08 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Dagster快速入门</title><link>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</link><pubDate>Fri, 26 Aug 2022 15:21:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Dagster%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/thumbnail.jpg" alt="Featured image of post Dagster快速入门" />&lt;p>dagster是 &lt;a class="link" href="https://octolis.com/blog/modern-stack-data" target="_blank" rel="noopener"
 >MDS&lt;/a> 中推荐使用的调度组件。Dagster的官方文档已经挺完善挺人性化的了，但为了公司内推广，还是写一篇快速入门的文档吧。&lt;/p>
+&lt;p>除了文档，官方youtube也可以看看，比如 &lt;a class="link" href="https://www.youtube.com/watch?v=70c84LDZuzQ" target="_blank" rel="noopener"
+>Dagster Day 2022&lt;/a> 对dagster有整体的介绍。&lt;/p>
 &lt;h2 id="准备工作">准备工作&lt;/h2>
 &lt;h3 id="环境准备">环境准备&lt;/h3>
 &lt;p>首先，Dagster需要Python环境和pip：&lt;/p>
@@ -134,6 +136,7 @@ data-flex-basis="399px"
 >Unconnected Inputs&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;h3 id="op--graph--job">Op &amp;amp;&amp;amp; Graph &amp;amp;&amp;amp; Job&lt;/h3>
+&lt;h4 id="概念简介">概念简介&lt;/h4>
 &lt;p>&lt;strong>Op&lt;/strong>（不是那个OP）是dagster最基础的计算单元，包括asset物化的时候，dagster也是包装成op进行执行的。&lt;br>
 Op也定义了（一个或多个）输入和输出，也可通过IO Manager做存储管理，也可以使用job级别的 resource 定义。&lt;br>
 还可以通过 &lt;code>@op&lt;/code> 注解的 &lt;code>config_schema&lt;/code> 定义执行时需要的op_config配置。&lt;/p>
@@ -178,7 +181,35 @@ graph的定义是通过python代码的入参依赖构建的，如官方的例子
 &lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/dynamic-graphs" target="_blank" rel="noopener"
 >Dynamic Graphs&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;p>&lt;strong>Job&lt;/strong> 是Dagster的执行和监控单元，Job由Graph或Op（通过Python代码）连接而成。&lt;/p></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
+&lt;p>&lt;strong>Job&lt;/strong> 是Dagster的执行和监控单元，Job由Graph或Op（通过Python代码）连接而成。类比到传统调度服务，就是整个工作流了。&lt;br>
+Job的定义方式与Graph类似，也是在Python代码中通过入参或注解实现依赖。&lt;/p>
+&lt;p>关于 Job 的文档：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/ops-jobs/connecting-ops" target="_blank" rel="noopener"
+>Connecting Ops In Jobs&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/tutorial/ops-jobs/testable" target="_blank" rel="noopener"
+>Testing Ops and Jobs&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/jobs" target="_blank" rel="noopener"
+>Jobs&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/job-execution" target="_blank" rel="noopener"
+>Job Execution&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/concepts/ops-jobs-graphs/metadata-tags" target="_blank" rel="noopener"
+>Job Metadata &amp;amp; Run Tags&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h4 id="几者转换--常用方法">几者转换 &amp;amp; 常用方法&lt;/h4>
+&lt;p>其实也不是互相转换，主要是转成Job的。我们在代码里定义了asset、op、graph这些，是可以直接定义为一个job的。具体：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/_apidocs/assets#dagster.load_assets_from_modules" target="_blank" rel="noopener"
+>&lt;code>dagster.load_assets_from_modules&lt;/code>&lt;/a> ：可以从指定的Python module中加载所有定义的asset，可以简化 repository 的配置。类似的还有 &lt;code>load_assets_from_current_module&lt;/code>、&lt;code>load_assets_from_package_module&lt;/code>、&lt;code>load_assets_from_package_name&lt;/code> 等方法。&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/_apidocs/assets#dagster.define_asset_job" target="_blank" rel="noopener"
+>&lt;code>dagster.define_asset_job&lt;/code>&lt;/a> ： 可以将一系列的asset的物化动作作为一个job，可以通过 &lt;code>selection&lt;/code> 属性选择所需的asset。&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/_apidocs/graphs#dagster.GraphDefinition.to_job" target="_blank" rel="noopener"
+>&lt;code>dagster.GraphDefinition.to_job&lt;/code>&lt;/a> ：可以将Graph定义（用Graph的方法名调用）转换为一个Job&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/_apidocs/libraries/dagster-dbt#assets" target="_blank" rel="noopener"
+>&lt;code>dagster_dbt.load_assets_from_dbt_project&lt;/code>&lt;/a> ：从dbt项目的模型定义加载asset，需要依赖 &lt;code>dagster-dbt&lt;/code>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.dagster.io/_apidocs/libraries/dagster-dbt#dagster_dbt.dbt_run_op" target="_blank" rel="noopener"
+>&lt;code>dagster_dbt.dbt_run_op&lt;/code>&lt;/a> ：利用resource里面定义的dbt资源，产生一个 &lt;code>dbt run&lt;/code> 的op&lt;/li>
+&lt;/ul></description></item><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
 &lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
 &lt;h3 id="lakehouse论文">Lakehouse论文&lt;/h3>
 &lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"
