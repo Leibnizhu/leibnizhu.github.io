@@ -203,4 +203,33 @@ Job的定义方式与Graph类似，也是在Python代码中通过入参或注解
 - [`dagster.define_asset_job`](https://docs.dagster.io/_apidocs/assets#dagster.define_asset_job) ： 可以将一系列的asset的物化动作作为一个job，可以通过 `selection` 属性选择所需的asset。
 - [`dagster.GraphDefinition.to_job`](https://docs.dagster.io/_apidocs/graphs#dagster.GraphDefinition.to_job) ：可以将Graph定义（用Graph的方法名调用）转换为一个Job
 - [`dagster_dbt.load_assets_from_dbt_project`](https://docs.dagster.io/_apidocs/libraries/dagster-dbt#assets) ：从dbt项目的模型定义加载asset，需要依赖 `dagster-dbt`
-- [`dagster_dbt.dbt_run_op`](https://docs.dagster.io/_apidocs/libraries/dagster-dbt#dagster_dbt.dbt_run_op) ：利用resource里面定义的dbt资源，产生一个 `dbt run` 的op
+- [`dagster_dbt.dbt_run_op`](https://docs.dagster.io/_apidocs/libraries/dagster-dbt#dagster_dbt.dbt_run_op) ：利用resource里面定义的dbt资源，产生一个 `dbt run` 的op。
+
+### Schedule & Sensor
+
+**image.png** 是定时执行Job，可以简单地配置每小时、每天、每周等，也可以通过cron表达式配置。详见 [Schedules](https://docs.dagster.io/concepts/partitions-schedules-sensors/schedules)。需要注意的是时区的配置，通过 `ScheduleDefinition` 的 `execution_timezone` 属性配置；以及可以通过 `environment_vars` 属性定义执行Job时的环境变量。
+
+**Sensor** 定义在Job运行结束或asset物化结束后的操作，可以根据执行结果做任何自定义的操作，包括但不限于：
+
+- 发送企业微信Bot消息通知
+- 获取物化结果的OSS下载地址，发送邮件给客户
+- 清理过时的分区数据
+- ………………
+
+详见 [Sensors](https://docs.dagster.io/concepts/partitions-schedules-sensors/sensors)。
+
+Schedule和Sensor的运行都需要 [`dagster-daemon`](https://docs.dagster.io/deployment/dagster-daemon) 进程。
+
+在k8s中，dagster-daemon可以与dagit分别做成一个pod里的两个容器。
+
+### Repository & Workspace
+
+**Repository** 包含一个项目的所有 Asset、Op、Graph、Job、Schedule、Sensor 等资源。dagster UI左侧栏同一时间只显示一个Repository。通过 `@repository` 注解定义。
+
+而 **Workspace** 是Dagit实例级别的工作区，可以包含多个Repository。通过 `workspace.yaml` 文件配置、里面从哪里加载Repository定义。  
+可以指定Python文件、Python的package、或gRpc服务（可通过 `dagster` 命令启动gRpc服务）。详见 [Workspace](https://docs.dagster.io/concepts/repositories-workspaces/workspaces)。
+
+### dagster实例
+
+在环境变量 `DAGSTER_HOME` 配置的目录下的 `dagster.yaml` 文件进行配置，该文件定义了Dagit实例的一些存储位置、日志等等配置。  
+详见 [Dagster Instance](https://docs.dagster.io/deployment/dagster-instance)。
