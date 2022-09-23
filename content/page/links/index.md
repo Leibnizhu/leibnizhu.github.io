@@ -18,6 +18,8 @@ menu:
 comments: false
 ---
 
-外链招租位。
+- <img src="https://avatars0.githubusercontent.com/u/13608862" width="50" alt="Counter2015"/> [Counter2015 ———知其强，守其弱，为天下菜，为天下菜，可以下饭。](https://counter2015.com/)
+
+右链招租位。
 
 请通过Email提供URL、LOGO、简介。
