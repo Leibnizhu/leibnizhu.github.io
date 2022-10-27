@@ -5833,5 +5833,20 @@
 "average_speed": 2.5211172315341304,
 "source": "Garmin Connect",
 "streak": 1
+},
+{
+"run_id": 1666824613000,
+"name": "\u5e7f\u5dde\u5e02 \u8dd1\u6b65",
+"distance": 4936.994651961903,
+"moving_time": "0:29:51",
+"type": "Run",
+"start_date": "2022-10-26 22:50:13",
+"start_date_local": "2022-10-27 06:50:13",
+"location_country": "\u4e2d\u5c71\u5927\u9053\u897f, \u68e0\u4e0b\u8857\u9053, \u5929\u6cb3\u533a, \u5e7f\u5dde\u5e02, \u5e7f\u4e1c\u7701, 510665, \u4e2d\u56fd",
+"summary_polyline": "k{clCa|_sTM`Mb@nIoBdDx@v@nAi@^X~AYbAcBtAJbAe@vEPhAm@h@}AGcA|@qBWyFd@uCbAs@CoBWq@uISeAW]u@{IaAa@vLg@~BHjDb@vB_@nANfBoArBvBHlBtAjAcDfFWbA`@xB?d@k@x@cG@wFxBcIy@y@iDIsAaAgANgB}@yC_@{ALcAg@[R@pLs@lBq@^PlHWbABzCg@xAzAOnDx@^[\\mC",
+"average_heartrate": 134.0,
+"average_speed": 2.7565575946185947,
+"source": "Garmin Connect",
+"streak": 1
 }
 ]
