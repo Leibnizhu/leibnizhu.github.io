@@ -29,6 +29,6 @@ Leibniz，这个名字的出典，无需多解释。
 
 ## 脚印
 
-**博客**：[Heaven's Door](leibnizhu.github.io)  
+**博客**：[Heaven's Door](https://leibnizhu.github.io)  
 **GitHub**：[Leibnizhu·Github](https://github.com/Leibnizhu)  
 **GitLab**：基本只放私有项目  
