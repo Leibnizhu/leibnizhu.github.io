@@ -25,12 +25,10 @@ Leibniz，这个名字的出典，无需多解释。
 现在还在玩的：
 > 跑步，折叠车（通勤）
 
-跑步记录可见： [Leibniz's Workouts Map](https://leibnizhu.github.io/running)
+跑步记录可见： [Leibniz's Workouts Map](https://leibnizhu.github.io/Workouts/)
 
 ## 脚印
 
-**Email**：(leibnizhu@gmail.com)  
 **博客**：[Heaven's Door](leibnizhu.github.io)  
-**出没于**：广州  
 **GitHub**：[Leibnizhu·Github](https://github.com/Leibnizhu)  
 **GitLab**：基本只放私有项目  
