@@ -58,13 +58,13 @@ image: thumbnail.jpg
 
 2022年跑了4次半马（或以上），路线基本还是那些，小区绕圈，天河公园，珠江沿岸（3桥、5桥）：
 
-![广州大桥遥望CDB](run1.png)
+![清晨LSD，在广州大桥遥望CDB](run1.png)
 
 静息心率基本在 38-42左右徘徊。
 
-跑鞋基本在用 `Altra Escalante`，到10月份基本损耗完了，里程1000km了，鞋底也磨得差不多了，就用回一段时间老 `Vibram FiveFinger V-Run`；其实这双 `V-Run` 的里程也是接近1000km了。终于撑到双11，搞了 `Hoka one one Rincon 3` 和 `Saucony Kinvara 13` 。
+跑鞋基本在用 `Altra Escalante 2.0`，到10月份基本损耗完了，里程1000km了，鞋底也磨得差不多了，就用回一段时间老 `Vibram FiveFinger V-Run`；其实这双 `V-Run` 的里程也是接近1000km了。终于撑到双11，搞了 `Hoka one one Rincon 3` 和 `Saucony Kinvara 13` 。
 
-![Altra Escalante](altra.png)
+![Altra Escalante 2.0](altra.png)
 
 ![Saucony Kinvara 13](saucony.png)
 
@@ -76,7 +76,7 @@ Saucony的熊猫背心也是挺有意思的，穿着也舒服，很干爽：
 
 ## 其他
 
-2022看的书（部分有记录的）：
+2022看的书（有记录的完整看完的）：
 
 - 强风吹拂
 - 凤凰架构
