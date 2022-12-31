@@ -1,7 +1,6 @@
 ---
 title: "2022年终总结"
 date: 2022-12-31T20:45:49+08:00
-draft: true
 image: thumbnail.jpg
 ---
 
