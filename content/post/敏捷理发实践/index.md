@@ -1,7 +1,6 @@
 ---
 title: "敏捷理发实践"
 date: 2023-01-05T13:10:12+08:00
-draft: true
 image: thumbnail.jpg
 tags:
 - 杂谈
