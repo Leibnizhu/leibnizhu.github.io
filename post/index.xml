@@ -1,4 +1,67 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 31 Dec 2022 20:45:49 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>2022年终总结</title><link>https://leibnizhu.github.io/p/2022%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</link><pubDate>Sat, 31 Dec 2022 20:45:49 +0800</pubDate><guid>https://leibnizhu.github.io/p/2022%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</guid><description>&lt;img src="https://leibnizhu.github.io/p/2022%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/thumbnail.jpg" alt="Featured image of post 2022年终总结" />&lt;p>又到年底了，今年的总结写到博客里吧。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 05 Jan 2023 13:10:12 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>敏捷理发实践</title><link>https://leibnizhu.github.io/p/%E6%95%8F%E6%8D%B7%E7%90%86%E5%8F%91%E5%AE%9E%E8%B7%B5/</link><pubDate>Thu, 05 Jan 2023 13:10:12 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%8F%E6%8D%B7%E7%90%86%E5%8F%91%E5%AE%9E%E8%B7%B5/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%8F%E6%8D%B7%E7%90%86%E5%8F%91%E5%AE%9E%E8%B7%B5/thumbnail.jpg" alt="Featured image of post 敏捷理发实践" />&lt;h2 id="什么是敏捷理发">什么是敏捷理发&lt;/h2>
+&lt;p>敏捷理发是将日常理发行为、与敏捷开发理念结合的理发方法论。&lt;/p>
+&lt;p>核心理念很简单，就是自己理发，只理制式发型，每周一理。&lt;/p>
+&lt;p>对，这里一开篇就先把核心理念给出来，下面再细说这个方案是怎么迭代出来的。&lt;/p>
+&lt;h2 id="传统理发">传统理发&lt;/h2>
+&lt;p>传统理发指的是到理发店里，用户提出需求，由随机或用户指定的理发师负责实施的理发行为。&lt;/p>
+&lt;h3 id="缺点">缺点&lt;/h3>
+&lt;p>传统理发相信大家都很熟悉了，但是可能很少人站在用户角度进行过总结。它有以下问题：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>时间成本高&lt;/strong>：算上来往理发店、排队等待、实施理发的时间，整体耗时从半小时到一小时不等。现在有一些理发店支持在线预约，避免了在店等待时间，但总耗时仍然很可观。&lt;/li>
+&lt;li>&lt;strong>经济成本高&lt;/strong>：在一二线城市，成年男子简单的理发往往需要数十元人民币。&lt;/li>
+&lt;li>&lt;strong>沟通成本高&lt;/strong>：
+&lt;ul>
+&lt;li>与理发师沟通，需要用专门的DSL（领域特定语言），换而言之，用户需要掌握理发相关的专业用词，并使用之与理发师达成理发需求的共识。&lt;/li>
+&lt;li>理发师大多社牛，在理发过程中往往需要产生大量无效社交和无效沟通，对内向者会产生很高的心智负担。&lt;/li>
+&lt;li>部分理发店的理发师还兼任着销售角色，理发过程中会不断推销会员卡等产品。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>试错成本高&lt;/strong>：由于以上成本高的原因，用户不得不降低了理发频率，往往是两个月以上理一次，而又由于理发的不可逆性，每一次理发都成了一次冒险，一次理不好，下一次又是数个月之后。&lt;/li>
+&lt;li>&lt;strong>额外的社交压力&lt;/strong>：在传统理发中，由于理发频率低，用户的理发动机一般不是自驱动的（不能在最佳时间意识到“我该理发了”），而往往是来源于一些负面情绪，这带来了不小的社交压力。包括但不限于：
+&lt;ul>
+&lt;li>头发长长到影响日常生活，如遮住视线；&lt;/li>
+&lt;li>发型走形、过长导致负面的社交评价；&lt;/li>
+&lt;li>就算理发后，对新发型的评价也有可能形成负面的社交评论。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="优点">优点&lt;/h3>
+&lt;p>传统理发的唯一优点就是理发过程不必自己动手；&lt;/p>
+&lt;p>但也仅仅是不需要自己动手&lt;/p>
+&lt;blockquote>
+&lt;p>理发的客体，也就是用户本身，是必定会被involve到这个过程中的；&lt;br>
+也就是说，就算你交了钱，也还是必须亲自去理；&lt;br>
+不用自己动手，但是要自己坐在那里等待二十分钟。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="自己理发">自己理发&lt;/h2>
+&lt;p>自己理发建议只理 &lt;strong>制式发型&lt;/strong>。&lt;/p>
+&lt;p>&lt;strong>制式发型&lt;/strong> 可能是我自创的名词，表示可以精确量化理发过程的发型。&lt;/p>
+&lt;p>如，&lt;code>6mm/3mm&lt;/code> 指推子理发，全头用6mm遮罩推平，用3mm遮罩渐变修边。 &lt;code>9mm／3mm&lt;/code> 同理。&lt;/p>
+&lt;p>我在这一步走了五六年，才领悟出敏捷理发，说明是解决了很多痛点，改进压力并不是那么大。&lt;/p>
+&lt;h3 id="解决的问题">解决的问题&lt;/h3>
+&lt;ul>
+&lt;li>&lt;strong>时间成本&lt;/strong>：经过两三次练熟手后，基本可以在5分钟内解决。&lt;/li>
+&lt;li>&lt;strong>经济成本&lt;/strong>：基本为零，推子是一次性几十块钱的投入，日常基本免维护。&lt;/li>
+&lt;li>&lt;strong>沟通成本&lt;/strong>：和自己达成妥协即可，无需外部沟通。&lt;/li>
+&lt;/ul>
+&lt;h3 id="带来的问题">带来的问题&lt;/h3>
+&lt;ul>
+&lt;li>&lt;strong>学习成本高&lt;/strong>：往往需要两三次的练手才能熟练，尤其是后脑勺的处理手法；在此期间产出不稳定。&lt;/li>
+&lt;li>&lt;strong>试错成本高&lt;/strong>：这个不用解释，尤其在新手阶段，可以给发型带来毁灭性的破坏。&lt;/li>
+&lt;li>&lt;strong>负面的社交评论&lt;/strong>：试错失败带来的。&lt;/li>
+&lt;/ul>
+&lt;h2 id="敏捷理发">敏捷理发&lt;/h2>
+&lt;p>如同开头所述，在自己理发的基础上，加入亿点点敏捷开发的思想，将理发频率提高到一周一次，很多问题就解决了、也带来了一些新的好处：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>总学习成本下降&lt;/strong>：第一次自己理发后，一周后就是第二次，手艺衰减少，可以很快巩固肌肉记忆；同时，一周后发量增加并不多，理发难度也下降了，预期理发效果更好，从而形成了学习的正向反馈，进一步减少了总学习成本。&lt;/li>
+&lt;li>&lt;strong>时间成本进一步下降&lt;/strong>：每周理发一次，发量增量就很少，基本只需要一两分钟可以处理完；同时剪出来的头发也很短，可以直接在淋浴室剪，发碎直接冲走，无需收集。&lt;/li>
+&lt;li>&lt;strong>自驱动&lt;/strong>：可以选择每周末理发，几个sprint之后就会产生记忆，到了周末洗澡的时候就自然会理发了，不需要外部提示。&lt;/li>
+&lt;li>&lt;strong>试错成本低&lt;/strong>：每周能剪的不多，也就没多少出错空间了；练得更多，每次复盘，很快就很熟练了。&lt;/li>
+&lt;li>&lt;strong>社交压力下降&lt;/strong>：理发变得敏捷之后，从第三方视角看来，你的发型一直没有变过，也就没有了相关的评论了。&lt;/li>
+&lt;li>&lt;strong>对脸盲者更友好&lt;/strong>：他们不再会因为你的发型变更而认不出你。&lt;/li>
+&lt;/ul>
+&lt;p>当然，启动的学习成本是绕不过去的，但一旦学会，终生受用。&lt;/p>
+&lt;p>至于缺点，除了一点点的学习成本，我能想到的就是发型会相对单一。&lt;/p></description></item><item><title>2022年终总结</title><link>https://leibnizhu.github.io/p/2022%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</link><pubDate>Sat, 31 Dec 2022 20:45:49 +0800</pubDate><guid>https://leibnizhu.github.io/p/2022%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</guid><description>&lt;img src="https://leibnizhu.github.io/p/2022%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/thumbnail.jpg" alt="Featured image of post 2022年终总结" />&lt;p>又到年底了，今年的总结写到博客里吧。&lt;/p>
 &lt;h2 id="工作">工作&lt;/h2>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/2022%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/gitlab.png"
 width="1870"
