@@ -40,8 +40,10 @@
                 <time class="article-time--reading">
                     {{ T "article.readingTime" .ReadingTime }}
                 </time>
+                <time class="article-time--reading">
+                    {{ .WordCount }} words
+                </time>
             </div>
-            <time class="article-time--reading"> {{ .WordCount }} words</time>
         {{ end }}
     </footer>
     {{ end }}
