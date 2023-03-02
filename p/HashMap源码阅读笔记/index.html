@@ -54,7 +54,7 @@
 resize的时候，因为我们使用的是2次幂的扩展(指长度扩为原来2倍)，所以，元素的位置要么是在原位置，要么是在原位置再移动2次幂（oldCap）的位置，例如我们从16扩展为32时，具体的变化如下所示：
 <img src=/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/1.png width=727 height=67 srcset="/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/1_hu30e718e41d0f537c7be0bcca5730372d_7396_480x0_resize_box_3.png 480w, /p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/1_hu30e718e41d0f537c7be0bcca5730372d_7396_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=1085 data-flex-basis=2604px>
 因此元素在重新计算hash之后，因为n变为2倍，那么n-1的mask范围在高位多1bit(红色，0或1)。
-因此，我们在扩充HashMap的时候，不需要重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了（通过<code>(e.hash&oldCap)==0</code>进行判断），是0的话索引没变，是1的话索引变成“原索引+oldCap”。可以看看下图为16扩充为32的resize示意图：
+因此，我们在扩充HashMap的时候，不需要重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了（通过<code>(e.hash&amp;oldCap)==0</code>进行判断），是0的话索引没变，是1的话索引变成“原索引+oldCap”。可以看看下图为16扩充为32的resize示意图：
 <img src=/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/2.png width=621 height=353 srcset="/p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/2_hu9b25c08baa945f3801d9bb9649882515_11884_480x0_resize_box_3.png 480w, /p/HashMap%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/2_hu9b25c08baa945f3801d9bb9649882515_11884_1024x0_resize_box_3.png 1024w" loading=lazy class=gallery-image data-flex-grow=175 data-flex-basis=422px>
 既省去了重新计算hash值的时间，而且由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。
 上面代码中else{//preserveorder之后的部分即完成了上述过程，将一个节点上的链表拆分成用loHead,loTail和hiHead,hiTail
