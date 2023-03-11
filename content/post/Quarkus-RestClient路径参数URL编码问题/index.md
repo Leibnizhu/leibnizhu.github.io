@@ -88,4 +88,4 @@ public interface SomeApi {
 }
 ```
 
-翻完代码，再想起来可以看看RestEasy的文档，发现其实有写的：https://docs.jboss.org/resteasy/docs/3.0.6.Final/userguide/html/_Encoded_and_encoding.html 。
+翻完代码，再想起来可以看看RestEasy的文档，发现其实有写的：[RestEasy4.7.7.Final UserGuide Chapter 16. @Encoded and encoding](https://docs.jboss.org/resteasy/docs/4.7.7.Final/userguide/html/_Encoded_and_encoding.html) 。
