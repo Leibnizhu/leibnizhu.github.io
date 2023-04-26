@@ -6913,5 +6913,20 @@
 "average_speed": 2.42795201403225,
 "source": "Garmin Connect",
 "streak": 1
+},
+{
+"run_id": 1682457694000,
+"name": "Chuo Ward \u8dd1\u6b65",
+"distance": 5086.60411175261,
+"moving_time": "0:42:01",
+"type": "Run",
+"start_date": "2023-04-25 21:21:34",
+"start_date_local": "2023-04-26 06:21:34",
+"location_country": "\u718a\u672c\u5927\u5b66\u85ac\u5b66\u90e8\u767a\u7965\u306e\u5730, \u767d\u5ddd\u3061\u3083\u308a\u3093\u307d\u307f\u3061, \u6176\u5fb3\u5800\u753a, \u4e2d\u592e\u533a, \u718a\u672c\u5e02, \u718a\u672c\u770c, 860-8601, \u65e5\u672c",
+"summary_polyline": "qkdgEsdw|W[^`IvNxD|Kv@vG?|MzAxH`CxDvEnC|CVfWcBEkIiU`Bi@cDI|CYLiEmBmBoHEiO{@iFeFkK}B{C{HyTwAiGuDbBuEaRx@rBvBhLkApAp@d@p@fBbA|FS^qCG",
+"average_heartrate": 122.0,
+"average_speed": 2.01769302330528,
+"source": "Garmin Connect",
+"streak": 1
 }
 ]
