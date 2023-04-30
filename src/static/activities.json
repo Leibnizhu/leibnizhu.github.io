@@ -6928,5 +6928,20 @@
 "average_speed": 2.01769302330528,
 "source": "Garmin Connect",
 "streak": 1
+},
+{
+"run_id": 1682802987000,
+"name": "Beppu City \u8dd1\u6b65",
+"distance": 4501.332913612024,
+"moving_time": "0:34:48",
+"type": "Run",
+"start_date": "2023-04-29 21:16:27",
+"start_date_local": "2023-04-30 06:16:27",
+"location_country": "\u5317\u6d5c\u4e09\u4e01\u76ee, \u5225\u5e9c\u5e02, \u5927\u5206\u770c, 874-0920, \u65e5\u672c",
+"summary_polyline": "kjcjEq~saXl@Ol@eB|I}AlAJg@U{S~CHpD[dBaN|CeBh@CXu@wFeC|@BtG{SrBo@aCC}AcEbB_QrBmI^]`@`Aw@pBJ~Y_E~Ap@j@zBzEw@lGMjN_B|XqGjCS",
+"average_heartrate": 116.0,
+"average_speed": 2.1558107823812374,
+"source": "Garmin Connect",
+"streak": 1
 }
 ]
