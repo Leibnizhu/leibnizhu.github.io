@@ -3474,10 +3474,10 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="5">
 &lt;li>cdh1中新建一个kafka.properties文件, 内容如下:&lt;/li>
 &lt;/ol>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>security.protocol=SASL_PLAINTEXT
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sasl.kerberos.service.name=kafka
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sasl.mechanism=GSSAPI
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>security.inter.broker.protocol=SASL_PLAINTEXT
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-conf" data-lang="conf">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">security.protocol&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">SASL_PLAINTEXT&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">sasl.kerberos.service.name&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">kafka&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">sasl.mechanism&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">GSSAPI&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">security.inter.broker.protocol&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">SASL_PLAINTEXT&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="6">
 &lt;li>编写Spark程序进行测试:&lt;/li>
 &lt;/ol>
@@ -3529,11 +3529,11 @@ Lucene删除索引之后,通过&lt;code>IndexReader.document()&lt;/code>还是�
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="2">
 &lt;li>编辑一个config.properties文件, 内容如下:&lt;/li>
 &lt;/ol>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>kafka.security.protocol=SASL_PLAINTEXT
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>kafka.sasl.kerberos.service.name=kafka
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>kafka.sasl.mechanism=GSSAPI
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>security.inter.broker.protocol=SASL_PLAINTEXT
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sasl.mechanism.inter.broker.protocol=PLAIN
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-conf" data-lang="conf">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">kafka.security.protocol&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">SASL_PLAINTEXT&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">kafka.sasl.kerberos.service.name&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">kafka&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">kafka.sasl.mechanism&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">GSSAPI&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">security.inter.broker.protocol&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">SASL_PLAINTEXT&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">sasl.mechanism.inter.broker.protocol&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#ef6155">PLAIN&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="3">
 &lt;li>在maxwell启动命令中增加参数:&lt;/li>
 &lt;/ol>
