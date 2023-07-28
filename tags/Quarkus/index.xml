@@ -1,4 +1,69 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Quarkus on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Quarkus/</link><description>Recent content in Quarkus on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 10 Mar 2023 13:17:21 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Quarkus/index.xml" rel="self" type="application/rss+xml"/><item><title>Quarkus RestClient路径参数URL编码问题</title><link>https://leibnizhu.github.io/p/Quarkus-RestClient%E8%B7%AF%E5%BE%84%E5%8F%82%E6%95%B0URL%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98/</link><pubDate>Fri, 10 Mar 2023 13:17:21 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus-RestClient%E8%B7%AF%E5%BE%84%E5%8F%82%E6%95%B0URL%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus-RestClient%E8%B7%AF%E5%BE%84%E5%8F%82%E6%95%B0URL%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98/thumbnail.jpg" alt="Featured image of post Quarkus RestClient路径参数URL编码问题" />&lt;p>问题比较简单，简单记录下。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Quarkus on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Quarkus/</link><description>Recent content in Quarkus on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 28 Jul 2023 12:11:44 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Quarkus/index.xml" rel="self" type="application/rss+xml"/><item><title>升级Quarkus3备忘录</title><link>https://leibnizhu.github.io/p/%E5%8D%87%E7%BA%A7Quarkus3%E5%A4%87%E5%BF%98%E5%BD%95/</link><pubDate>Fri, 28 Jul 2023 12:11:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%8D%87%E7%BA%A7Quarkus3%E5%A4%87%E5%BF%98%E5%BD%95/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%8D%87%E7%BA%A7Quarkus3%E5%A4%87%E5%BF%98%E5%BD%95/zelda.png" alt="Featured image of post 升级Quarkus3备忘录" />&lt;p>Quarkus3已经发布一段时间了（&lt;a class="link" href="https://cn.quarkus.io/blog/quarkus-3-0-final-released/" target="_blank" rel="noopener"
+>Quarkus 3.0, our new major release, is here! April 26, 2023&lt;/a>），不知道大家都升级了没有。&lt;br>
+而Quarkus3.2也成为了首个LTS版本（&lt;a class="link" href="https://quarkus.io/blog/lts-releases/" target="_blank" rel="noopener"
+>Long-Term Support (LTS) for Quarkus&lt;/a>），很适合升级。&lt;br>
+官方给出了升级的方法，如：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.0" target="_blank" rel="noopener"
+>Migration Guide 3.0&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.0:-Hibernate-ORM-5-to-6-migration" target="_blank" rel="noopener"
+>Migration Guide 3.0: Hibernate ORM 5 to 6 migration&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.1" target="_blank" rel="noopener"
+>Migration Guide 3.1&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/quarkusio/quarkus/wiki/Migration-Guide-3.2" target="_blank" rel="noopener"
+>Migration Guide 3.2&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>但实际升级下来，除了官方Migration Guide以外，还有一些其他的必要的调整，如第三方插件，在此记录。&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>kubernetes-client&lt;/code> 系列依赖从6.3升级到6.7，部分api不兼容；因此要检查pom文件，确认是否有显式声明的依赖版本和 &lt;code>quarkus-bom&lt;/code> 所定义的版本冲突；其他的依赖类似的，比如 &lt;code>quarkus-bom&lt;/code> 声明了一个依赖A及其子依赖B的版本，而在项目中显式声明了依赖A的版本，则其B与A可能不兼容&lt;/li>
+&lt;li>如果测试中使用到h2数据库，需要在jdbcUrl加上 &lt;code>DATABASE_TO_UPPER=false&lt;/code> 以避免一些sql语句失败；h2变成默认区分大小写了，具体原因未知&lt;/li>
+&lt;li>javax转jakarta包这点是官方Migration Guide里面有写的，但要注意配置文件里如果用到也记得修改。如restclient的scope配置&lt;/li>
+&lt;li>如果使用到lombok，建议升级到最新版，并需要在 &lt;code>maven-compiler-plugin&lt;/code> 插件加上：
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;annotationProcessorPaths&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;path&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.projectlombok&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>lombok&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${lombok.version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/path&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/annotationProcessorPaths&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
+&lt;li>一些插件依赖的升级：
+&lt;ul>
+&lt;li>quarkus-logging-logback=1.1.0&lt;/li>
+&lt;li>logback-core=1.4.7&lt;/li>
+&lt;li>quarkus-mybatis-plus=2.0.0&lt;/li>
+&lt;li>quarkus-openapi-generator=2.2.8&lt;/li>
+&lt;li>mockito-inline=5.2.0&lt;/li>
+&lt;li>显式增加 quarkus-rest-client-jackson 依赖（quarkus3不绑定在 quarkus-rest-client 里面了）&lt;/li>
+&lt;li>openapi-generator-maven-plugin 升级6.6.0，并加上 &lt;code>&amp;lt;useJakartaEe&amp;gt;true&amp;lt;/useJakartaEe&amp;gt;&lt;/code> 配置，这样生成的代码的import才是使用jakarta包的；但升级后，model前缀的替换出现问题，如果不使用 &lt;code>modelNamePrefix + importMappings&lt;/code> 配置则无影响&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>如果使用到spotless，注意检查import顺序是否加上了jakarta包&lt;/li>
+&lt;li>Hibernate升级带来的一些调整；
+&lt;ul>
+&lt;li>hql语句必须用实体的属性名，需要检查&lt;/li>
+&lt;li>hql语句对类型的检查更为严格，需要检查&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>由于Quarkus3使用的 &lt;code>Resteasy&lt;/code> 升级到6.x（升级Jakarta REST3），所以如果你的应用使用到Skywalking进行监控，则原来的Resteasy4.x插件无法正常工作：
+&lt;ul>
+&lt;li>为此我写了Skywalking javaagent的Resteasy 6.x plugin&lt;/li>
+&lt;li>该PR &lt;a class="link" href="https://github.com/apache/skywalking-java/pull/587" target="_blank" rel="noopener"
+>Add support for RESTEasy 6.x #587&lt;/a> 已合入主分支&lt;/li>
+&lt;li>该特性随Skywalking javaagent 9.0.0版本发布，预估最早8月底发布：&lt;img src="https://leibnizhu.github.io/p/%E5%8D%87%E7%BA%A7Quarkus3%E5%A4%87%E5%BF%98%E5%BD%95/skw9.png"
+width="1834"
+height="642"
+srcset="https://leibnizhu.github.io/p/%E5%8D%87%E7%BA%A7Quarkus3%E5%A4%87%E5%BF%98%E5%BD%95/skw9_hu4dff89fbeb87127e2d9147e6535d98ab_128230_480x0_resize_box_3.png 480w, https://leibnizhu.github.io/p/%E5%8D%87%E7%BA%A7Quarkus3%E5%A4%87%E5%BF%98%E5%BD%95/skw9_hu4dff89fbeb87127e2d9147e6535d98ab_128230_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="285"
+data-flex-basis="685px"
+>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol></description></item><item><title>Quarkus RestClient路径参数URL编码问题</title><link>https://leibnizhu.github.io/p/Quarkus-RestClient%E8%B7%AF%E5%BE%84%E5%8F%82%E6%95%B0URL%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98/</link><pubDate>Fri, 10 Mar 2023 13:17:21 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus-RestClient%E8%B7%AF%E5%BE%84%E5%8F%82%E6%95%B0URL%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus-RestClient%E8%B7%AF%E5%BE%84%E5%8F%82%E6%95%B0URL%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98/thumbnail.jpg" alt="Featured image of post Quarkus RestClient路径参数URL编码问题" />&lt;p>问题比较简单，简单记录下。&lt;/p>
 &lt;p>当我们在Quarkus中使用他的 &lt;a class="link" href="https://cn.quarkus.io/guides/rest-client" target="_blank" rel="noopener"
 >RestClient&lt;/a>，恩其实主要是用RestEasy client，声明了一个带路径参数的API，如：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Path&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/path&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
