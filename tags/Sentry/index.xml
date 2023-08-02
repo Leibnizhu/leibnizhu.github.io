@@ -206,5 +206,5 @@ data-flex-basis="606px"
 &lt;h3 id="hive最高权限">Hive最高权限&lt;/h3>
 &lt;p>Hue中配置的Hive权限是针对表的读写权限的, 并没有涉及到建库建表的权限, 使用管理员用户可以赋予该权限, 进入hue
 的Hive编辑器, 执行:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> server server1 &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#815ba4">role&lt;/span> hue&lt;span style="color:#ef6155">角色名&lt;/span>;
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> server server1 &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#815ba4">role&lt;/span> hue角色名;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

@@ -11,7 +11,7 @@ data-flex-basis="347px"
 >&lt;/p>
 &lt;h2 id="成员变量">成员变量&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//记录长度
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">transient&lt;/span> &lt;span style="color:#fec418">int&lt;/span> size &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#f99b15">0&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">transient&lt;/span> &lt;span style="color:#fec418">int&lt;/span> size &lt;span style="color:#5bc4bf">=&lt;/span> 0&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//第一个元素的指针
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">transient&lt;/span> Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> first&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//最后一个元素的指针（为了增加从尾部开始的速度，及支持一些增删改查尾部元素的方法）
