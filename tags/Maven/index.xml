@@ -336,7 +336,7 @@ data-flex-basis="1058px"
 注: MacOS下可能会提示：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>gpg: signing failed: Inappropriate ioctl for device
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>请先输入：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>export GPG_TTY=$(tty)
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">export&lt;/span> GPG_TTY&lt;span style="color:#5bc4bf">=$&lt;/span>(tty)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再执行&lt;code>mvn deploy&lt;/code>&lt;/p>
 &lt;h3 id="oss发布">OSS发布&lt;/h3>
 &lt;p>打开 &lt;a class="link" href="https://oss.sonatype.org/" target="_blank" rel="noopener"

@@ -44,7 +44,7 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">+&lt;/span> x&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">toString&lt;/span>&lt;span style="color:#5bc4bf">());&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// If we can not find ISO-8859-1 (a required encoding) then things
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// are seriously wrong with the installation.
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> System&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">exit&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>1&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> System&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">exit&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#f99b15">1&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
