@@ -21,3 +21,6 @@ lxml
 # if you need to import kml file
 fastkml
 eviltransform
+garth
+aiofiles
+fit-tool
