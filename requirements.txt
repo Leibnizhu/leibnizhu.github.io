@@ -21,6 +21,7 @@ lxml
 # if you need to import kml file
 fastkml
 eviltransform
+stravaweblib
 garth
 aiofiles
 fit-tool
