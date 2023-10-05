@@ -20,7 +20,7 @@ import garth
 import httpx
 from config import FOLDER_DICT, JSON_FILE, SQL_FILE, config
 from garmin_device_adaptor import wrap_device_info
-from utils import make_activities_file
+from utils import make_activities_file_v2
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -356,4 +356,4 @@ if __name__ == "__main__":
         )
     )
     loop.run_until_complete(future)
-    make_activities_file(SQL_FILE, folder, JSON_FILE, file_suffix=file_type)
+    make_activities_file_v2(SQL_FILE, folder, JSON_FILE, file_suffix=file_type)

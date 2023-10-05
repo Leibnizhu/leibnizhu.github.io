@@ -9,6 +9,7 @@ from sqlalchemy import func
 
 from .db import Activity, init_db, update_or_create_activity
 
+from synced_data_file_logger import save_synced_data_file_list
 
 class Generator:
     def __init__(self, db_path):
@@ -77,6 +78,29 @@ class Generator:
             else:
                 sys.stdout.write(".")
             sys.stdout.flush()
+
+        self.session.commit()
+
+    def sync_from_data_dir(self, data_dir, file_suffix="gpx"):
+        loader = track_loader.TrackLoader()
+        tracks = loader.load_tracks_v2(data_dir, file_suffix=file_suffix)
+        print(f"load {len(tracks)} tracks")
+        if not tracks:
+            print("No tracks found.")
+            return
+
+        synced_files = []
+
+        for t in tracks:
+            created = update_or_create_activity(self.session, t.to_namedtuple())
+            if created:
+                sys.stdout.write("+")
+            else:
+                sys.stdout.write(".")
+            synced_files.extend(t.file_names)
+            sys.stdout.flush()
+
+        save_synced_data_file_list(synced_files)
 
         self.session.commit()
 
