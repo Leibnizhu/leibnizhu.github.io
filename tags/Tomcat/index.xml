@@ -20,9 +20,9 @@ data-flex-basis="169px"
 从UML图可以看到，Tomcat中&lt;code>HttpServletRequest&lt;/code>和&lt;code>HttpServletResponse&lt;/code>的实现类是&lt;code>org.apache.catalina.connector.Request&lt;/code>和&lt;code>org.apache.catalina.connector.Response&lt;/code>，但实际提供给Servlet的时候用的是门面类&lt;code>RequestFacade&lt;/code>和&lt;code>ResponseFacade&lt;/code>。这是因为实现类里面的public方法比接口的多，而且可能涉及到安全问题，如果Servlet直接将其强转成实现类，是可以访问这些方法的，存在安全问题，因为使用了门面模式，将这些方法隐藏起来。&lt;/p>
 &lt;h3 id="统一日志消息处理">统一日志消息处理&lt;/h3>
 &lt;p>Tomcat8使用&lt;code>org.apache.catalina.tribes.util.StringManager&lt;/code>对日志消息进行统一处理，每个包一般都有一个&lt;code>LocalStrings.properties&lt;/code>文件，需要调用这些日志信息的类，会维护一个&lt;code>StringManager&lt;/code>的实例，初始化时以当前包名为参数，以获取当前包对应的&lt;code>LocalStrings.properties&lt;/code>文件：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#06b6ef">StringManager&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>String packageName&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> Hashtable&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">,&lt;/span> StringManager&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> managers &lt;span style="color:#5bc4bf">=&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">new&lt;/span> Hashtable&lt;span style="color:#5bc4bf">&amp;lt;&amp;gt;();&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#06b6ef">StringManager&lt;/span>(String packageName);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> Hashtable&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String, StringManager&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> managers &lt;span style="color:#5bc4bf">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">new&lt;/span> Hashtable&lt;span style="color:#5bc4bf">&amp;lt;&amp;gt;&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Get the StringManager for a particular package. If a manager for
@@ -31,26 +31,26 @@ data-flex-basis="169px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> *
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * @param packageName The package name
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">synchronized&lt;/span> StringManager &lt;span style="color:#06b6ef">getManager&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>String packageName&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> StringManager mgr &lt;span style="color:#5bc4bf">=&lt;/span> managers&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">get&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>packageName&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>mgr &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> mgr &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> StringManager&lt;span style="color:#5bc4bf">(&lt;/span>packageName&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> managers&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">put&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>packageName&lt;span style="color:#5bc4bf">,&lt;/span> mgr&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> mgr&lt;span style="color:#5bc4bf">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">synchronized&lt;/span> StringManager &lt;span style="color:#06b6ef">getManager&lt;/span>(String packageName) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> StringManager mgr &lt;span style="color:#5bc4bf">=&lt;/span> managers.&lt;span style="color:#06b6ef">get&lt;/span>(packageName);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (mgr &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> mgr &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> StringManager(packageName);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> managers.&lt;span style="color:#06b6ef">put&lt;/span>(packageName, mgr);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> mgr;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/* For Example */&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> StringManager sm &lt;span style="color:#5bc4bf">=&lt;/span> StringManager&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getManager&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>Constants&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">Package&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> StringManager sm &lt;span style="color:#5bc4bf">=&lt;/span> StringManager.&lt;span style="color:#06b6ef">getManager&lt;/span>(Constants.&lt;span style="color:#06b6ef">Package&lt;/span>);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到它使用了&lt;code>Hashtable&lt;/code>来维护每个包对应的&lt;code>StringManager&lt;/code>单例。&lt;br>
 然后在需要读取消息的时候调用&lt;code>StringManager&lt;/code>的&lt;code>getString(String key)&lt;/code>方法，如：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>log&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">info&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>sm&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getString&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;receiverBase.socket.bind&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> addr&lt;span style="color:#5bc4bf">));&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>log.&lt;span style="color:#06b6ef">info&lt;/span>(sm.&lt;span style="color:#06b6ef">getString&lt;/span>(&lt;span style="color:#48b685">&amp;#34;receiverBase.socket.bind&amp;#34;&lt;/span>, addr));
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="请求参数等的懒解析">请求参数等的懒解析&lt;/h3>
 &lt;p>为了提高效率，请求参数在第一次调用&lt;code>public String getParameter(String name)&lt;/code>、&lt;code>public Enumeration&amp;lt;String&amp;gt; getParameterNames()&lt;/code>等方法的时候才会解析，如果整个请求响应处理过程中都没有调用相关方法的话，请求参数将不会被解析，因为字符串处理的消耗不低。其他的一些属性也有类似的处理。主要的代码如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Request parameters parsed flag.
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> parametersParsed &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> parametersParsed &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">false&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Return the value of the specified request parameter, if any; otherwise,
@@ -60,13 +60,13 @@ data-flex-basis="169px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * @param name Name of the desired request parameter
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Override&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">getParameter&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>String name&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(!&lt;/span>parametersParsed&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parseParameters&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> coyoteRequest&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getParameters&lt;/span>&lt;span style="color:#5bc4bf">().&lt;/span>&lt;span style="color:#06b6ef">getParameter&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>name&lt;span style="color:#5bc4bf">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">getParameter&lt;/span>(String name) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (&lt;span style="color:#5bc4bf">!&lt;/span>parametersParsed) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parseParameters();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> coyoteRequest.&lt;span style="color:#06b6ef">getParameters&lt;/span>().&lt;span style="color:#06b6ef">getParameter&lt;/span>(name);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Returns a &amp;lt;code&amp;gt;Map&amp;lt;/code&amp;gt; of the parameters of this request.
@@ -78,40 +78,40 @@ data-flex-basis="169px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * and parameter values as map values.
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Override&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Map&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">,&lt;/span> String&lt;span style="color:#5bc4bf">[]&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">getParameterMap&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>parameterMap&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">isLocked&lt;/span>&lt;span style="color:#5bc4bf">())&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> parameterMap&lt;span style="color:#5bc4bf">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Enumeration&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> enumeration &lt;span style="color:#5bc4bf">=&lt;/span> getParameterNames&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">while&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>enumeration&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">hasMoreElements&lt;/span>&lt;span style="color:#5bc4bf">())&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String name &lt;span style="color:#5bc4bf">=&lt;/span> enumeration&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">nextElement&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String&lt;span style="color:#5bc4bf">[]&lt;/span> values &lt;span style="color:#5bc4bf">=&lt;/span> getParameterValues&lt;span style="color:#5bc4bf">(&lt;/span>name&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parameterMap&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">put&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>name&lt;span style="color:#5bc4bf">,&lt;/span> values&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parameterMap&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">setLocked&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> parameterMap&lt;span style="color:#5bc4bf">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Map&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String, String&lt;span style="color:#5bc4bf">[]&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">getParameterMap&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (parameterMap.&lt;span style="color:#06b6ef">isLocked&lt;/span>()) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> parameterMap;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Enumeration&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> enumeration &lt;span style="color:#5bc4bf">=&lt;/span> getParameterNames();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">while&lt;/span> (enumeration.&lt;span style="color:#06b6ef">hasMoreElements&lt;/span>()) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String name &lt;span style="color:#5bc4bf">=&lt;/span> enumeration.&lt;span style="color:#06b6ef">nextElement&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String&lt;span style="color:#5bc4bf">[]&lt;/span> values &lt;span style="color:#5bc4bf">=&lt;/span> getParameterValues(name);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parameterMap.&lt;span style="color:#06b6ef">put&lt;/span>(name, values);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parameterMap.&lt;span style="color:#06b6ef">setLocked&lt;/span>(&lt;span style="color:#815ba4">true&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> parameterMap;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Return the names of all defined request parameters for this request.
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Override&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Enumeration&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">getParameterNames&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(!&lt;/span>parametersParsed&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parseParameters&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> coyoteRequest&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getParameters&lt;/span>&lt;span style="color:#5bc4bf">().&lt;/span>&lt;span style="color:#06b6ef">getParameterNames&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Enumeration&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">getParameterNames&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (&lt;span style="color:#5bc4bf">!&lt;/span>parametersParsed) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parseParameters();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> coyoteRequest.&lt;span style="color:#06b6ef">getParameters&lt;/span>().&lt;span style="color:#06b6ef">getParameterNames&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Parse request parameters.
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">parseParameters&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parametersParsed &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">parseParameters&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> parametersParsed &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">true&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">/*………具体的解析处理，在此省略………*/&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中&lt;code>ParameterMap&lt;/code>是一个继承了&lt;code>LinkedHashMap&lt;/code>的类：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">ParameterMap&lt;/span>&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>K&lt;span style="color:#5bc4bf">,&lt;/span>V&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> LinkedHashMap&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>K&lt;span style="color:#5bc4bf">,&lt;/span>V&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">ParameterMap&lt;/span>&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>K,V&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> LinkedHashMap&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>K,V&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="connector连接器">Connector连接器&lt;/h3>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/Tomcat8%E6%BA%90%E7%A0%81%E8%AF%BB%E5%90%8E%E6%84%9F/connector.png"
 width="526"

@@ -50,16 +50,16 @@ data-flex-basis="500px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中h1的&lt;strong>th:text=&amp;quot;${host}&amp;quot;&lt;/strong> 即为Thymeleaf的属性，表示获取ModelMap中的host属性赋值给h1的文本；而这个文件直接用浏览器访问的时候h1元素则显示“Hello World”。
 再编写一个Controller：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Controller&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/template&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">TemplateController&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;/&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">index&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>ModelMap map&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 加入一个属性，用来在模板中读取
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> map&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">addAttribute&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;host&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#48b685">&amp;#34;http://www.turingdi.com&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// return模板文件的名称，对应resources/templates/temp.html
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#48b685">&amp;#34;temp&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>(&lt;span style="color:#48b685">&amp;#34;/template&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">TemplateController&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@RequestMapping&lt;/span>(&lt;span style="color:#48b685">&amp;#34;/&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">index&lt;/span>(ModelMap map) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 加入一个属性，用来在模板中读取&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> map.&lt;span style="color:#06b6ef">addAttribute&lt;/span>(&lt;span style="color:#48b685">&amp;#34;host&amp;#34;&lt;/span>, &lt;span style="color:#48b685">&amp;#34;http://www.turingdi.com&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// return模板文件的名称，对应resources/templates/temp.html&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#48b685">&amp;#34;temp&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意这里使用了@Controller注解而不是之前的@RestController，若使用后者，index()方法返回的”temp”会直接以JSON格式返回，页面显示“temp”。实际上我们使用@Controller注解并加入了Thymeleaf模板引擎后，index()方法返回的”temp”会被Thymeleaf模板引擎理解为src/main/resources/templates/temp.html文件，然后解析该文档并响应返回。在浏览器中接收到的html源码如下：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/8.png"
 width="254"

@@ -191,10 +191,10 @@ data-flex-grow="161"
 data-flex-basis="386px"
 >&lt;/p>
 &lt;p>参考注释：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// Add the localized Hadoop config at the end of the classpath, in case it contains other
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// files (such as configuration files for different services) that are not part of the
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// YARN cluster&amp;#39;s config.
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是为了防止将其他非Yarn集群配置的文件也引入了。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// Add the localized Hadoop config at the end of the classpath, in case it contains other&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// files (such as configuration files for different services) that are not part of the&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// YARN cluster&amp;#39;s config.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是为了防止将其他非Yarn集群配置的文件也引入了。&lt;/p>
 &lt;h4 id="createconfarchive">createConfArchive()&lt;/h4>
 &lt;p>这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。&lt;/p>
 &lt;p>&lt;a class="link" href="https://issues.apache.org/jira/browse/SPARK-23630" target="_blank" rel="noopener"

@@ -103,9 +103,9 @@ data-flex-basis="1116px"
 &lt;/tbody>
 &lt;/table>
 &lt;p>描述符描述方法的时候，先是参数列表，然后是返回值类型。而方法&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">toString&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">int&lt;/span> test&lt;span style="color:#5bc4bf">)&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">toString&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> test)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>对应的描述符是&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">(&lt;/span>I&lt;span style="color:#5bc4bf">)&lt;/span>Ljava&lt;span style="color:#5bc4bf">/&lt;/span>lang&lt;span style="color:#5bc4bf">/&lt;/span>String&lt;span style="color:#5bc4bf">;&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>(I)Ljava&lt;span style="color:#5bc4bf">/&lt;/span>lang&lt;span style="color:#5bc4bf">/&lt;/span>String;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中L是表示对象类型。&lt;br>
 此外，字段表集合不会列出从父类或接口中继承的字段，但可能会有代码中不存在的字段，比如内部类对外部类实例的引用之类。&lt;/p>
 &lt;h3 id="方法表集合">方法表集合&lt;/h3>

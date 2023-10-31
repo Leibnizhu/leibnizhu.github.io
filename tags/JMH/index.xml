@@ -18,62 +18,62 @@ data-flex-basis="533px"
 &lt;h3 id="编写benchmark方法">编写BenchMark方法&lt;/h3>
 &lt;p>安装&lt;code>JMH Plugin&lt;/code>插件之后无需编写入口方法、增加依赖，可以直接关注具体的测试。&lt;br>
 编写一个简单例子，测试我们容器的测试用例吞吐量：&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@BenchmarkMode&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>Mode&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">Throughput&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">NettyServletBenchmark&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@BenchmarkMode&lt;/span>(Mode.&lt;span style="color:#06b6ef">Throughput&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">NettyServletBenchmark&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Benchmark&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Warmup&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>iterations &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#f99b15">10&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Measurement&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>iterations &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#f99b15">20&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">plaintext&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/plaintext&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Warmup&lt;/span>(iterations &lt;span style="color:#5bc4bf">=&lt;/span> 10)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Measurement&lt;/span>(iterations &lt;span style="color:#5bc4bf">=&lt;/span> 20)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">plaintext&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl(&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/plaintext&amp;#34;&lt;/span>, &lt;span style="color:#815ba4">false&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Benchmark&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Warmup&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>iterations &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#f99b15">10&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Measurement&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>iterations &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#f99b15">20&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">json&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/json?msg=1&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Warmup&lt;/span>(iterations &lt;span style="color:#5bc4bf">=&lt;/span> 10)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Measurement&lt;/span>(iterations &lt;span style="color:#5bc4bf">=&lt;/span> 20)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">json&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl(&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/json?msg=1&amp;#34;&lt;/span>, &lt;span style="color:#815ba4">false&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> String &lt;span style="color:#06b6ef">getUrl&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>String url&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> read&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> BufferedReader br &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> InputStream is &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> StringBuilder sbuf &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> StringBuilder&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> URL reqURL &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> URL&lt;span style="color:#5bc4bf">(&lt;/span>url&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> HttpURLConnection connection &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>HttpURLConnection&lt;span style="color:#5bc4bf">)&lt;/span> reqURL&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">openConnection&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span> &lt;span style="color:#776e71">// 进行连接，但是实际上getrequest要在下一句的connection.getInputStream() 函数中才会真正发到服务器
-&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">setDoOutput&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">setUseCaches&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">setRequestMethod&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;GET&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">setConnectTimeout&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#f99b15">200&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">setDoInput&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">connect&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>read&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> br &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> BufferedReader&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> InputStreamReader&lt;span style="color:#5bc4bf">(&lt;/span>connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getInputStream&lt;/span>&lt;span style="color:#5bc4bf">()));&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String line&lt;span style="color:#5bc4bf">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">while&lt;/span> &lt;span style="color:#5bc4bf">((&lt;/span>line &lt;span style="color:#5bc4bf">=&lt;/span> br&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">readLine&lt;/span>&lt;span style="color:#5bc4bf">())&lt;/span> &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sbuf&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">append&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>line&lt;span style="color:#5bc4bf">).&lt;/span>&lt;span style="color:#06b6ef">append&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;\n&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#815ba4">else&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> is &lt;span style="color:#5bc4bf">=&lt;/span> connection&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getInputStream&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> String &lt;span style="color:#06b6ef">getUrl&lt;/span>(String url, &lt;span style="color:#fec418">boolean&lt;/span> read) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> BufferedReader br &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> InputStream is &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> StringBuilder sbuf &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> StringBuilder();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> URL reqURL &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> URL(url);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> HttpURLConnection connection &lt;span style="color:#5bc4bf">=&lt;/span> (HttpURLConnection) reqURL.&lt;span style="color:#06b6ef">openConnection&lt;/span>(); &lt;span style="color:#776e71">// 进行连接，但是实际上getrequest要在下一句的connection.getInputStream() 函数中才会真正发到服务器&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection.&lt;span style="color:#06b6ef">setDoOutput&lt;/span>(&lt;span style="color:#815ba4">false&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection.&lt;span style="color:#06b6ef">setUseCaches&lt;/span>(&lt;span style="color:#815ba4">false&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection.&lt;span style="color:#06b6ef">setRequestMethod&lt;/span>(&lt;span style="color:#48b685">&amp;#34;GET&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection.&lt;span style="color:#06b6ef">setConnectTimeout&lt;/span>(200);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection.&lt;span style="color:#06b6ef">setDoInput&lt;/span>(&lt;span style="color:#815ba4">true&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> connection.&lt;span style="color:#06b6ef">connect&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (read) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> br &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> BufferedReader(&lt;span style="color:#815ba4">new&lt;/span> InputStreamReader(connection.&lt;span style="color:#06b6ef">getInputStream&lt;/span>()));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String line;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">while&lt;/span> ((line &lt;span style="color:#5bc4bf">=&lt;/span> br.&lt;span style="color:#06b6ef">readLine&lt;/span>()) &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sbuf.&lt;span style="color:#06b6ef">append&lt;/span>(line).&lt;span style="color:#06b6ef">append&lt;/span>(&lt;span style="color:#48b685">&amp;#34;\n&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> is &lt;span style="color:#5bc4bf">=&lt;/span> connection.&lt;span style="color:#06b6ef">getInputStream&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#815ba4">catch&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>IOException e&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> System&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">out&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">println&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;连接服务器&amp;#39;&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> url &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#48b685">&amp;#34;&amp;#39;时发生错误：&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> e&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">getMessage&lt;/span>&lt;span style="color:#5bc4bf">());&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#815ba4">finally&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">null&lt;/span> &lt;span style="color:#5bc4bf">!=&lt;/span> br&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> br&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">close&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>is &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> is&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">close&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span> &lt;span style="color:#815ba4">catch&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>IOException e&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> e&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">printStackTrace&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> sbuf&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#06b6ef">toString&lt;/span>&lt;span style="color:#5bc4bf">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">catch&lt;/span> (IOException e) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> System.&lt;span style="color:#06b6ef">out&lt;/span>.&lt;span style="color:#06b6ef">println&lt;/span>(&lt;span style="color:#48b685">&amp;#34;连接服务器&amp;#39;&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> url &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#48b685">&amp;#34;&amp;#39;时发生错误：&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> e.&lt;span style="color:#06b6ef">getMessage&lt;/span>());
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">finally&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (&lt;span style="color:#815ba4">null&lt;/span> &lt;span style="color:#5bc4bf">!=&lt;/span> br) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> br.&lt;span style="color:#06b6ef">close&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (is &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> is.&lt;span style="color:#06b6ef">close&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">catch&lt;/span> (IOException e) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> e.&lt;span style="color:#06b6ef">printStackTrace&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> sbuf.&lt;span style="color:#06b6ef">toString&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中&lt;code>@BenchmarkMode(Mode.Throughput)&lt;/code>表示测试吞吐量，即一秒内可以跑多少次测试方法。其他的测试模式如下：&lt;/p>
 &lt;table>
 &lt;thead>
@@ -111,11 +111,11 @@ data-flex-basis="533px"
 &lt;/table>
 &lt;p>接下来是具体的测试方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Benchmark&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Warmup&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>iterations &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#f99b15">10&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Measurement&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>iterations &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#f99b15">20&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">plaintext&lt;/span>&lt;span style="color:#5bc4bf">()&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/plaintext&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> &lt;span style="color:#815ba4">false&lt;/span>&lt;span style="color:#5bc4bf">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Warmup&lt;/span>(iterations &lt;span style="color:#5bc4bf">=&lt;/span> 10)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Measurement&lt;/span>(iterations &lt;span style="color:#5bc4bf">=&lt;/span> 20)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">plaintext&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl(&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/plaintext&amp;#34;&lt;/span>, &lt;span style="color:#815ba4">false&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中&lt;code>@Benchmark&lt;/code>注解表示当前方法是需要JMH执行测试的方法，&lt;code>@Warmup(iterations = 10)&lt;/code>表示每次正式测试前，先跑10次进行热身（不参与测试结果的计算），&lt;code>@Measurement(iterations = 20)&lt;/code>表示每次正式测试执行20次方法。&lt;/p>
 &lt;h3 id="执行测试">执行测试&lt;/h3>
 &lt;p>执行方法很简单，点击菜单&lt;code>Run-Run...&lt;/code>，弹出窗中选择当前类，即可：&lt;br>
