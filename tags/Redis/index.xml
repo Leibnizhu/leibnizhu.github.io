@@ -22,50 +22,50 @@ data-flex-basis="344px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th style="text-align:left">参数名&lt;/th>
-&lt;th style="text-align:left">说明&lt;/th>
+&lt;th style="text-align: left">参数名&lt;/th>
+&lt;th style="text-align: left">说明&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td style="text-align:left">server&lt;/td>
-&lt;td style="text-align:left">获取 server 信息，包括 version, OS, port 等信息&lt;/td>
+&lt;td style="text-align: left">server&lt;/td>
+&lt;td style="text-align: left">获取 server 信息，包括 version, OS, port 等信息&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">clients&lt;/td>
-&lt;td style="text-align:left">获取 clients 信息，如客户端连接数等&lt;/td>
+&lt;td style="text-align: left">clients&lt;/td>
+&lt;td style="text-align: left">获取 clients 信息，如客户端连接数等&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">memory&lt;/td>
-&lt;td style="text-align:left">获取 server 的内存信息，包括当前内存消耗、内存使用峰值&lt;/td>
+&lt;td style="text-align: left">memory&lt;/td>
+&lt;td style="text-align: left">获取 server 的内存信息，包括当前内存消耗、内存使用峰值&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">persistence&lt;/td>
-&lt;td style="text-align:left">获取 server 的持久化配置信息&lt;/td>
+&lt;td style="text-align: left">persistence&lt;/td>
+&lt;td style="text-align: left">获取 server 的持久化配置信息&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">stats&lt;/td>
-&lt;td style="text-align:left">获取 server 的一些基本统计信息，如处理过的连接数量等&lt;/td>
+&lt;td style="text-align: left">stats&lt;/td>
+&lt;td style="text-align: left">获取 server 的一些基本统计信息，如处理过的连接数量等&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">replication&lt;/td>
-&lt;td style="text-align:left">获取 server 的主从配置信息&lt;/td>
+&lt;td style="text-align: left">replication&lt;/td>
+&lt;td style="text-align: left">获取 server 的主从配置信息&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">cpu&lt;/td>
-&lt;td style="text-align:left">获取 server 的 CPU 使用信息&lt;/td>
+&lt;td style="text-align: left">cpu&lt;/td>
+&lt;td style="text-align: left">获取 server 的 CPU 使用信息&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">keyspace&lt;/td>
-&lt;td style="text-align:left">获取 server 中各个 DB 的 key 的数量&lt;/td>
+&lt;td style="text-align: left">keyspace&lt;/td>
+&lt;td style="text-align: left">获取 server 中各个 DB 的 key 的数量&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">cluster&lt;/td>
-&lt;td style="text-align:left">获取集群节点信息，仅在开启集群后可见&lt;/td>
+&lt;td style="text-align: left">cluster&lt;/td>
+&lt;td style="text-align: left">获取集群节点信息，仅在开启集群后可见&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">commandstats&lt;/td>
-&lt;td style="text-align:left">获取每种命令的统计信息，非常有用&lt;/td>
+&lt;td style="text-align: left">commandstats&lt;/td>
+&lt;td style="text-align: left">获取每种命令的统计信息，非常有用&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>

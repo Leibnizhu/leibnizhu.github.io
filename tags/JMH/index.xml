@@ -78,34 +78,34 @@ data-flex-basis="533px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th style="text-align:left">名称&lt;/th>
-&lt;th style="text-align:left">描述&lt;/th>
+&lt;th style="text-align: left">名称&lt;/th>
+&lt;th style="text-align: left">描述&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td style="text-align:left">Mode.Throughput&lt;/td>
-&lt;td style="text-align:left">计算一个时间单位内操作数量&lt;/td>
+&lt;td style="text-align: left">Mode.Throughput&lt;/td>
+&lt;td style="text-align: left">计算一个时间单位内操作数量&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">Mode.AverageTime&lt;/td>
-&lt;td style="text-align:left">计算平均运行时间&lt;/td>
+&lt;td style="text-align: left">Mode.AverageTime&lt;/td>
+&lt;td style="text-align: left">计算平均运行时间&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">Mode.SampleTime&lt;/td>
-&lt;td style="text-align:left">计算一个方法的运行时间(包括百分位)&lt;/td>
+&lt;td style="text-align: left">Mode.SampleTime&lt;/td>
+&lt;td style="text-align: left">计算一个方法的运行时间(包括百分位)&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">Mode.SingleShotTime&lt;/td>
-&lt;td style="text-align:left">方法仅运行一次(用于冷测试模式)。或者特定批量大小的迭代多次运行；这种情况下JMH将计算批处理运行时间(一次批处理所有调用的总时间)&lt;/td>
+&lt;td style="text-align: left">Mode.SingleShotTime&lt;/td>
+&lt;td style="text-align: left">方法仅运行一次(用于冷测试模式)。或者特定批量大小的迭代多次运行；这种情况下JMH将计算批处理运行时间(一次批处理所有调用的总时间)&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">这些模式的任意组合&lt;/td>
-&lt;td style="text-align:left">可以指定这些模式的任意组合——该测试运行多次(取决于请求模式的数量)&lt;/td>
+&lt;td style="text-align: left">这些模式的任意组合&lt;/td>
+&lt;td style="text-align: left">可以指定这些模式的任意组合——该测试运行多次(取决于请求模式的数量)&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">Mode.All&lt;/td>
-&lt;td style="text-align:left">所有模式依次运行&lt;/td>
+&lt;td style="text-align: left">Mode.All&lt;/td>
+&lt;td style="text-align: left">所有模式依次运行&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>

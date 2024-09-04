@@ -128,22 +128,22 @@ data-flex-basis="207px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>✅ Iceberg 是……&lt;/th>
-&lt;th>❌ Iceberg不是……&lt;/th>
+&lt;th style="text-align: left">✅ Iceberg 是……&lt;/th>
+&lt;th style="text-align: left">❌ Iceberg不是……&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td>Table Format定义&lt;/td>
-&lt;td>存储引擎&lt;/td>
+&lt;td style="text-align: left">Table Format定义&lt;/td>
+&lt;td style="text-align: left">存储引擎&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>遵循Iceberg Table Format定义与表进行交互的一套API及库&lt;/td>
-&lt;td>执行引擎&lt;/td>
+&lt;td style="text-align: left">遵循Iceberg Table Format定义与表进行交互的一套API及库&lt;/td>
+&lt;td style="text-align: left">执行引擎&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>&lt;/td>
-&lt;td>一套服务&lt;/td>
+&lt;td style="text-align: left">&lt;/td>
+&lt;td style="text-align: left">一套服务&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -264,14 +264,14 @@ data-flex-basis="230px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>DeltaLake&lt;/th>
-&lt;th>Iceberg&lt;/th>
+&lt;th style="text-align: left">DeltaLake&lt;/th>
+&lt;th style="text-align: left">Iceberg&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td>• 快速upsert/delete数据&lt;br/>• Schema限制&lt;br/>• ACID事务&lt;br/>• 多版本控制&lt;br/>• 小文件Compaction&lt;br/>• 支持流批读写&lt;/td>
-&lt;td>• ACID事务&lt;br/>• 多版本控制&lt;br/>• 抽象、通用、优雅&lt;br/>• 灵活的元数据管理&lt;br/>• 元数据性能(文件粒度跟踪)&lt;br/>• 隐式分区、分区演进&lt;/td>
+&lt;td style="text-align: left">• 快速upsert/delete数据&lt;br/>• Schema限制&lt;br/>• ACID事务&lt;br/>• 多版本控制&lt;br/>• 小文件Compaction&lt;br/>• 支持流批读写&lt;/td>
+&lt;td style="text-align: left">• ACID事务&lt;br/>• 多版本控制&lt;br/>• 抽象、通用、优雅&lt;br/>• 灵活的元数据管理&lt;br/>• 元数据性能(文件粒度跟踪)&lt;br/>• 隐式分区、分区演进&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -279,72 +279,72 @@ data-flex-basis="230px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>&lt;/th>
-&lt;th>Iceberg&lt;/th>
-&lt;th>Hudi&lt;/th>
-&lt;th>Delta Lake&lt;/th>
+&lt;th style="text-align: left">&lt;/th>
+&lt;th style="text-align: left">Iceberg&lt;/th>
+&lt;th style="text-align: left">Hudi&lt;/th>
+&lt;th style="text-align: left">Delta Lake&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td>ACID事务&lt;/td>
-&lt;td>√&lt;/td>
-&lt;td>√&lt;/td>
-&lt;td>√&lt;/td>
+&lt;td style="text-align: left">ACID事务&lt;/td>
+&lt;td style="text-align: left">√&lt;/td>
+&lt;td style="text-align: left">√&lt;/td>
+&lt;td style="text-align: left">√&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>分区演进&lt;/td>
-&lt;td>&lt;a class="link" href="https://iceberg.apache.org/docs/latest/partitioning/" target="_blank" rel="noopener"
+&lt;td style="text-align: left">分区演进&lt;/td>
+&lt;td style="text-align: left">&lt;a class="link" href="https://iceberg.apache.org/docs/latest/partitioning/" target="_blank" rel="noopener"
 >分区演进&lt;/a> 支持更改分区方案；&lt;br/>&lt;a class="link" href="https://iceberg.apache.org/spec/#partition-transforms" target="_blank" rel="noopener"
 >分区转换&lt;/a> 可对时间戳字段以年、月、日、小时粒度隐式分区&lt;/td>
-&lt;td>× &lt;a class="link" href="https://docs.databricks.com/delta/delta-batch.html#deltausegeneratedcolumns" target="_blank" rel="noopener"
+&lt;td style="text-align: left">× &lt;a class="link" href="https://docs.databricks.com/delta/delta-batch.html#deltausegeneratedcolumns" target="_blank" rel="noopener"
 >Generated Columns&lt;/a>可以实现类似隐式分区的功能，但目前是Public Preview状态&lt;/td>
-&lt;td>× &lt;a class="link" href="https://hudi.apache.org/releases/release-0.11.0/#data-skipping-with-metadata-table" target="_blank" rel="noopener"
+&lt;td style="text-align: left">× &lt;a class="link" href="https://hudi.apache.org/releases/release-0.11.0/#data-skipping-with-metadata-table" target="_blank" rel="noopener"
 >Data Skipping&lt;/a>可以实现类似隐式分区的功能&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>Schema演进&lt;/td>
-&lt;td>增/删/改/重命名/重排列&lt;/td>
-&lt;td>删/改名/重排只在Spark中支持&lt;/td>
-&lt;td>2.0.0之前只支持增加列、列重命名、更新列、重排序，&lt;a class="link" href="https://github.com/delta-io/delta/releases/tag/v2.0.0" target="_blank" rel="noopener"
+&lt;td style="text-align: left">Schema演进&lt;/td>
+&lt;td style="text-align: left">增/删/改/重命名/重排列&lt;/td>
+&lt;td style="text-align: left">删/改名/重排只在Spark中支持&lt;/td>
+&lt;td style="text-align: left">2.0.0之前只支持增加列、列重命名、更新列、重排序，&lt;a class="link" href="https://github.com/delta-io/delta/releases/tag/v2.0.0" target="_blank" rel="noopener"
 >2.0.0&lt;/a>(2022-07-21发布)开始支持删除列&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>Time-Travel(表版本管理)&lt;/td>
-&lt;td>√ 通过快照实现&lt;/td>
-&lt;td>√&lt;/td>
-&lt;td>√ 每个Delta文件都代表了表对上一版本的更改，&lt;a class="link" href="https://docs.delta.io/latest/delta-batch.html#data-retention" target="_blank" rel="noopener"
+&lt;td style="text-align: left">Time-Travel(表版本管理)&lt;/td>
+&lt;td style="text-align: left">√ 通过快照实现&lt;/td>
+&lt;td style="text-align: left">√&lt;/td>
+&lt;td style="text-align: left">√ 每个Delta文件都代表了表对上一版本的更改，&lt;a class="link" href="https://docs.delta.io/latest/delta-batch.html#data-retention" target="_blank" rel="noopener"
 >默认保留30天&lt;/a>&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>项目级别&lt;/td>
-&lt;td>Apache顶级项目&lt;/td>
-&lt;td>Apache顶级项目&lt;/td>
-&lt;td>Linux基金会项目（Databricks TSC）&lt;/td>
+&lt;td style="text-align: left">项目级别&lt;/td>
+&lt;td style="text-align: left">Apache顶级项目&lt;/td>
+&lt;td style="text-align: left">Apache顶级项目&lt;/td>
+&lt;td style="text-align: left">Linux基金会项目（Databricks TSC）&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>社区活跃度&lt;br/>(截至2022/03/28)&lt;/td>
-&lt;td>240贡献者&lt;br/>2241已合并PR&lt;br/>275未关闭PR&lt;/td>
-&lt;td>252贡献者&lt;br/>2880已合并PR&lt;br/>160未关闭PR&lt;/td>
-&lt;td>145贡献者&lt;br/>16已合并PR&lt;br/>43未关闭PR&lt;/td>
+&lt;td style="text-align: left">社区活跃度&lt;br/>(截至2022/03/28)&lt;/td>
+&lt;td style="text-align: left">240贡献者&lt;br/>2241已合并PR&lt;br/>275未关闭PR&lt;/td>
+&lt;td style="text-align: left">252贡献者&lt;br/>2880已合并PR&lt;br/>160未关闭PR&lt;/td>
+&lt;td style="text-align: left">145贡献者&lt;br/>16已合并PR&lt;br/>43未关闭PR&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>兼容读取的工具&lt;/td>
-&lt;td>Apache Hive, Dremio Sonar, Apache Flink, Apache Spark, Presto, Trino, Athena, Snowflake, Databricks Spark, Apache Impala, Apache Drill&lt;/td>
-&lt;td>Apache Hive, Apache Flink, Apache Spark, Presto, Trino, Athena, Databricks Spark, Redshift, Apache Impala, BigQuery&lt;/td>
-&lt;td>Apache Hive, Dremio Sonar, Apache Flink, Databricks Spark, Apache Spark, Databricks SQL Analytics, Trino, Presto, Snowflake, Redshift, Apache Beam, Athena&lt;/td>
+&lt;td style="text-align: left">兼容读取的工具&lt;/td>
+&lt;td style="text-align: left">Apache Hive, Dremio Sonar, Apache Flink, Apache Spark, Presto, Trino, Athena, Snowflake, Databricks Spark, Apache Impala, Apache Drill&lt;/td>
+&lt;td style="text-align: left">Apache Hive, Apache Flink, Apache Spark, Presto, Trino, Athena, Databricks Spark, Redshift, Apache Impala, BigQuery&lt;/td>
+&lt;td style="text-align: left">Apache Hive, Dremio Sonar, Apache Flink, Databricks Spark, Apache Spark, Databricks SQL Analytics, Trino, Presto, Snowflake, Redshift, Apache Beam, Athena&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>兼容写入的工具&lt;/td>
-&lt;td>Apache Hive, Dremio Sonar, Apache Flink, Apache Spark, Trino, Athena, Databricks Spark, Debezium&lt;/td>
-&lt;td>Apache Flink, Apache Spark, Databricks Spark, Debezium, Kafka Connect&lt;/td>
-&lt;td>OSS Delta Lake: Trino, Apache Spark, Databricks Spark Apache Flink, Debezium.Databricks Delta Lake: Databricks Spark, Kafka Connect&lt;/td>
+&lt;td style="text-align: left">兼容写入的工具&lt;/td>
+&lt;td style="text-align: left">Apache Hive, Dremio Sonar, Apache Flink, Apache Spark, Trino, Athena, Databricks Spark, Debezium&lt;/td>
+&lt;td style="text-align: left">Apache Flink, Apache Spark, Databricks Spark, Debezium, Kafka Connect&lt;/td>
+&lt;td style="text-align: left">OSS Delta Lake: Trino, Apache Spark, Databricks Spark Apache Flink, Debezium.Databricks Delta Lake: Databricks Spark, Kafka Connect&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td>文件格式支持&lt;/td>
-&lt;td>Parquet&lt;br/>ORC&lt;br/>Avro&lt;/td>
-&lt;td>Parquet&lt;br/>ORC&lt;/td>
-&lt;td>Parquet&lt;/td>
+&lt;td style="text-align: left">文件格式支持&lt;/td>
+&lt;td style="text-align: left">Parquet&lt;br/>ORC&lt;br/>Avro&lt;/td>
+&lt;td style="text-align: left">Parquet&lt;br/>ORC&lt;/td>
+&lt;td style="text-align: left">Parquet&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>

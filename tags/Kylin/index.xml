@@ -22,42 +22,42 @@ data-flex-basis="170px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th style="text-align:left">属性&lt;/th>
-&lt;th style="text-align:left">填的值&lt;/th>
+&lt;th style="text-align: left">属性&lt;/th>
+&lt;th style="text-align: left">填的值&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td style="text-align:left">驱动名称&lt;/td>
-&lt;td style="text-align:left">Apache Kylin 或随意&lt;/td>
+&lt;td style="text-align: left">驱动名称&lt;/td>
+&lt;td style="text-align: left">Apache Kylin 或随意&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">驱动类型&lt;/td>
-&lt;td style="text-align:left">默认&lt;/td>
+&lt;td style="text-align: left">驱动类型&lt;/td>
+&lt;td style="text-align: left">默认&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">类名&lt;/td>
-&lt;td style="text-align:left">org.apache.kylin.jdbc.Driver&lt;/td>
+&lt;td style="text-align: left">类名&lt;/td>
+&lt;td style="text-align: left">org.apache.kylin.jdbc.Driver&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">URL模板&lt;/td>
-&lt;td style="text-align:left">jdbc:kylin://{host}:{port}/{database}&lt;/td>
+&lt;td style="text-align: left">URL模板&lt;/td>
+&lt;td style="text-align: left">jdbc:kylin://{host}:{port}/{database}&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">默认端口&lt;/td>
-&lt;td style="text-align:left">7070&lt;/td>
+&lt;td style="text-align: left">默认端口&lt;/td>
+&lt;td style="text-align: left">7070&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">目录&lt;/td>
-&lt;td style="text-align:left">Hadoop 或随意&lt;/td>
+&lt;td style="text-align: left">目录&lt;/td>
+&lt;td style="text-align: left">Hadoop 或随意&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">添加文件&lt;/td>
-&lt;td style="text-align:left">可以在maven仓库找 ~/.m2/repository/org/apache/kylin/kylin-jdbc/&amp;lt;版本号&amp;gt;/kylin-jdbc-&amp;lt;版本号&amp;gt;.jar&lt;/td>
+&lt;td style="text-align: left">添加文件&lt;/td>
+&lt;td style="text-align: left">可以在maven仓库找 ~/.m2/repository/org/apache/kylin/kylin-jdbc/&amp;lt;版本号&amp;gt;/kylin-jdbc-&amp;lt;版本号&amp;gt;.jar&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:left">驱动类&lt;/td>
-&lt;td style="text-align:left">点击找到类，一般需要选择的就是列表中第一个，与类名一致&lt;/td>
+&lt;td style="text-align: left">驱动类&lt;/td>
+&lt;td style="text-align: left">点击找到类，一般需要选择的就是列表中第一个，与类名一致&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>

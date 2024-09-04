@@ -272,30 +272,30 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th style="text-align:center">浏览器&lt;/th>
-&lt;th style="text-align:center">支持的版本&lt;/th>
+&lt;th style="text-align: center">浏览器&lt;/th>
+&lt;th style="text-align: center">支持的版本&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td style="text-align:center">Chrome&lt;/td>
-&lt;td style="text-align:center">4+&lt;/td>
+&lt;td style="text-align: center">Chrome&lt;/td>
+&lt;td style="text-align: center">4+&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">Firefox&lt;/td>
-&lt;td style="text-align:center">4+&lt;/td>
+&lt;td style="text-align: center">Firefox&lt;/td>
+&lt;td style="text-align: center">4+&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">Internet Explorer&lt;/td>
-&lt;td style="text-align:center">10+&lt;/td>
+&lt;td style="text-align: center">Internet Explorer&lt;/td>
+&lt;td style="text-align: center">10+&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">Opera&lt;/td>
-&lt;td style="text-align:center">10+&lt;/td>
+&lt;td style="text-align: center">Opera&lt;/td>
+&lt;td style="text-align: center">10+&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">Safari&lt;/td>
-&lt;td style="text-align:center">5+&lt;/td>
+&lt;td style="text-align: center">Safari&lt;/td>
+&lt;td style="text-align: center">5+&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -305,26 +305,26 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th style="text-align:center">服务器&lt;/th>
-&lt;th style="text-align:center">支持的版本&lt;/th>
+&lt;th style="text-align: center">服务器&lt;/th>
+&lt;th style="text-align: center">支持的版本&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td style="text-align:center">jetty&lt;/td>
-&lt;td style="text-align:center">7.0.1+&lt;/td>
+&lt;td style="text-align: center">jetty&lt;/td>
+&lt;td style="text-align: center">7.0.1+&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">tomcat&lt;/td>
-&lt;td style="text-align:center">7.0.27+&lt;/td>
+&lt;td style="text-align: center">tomcat&lt;/td>
+&lt;td style="text-align: center">7.0.27+&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">Nginx&lt;/td>
-&lt;td style="text-align:center">1.3.13+&lt;/td>
+&lt;td style="text-align: center">Nginx&lt;/td>
+&lt;td style="text-align: center">1.3.13+&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">resin&lt;/td>
-&lt;td style="text-align:center">4+&lt;/td>
+&lt;td style="text-align: center">resin&lt;/td>
+&lt;td style="text-align: center">4+&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -1485,42 +1485,42 @@ data-flex-basis="1116px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th style="text-align:center">类型&lt;/th>
-&lt;th style="text-align:center">名称&lt;/th>
-&lt;th style="text-align:center">数量&lt;/th>
-&lt;th style="text-align:center">含义&lt;/th>
+&lt;th style="text-align: center">类型&lt;/th>
+&lt;th style="text-align: center">名称&lt;/th>
+&lt;th style="text-align: center">数量&lt;/th>
+&lt;th style="text-align: center">含义&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">access_flags&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">访问标志，public/private/final/static/enum等描述符&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">access_flags&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">访问标志，public/private/final/static/enum等描述符&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">name_index&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">字段简单名称在常量池中的索引，即变量名或方法名&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">name_index&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">字段简单名称在常量池中的索引，即变量名或方法名&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">descriptor_index&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">字段和方法的描述符在常量池的索引，描述字段类型或方法参数列表/返回类型&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">descriptor_index&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">字段和方法的描述符在常量池的索引，描述字段类型或方法参数列表/返回类型&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">attibutes_count&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">属性表计数器&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">attibutes_count&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">属性表计数器&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">attribute_info&lt;/td>
-&lt;td style="text-align:center">attributes&lt;/td>
-&lt;td style="text-align:center">attibutes_count&lt;/td>
-&lt;td style="text-align:center">属性额外描述，比如描述变量初始化值在常量池中的索引&lt;/td>
+&lt;td style="text-align: center">attribute_info&lt;/td>
+&lt;td style="text-align: center">attributes&lt;/td>
+&lt;td style="text-align: center">attibutes_count&lt;/td>
+&lt;td style="text-align: center">属性额外描述，比如描述变量初始化值在常量池中的索引&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
@@ -1547,72 +1547,72 @@ data-flex-basis="1116px"
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th style="text-align:center">类型&lt;/th>
-&lt;th style="text-align:center">名称&lt;/th>
-&lt;th style="text-align:center">数量&lt;/th>
-&lt;th style="text-align:center">含义&lt;/th>
+&lt;th style="text-align: center">类型&lt;/th>
+&lt;th style="text-align: center">名称&lt;/th>
+&lt;th style="text-align: center">数量&lt;/th>
+&lt;th style="text-align: center">含义&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">attribute_name_index&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">属性名的索引，对Code属性而言恒为&amp;quot;Code&amp;quot;&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">attribute_name_index&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">属性名的索引，对Code属性而言恒为&amp;quot;Code&amp;quot;&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u4&lt;/td>
-&lt;td style="text-align:center">attribute_length&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">属性值长度，相当于整个属性表长度长度减6(u2+u4)&lt;/td>
+&lt;td style="text-align: center">u4&lt;/td>
+&lt;td style="text-align: center">attribute_length&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">属性值长度，相当于整个属性表长度长度减6(u2+u4)&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">max_stack&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">操作数栈深度最大值。JVM运行时根据此值分配栈桢的操作栈深度&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">max_stack&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">操作数栈深度最大值。JVM运行时根据此值分配栈桢的操作栈深度&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">max_locals&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">局部变量表所需存储空间，单位是Slot，double和long占用2个Slot、其他基本类型1Slot，Slot空间可以重用(变量作用域问题)&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">max_locals&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">局部变量表所需存储空间，单位是Slot，double和long占用2个Slot、其他基本类型1Slot，Slot空间可以重用(变量作用域问题)&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u4&lt;/td>
-&lt;td style="text-align:center">code_length&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">编译后的字节码长度，理论上最长2^32-1，实际上JVM规定一个方法不允许超过65535条字节码指令&lt;/td>
+&lt;td style="text-align: center">u4&lt;/td>
+&lt;td style="text-align: center">code_length&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">编译后的字节码长度，理论上最长2^32-1，实际上JVM规定一个方法不允许超过65535条字节码指令&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u1&lt;/td>
-&lt;td style="text-align:center">code&lt;/td>
-&lt;td style="text-align:center">code_length&lt;/td>
-&lt;td style="text-align:center">代码编译后的字节码&lt;/td>
+&lt;td style="text-align: center">u1&lt;/td>
+&lt;td style="text-align: center">code&lt;/td>
+&lt;td style="text-align: center">code_length&lt;/td>
+&lt;td style="text-align: center">代码编译后的字节码&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">exception_table_length&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">异常表长度&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">exception_table_length&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">异常表长度&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">exception_info&lt;/td>
-&lt;td style="text-align:center">exception_table&lt;/td>
-&lt;td style="text-align:center">exception_table_length&lt;/td>
-&lt;td style="text-align:center">异常表，记录字节码在start_pc到end_pc行之间如果出现类型为catch_type或其子类的异常则跳转到handler_pc行继续处理&lt;/td>
+&lt;td style="text-align: center">exception_info&lt;/td>
+&lt;td style="text-align: center">exception_table&lt;/td>
+&lt;td style="text-align: center">exception_table_length&lt;/td>
+&lt;td style="text-align: center">异常表，记录字节码在start_pc到end_pc行之间如果出现类型为catch_type或其子类的异常则跳转到handler_pc行继续处理&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">u2&lt;/td>
-&lt;td style="text-align:center">attibutes_count&lt;/td>
-&lt;td style="text-align:center">1&lt;/td>
-&lt;td style="text-align:center">属性表计数器&lt;/td>
+&lt;td style="text-align: center">u2&lt;/td>
+&lt;td style="text-align: center">attibutes_count&lt;/td>
+&lt;td style="text-align: center">1&lt;/td>
+&lt;td style="text-align: center">属性表计数器&lt;/td>
 &lt;/tr>
 &lt;tr>
-&lt;td style="text-align:center">attribute_info&lt;/td>
-&lt;td style="text-align:center">attributes&lt;/td>
-&lt;td style="text-align:center">attibutes_count&lt;/td>
-&lt;td style="text-align:center">属性额外描述，比如描述变量初始化值在常量池中的索引&lt;/td>
+&lt;td style="text-align: center">attribute_info&lt;/td>
+&lt;td style="text-align: center">attributes&lt;/td>
+&lt;td style="text-align: center">attibutes_count&lt;/td>
+&lt;td style="text-align: center">属性额外描述，比如描述变量初始化值在常量池中的索引&lt;/td>
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
