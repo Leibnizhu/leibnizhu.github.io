@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Elasticsearch on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Elasticsearch/</link><description>Recent content in Elasticsearch on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 20 Jun 2021 13:17:54 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Elasticsearch/index.xml" rel="self" type="application/rss+xml"/><item><title>修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</link><pubDate>Sun, 20 Jun 2021 13:17:54 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/bg1.png" alt="Featured image of post 修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException" />&lt;h2 id="故障背景">故障背景&lt;/h2>
-&lt;p>通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Elasticsearch on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Elasticsearch/</link><description>Recent content in Elasticsearch on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 20 Jun 2021 13:17:54 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Elasticsearch/index.xml" rel="self" type="application/rss+xml"/><item><title>修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</link><pubDate>Sun, 20 Jun 2021 13:17:54 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/bg1.png" alt="Featured image of post 修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException" />&lt;h2 id="故障背景">故障背景
+&lt;/h2>&lt;p>通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
 >ES-Hadoop&lt;/a> （亦可参考 &lt;a class="link" href="https://github.com/elastic/elasticsearch-hadoop" target="_blank" rel="noopener"
 >Github&lt;/a> ） 查询ES时，若查询条件包含emoji，会在json序列化的时候抛出异常（在最新的 &lt;code>7.13.2&lt;/code> 版本仍存在）：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>Caused by: org.codehaus.jackson.JsonGenerationException: Incomplete surrogate pair: first char 0xde97, second 0x22
@@ -11,8 +11,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.codehaus.jackson.impl.Utf8Generator.writeRaw&lt;span style="color:#5bc4bf">(&lt;/span>Utf8Generator.java:697&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator.writeRaw&lt;span style="color:#5bc4bf">(&lt;/span>JacksonJsonGenerator.java:252&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ... &lt;span style="color:#f99b15">21&lt;/span> more
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析&lt;/h2>
-&lt;p>根据报错的调用栈，直接原因出在 &lt;code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate&lt;/code> 方法中，其源码：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析
+&lt;/h2>&lt;p>根据报错的调用栈，直接原因出在 &lt;code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate&lt;/code> 方法中，其源码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">_decodeSurrogate&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> surr1, &lt;span style="color:#fec418">int&lt;/span> surr2) &lt;span style="color:#815ba4">throws&lt;/span> IOException {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (surr2 &lt;span style="color:#5bc4bf">&amp;lt;&lt;/span> 56320 &lt;span style="color:#5bc4bf">||&lt;/span> surr2 &lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> 57343) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String msg &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;Incomplete surrogate pair: first char 0x&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> Integer.&lt;span style="color:#06b6ef">toHexString&lt;/span>(surr1) &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#48b685">&amp;#34;, second 0x&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> Integer.&lt;span style="color:#06b6ef">toHexString&lt;/span>(surr2);
@@ -53,8 +53,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> out.&lt;span style="color:#06b6ef">bytes&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;p>故障分析到这里，似乎只要升级 &lt;code>jackson-core&lt;/code> 版本就可以了……&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;p>故障分析到这里，似乎只要升级 &lt;code>jackson-core&lt;/code> 版本就可以了……&lt;br>
 然而上面提到，在 &lt;code>jackson-core 2.3.0&lt;/code> 才修复了这个问题，而 Es-Spark 使用的是内置的1.x 版本，前面也有提到 &lt;code>jackson-core&lt;/code> 自2.x开始迁移到 &lt;code>com.fasterxml&lt;/code> 。具体到代码，Es-spark 的 &lt;code>JacksonJsonGenerator&lt;/code> 是这样使用 &lt;code>jackson&lt;/code> 的：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">org.elasticsearch.hadoop.serialization.json&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -87,8 +87,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>也就是说，直接升级依赖版本是不行的，maven的GAV都变了，类名也变了，必须改代码。&lt;/p>
-&lt;h3 id="同名类的patch">同名类的Patch&lt;/h3>
-&lt;p>可以看到，虽说 &lt;code>Jackson&lt;/code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 &lt;code>JSON_FACTORY&lt;/code> 和 &lt;code>generator&lt;/code> 这个两个属性替换为 &lt;code>Jackson 2.3+&lt;/code> 版本的类、并微调静态代码块和构造方法里面的代码即可：&lt;/p>
+&lt;h3 id="同名类的patch">同名类的Patch
+&lt;/h3>&lt;p>可以看到，虽说 &lt;code>Jackson&lt;/code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 &lt;code>JSON_FACTORY&lt;/code> 和 &lt;code>generator&lt;/code> 这个两个属性替换为 &lt;code>Jackson 2.3+&lt;/code> 版本的类、并微调静态代码块和构造方法里面的代码即可：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">org.elasticsearch.hadoop.serialization.json&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">com.fasterxml.jackson.core.JsonEncoding&lt;/span>;
@@ -118,8 +118,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="javassist-patch">Javassist Patch&lt;/h3>
-&lt;p>与上一篇博客一样，为了可维护性，最后还是选择使用 &lt;code>Javassist&lt;/code> 进行Patch。但受限于 &lt;code>Javassist&lt;/code> 的机制，这个Patch起来有点麻烦。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="javassist-patch">Javassist Patch
+&lt;/h3>&lt;p>与上一篇博客一样，为了可维护性，最后还是选择使用 &lt;code>Javassist&lt;/code> 进行Patch。但受限于 &lt;code>Javassist&lt;/code> 的机制，这个Patch起来有点麻烦。&lt;br>
 首先，阅读 &lt;code>JacksonJsonGenerator&lt;/code> 源码，它其实相当于是在 Es-spark 的 &lt;code>Generator&lt;/code> 接口与 &lt;code>jackson 1.8.8&lt;/code> 的 &lt;code>JsonGenerator&lt;/code> 之间做了Adaptor；因此可以考虑写一个 &lt;code>Generator&lt;/code> 接口与 &lt;code>jackson 2.3+&lt;/code> 之间的Adaptor给原调用者使用。&lt;br>
 但阅读 Es-spark 的其他代码可以发现，虽然它定义了 &lt;code>Generator&lt;/code> 接口，但调用时都是直接面向 &lt;code>JacksonJsonGenerator&lt;/code> 实现类，如上面给出过的 &lt;code>RestClient#searchRequest&lt;/code> 的代码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//RestClient 某查询方法&lt;/span>
@@ -462,8 +462,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>} &lt;span style="color:#815ba4">catch&lt;/span> (Exception e) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log.&lt;span style="color:#06b6ef">error&lt;/span>(&lt;span style="color:#48b685">&amp;#34;给 JacksonJsonGenerator 进行静态代码块和构造方法的pack失败:&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> e.&lt;span style="color:#06b6ef">getMessage&lt;/span>(), e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>完事儿。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</link><pubDate>Sat, 19 Jun 2021 23:40:50 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/bg2.jpg" alt="Featured image of post 修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException" />&lt;h2 id="故障背景">故障背景&lt;/h2>
-&lt;p>众所周知，&lt;code>Elasticsearch&lt;/code>（下文简称&lt;code>&amp;quot;ES&amp;quot;&lt;/code>）的数值类型字段是支持一些特殊格式的。比如，&lt;code>integer&lt;/code> 类型的字段取值可以是浮点数的字符串，如 &lt;code>&amp;quot;2.0&amp;quot;&lt;/code>；&lt;code>long&lt;/code> 类型的字段取值可以是科学计数法的字符串，如 &lt;code>&amp;quot;2E3&amp;quot;&lt;/code>，诸如此类的一些。不同于时间类型的字段可以 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html" target="_blank" rel="noopener"
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>完事儿。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</link><pubDate>Sat, 19 Jun 2021 23:40:50 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/bg2.jpg" alt="Featured image of post 修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException" />&lt;h2 id="故障背景">故障背景
+&lt;/h2>&lt;p>众所周知，&lt;code>Elasticsearch&lt;/code>（下文简称&lt;code>&amp;quot;ES&amp;quot;&lt;/code>）的数值类型字段是支持一些特殊格式的。比如，&lt;code>integer&lt;/code> 类型的字段取值可以是浮点数的字符串，如 &lt;code>&amp;quot;2.0&amp;quot;&lt;/code>；&lt;code>long&lt;/code> 类型的字段取值可以是科学计数法的字符串，如 &lt;code>&amp;quot;2E3&amp;quot;&lt;/code>，诸如此类的一些。不同于时间类型的字段可以 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html" target="_blank" rel="noopener"
 >通过 &lt;code>mapping&lt;/code> 的 &lt;code>format&lt;/code> 属性配置取值格式&lt;/a> ，数值字段的取值没有格式的配置、上面举例的取值都是可以直接索引文档的。&lt;/p>
 &lt;p>然而，通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
 >ES-Hadoop&lt;/a> （亦可参考 &lt;a class="link" href="https://github.com/elastic/elasticsearch-hadoop" target="_blank" rel="noopener"
@@ -475,8 +475,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.builder.JdkValueReader.parseLong&lt;span style="color:#5bc4bf">(&lt;/span>JdkValueReader.java:296&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.builder.JdkValueReader.longValue&lt;span style="color:#5bc4bf">(&lt;/span>JdkValueReader.java:288&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>…………
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析&lt;/h2>
-&lt;p>阅读 &lt;code>JdkValueReader&lt;/code> 源码，以读取integer类型字段为例：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析
+&lt;/h2>&lt;p>阅读 &lt;code>JdkValueReader&lt;/code> 源码，以读取integer类型字段为例：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> Object &lt;span style="color:#06b6ef">intValue&lt;/span>(String value, Parser parser) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Integer val &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -502,13 +502,13 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到字段取值直接调用 &lt;code>Integer.parseInt&lt;/code> 方法解析，且没捕获异常。&lt;br>
 不知道这样设计是处于什么考虑，但这个 &lt;code>NumberFormatException&lt;/code> 异常会打断读取的流程：出现一条有问题的数据时，会影响整个查询任务的执行，在 Es-spark 使用于离线批处理的场景，是不恰当的，所以有必要进行调整。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;h3 id="自定义-valuereader">自定义 ValueReader&lt;/h3>
-&lt;p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 &lt;code>org.elasticsearch.hadoop.serialization.builder.ValueReader&lt;/code> 接口，并通过 &lt;code>es.ser.reader.value.class&lt;/code> 配置项（常量&lt;code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS&lt;/code>）配置自定义的 &lt;code>ValueReader&lt;/code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html" target="_blank" rel="noopener"
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;h3 id="自定义-valuereader">自定义 ValueReader
+&lt;/h3>&lt;p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 &lt;code>org.elasticsearch.hadoop.serialization.builder.ValueReader&lt;/code> 接口，并通过 &lt;code>es.ser.reader.value.class&lt;/code> 配置项（常量&lt;code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS&lt;/code>）配置自定义的 &lt;code>ValueReader&lt;/code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html" target="_blank" rel="noopener"
 >官方文档&lt;/a> 中也印证了这一点。&lt;/p>
 &lt;p>这样实际处理下来，基本是要拷贝 &lt;code>JdkValueReader&lt;/code> 源码进行修改作为自定义的 &lt;code>ValueReader&lt;/code> 实现；显然，这样就不能随 ES-spark 升级而自动升级对应实现，同时，在代码中，自定义的修改也和原 &lt;code>JdkValueReader&lt;/code> 的实现混杂在一起，给升级带来困难；因此考虑使用 &lt;code>Javassist&lt;/code> 进行patch。&lt;/p>
-&lt;h3 id="javassist-patch">Javassist Patch&lt;/h3>
-&lt;p>&lt;code>Javassist&lt;/code> 入门和介绍的文章在网上已经很多了，在此不再赘述。&lt;br>
+&lt;h3 id="javassist-patch">Javassist Patch
+&lt;/h3>&lt;p>&lt;code>Javassist&lt;/code> 入门和介绍的文章在网上已经很多了，在此不再赘述。&lt;br>
 列举一下patch过程中遇到的一些坑，或者说，&lt;code>Javassist&lt;/code> 的一些使用注意事项：&lt;/p>
 &lt;ol>
 &lt;li>不支持泛型，请自行强转；&lt;/li>

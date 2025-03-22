@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SSE on Heaven's Door</title><link>https://leibnizhu.github.io/tags/SSE/</link><description>Recent content in SSE on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 22 Mar 2025 12:00:00 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/SSE/index.xml" rel="self" type="application/rss+xml"/><item><title>处理jvppeteer获取SSE响应内容乱码问题</title><link>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 22 Mar 2025 12:00:00 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/thumbnail.png" alt="Featured image of post 处理jvppeteer获取SSE响应内容乱码问题" />&lt;p>最近在使用jvppeteer监听SSE（Server-Sent Events）响应时，调用 &lt;code>com.ruiyun.jvppeteer.api.core.Response.content()&lt;/code> 方法获取响应内容，结果发现返回的中文内容全部变成了乱码。这里记录一下问题的分析过程和解决方案。&lt;/p>
+&lt;h2 id="现象描述">现象描述
+&lt;/h2>&lt;p>在SSE接口的响应中，中文内容无法正常显示，变成了乱码，而英文部分则没有受到影响。这个问题出现在使用 &lt;code>jvppeteer&lt;/code> 处理 Chrome DevTools Protocol（CDP）的 &lt;code>Network.getResponseBody&lt;/code> 方法时。&lt;/p>
+&lt;h2 id="原因分析">原因分析
+&lt;/h2>&lt;p>经过源码分析发现，&lt;code>Response.content()&lt;/code> 方法实际上是调用了 &lt;a class="link" href="https://chromedevtools.github.io/devtools-protocol/tot/Network/#method-getResponseBody" target="_blank" rel="noopener"
+>CDP协议&lt;/a> 获取响应内容。然而，SSE接口返回的 &lt;code>Content-Type&lt;/code> 头部为 &lt;code>text/event-stream&lt;/code>，但未显式声明编码方式。&lt;/p>
+&lt;p>CDP 默认按照 &lt;code>windows-1252&lt;/code> 编码解析响应数据，而实际数据是 &lt;code>UTF-8&lt;/code> 编码，导致乱码。例如，在 &lt;a class="link" href="https://github.com/g1879/DrissionPage/issues/343" target="_blank" rel="noopener"
+>DrissionPage 的 issue&lt;/a> 中，也有人遇到类似问题。&lt;/p>
+&lt;p>尝试使用 &lt;a class="link" href="http://www.mytju.com/classcode/tools/messycoderecover.asp" target="_blank" rel="noopener"
+>在线工具&lt;/a> 恢复乱码，发现这些乱码正是将 UTF-8 文本按 &lt;code>windows-1252&lt;/code> 编码读取后导致的，因此是可逆的。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/messy_code.png"
+width="2334"
+height="879"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/messy_code_hu10998148672036293904.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/messy_code_hu9103320569865329723.png 1024w"
+loading="lazy"
+alt="乱码可恢复"
+class="gallery-image"
+data-flex-grow="265"
+data-flex-basis="637px"
+>&lt;/p>
+&lt;h2 id="乱码恢复方案">乱码恢复方案
+&lt;/h2>&lt;h3 id="java-中恢复乱码">Java 中恢复乱码
+&lt;/h3>&lt;p>尝试在 Java 中手动转换 &lt;code>windows-1252&lt;/code> -&amp;gt; &lt;code>UTF-8&lt;/code>，但发现部分字符会丢失。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery1.png"
+width="1762"
+height="108"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery1_hu15217162607424412618.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery1_hu1306001233224219932.png 1024w"
+loading="lazy"
+alt="java恢复乱码失败"
+class="gallery-image"
+data-flex-grow="1631"
+data-flex-basis="3915px"
+>&lt;/p>
+&lt;p>原因未知，但测试中发现复制粘贴乱码的时候存在格式变乱的情况，可能是由于windows-1252编码的乱码中包含了控制字符，导致java中解码失败。&lt;/p>
+&lt;p>挑选丢失了字符的一段进行对比，发现这段乱码使用windows-1252的编码、与原文使用utf-8编码生成的byte数组确实有差异：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery2.png"
+width="2290"
+height="142"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery2_hu2043261210891607629.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery2_hu7984525941282566837.png 1024w"
+loading="lazy"
+alt="alt text"
+class="gallery-image"
+data-flex-grow="1612"
+data-flex-basis="3870px"
+>&lt;/p>
+&lt;h3 id="python-方案推荐">Python 方案（推荐）
+&lt;/h3>&lt;p>在 &lt;a class="link" href="https://github.com/g1879/DrissionPage/issues/343" target="_blank" rel="noopener"
+>GitHub issue&lt;/a> 讨论中，有人推荐使用 Python 的 &lt;a class="link" href="https://github.com/rspeer/python-ftfy" target="_blank" rel="noopener"
+>&lt;code>ftfy&lt;/code>&lt;/a> 库来修复乱码，实测效果良好:&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/ftfy_recovery.png"
+width="1166"
+height="72"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/ftfy_recovery_hu17722702481251396867.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/ftfy_recovery_hu4553067058202656807.png 1024w"
+loading="lazy"
+alt="alt text"
+class="gallery-image"
+data-flex-grow="1619"
+data-flex-basis="3886px"
+>&lt;/p>
+&lt;h2 id="临时解决方案">临时解决方案
+&lt;/h2>&lt;p>在实际环境中，可以采用以下步骤修复乱码：&lt;/p>
+&lt;ol>
+&lt;li>在 &lt;code>Docker&lt;/code> 镜像中安装 &lt;code>ftfy&lt;/code>。&lt;/li>
+&lt;li>在处理可能包含中文的内容时（如 AI 回答、网页搜索结果等），调用 &lt;code>ftfy&lt;/code> 进行修复。&lt;/li>
+&lt;li>需要特别注意：
+&lt;ul>
+&lt;li>文本中的换行符需要特殊处理，以避免 &lt;code>ftfy&lt;/code> 处理后丢失格式，建议替换为其他字符。&lt;/li>
+&lt;li>文本中的单引号 &lt;code>'&lt;/code> 可能导致生成的 &lt;code>ftfy&lt;/code> 命令无效，需在调用前替换或转义。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>通过 &lt;code>ftfy&lt;/code> 进行自动修复，可以较好地解决 SSE 响应乱码问题，避免影响正常业务逻辑。&lt;/p>
+&lt;h2 id="处理sse响应异常">处理SSE响应异常
+&lt;/h2>&lt;p>在 jvppeteer 中，使用 Response.content() 方法获取 SSE 的响应内容时，可能会遇到以下问题：&lt;/p>
+&lt;ul>
+&lt;li>在 SSE 事件未完全响应时，方法可能抛出 ProtocolException。&lt;/li>
+&lt;li>偶尔不会报错，但返回 null。&lt;/li>
+&lt;/ul>
+&lt;p>为了解决这些问题，可以捕获异常并进行重试，直到 SSE 完全响应结束。&lt;/p></description></item></channel></rss>

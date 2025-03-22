@@ -122,8 +122,8 @@ data-flex-basis="685px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String &lt;span style="color:#06b6ef">getSomething&lt;/span>(&lt;span style="color:#5bc4bf">@PathParam&lt;/span>(&lt;span style="color:#48b685">&amp;#34;id&amp;#34;&lt;/span>) &lt;span style="color:#5bc4bf">@Encoded&lt;/span> String id;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>翻完代码，再想起来可以看看RestEasy的文档，发现其实有写的：&lt;a class="link" href="https://docs.jboss.org/resteasy/docs/4.7.7.Final/userguide/html/_Encoded_and_encoding.html" target="_blank" rel="noopener"
->RestEasy4.7.7.Final UserGuide Chapter 16. @Encoded and encoding&lt;/a> 。&lt;/p></description></item><item><title>Quarkus服务接入Skywalking链路跟踪</title><link>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</link><pubDate>Mon, 18 Jul 2022 12:58:35 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/bus.jpg" alt="Featured image of post Quarkus服务接入Skywalking链路跟踪" />&lt;h2 id="quarkus对可观测性的支持情况">Quarkus对可观测性的支持情况&lt;/h2>
-&lt;p>Quarkus在可观测性方面支持了 &lt;a class="link" href="https://opentracing.io/" target="_blank" rel="noopener"
+>RestEasy4.7.7.Final UserGuide Chapter 16. @Encoded and encoding&lt;/a> 。&lt;/p></description></item><item><title>Quarkus服务接入Skywalking链路跟踪</title><link>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</link><pubDate>Mon, 18 Jul 2022 12:58:35 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus%E6%9C%8D%E5%8A%A1%E6%8E%A5%E5%85%A5Skywalking%E9%93%BE%E8%B7%AF%E8%B7%9F%E8%B8%AA/bus.jpg" alt="Featured image of post Quarkus服务接入Skywalking链路跟踪" />&lt;h2 id="quarkus对可观测性的支持情况">Quarkus对可观测性的支持情况
+&lt;/h2>&lt;p>Quarkus在可观测性方面支持了 &lt;a class="link" href="https://opentracing.io/" target="_blank" rel="noopener"
 >OpenTracing&lt;/a> 和 &lt;a class="link" href="https://opentelemetry.io/" target="_blank" rel="noopener"
 >OpenTelemetry&lt;/a> 。如果要对使用Quarkus开发的服务接入Skywalking做链路跟踪：&lt;/p>
 &lt;ul>
@@ -139,8 +139,8 @@ data-flex-basis="685px"
 &lt;li>使用Skywalking Java Agent 传统姿势，但要注意各个组件的支持情况。&lt;/li>
 &lt;/ol>
 &lt;p>第一条路工作量是未知的，可行性也未知。还是选简单点的第二条路吧。&lt;/p>
-&lt;h2 id="skywalking对quarkus常用组件的支持情况">Skywalking对Quarkus常用组件的支持情况&lt;/h2>
-&lt;p>先简单盘点一下Skywalking Java Agent对Quarkus做web服务常用组件的支持情况：&lt;/p>
+&lt;h2 id="skywalking对quarkus常用组件的支持情况">Skywalking对Quarkus常用组件的支持情况
+&lt;/h2>&lt;p>先简单盘点一下Skywalking Java Agent对Quarkus做web服务常用组件的支持情况：&lt;/p>
 &lt;ul>
 &lt;li>core: 使用了 &lt;code>Vert.X-core&lt;/code>， 支持3.x 和 4.x。&lt;/li>
 &lt;li>Http server: 使用了 &lt;code>RestEasy&lt;/code>， 已支持 3.x。Quarkus用的是 4.x&lt;/li>
@@ -156,9 +156,9 @@ data-flex-basis="685px"
 &lt;p>可以看到，目前redis client、http Server、Hibernate还不支持。&lt;/p>
 &lt;p>注：详细请参考官方的 &lt;a class="link" href="https://skywalking.apache.org/docs/skywalking-java/latest/en/setup/service-agent/java-agent/supported-list/" target="_blank" rel="noopener"
 >支持列表&lt;/a> 。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;h3 id="resteasy-4x">RestEasy 4.x&lt;/h3>
-&lt;p>这个我提了 &lt;a class="link" href="https://github.com/apache/skywalking-java/pull/265" target="_blank" rel="noopener"
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;h3 id="resteasy-4x">RestEasy 4.x
+&lt;/h3>&lt;p>这个我提了 &lt;a class="link" href="https://github.com/apache/skywalking-java/pull/265" target="_blank" rel="noopener"
 >PR&lt;/a>，已 &lt;a class="link" href="https://github.com/apache/skywalking-java/commit/a60a61b83de7d7daed1a4bb1d2953ce1bc3f4fa4" target="_blank" rel="noopener"
 >合入main分支&lt;/a>，等8.12.0版本发布就行，或者先下载 &lt;a class="link" href="https://github.com/apache/skywalking-java/commits/main" target="_blank" rel="noopener"
 >main分支源码&lt;/a>、自行打包用着。&lt;/p>
@@ -166,17 +166,17 @@ data-flex-basis="685px"
 >Releases v8.12.0&lt;/a>，可直接使用&lt;/p>
 &lt;p>在实操中，请移除掉 RestEasy 3.x 的插件，以免冲突。如在sidecar中执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>rm /skywalking/agent/plugins/resteasy-server-3.x*
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="hibernate">Hibernate&lt;/h3>
-&lt;p>ORM虽然不支持 &lt;code>Hibernate&lt;/code>，但支持具体的jdbc驱动（如Mysql、PostgreSql等），其实是可以追踪到数据库读写的，只是少了ORM这一层而已，关系不大。&lt;/p>
-&lt;h3 id="vertx相关">Vert.X相关&lt;/h3>
-&lt;p>什么？Vert.X-core不是支持了吗？&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="hibernate">Hibernate
+&lt;/h3>&lt;p>ORM虽然不支持 &lt;code>Hibernate&lt;/code>，但支持具体的jdbc驱动（如Mysql、PostgreSql等），其实是可以追踪到数据库读写的，只是少了ORM这一层而已，关系不大。&lt;/p>
+&lt;h3 id="vertx相关">Vert.X相关
+&lt;/h3>&lt;p>什么？Vert.X-core不是支持了吗？&lt;/p>
 &lt;p>正因为支持了才有问题！&lt;/p>
-&lt;h4 id="skywalking如何支持vertx的">Skywalking如何支持Vert.X的&lt;/h4>
-&lt;p>我们可以先看看Skywalking的 &lt;a class="link" href="https://github.com/apache/skywalking-java/tree/main/apm-sniffer/apm-sdk-plugin/vertx-plugins/vertx-core-4.x-plugin" target="_blank" rel="noopener"
+&lt;h4 id="skywalking如何支持vertx的">Skywalking如何支持Vert.X的
+&lt;/h4>&lt;p>我们可以先看看Skywalking的 &lt;a class="link" href="https://github.com/apache/skywalking-java/tree/main/apm-sniffer/apm-sdk-plugin/vertx-plugins/vertx-core-4.x-plugin" target="_blank" rel="noopener"
 >&lt;code>vertx-core-4.x-plugin&lt;/code>&lt;/a> 源码，跟踪原理很简单，它对 &lt;code>VertxBuilder&lt;/code> 进行了增强，在VertxImpl实例化时注入了 &lt;code>SWVertxTracer&lt;/code> 作为Vertx的tracer，也就是说利用了vertx的tracer机制。&lt;/p>
 &lt;p>这样做的原因很简单，Vertx大量用到了EventLoop线程和Worker线程的切换，如果直接像其他的Skywalking插件一样，直接增强处理的方法，那么调用 &lt;code>ContextManager.getOrCreate()&lt;/code> 的时候，由于线程切换，是拿不到上一个span使用的 &lt;code>TracerContext&lt;/code> （保存在ThreadLocal里）的，也就是每个操作都成了独立的TracerContext，那么就无法将span串起来，也就无法实现追踪。所以直接利用Vert.X自己提供的tracer机制，Vert.X各个组件在触发一些事件（如Http服务接受到请求，Http客户端接受到响应）时，就会调用 &lt;code>VertxTracer&lt;/code> 的对应方法，记录事件，在这个过程中，Vertx是允许带一个Payload的，对于 &lt;code>vertx-core-4.x-plugin&lt;/code> 插件，这个Payload就是 Skywalking的 &lt;code>AbstractSpan&lt;/code> ，这样就可以在Vert.X内部实现绕开ThreadLocal的线程限制、进行追踪了。&lt;/p>
-&lt;h4 id="skywalking对vertx的支持与quarkus的关系">Skywalking对Vert.X的支持、与Quarkus的关系&lt;/h4>
-&lt;p>那么问题在哪呢？&lt;/p>
+&lt;h4 id="skywalking对vertx的支持与quarkus的关系">Skywalking对Vert.X的支持、与Quarkus的关系
+&lt;/h4>&lt;p>那么问题在哪呢？&lt;/p>
 &lt;p>问题就在于，这样的机制决定了，只有在Vert.X体系里的才会被追踪到，看看前面列的那些组件，RestEasy、HttpClient、JDBC Driver这些都不在Vert.X控制下的，他们产生的Span和Vert.X是无法关联起来的。&lt;/p>
 &lt;p>我们再看看目前 &lt;code>vertx-core-4.x-plugin&lt;/code> 实际支持的Vert.X组件，从 &lt;a class="link" href="https://github.com/apache/skywalking-java/blob/main/apm-sniffer/apm-sdk-plugin/vertx-plugins/vertx-core-4.x-plugin/src/main/java/org/apache/skywalking/apm/plugin/vertx4/SWVertxTracer.java" target="_blank" rel="noopener"
 >源码&lt;/a> 来看，实际支持了HTTP服务、HTTP客户端，以及EventBus（包括本地的和分布式的）。&lt;/p>
@@ -205,8 +205,8 @@ data-flex-basis="685px"
 &lt;/ul>
 &lt;p>我选择放弃，在sidecar里面执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>rm /skywalking/agent/plugins/apm-vertx-core-*
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="总结">总结&lt;/h2>
-&lt;ol>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="总结">总结
+&lt;/h2>&lt;ol>
 &lt;li>
 &lt;p>RestEasy 4.x 将在Skywalking 8.12.0里面支持，如有需要可提前自行编译（&lt;strong>2022-09-10更新&lt;/strong> 2022-09-03已release）&lt;/p>
 &lt;/li>
@@ -218,8 +218,8 @@ data-flex-basis="685px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>rm /skywalking/agent/plugins/apm-vertx-core-* /skywalking/agent/plugins/resteasy-server-3.x*
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;/li>
 &lt;/ol></description></item><item><title>关于Quarkus的碎碎念</title><link>https://leibnizhu.github.io/p/%E5%85%B3%E4%BA%8EQuarkus%E7%9A%84%E7%A2%8E%E7%A2%8E%E5%BF%B5/</link><pubDate>Sun, 15 May 2022 16:03:10 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%85%B3%E4%BA%8EQuarkus%E7%9A%84%E7%A2%8E%E7%A2%8E%E5%BF%B5/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%85%B3%E4%BA%8EQuarkus%E7%9A%84%E7%A2%8E%E7%A2%8E%E5%BF%B5/thumbnail.jpg" alt="Featured image of post 关于Quarkus的碎碎念" />&lt;p>最近把一个老项目迁到了Quarkus，想谈谈一些感想和想-法。&lt;/p>
-&lt;h2 id="why-quarkus">Why Quarkus???&lt;/h2>
-&lt;p>答案很简单，for 云原生。在 &lt;a class="link" href="https://quarkus.io/" target="_blank" rel="noopener"
+&lt;h2 id="why-quarkus">Why Quarkus???
+&lt;/h2>&lt;p>答案很简单，for 云原生。在 &lt;a class="link" href="https://quarkus.io/" target="_blank" rel="noopener"
 >官网&lt;/a> 也可以看到Quarkus的宣传点也是围绕云原生进行的。&lt;br>
 云原生的实现大概有这些要点：&lt;/p>
 &lt;ol>
@@ -230,8 +230,8 @@ data-flex-basis="685px"
 &lt;li>配合GitOps持续集成、持续交付&lt;/li>
 &lt;/ol>
 &lt;p>而Quarkus很好解决了这些问题。反观Spring，在启动速度、资源占用这块实在不尽人意，对k8s的支持也是很落后，对graalvm native- image也是起步落后。&lt;/p>
-&lt;h2 id="用不用native">用不用Native??&lt;/h2>
-&lt;p>谈Quarkus绕不开native（native可执行文件的构建）。没办法，官方先来的，首页就是大大的native/jvm性能对比。&lt;br>
+&lt;h2 id="用不用native">用不用Native??
+&lt;/h2>&lt;p>谈Quarkus绕不开native（native可执行文件的构建）。没办法，官方先来的，首页就是大大的native/jvm性能对比。&lt;br>
 native实测是真的快（不到0.1s），内存占用也确实小（启动几十MB，跑一段时间稳定大概300MB附近，不过不同压力的不同类型服务也不能说明什么）。但有什么缺点？&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>编译速度慢&lt;/strong> ：一个比较简单的web服务，在我们CICD的机器上编译大概需要4min，如果是容器内multistage编译则时间更长，但直接编译对环境又有要求，所以还是最好有更强大的编译机器。&lt;/li>
@@ -239,8 +239,8 @@ native实测是真的快（不到0.1s），内存占用也确实小（启动几�
 &lt;li>&lt;strong>开发多了不少限制&lt;/strong> ：你要注意新引入的依赖是不是支持native的；所以可能需要json序列化反序列化的类记得加上 &lt;code>@RegisterForReflection&lt;/code> 注解；如果是外部依赖的实体类，要编写一个什么json文件声明要处理…………本文不是Quarkus教程，就不详细展开了，总之，如果要native，最好整个服务都只用quarkus生态里面的依赖，否则你不知道什么时候就编译不了了。虽然quarkus的生态已经比较完善，但总有没cover到的地方，比如hadoop生态的sdk。&lt;/li>
 &lt;/ol>
 &lt;p>没错，我们quarkus native上了生产一两个月，运行良好，充分体现了native的优越性；但是，现在要加入hadoop这些，没办法，只能放弃，要么自己实现一整套hdfs client之类的，成本很高。&lt;/p>
-&lt;h2 id="响应式要上吗">响应式要上吗?&lt;/h2>
-&lt;p>官网说：&lt;/p>
+&lt;h2 id="响应式要上吗">响应式要上吗?
+&lt;/h2>&lt;p>官网说：&lt;/p>
 &lt;blockquote>
 &lt;p>Unifies imperative and reactive
 Combine both the familiar imperative code and the reactive style when developing applications.&lt;/p>
@@ -277,9 +277,9 @@ Combine both the familiar imperative code and the reactive style when developing
 &lt;blockquote>
 &lt;p>&lt;strong>有一说一，Quarkus 的 mutiny对比RxJava之类，好用不是一点两点，接口设计相当优秀，值得学习。&lt;/strong>&lt;/p>
 &lt;/blockquote>
-&lt;h2 id="其他">其他&lt;/h2>
-&lt;h3 id="openapi">OpenAPI&lt;/h3>
-&lt;p>回顾下使用OpenAPI的目的：&lt;/p>
+&lt;h2 id="其他">其他
+&lt;/h2>&lt;h3 id="openapi">OpenAPI
+&lt;/h3>&lt;p>回顾下使用OpenAPI的目的：&lt;/p>
 &lt;ol>
 &lt;li>接口标准&lt;/li>
 &lt;li>提供给其他业务方/前端访问文档&lt;/li>
@@ -296,20 +296,20 @@ Quarkus对OpenAPI的支持可以见 &lt;a class="link" href="https://quarkus.io/
 >Using OpenAPI And Swagger UI&lt;/a> 。&lt;/li>
 &lt;/ol>
 &lt;p>第3点会带来一些不便，比如，OpenAPI spec文件在另一个项目，deploy到maven仓库，Quarkus的项目去依赖的时候，就要求它按这个目录来，如果OpenAPI spec是外部的项目，就不好控制了。&lt;/p>
-&lt;h3 id="restclient">RestClient&lt;/h3>
-&lt;p>Quarkus的 &lt;a class="link" href="https://quarkus.io/guides/rest-client-reactive" target="_blank" rel="noopener"
+&lt;h3 id="restclient">RestClient
+&lt;/h3>&lt;p>Quarkus的 &lt;a class="link" href="https://quarkus.io/guides/rest-client-reactive" target="_blank" rel="noopener"
 >RestClient&lt;/a> 基本功能是完备的，配合 &lt;code>quarkus-smallrye-fault-tolerance&lt;/code> 可以做一些重试啊、Fallback啊、熔断啊之类的操作。&lt;br>
 但有两个点要吐槽下：&lt;/p>
 &lt;ol>
 &lt;li>RestClient是可以通过 &lt;code>@RegisterClientHeaders&lt;/code> 注册一个请求header的处理器的；但这个处理器的生命周期是restclient自己管的，给一个输入的header，你可以往里加header之类，实际上能操作的空间的很小，一般就是只能加一些固定的header。所以很多时候只能在接口方法加 &lt;code>@HeaderParam&lt;/code> 的参数，如果又有一些固定的header处理逻辑，要么就写一层Facade，要么就在接口里做个default方法处理下。&lt;/li>
 &lt;li>接口的异常处理定义比较弱，基本只能通过Interceptor、或者异常捕获；比如想根据响应http status code有不同处理，获取响应header这种，就比较麻烦。&lt;/li>
 &lt;/ol>
-&lt;h3 id="multipart">Multipart&lt;/h3>
-&lt;p>有一点比较坑的，&lt;code>@MultipartForm&lt;/code> 注解有俩：&lt;/p>
+&lt;h3 id="multipart">Multipart
+&lt;/h3>&lt;p>有一点比较坑的，&lt;code>@MultipartForm&lt;/code> 注解有俩：&lt;/p>
 &lt;ul>
 &lt;li>org.jboss.resteasy.annotations.providers.multipart.MultipartForm&lt;/li>
 &lt;li>org.jboss.resteasy.reactive.MultipartForm&lt;/li>
 &lt;/ul>
 &lt;p>还都是resteasy下的，注意哈，用第一个才行的，resteasy-multipart-provider 里面的。&lt;/p>
-&lt;h3 id="redisclient">RedisClient&lt;/h3>
-&lt;p>好几个方法，如 &lt;code>io.quarkus.redis.client.RedisClient#del&lt;/code> ，没用变长参数，用的是List接收参数。 算是有点不方便吧。&lt;/p></description></item></channel></rss>
+&lt;h3 id="redisclient">RedisClient
+&lt;/h3>&lt;p>好几个方法，如 &lt;code>io.quarkus.redis.client.RedisClient#del&lt;/code> ，没用变长参数，用的是List接收参数。 算是有点不方便吧。&lt;/p></description></item></channel></rss>

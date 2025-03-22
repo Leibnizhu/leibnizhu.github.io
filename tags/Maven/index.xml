@@ -55,21 +55,21 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 以前的配置 --&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>发布项目到Maven中央仓库</title><link>https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/</link><pubDate>Tue, 05 Sep 2017 13:36:04 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/melen.png" alt="Featured image of post 发布项目到Maven中央仓库" />&lt;h1 id="发布项目到maven中央仓库">发布项目到Maven中央仓库&lt;/h1>
-&lt;h2 id="前言">前言&lt;/h2>
-&lt;p>写完项目之后，为了方便别人调用，需要发布到网上，有以下方法：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>发布项目到Maven中央仓库</title><link>https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/</link><pubDate>Tue, 05 Sep 2017 13:36:04 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/melen.png" alt="Featured image of post 发布项目到Maven中央仓库" />&lt;h1 id="发布项目到maven中央仓库">发布项目到Maven中央仓库
+&lt;/h1>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>写完项目之后，为了方便别人调用，需要发布到网上，有以下方法：&lt;/p>
 &lt;ol>
 &lt;li>提交到Github/Gitlab上的公开项目（包含pom.xml），其他人clone后，通过&lt;code>mvn install&lt;/code>安装到本地仓库，再通过maven依赖引入。缺点：需要使用者手动操作的比较多，体验不好。&lt;/li>
 &lt;li>提交到Maven中央仓库，使用者只要直接通过maven依赖引入即可。缺点：发布者操作较多麻烦。&lt;/li>
 &lt;/ol>
 &lt;p>本文讨论的是第二种方法，目前网上也有很多相关文章，经过实践发现一些具体的操作已经过时/不可用，本人也踩了不少坑。所以写下本文记录。&lt;/p>
-&lt;h2 id="注册sonatype提交申请">注册Sonatype提交申请&lt;/h2>
-&lt;p>Maven中央仓库由Sonatype公司在维护，在向Maven中央仓库提交项目前，需要先注册Sonatype账户，然后提交issue申请。&lt;/p>
-&lt;h3 id="注册sonatype">注册Sonatype&lt;/h3>
-&lt;p>到 &lt;a class="link" href="https://issues.sonatype.org/secure/Signup!default.jspa" target="_blank" rel="noopener"
+&lt;h2 id="注册sonatype提交申请">注册Sonatype提交申请
+&lt;/h2>&lt;p>Maven中央仓库由Sonatype公司在维护，在向Maven中央仓库提交项目前，需要先注册Sonatype账户，然后提交issue申请。&lt;/p>
+&lt;h3 id="注册sonatype">注册Sonatype
+&lt;/h3>&lt;p>到 &lt;a class="link" href="https://issues.sonatype.org/secure/Signup!default.jspa" target="_blank" rel="noopener"
 >Sonatype官网&lt;/a> 注册帐号，随后登录。&lt;/p>
-&lt;h3 id="提交issue申请">提交issue申请&lt;/h3>
-&lt;p>登录点击上方导航栏的&lt;code>Create&lt;/code>按钮：
+&lt;h3 id="提交issue申请">提交issue申请
+&lt;/h3>&lt;p>登录点击上方导航栏的&lt;code>Create&lt;/code>按钮：
 &lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/1.png"
 width="933"
 height="58"
@@ -100,8 +100,8 @@ class="gallery-image"
 data-flex-grow="258"
 data-flex-basis="621px"
 >&lt;/p>
-&lt;h3 id="等待工作人员确认">等待工作人员确认&lt;/h3>
-&lt;p>由于时差关系，Sonatype的工作人员大约会在北京时间22：00开始处理issue。&lt;br>
+&lt;h3 id="等待工作人员确认">等待工作人员确认
+&lt;/h3>&lt;p>由于时差关系，Sonatype的工作人员大约会在北京时间22：00开始处理issue。&lt;br>
 分配工作人员后，在issue页面右边看到&lt;code>Assignee&lt;/code>分配给谁了：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/4.png"
 width="395"
@@ -133,9 +133,9 @@ data-flex-grow="296"
 data-flex-basis="711px"
 >&lt;br>
 这时就可以准备上传了。&lt;/p>
-&lt;h2 id="上传前的准备">上传前的准备&lt;/h2>
-&lt;h3 id="gpg签名">GPG签名&lt;/h3>
-&lt;p>一般Linux发行版都会预装gpg，没有的自行安装即可（apt、pacman等命令，不再赘述）。输入命令：&lt;/p>
+&lt;h2 id="上传前的准备">上传前的准备
+&lt;/h2>&lt;h3 id="gpg签名">GPG签名
+&lt;/h3>&lt;p>一般Linux发行版都会预装gpg，没有的自行安装即可（apt、pacman等命令，不再赘述）。输入命令：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>gpg --gen-key
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>需要输入姓名、邮箱等字段，其它字段可使用默认值，此外，还需要输入一个 Passphase，相当于一个密钥库的密码，要记好，deploy要用。&lt;br>
 再输入下面命令来获取公钥ID：&lt;/p>
@@ -162,8 +162,8 @@ data-flex-basis="1058px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>gpg: 密钥 F***9：“L***z &amp;lt;l***u@***.***&amp;gt;”未改变
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg: 合计被处理的数量：1
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>gpg: 未改变：1
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改pomxml">修改pom.xml&lt;/h3>
-&lt;p>pom.xml文件需要修改比较多，在这直接列出相关的：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改pomxml">修改pom.xml
+&lt;/h3>&lt;p>pom.xml文件需要修改比较多，在这直接列出相关的：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;licenses&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;license&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;name&amp;gt;&lt;/span>The Apache Software License, Version 2.0&lt;span style="color:#5bc4bf">&amp;lt;/name&amp;gt;&lt;/span>
@@ -316,8 +316,8 @@ data-flex-basis="1058px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/plugins&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这里加了很多插件，因为Sonatype要求有javadoc、GPG签名等等。&lt;/p>
-&lt;h3 id="修改m2settingsxml">修改~/.m2/settings.xml&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;settings&amp;gt;&lt;/span>
+&lt;h3 id="修改m2settingsxml">修改~/.m2/settings.xml
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;settings&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ...
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;servers&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;server&amp;gt;&lt;/span>
@@ -328,9 +328,9 @@ data-flex-basis="1058px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/servers&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ...
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/settings&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="上传发布">上传&amp;amp;&amp;amp;发布&lt;/h2>
-&lt;h3 id="maven上传">Maven上传&lt;/h3>
-&lt;p>进入项目，输入以下命令：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="上传发布">上传&amp;amp;&amp;amp;发布
+&lt;/h2>&lt;h3 id="maven上传">Maven上传
+&lt;/h3>&lt;p>进入项目，输入以下命令：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>mvn deploy -P release -Dgpg.passphrase&lt;span style="color:#5bc4bf">=[&lt;/span>GPG密码&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>稍等片刻，期间可能会弹窗要求输入GPG密码。最后看到&lt;code>BUILD SUCCESS&lt;/code>成功。&lt;br>
 注: MacOS下可能会提示：&lt;/p>
@@ -338,8 +338,8 @@ data-flex-basis="1058px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>请先输入：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">export&lt;/span> GPG_TTY&lt;span style="color:#5bc4bf">=$&lt;/span>(tty)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再执行&lt;code>mvn deploy&lt;/code>&lt;/p>
-&lt;h3 id="oss发布">OSS发布&lt;/h3>
-&lt;p>打开 &lt;a class="link" href="https://oss.sonatype.org/" target="_blank" rel="noopener"
+&lt;h3 id="oss发布">OSS发布
+&lt;/h3>&lt;p>打开 &lt;a class="link" href="https://oss.sonatype.org/" target="_blank" rel="noopener"
 >https://oss.sonatype.org/&lt;/a> 并登陆（帐号密码与前面注册一样）。&lt;br>
 点击左边的&lt;code>Staging Repositories&lt;/code>，再在右上角搜索groupid：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/8.png"
@@ -363,9 +363,9 @@ data-flex-basis="357px"
 >&lt;br>
 等一两分钟再刷新上面的列表，可以看到状态已经变成Closed（如果没有的话，在下方的Acitivity可以看到close操作的情况，看具体是什么问题，我一开始就一直说找不到签名，将GPG公钥发布后又说缺少javadoc，于是再加Maven插件生成javadoc）。
 这时候再选中自己的项目，然后点&lt;code>Release&lt;/code>按钮，再点&lt;code>Confirm&lt;/code>提交，即可。&lt;/p>
-&lt;h2 id="收尾工作">收尾工作&lt;/h2>
-&lt;h3 id="关闭oss的issue">关闭OSS的issue&lt;/h3>
-&lt;p>回到OSS &lt;a class="link" href="https://issues.sonatype.org" target="_blank" rel="noopener"
+&lt;h2 id="收尾工作">收尾工作
+&lt;/h2>&lt;h3 id="关闭oss的issue">关闭OSS的issue
+&lt;/h3>&lt;p>回到OSS &lt;a class="link" href="https://issues.sonatype.org" target="_blank" rel="noopener"
 >https://issues.sonatype.org&lt;/a> ，打开自己提交的issue，回复一下，告诉工作人员已经上传发布到OSS了，很快他们就会回复说10分钟内会同步到中央仓库，2小时内可以被搜索到：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%8F%91%E5%B8%83%E9%A1%B9%E7%9B%AE%E5%88%B0Maven%E4%B8%AD%E5%A4%AE%E4%BB%93%E5%BA%93/10.png"
 width="953"
@@ -376,8 +376,8 @@ class="gallery-image"
 data-flex-grow="850"
 data-flex-basis="2042px"
 >&lt;/p>
-&lt;h3 id="等待同步中央仓库">等待同步中央仓库&lt;/h3>
-&lt;p>一般等最多两个小时，就可以在 &lt;a class="link" href="https://search.maven.org" target="_blank" rel="noopener"
+&lt;h3 id="等待同步中央仓库">等待同步中央仓库
+&lt;/h3>&lt;p>一般等最多两个小时，就可以在 &lt;a class="link" href="https://search.maven.org" target="_blank" rel="noopener"
 >https://search.maven.org&lt;/a> 搜索到自己发布的项目啦。&lt;br>
 我的Spring-Boot-Starter-Netty项目地址： &lt;a class="link" href="https://search.maven.org/#artifactdetails%7Cio.gitlab.leibnizhu%7Cspring-boot-starter-netty%7C1.0%7Cjar" target="_blank" rel="noopener"
 >https://search.maven.org/#artifactdetails%7Cio.gitlab.leibnizhu%7Cspring-boot-starter-netty%7C1.0%7Cjar&lt;/a>&lt;/p></description></item></channel></rss>

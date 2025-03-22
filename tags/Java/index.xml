@@ -1,6 +1,84 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Java on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Java/</link><description>Recent content in Java on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 31 Jul 2017 14:35:06 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Java/index.xml" rel="self" type="application/rss+xml"/><item><title>LinkedList源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Mon, 31 Jul 2017 14:35:06 +0800</pubDate><guid>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/night.png" alt="Featured image of post LinkedList源码阅读笔记（JDK8）" />&lt;h1 id="linkedlist源码阅读笔记">LinkedList源码阅读笔记&lt;/h1>
-&lt;h2 id="继承结构">继承结构&lt;/h2>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML.png"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Java on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Java/</link><description>Recent content in Java on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 22 Mar 2025 12:00:00 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Java/index.xml" rel="self" type="application/rss+xml"/><item><title>处理jvppeteer获取SSE响应内容乱码问题</title><link>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 22 Mar 2025 12:00:00 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/thumbnail.png" alt="Featured image of post 处理jvppeteer获取SSE响应内容乱码问题" />&lt;p>最近在使用jvppeteer监听SSE（Server-Sent Events）响应时，调用 &lt;code>com.ruiyun.jvppeteer.api.core.Response.content()&lt;/code> 方法获取响应内容，结果发现返回的中文内容全部变成了乱码。这里记录一下问题的分析过程和解决方案。&lt;/p>
+&lt;h2 id="现象描述">现象描述
+&lt;/h2>&lt;p>在SSE接口的响应中，中文内容无法正常显示，变成了乱码，而英文部分则没有受到影响。这个问题出现在使用 &lt;code>jvppeteer&lt;/code> 处理 Chrome DevTools Protocol（CDP）的 &lt;code>Network.getResponseBody&lt;/code> 方法时。&lt;/p>
+&lt;h2 id="原因分析">原因分析
+&lt;/h2>&lt;p>经过源码分析发现，&lt;code>Response.content()&lt;/code> 方法实际上是调用了 &lt;a class="link" href="https://chromedevtools.github.io/devtools-protocol/tot/Network/#method-getResponseBody" target="_blank" rel="noopener"
+>CDP协议&lt;/a> 获取响应内容。然而，SSE接口返回的 &lt;code>Content-Type&lt;/code> 头部为 &lt;code>text/event-stream&lt;/code>，但未显式声明编码方式。&lt;/p>
+&lt;p>CDP 默认按照 &lt;code>windows-1252&lt;/code> 编码解析响应数据，而实际数据是 &lt;code>UTF-8&lt;/code> 编码，导致乱码。例如，在 &lt;a class="link" href="https://github.com/g1879/DrissionPage/issues/343" target="_blank" rel="noopener"
+>DrissionPage 的 issue&lt;/a> 中，也有人遇到类似问题。&lt;/p>
+&lt;p>尝试使用 &lt;a class="link" href="http://www.mytju.com/classcode/tools/messycoderecover.asp" target="_blank" rel="noopener"
+>在线工具&lt;/a> 恢复乱码，发现这些乱码正是将 UTF-8 文本按 &lt;code>windows-1252&lt;/code> 编码读取后导致的，因此是可逆的。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/messy_code.png"
+width="2334"
+height="879"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/messy_code_hu10998148672036293904.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/messy_code_hu9103320569865329723.png 1024w"
+loading="lazy"
+alt="乱码可恢复"
+class="gallery-image"
+data-flex-grow="265"
+data-flex-basis="637px"
+>&lt;/p>
+&lt;h2 id="乱码恢复方案">乱码恢复方案
+&lt;/h2>&lt;h3 id="java-中恢复乱码">Java 中恢复乱码
+&lt;/h3>&lt;p>尝试在 Java 中手动转换 &lt;code>windows-1252&lt;/code> -&amp;gt; &lt;code>UTF-8&lt;/code>，但发现部分字符会丢失。&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery1.png"
+width="1762"
+height="108"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery1_hu15217162607424412618.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery1_hu1306001233224219932.png 1024w"
+loading="lazy"
+alt="java恢复乱码失败"
+class="gallery-image"
+data-flex-grow="1631"
+data-flex-basis="3915px"
+>&lt;/p>
+&lt;p>原因未知，但测试中发现复制粘贴乱码的时候存在格式变乱的情况，可能是由于windows-1252编码的乱码中包含了控制字符，导致java中解码失败。&lt;/p>
+&lt;p>挑选丢失了字符的一段进行对比，发现这段乱码使用windows-1252的编码、与原文使用utf-8编码生成的byte数组确实有差异：&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery2.png"
+width="2290"
+height="142"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery2_hu2043261210891607629.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/java_try_recovery2_hu7984525941282566837.png 1024w"
+loading="lazy"
+alt="alt text"
+class="gallery-image"
+data-flex-grow="1612"
+data-flex-basis="3870px"
+>&lt;/p>
+&lt;h3 id="python-方案推荐">Python 方案（推荐）
+&lt;/h3>&lt;p>在 &lt;a class="link" href="https://github.com/g1879/DrissionPage/issues/343" target="_blank" rel="noopener"
+>GitHub issue&lt;/a> 讨论中，有人推荐使用 Python 的 &lt;a class="link" href="https://github.com/rspeer/python-ftfy" target="_blank" rel="noopener"
+>&lt;code>ftfy&lt;/code>&lt;/a> 库来修复乱码，实测效果良好:&lt;/p>
+&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/ftfy_recovery.png"
+width="1166"
+height="72"
+srcset="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/ftfy_recovery_hu17722702481251396867.png 480w, https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/ftfy_recovery_hu4553067058202656807.png 1024w"
+loading="lazy"
+alt="alt text"
+class="gallery-image"
+data-flex-grow="1619"
+data-flex-basis="3886px"
+>&lt;/p>
+&lt;h2 id="临时解决方案">临时解决方案
+&lt;/h2>&lt;p>在实际环境中，可以采用以下步骤修复乱码：&lt;/p>
+&lt;ol>
+&lt;li>在 &lt;code>Docker&lt;/code> 镜像中安装 &lt;code>ftfy&lt;/code>。&lt;/li>
+&lt;li>在处理可能包含中文的内容时（如 AI 回答、网页搜索结果等），调用 &lt;code>ftfy&lt;/code> 进行修复。&lt;/li>
+&lt;li>需要特别注意：
+&lt;ul>
+&lt;li>文本中的换行符需要特殊处理，以避免 &lt;code>ftfy&lt;/code> 处理后丢失格式，建议替换为其他字符。&lt;/li>
+&lt;li>文本中的单引号 &lt;code>'&lt;/code> 可能导致生成的 &lt;code>ftfy&lt;/code> 命令无效，需在调用前替换或转义。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>通过 &lt;code>ftfy&lt;/code> 进行自动修复，可以较好地解决 SSE 响应乱码问题，避免影响正常业务逻辑。&lt;/p>
+&lt;h2 id="处理sse响应异常">处理SSE响应异常
+&lt;/h2>&lt;p>在 jvppeteer 中，使用 Response.content() 方法获取 SSE 的响应内容时，可能会遇到以下问题：&lt;/p>
+&lt;ul>
+&lt;li>在 SSE 事件未完全响应时，方法可能抛出 ProtocolException。&lt;/li>
+&lt;li>偶尔不会报错，但返回 null。&lt;/li>
+&lt;/ul>
+&lt;p>为了解决这些问题，可以捕获异常并进行重试，直到 SSE 完全响应结束。&lt;/p></description></item><item><title>LinkedList源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Mon, 31 Jul 2017 14:35:06 +0800</pubDate><guid>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/night.png" alt="Featured image of post LinkedList源码阅读笔记（JDK8）" />&lt;h1 id="linkedlist源码阅读笔记">LinkedList源码阅读笔记
+&lt;/h1>&lt;h2 id="继承结构">继承结构
+&lt;/h2>&lt;p>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML.png"
 width="658"
 height="455"
 srcset="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML_hu17910684674494748801.png 480w, https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML_hu3714244879672279204.png 1024w"
@@ -9,8 +87,8 @@ class="gallery-image"
 data-flex-grow="144"
 data-flex-basis="347px"
 >&lt;/p>
-&lt;h2 id="成员变量">成员变量&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//记录长度&lt;/span>
+&lt;h2 id="成员变量">成员变量
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//记录长度&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> &lt;span style="color:#fec418">int&lt;/span> size &lt;span style="color:#5bc4bf">=&lt;/span> 0;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//第一个元素的指针&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> first;
@@ -18,14 +96,14 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> last;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>以上成员变量都用了transient关键字避免被持久化。&lt;/p>
 &lt;p>从继承结构来看，&lt;code>LinkedList&lt;/code>继承了&lt;code>AbstractSequentialList&lt;/code>，而&lt;code>AbstractSequentialList&lt;/code>继承了&lt;code>AbstractList&lt;/code>，因此&lt;code>LinkedList&lt;/code>也继承了&lt;code>protected transient int modCount&lt;/code>变量，具体作用与&lt;code>ArayList&lt;/code>中一样，不再赘述。&lt;/p>
-&lt;h2 id="构造方法">构造方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#06b6ef">LinkedList&lt;/span>()
+&lt;h2 id="构造方法">构造方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#06b6ef">LinkedList&lt;/span>()
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>默认构造方法，实现为空方法。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#06b6ef">LinkedList&lt;/span>(Collection&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> c)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>addAll()&lt;/code>方法将参数c中的所有元素增加到当前实例中，完成构造。&lt;/p>
-&lt;h2 id="内部类node">内部类Node&lt;/h2>
-&lt;h3 id="定义">定义&lt;/h3>
-&lt;p>在&lt;code>LinkedList&lt;/code>中，使用&lt;code>Node&lt;/code>内部类存储List的每个元素，其结构比较简单:&lt;/p>
+&lt;h2 id="内部类node">内部类Node
+&lt;/h2>&lt;h3 id="定义">定义
+&lt;/h3>&lt;p>在&lt;code>LinkedList&lt;/code>中，使用&lt;code>Node&lt;/code>内部类存储List的每个元素，其结构比较简单:&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>item&lt;/code>存储具体的List元素引用&lt;/li>
 &lt;li>&lt;code>next&lt;/code>和&lt;code>prev&lt;/code>分别存储后一个和上一个元素的引用，由此构成链表。&lt;/li>
@@ -41,8 +119,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">prev&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> prev;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="维护链表的基础方法">维护链表的基础方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="维护链表的基础方法">维护链表的基础方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 将元素插入到链表头部
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * prev=LinkedList.next, next=null
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 然后更新first，原来first的prev引用更新为新元素
@@ -84,9 +162,9 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 代码实现上类似于unlinkFirst()与unlinkLast()的结合
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>E &lt;span style="color:#06b6ef">unlink&lt;/span>(Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> x)
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="常规方法">常规方法&lt;/h2>
-&lt;h3 id="维护头部尾部的方法">维护头部尾部的方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//first为空则抛NoSuchElementException异常，否则返回first.item&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="常规方法">常规方法
+&lt;/h2>&lt;h3 id="维护头部尾部的方法">维护头部尾部的方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//first为空则抛NoSuchElementException异常，否则返回first.item&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">getFirst&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//last为空则抛NoSuchElementException异常，否则返回last.item&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">getLast&lt;/span>();
@@ -100,9 +178,9 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">addFirst&lt;/span>(E e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//调用linkLast()进行处理，允许e为null&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">addLast&lt;/span>(E e);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="接口常规增删改查方法">接口常规增删改查方法&lt;/h3>
-&lt;h4 id="增">增&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(E e); &lt;span style="color:#776e71">//调用linkLast()进行处理，并返回true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="接口常规增删改查方法">接口常规增删改查方法
+&lt;/h3>&lt;h4 id="增">增
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(E e); &lt;span style="color:#776e71">//调用linkLast()进行处理，并返回true&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E element);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>指定下标插入元素的方法&lt;code>add()&lt;/code>先对&lt;code>index&lt;/code>进行下标越界检查，然后如果&lt;code>index==size&lt;/code>，即插入到List最后面，那么直接调用&lt;code>linkLast()&lt;/code>执行插入就可以；否则调用&lt;code>linkBefore()&lt;/code>插入到指定下标的元素前面，即新的元素拥有&lt;code>index&lt;/code>的下标（符合&lt;code>add()&lt;/code>方法对&lt;code>index&lt;/code>参数的定义）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">addAll&lt;/span>(Collection&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> c); &lt;span style="color:#776e71">//调用addAll(size, c)&lt;/span>
@@ -117,18 +195,18 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> pred &lt;span style="color:#5bc4bf">=&lt;/span> succ.&lt;span style="color:#06b6ef">prev&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>随后遍历Object数组，逐个生成&lt;code>Node&lt;/code>对象，并将上一个元素的next指向当前元素。遍历完后，维护插入新元素的前/后元素的后/前引用，如果succ为null则&lt;code>LinkedList.last&lt;/code>赋值为&lt;code>pred&lt;/code>，同时维护&lt;code>size&lt;/code>，更新&lt;code>modCount&lt;/code>。&lt;/p>
-&lt;h4 id="删">删&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">remove&lt;/span>(Object o);
+&lt;h4 id="删">删
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">remove&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>删除元素的方法&lt;code>remove()&lt;/code>类似&lt;code>indexOf()&lt;/code>，从&lt;code>first&lt;/code>开始遍历List，逐个元素判断是否与参数&lt;code>o&lt;/code>相同（判断方法与&lt;code>indexOf()&lt;/code>一样），找到后调用&lt;code>unlink()&lt;/code>进行删除并返回true。如果没找到相同的元素则返回false。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">remove&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>该方法删除指定下标的元素。检查下标没有越界后，调用&lt;code>unlink(node(index))&lt;/code>删除指定元素（其中&lt;code>node()&lt;/code>是查找指定下标的元素，详见 &lt;em>查&lt;/em> 部分）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">clear&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>清空整个List，从&lt;code>first&lt;/code>开始，遍历整个List，把每个&lt;code>Node&lt;/code>的&lt;code>item next prev&lt;/code>都置为null（方便GC），以及&lt;code>LinkedList&lt;/code>的&lt;code>first last&lt;/code>也置为null，&lt;code>size&lt;/code>归零。&lt;/p>
-&lt;h4 id="改">改&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">set&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E element);
+&lt;h4 id="改">改
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">set&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E element);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将下标为&lt;code>index&lt;/code>的元素设置为&lt;code>element&lt;/code>，并将旧值返回。该方法在检查&lt;code>index&lt;/code>是否越界后，先调用&lt;code>node()&lt;/code>方法查找到指定下标的&lt;code>Node&lt;/code>元素，直接修改&lt;code>Node&lt;/code>实例的&lt;code>item&lt;/code>属性为新值，并返回旧值（而不是新建一个&lt;code>Node&lt;/code>，这样既减少操作，也减少多余的对象，从而减轻GC负担）。&lt;/p>
-&lt;h4 id="旧的查找方法">旧的查找方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">contains&lt;/span>(Object o);
+&lt;h4 id="旧的查找方法">旧的查找方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">contains&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">lastIndexOf&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>方法&lt;code>contains()&lt;/code>判断当前List是否包含指定元素，返回&lt;code>indexOf(o) != -1&lt;/code>。&lt;br>
@@ -139,8 +217,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">get&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前者&lt;code>node()&lt;/code>方法是通过遍历从链表中查找到指定下标的元素，其中有个优化，如果查找的下标大于&lt;code>size&lt;/code>的一半则从&lt;code>last&lt;/code>引用开始找，否则从&lt;code>first&lt;/code>引用开始找。&lt;br>
 后者&lt;code>get()&lt;/code>方法在检查&lt;code>index&lt;/code>参数没有越界后，调用前者进行查找。&lt;/p>
-&lt;h4 id="jdk5-开始引入的方法">&lt;em>JDK5&lt;/em> 开始引入的方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//获取但不移除该List的头部，first为null时返回null&lt;/span>
+&lt;h4 id="jdk5-开始引入的方法">&lt;em>JDK5&lt;/em> 开始引入的方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//获取但不移除该List的头部，first为null时返回null&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">peek&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//获取但不移除该List的头部，调用getFirst()，first为null时抛NoSuchElementException异常&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">element&lt;/span>();
@@ -152,8 +230,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//将指定元素添加到该List的尾部，调用add()方法处理&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">offer&lt;/span>(E e);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="jdk6-开始引入的方法">&lt;em>JDK6&lt;/em> 开始引入的方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//在该List的开头插入指定的元素，调用addFirst()方法，后者又调用linkFirst()处理，返回true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="jdk6-开始引入的方法">&lt;em>JDK6&lt;/em> 开始引入的方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//在该List的开头插入指定的元素，调用addFirst()方法，后者又调用linkFirst()处理，返回true&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">offerFirst&lt;/span>(E e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// 在该List末尾插入指定的元素，调用addLast()方法，后者又调用linkLast()处理，返回true。实际实现与offer()一致&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">offerLast&lt;/span>(E e);
@@ -179,8 +257,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//再调用unlink()进行删除处理，返回true；遍历完后还找不到对应元素则返回false。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">removeLastOccurrence&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到 &lt;em>JDK6&lt;/em> 新增的这些方法实际上是对 &lt;em>JDK5&lt;/em> 新增的方法的扩展，从默认的操作（可能是针对头部或尾部）扩展到对头部和尾部的操作。&lt;/p>
-&lt;h3 id="边界检查方法">边界检查方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//是否合法的元素下标&lt;/span>
+&lt;h3 id="边界检查方法">边界检查方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//是否合法的元素下标&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isElementIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//对迭代器和add()方法而言是否合法下标（允许等于size）&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isPositionIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
@@ -192,8 +270,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">checkElementIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//检查对迭代器和add()方法而言是否合法下标，不合法则抛出IndexOutOfBoundsException异常&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">checkPositionIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="其他方法">其他方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//先调用父类的clone方法复制（其实是Object的本地方法），&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="其他方法">其他方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//先调用父类的clone方法复制（其实是Object的本地方法），&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//然后遍历原List，逐个add到克隆后的新List中并返回&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Object &lt;span style="color:#06b6ef">clone&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -211,15 +289,15 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//读取输入流构造List，先读入一个int作为size，&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//然后从输入流读取size次，每次读取的对象强转为E类型，并调用linkLast()加入到L链表尾部&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">readObject&lt;/span>(java.&lt;span style="color:#06b6ef">io&lt;/span>.&lt;span style="color:#06b6ef">ObjectInputStream&lt;/span> s);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="jdk8-开始引入的方法">&lt;em>JDK8&lt;/em> 开始引入的方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//spliterator：返回一个内部类static final class LLSpliterator&amp;lt;E&amp;gt; implements Spliterator&amp;lt;E&amp;gt; 的实例。&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="jdk8-开始引入的方法">&lt;em>JDK8&lt;/em> 开始引入的方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//spliterator：返回一个内部类static final class LLSpliterator&amp;lt;E&amp;gt; implements Spliterator&amp;lt;E&amp;gt; 的实例。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//为了并行遍历数据源中的元素，Stream.isParallel()实现调用。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//关于Spliterator接口在ArrayList源码的笔记里有介绍，在此不再赘述&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//这个实现类在final int getEst()est = LinkedList的size，expectedModCount = LinkedList的modCount&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Spliterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">spliterator&lt;/span>();
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="迭代器">迭代器&lt;/h2>
-&lt;h3 id="获取迭代器的方法">获取迭代器的方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回此列表中的元素的列表迭代器（按适当顺序），从列表中指定位置开始。&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="迭代器">迭代器
+&lt;/h2>&lt;h3 id="获取迭代器的方法">获取迭代器的方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回此列表中的元素的列表迭代器（按适当顺序），从列表中指定位置开始。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//检查下标越界后，返回LinkedList的内部类ListItr的实例&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">listIterator&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回以逆向顺序在此双端队列的元素上进行迭代的迭代器。&lt;/span>
@@ -228,8 +306,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回父类AbstractList的内部类ListItr实例&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Iterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> AbstractSequentialList.&lt;span style="color:#06b6ef">iterator&lt;/span>();
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="迭代器listitr">迭代器ListItr&lt;/h3>
-&lt;p>包含以下成员变量：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="迭代器listitr">迭代器ListItr
+&lt;/h3>&lt;p>包含以下成员变量：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//next()，previous()，remove()，set()，add()等方法返回的Node元素记录&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> lastReturned;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//当前游标指向的Node元素&lt;/span>
@@ -241,8 +319,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//因此外部操作后再进行迭代器的操作会抛出ConcurrentModificationException异常&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">int&lt;/span> expectedModCount &lt;span style="color:#5bc4bf">=&lt;/span> modCount;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其余&lt;code>ListIterator&lt;/code>接口方法的具体实现在此不表，与&lt;code>ArrayList&lt;/code>的&lt;code>ListItr&lt;/code>的实现类似，只是在一些修改链表的方法里需要对应修改前后元素的引用而已，此外上一个下一个的迭代效率也较高（直接读取Node元素的prev/next引用）。&lt;/p>
-&lt;h3 id="迭代器descendingiterator">迭代器DescendingIterator&lt;/h3>
-&lt;p>该迭代器是为了实现&lt;code>java.util.Deque&lt;/code>接口的&lt;code>Iterator&amp;lt;E&amp;gt; descendingIterator()&lt;/code>方法。&lt;br>
+&lt;h3 id="迭代器descendingiterator">迭代器DescendingIterator
+&lt;/h3>&lt;p>该迭代器是为了实现&lt;code>java.util.Deque&lt;/code>接口的&lt;code>Iterator&amp;lt;E&amp;gt; descendingIterator()&lt;/code>方法。&lt;br>
 具体实现还是用前面介绍的&lt;code>LinkedList&lt;/code>的内部类&lt;code>ListItr&lt;/code>。由于是反向的迭代器，因此用私有变量&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> ListItr itr &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> ListItr(size());
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>实现从链表尾部开始迭代。&lt;br>
@@ -258,14 +336,14 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看出并没有去重写 &lt;em>JDK8&lt;/em> 的&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">default&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">forEachRemaining&lt;/span>(Consumer&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">super&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> action)
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>方法。&lt;/p></description></item><item><title>SpringMVC中的WebSocket开发</title><link>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</link><pubDate>Sat, 29 Jul 2017 15:26:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/snow.png" alt="Featured image of post SpringMVC中的WebSocket开发" />&lt;h1 id="springmvc中的websocket开发">SpringMVC中的WebSocket开发&lt;/h1>
-&lt;h2 id="websocket简介">WebSocket简介&lt;/h2>
-&lt;h3 id="websocket背景">WebSocket背景&lt;/h3>
-&lt;p>在WebSocket出现之前，服务器的状态更新想要通知客户端，只能由客户端发起轮询（如Ajax）， 即在特定的的时间间隔（如每1秒），由浏览器对服务器发出HTTP request，然后由服务器返回最新的数据给客服端的浏览器。这种传统的HTTP request 的模式带来很明显的缺点 – 浏览器需要不断的向服务器发出请求，然而HTTP request 的header是非常长的，里面包含的有用数据可能只是一个很小的值，这样会占用很多的带宽。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>方法。&lt;/p></description></item><item><title>SpringMVC中的WebSocket开发</title><link>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</link><pubDate>Sat, 29 Jul 2017 15:26:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/snow.png" alt="Featured image of post SpringMVC中的WebSocket开发" />&lt;h1 id="springmvc中的websocket开发">SpringMVC中的WebSocket开发
+&lt;/h1>&lt;h2 id="websocket简介">WebSocket简介
+&lt;/h2>&lt;h3 id="websocket背景">WebSocket背景
+&lt;/h3>&lt;p>在WebSocket出现之前，服务器的状态更新想要通知客户端，只能由客户端发起轮询（如Ajax）， 即在特定的的时间间隔（如每1秒），由浏览器对服务器发出HTTP request，然后由服务器返回最新的数据给客服端的浏览器。这种传统的HTTP request 的模式带来很明显的缺点 – 浏览器需要不断的向服务器发出请求，然而HTTP request 的header是非常长的，里面包含的有用数据可能只是一个很小的值，这样会占用很多的带宽。
 WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket通讯协议于2011年被IETF定为标准RFC 6455，WebSocketAPI被W3C定为标准。
 在WebSocket API中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。WebSocket不仅允许服务器和客户端双向通信，而且互相沟通的Header是很小的-大概只有 2 Bytes。&lt;/p>
-&lt;h3 id="支持情况">支持情况&lt;/h3>
-&lt;ul>
+&lt;h3 id="支持情况">支持情况
+&lt;/h3>&lt;ul>
 &lt;li>Spring： Spring从4.0开始加入了spring-websocket这个模块，并能够全面支持WebSocket，它与Java WebSocket API标准（JSR-356）保持一致，同时提供了额外的服务。&lt;/li>
 &lt;li>浏览器：&lt;/li>
 &lt;/ul>
@@ -328,34 +406,34 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h3 id="java-实现方法">Java 实现方法&lt;/h3>
-&lt;p>在 Spring 端可以有以下几种方法使用 WebSocket：&lt;/p>
+&lt;h3 id="java-实现方法">Java 实现方法
+&lt;/h3>&lt;p>在 Spring 端可以有以下几种方法使用 WebSocket：&lt;/p>
 &lt;ol>
 &lt;li>使用 Java EE7 的方式&lt;/li>
 &lt;li>使用 Spring 提供的接口&lt;/li>
 &lt;li>使用 STOMP 协议以及 Spring 的 MVC&lt;/li>
 &lt;/ol>
 &lt;p>本文使用Spring提供的接口，实现起来比较简单。&lt;/p>
-&lt;h3 id="适用场景">适用场景&lt;/h3>
-&lt;p>客户端和服务器需要 &lt;strong>高频率&lt;/strong> &lt;strong>低延迟&lt;/strong> 交换事件的时候。基本的候选包括但不限于，金融、游戏、合作、以及其他应用。这些应用对时间延迟很敏感，还需要以高频率交换大量的消息。&lt;/p>
-&lt;h2 id="spring-mvc的websocket开发实战">Spring MVC的WebSocket开发实战&lt;/h2>
-&lt;h3 id="nginx配置">Nginx配置&lt;/h3>
-&lt;p>我们知道，WebSocket握手需要在HTTP请求头里增加&lt;code>Upgrade&lt;/code>和&lt;code>Connection&lt;/code>字段，以便向服务申请将连接升级为WebSocket。&lt;br>
+&lt;h3 id="适用场景">适用场景
+&lt;/h3>&lt;p>客户端和服务器需要 &lt;strong>高频率&lt;/strong> &lt;strong>低延迟&lt;/strong> 交换事件的时候。基本的候选包括但不限于，金融、游戏、合作、以及其他应用。这些应用对时间延迟很敏感，还需要以高频率交换大量的消息。&lt;/p>
+&lt;h2 id="spring-mvc的websocket开发实战">Spring MVC的WebSocket开发实战
+&lt;/h2>&lt;h3 id="nginx配置">Nginx配置
+&lt;/h3>&lt;p>我们知道，WebSocket握手需要在HTTP请求头里增加&lt;code>Upgrade&lt;/code>和&lt;code>Connection&lt;/code>字段，以便向服务申请将连接升级为WebSocket。&lt;br>
 但如果tomcat服务器使用了Nginx作为反向代理，那么默认是不会转发这两个请求头的，所以需要手动设置这两个HTTP请求头。&lt;br>
 应在&lt;code>nginx.conf&lt;/code>对应域名&lt;code>server&lt;/code>配置里面的&lt;code>location&lt;/code>配置中增加：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>proxy_set_header Upgrade &lt;span style="color:#ef6155">$http_upgrade&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>proxy_set_header Connection &lt;span style="color:#48b685">&amp;#34;upgrade&amp;#34;&lt;/span>;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="heading">&lt;/h3>
-&lt;h3 id="maven依赖">Maven依赖&lt;/h3>
-&lt;p>在pom.xml文件中增加以下依赖：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="heading">
+&lt;/h3>&lt;h3 id="maven依赖">Maven依赖
+&lt;/h3>&lt;p>在pom.xml文件中增加以下依赖：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-websocket&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${spring-version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="websocket相关的类">WebSocket相关的类&lt;/h3>
-&lt;h4 id="实现websocketconfigurer">实现WebSocketConfigurer&lt;/h4>
-&lt;p>对Spring WebSocket进行配置，可以通过xml配置文件的方式，也可以通过实现WebSocketConfigurer接口进行配置：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="websocket相关的类">WebSocket相关的类
+&lt;/h3>&lt;h4 id="实现websocketconfigurer">实现WebSocketConfigurer
+&lt;/h4>&lt;p>对Spring WebSocket进行配置，可以通过xml配置文件的方式，也可以通过实现WebSocketConfigurer接口进行配置：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Configuration&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@EnableWebSocket&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">WebSocketConfig&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> WebMvcConfigurerAdapter &lt;span style="color:#815ba4">implements&lt;/span> WebSocketConfigurer {
@@ -371,8 +449,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>我们设置了两个监听的路径，第一个是传统的WebSocket，第二个是支持SockJS的。SockJS是一个JavaScript库，提供跨浏览器JavaScript的API，创建了一个低延迟、全双工的浏览器和web服务器之间通信通道。SockJS的API的命名方式基本上也和 WebSocket 一样，并且支持自动降级到AJAX轮询（降级顺序依次为：websocket -&amp;gt; html strea m -&amp;gt; long polling -&amp;gt; ajaxjsonp），因此可以很好地跨浏览器工作。
 在配置文件里，我们设定了&lt;code>SystemWebSocketHandler&lt;/code>类（实现&lt;code>WebSocketHandler&lt;/code>接口，类似Controller）作为WebSocket各种事件的处理器，以及设定&lt;code>WebSocketHandshakeInterceptor&lt;/code>类（实现&lt;code>HandshakeInterceptor&lt;/code>接口）作为WebSocket协议握手的拦截器，这两个类时我们自己实现的，将在下文细述。&lt;/p>
-&lt;h4 id="实现websockethandler接口">实现WebSocketHandler接口&lt;/h4>
-&lt;p>WebSocketHandler接口为WebSocket事件处理器接口，有以下方法需要实现：&lt;/p>
+&lt;h4 id="实现websockethandler接口">实现WebSocketHandler接口
+&lt;/h4>&lt;p>WebSocketHandler接口为WebSocket事件处理器接口，有以下方法需要实现：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">interface&lt;/span> &lt;span style="color:#fec418">WebSocketHandler&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//WebSocket连接建立后的回调方法&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">afterConnectionEstablished&lt;/span>(WebSocketSession var1) &lt;span style="color:#815ba4">throws&lt;/span> Exception;
@@ -543,8 +621,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>值得注意的是，使用&lt;code>WebSocketSession.sendMessage()&lt;/code>方法可以向指定用户页面发送消息。&lt;/p>
-&lt;h4 id="实现handshakeinterceptor接口">实现HandshakeInterceptor接口&lt;/h4>
-&lt;p>HandshakeInterceptor接口为WebSocket握手拦截器接口，包含以下方法：&lt;/p>
+&lt;h4 id="实现handshakeinterceptor接口">实现HandshakeInterceptor接口
+&lt;/h4>&lt;p>HandshakeInterceptor接口为WebSocket握手拦截器接口，包含以下方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">interface&lt;/span> &lt;span style="color:#fec418">HandshakeInterceptor&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//建立WebSocket连接、握手前的处理方法&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">beforeHandshake&lt;/span>(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String, Object&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> attributes) &lt;span style="color:#815ba4">throws&lt;/span> Exception;
@@ -606,8 +684,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">afterHandshake&lt;/span>(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="业务层的封装">业务层的封装&lt;/h4>
-&lt;p>实际的使用中，我们封装了一些类，包括WebSocket消息内容的实体类，以及发送消息的Service类（在Controller层触发了相应的事件时进行调用），以下代码仅供参考，请根据实际业务需求进行封装。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="业务层的封装">业务层的封装
+&lt;/h4>&lt;p>实际的使用中，我们封装了一些类，包括WebSocket消息内容的实体类，以及发送消息的Service类（在Controller层触发了相应的事件时进行调用），以下代码仅供参考，请根据实际业务需求进行封装。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * WebSocket消息的统一封装
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> *
@@ -726,8 +804,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="页面js">页面&amp;amp;&amp;amp;js&lt;/h3>
-&lt;p>页面需要引入SockJS，js中需要初始化WebSocket并建立链接（前面在WebSocketConfig类中配置的映射路径）。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="页面js">页面&amp;amp;&amp;amp;js
+&lt;/h3>&lt;p>页面需要引入SockJS，js中需要初始化WebSocket并建立链接（前面在WebSocketConfig类中配置的映射路径）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">html&lt;/span> &lt;span style="color:#06b6ef">xmlns&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.w3.org/1999/xhtml&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">xmlns:th&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.thymeleaf.org&amp;#34;&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">head&lt;/span>&amp;gt;
@@ -773,9 +851,9 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;/&lt;span style="color:#5bc4bf">script&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;/&lt;span style="color:#5bc4bf">body&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;/&lt;span style="color:#5bc4bf">html&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>ArrayList源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Tue, 11 Jul 2017 21:48:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/city.png" alt="Featured image of post ArrayList源码阅读笔记（JDK8）" />&lt;h1 id="arraylist源码阅读笔记">ArrayList源码阅读笔记&lt;/h1>
-&lt;h2 id="继承结构">继承结构&lt;/h2>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/ArrayList_UML.png"
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>ArrayList源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Tue, 11 Jul 2017 21:48:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/city.png" alt="Featured image of post ArrayList源码阅读笔记（JDK8）" />&lt;h1 id="arraylist源码阅读笔记">ArrayList源码阅读笔记
+&lt;/h1>&lt;h2 id="继承结构">继承结构
+&lt;/h2>&lt;p>&lt;img src="https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/ArrayList_UML.png"
 width="645"
 height="380"
 srcset="https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/ArrayList_UML_hu8427491769395021070.png 480w, https://leibnizhu.github.io/p/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/ArrayList_UML_hu11705378749285573509.png 1024w"
@@ -784,8 +862,8 @@ class="gallery-image"
 data-flex-grow="169"
 data-flex-basis="407px"
 >&lt;/p>
-&lt;h2 id="成员变量">成员变量&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> Object&lt;span style="color:#5bc4bf">[]&lt;/span> elementData;
+&lt;h2 id="成员变量">成员变量
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> Object&lt;span style="color:#5bc4bf">[]&lt;/span> elementData;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>存储List数据，用了transient关键字避免被持久化。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">int&lt;/span> size;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>List长度。 &lt;br>
@@ -794,15 +872,15 @@ data-flex-basis="407px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>有些JVM会在数组保留一些头部信息，为了防止报内存不足Error，在int最大值的基础上预留8个元素。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#815ba4">transient&lt;/span> &lt;span style="color:#fec418">int&lt;/span> modCount &lt;span style="color:#5bc4bf">=&lt;/span> 0;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>表示已从结构上修改此列表的次数。从结构上修改是指更改列表的大小，或者打乱列表，从而使正在进行的迭代产生错误的结果。此字段由iterator和listiterator方法返回的迭代器和列表迭代器实现使用。如果意外更改了此字段中的值，则迭代器（或列表迭代器）将抛出&lt;code>ConcurrentModificationException&lt;/code>来响应next、remove、previous、set或add操作。子类是否使用此字段是可选的。如果子类希望提供快速失败迭代器（和列表迭代器），则它只需在其 add(int,e)和remove(int)方法（以及它所重写的、导致列表结构上修改的任何其他方法）中增加此字段，否则可以忽略此字段。对add(int, e)或remove(int)的单个调用向此字段添加的数量不得超过 1，否则迭代器（和列表迭代器）将抛出虚假的 &lt;code>ConcurrentModificationException&lt;/code>。&lt;/p>
-&lt;h2 id="构造方法">构造方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>ArrayList(&lt;span style="color:#fec418">int&lt;/span> initialCapacity)
+&lt;h2 id="构造方法">构造方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>ArrayList(&lt;span style="color:#fec418">int&lt;/span> initialCapacity)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>initialCapacity大于0的话elementData赋值为对应长度的Object数组；为0的话赋值为EMPTY_ELEMENTDATA（空数组）；负数的情况抛&lt;code>IllegalArgumentException&lt;/code>异常。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>ArrayList()
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>默认构造方法，elementData赋值为DEFAULTCAPACITY_EMPTY_ELEMENTDATA（空数组）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>ArrayList(Collection&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> c)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>c先转成数组赋值给elementData，如果长度不为0且数组不为Object数组，则通过&lt;code> Arrays.copyOf()&lt;/code>转换为Object数组；如果长度为0则c先转成数组赋值给elementData，如果长度不为0且数组不为Object数组，则通过重新赋值为EMPTY_ELEMENTDATA（空数组）。&lt;/p>
-&lt;h2 id="常规方法">常规方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">trimToSize&lt;/span>();
+&lt;h2 id="常规方法">常规方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">trimToSize&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>modCount++后，调用&lt;code>Arrays.copyOf()&lt;/code>将elementData复制到size大小的数组里并赋值给elementData。这样是因为容量常常会大于实际元素的数量。内存紧张时，可以调用该方法删除预留的位置，调整容量为元素实际数量。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">ensureCapacity&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> minCapacity);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>如果数组为空，容量预取0，否则去默认值(DEFAULT_CAPACITY = 10)；若参数大于预设的容量，则使用该参数调用私有方法&lt;code>void ensureCapacityInternal(int minCapacity)&lt;/code>设置数组容量；后者会在当前数组长度不足时调用&lt;code>grow()&lt;/code>进行扩容。&lt;/p>
@@ -820,8 +898,8 @@ data-flex-basis="407px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>T&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> T&lt;span style="color:#5bc4bf">[]&lt;/span> &lt;span style="color:#06b6ef">toArray&lt;/span>(T&lt;span style="color:#5bc4bf">[]&lt;/span> a);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前者转换为Object数组，调用&lt;code>Arrays.copyOf()&lt;/code>方法。&lt;br>
 后者转换为指定类型的数组，返回的数组容量由参数和本数组中较大值确定；如果a参数的长度小于当前size，则调用带Class参数的&lt;code>Arrays.copyOf()&lt;/code>方法进行复制并返回；否则a的长度足够，则调用&lt;code>System.arraycopy()&lt;/code>将elementData复制到a，并将第一个实际没有数据的设为null（a[size]）。&lt;/p>
-&lt;h2 id="增删改查方法">增删改查方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">get&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
+&lt;h2 id="增删改查方法">增删改查方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">get&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>rangeCheck(index);&lt;/code>检查下标是否越界后（越界则抛出&lt;code>IndexOutOfBoundsException&lt;/code>异常），直接从elementData数组根据下标拿值，速度比较快。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">set&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E element);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>rangeCheck(index);&lt;/code>检查下标是否越界后，读取索引对应的旧值，然后改为新值，并将旧的值返回；注意用到泛型。&lt;/p>
@@ -878,24 +956,24 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> modified;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前两个方法调用后面的&lt;code>batchRemove()&lt;/code>方法（具体看上面的注释），第一个方法删除c里面的元素，第二个方法保留c里面的元素，有任何删除操作都会返回true，返回false表示没有删除任一元素。不难看出&lt;code>batchRemove()&lt;/code>方法的时间复杂度是&lt;code>O(n^2)&lt;/code>，大致逻辑是遍历数组，根据complement条件判断要保留的元素依次复制到数组的前面，w保存要保留的最大下标，如果期间发生异常则将未处理的元素都保留，遍历后将w之后的元素设置为null等待GC。&lt;/p>
-&lt;h2 id="io方法">IO方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">writeObject&lt;/span>(java.&lt;span style="color:#06b6ef">io&lt;/span>.&lt;span style="color:#06b6ef">ObjectOutputStream&lt;/span> s);
+&lt;h2 id="io方法">IO方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">writeObject&lt;/span>(java.&lt;span style="color:#06b6ef">io&lt;/span>.&lt;span style="color:#06b6ef">ObjectOutputStream&lt;/span> s);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">readObject&lt;/span>(java.&lt;span style="color:#06b6ef">io&lt;/span>.&lt;span style="color:#06b6ef">ObjectInputStream&lt;/span> s);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前者将List序列化到输出流，先写入size，再逐个元素写入，写入过程数组被更改会抛出ConcurrentModificationException异常。&lt;br>
 后者读取输入流反序列化到List，先从输入流读取一个int，判断这个int作为size的话是否需要扩容，然后从输入流中读取Object从下标0开始逐个写入到elementData数组中（就是说读取的数量小于原来size的话，读取最后的下标之后的元素不会变动）。&lt;/p>
-&lt;h2 id="迭代器方法">迭代器方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">listIterator&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index); &lt;span style="color:#776e71">//new ListItr(index);开始位置为指定参数&lt;/span>
+&lt;h2 id="迭代器方法">迭代器方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">listIterator&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index); &lt;span style="color:#776e71">//new ListItr(index);开始位置为指定参数&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">listIterator&lt;/span>(); &lt;span style="color:#776e71">//return new ListItr(0);开始位置为0&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Iterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">iterator&lt;/span>(); &lt;span style="color:#776e71">//return new Itr();&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>迭代器方法分别返回ListItr和Itr内部类的实例，而ListItr继承了Itr。&lt;/p>
-&lt;h3 id="迭代器类itr">迭代器类Itr&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">Itr&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> Iterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> {}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="成员变量-1">成员变量&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> cursor; &lt;span style="color:#776e71">//游标，下一个元素的索引，默认初始化为0&lt;/span>
+&lt;h3 id="迭代器类itr">迭代器类Itr
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">Itr&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> Iterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> {}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="成员变量-1">成员变量
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> cursor; &lt;span style="color:#776e71">//游标，下一个元素的索引，默认初始化为0&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> lastRet &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#5bc4bf">-&lt;/span>1; &lt;span style="color:#776e71">//上次返回的元素的位置&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> expectedModCount &lt;span style="color:#5bc4bf">=&lt;/span> modCount;&lt;span style="color:#776e71">//迭代过程不运行修改数组，否则就抛出异常&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="iterator接口方法">Iterator接口方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">hasNext&lt;/span>();
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="iterator接口方法">Iterator接口方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">hasNext&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>返回cursor != size;，如果游标到了size那也就是没有下一个了。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">next&lt;/span>();
@@ -906,16 +984,16 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 所以在循环里删除元素的话要用迭代器的remove()方法。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">forEachRemaining&lt;/span>(Consumer&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">super&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> consumer);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>JDK8开始有的方法，遍历数组，分别传入调用&lt;code>consumer.accept((E) elementData[i++]);&lt;/code>，即对每个元素执行同一方法。&lt;/p>
-&lt;h4 id="其他方法">其他方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">checkForComodification&lt;/span>();
+&lt;h4 id="其他方法">其他方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">checkForComodification&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>modCount != expectedModCount则抛出ConcurrentModificationException异常。&lt;/p>
-&lt;h3 id="迭代器类listitr">迭代器类ListItr&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">ListItr&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> Itr &lt;span style="color:#815ba4">implements&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> {}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="构造器">构造器&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>ListItr(&lt;span style="color:#fec418">int&lt;/span> index);
+&lt;h3 id="迭代器类listitr">迭代器类ListItr
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">ListItr&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> Itr &lt;span style="color:#815ba4">implements&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> {}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="构造器">构造器
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>ListItr(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将游标设置为index。&lt;/p>
-&lt;h4 id="接口方法">接口方法&lt;/h4>
-&lt;p>接口&lt;code> Iterator&lt;/code>的方法在Itr中实现了，该类实现了&lt;code>ListIterator&lt;/code>接口中其他的方法。&lt;/p>
+&lt;h4 id="接口方法">接口方法
+&lt;/h4>&lt;p>接口&lt;code> Iterator&lt;/code>的方法在Itr中实现了，该类实现了&lt;code>ListIterator&lt;/code>接口中其他的方法。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">hasPrevious&lt;/span>() {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> cursor &lt;span style="color:#5bc4bf">!=&lt;/span> 0; &lt;span style="color:#776e71">//根据游标判断是否有前一个元素&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
@@ -933,8 +1011,8 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(E e);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将指定的元素插入列表。在当前游标处调用&lt;code>List.add()&lt;/code>方法插入一个元素e，然后游标前进，lastRet恢复-1，同时更新expectedModCount。&lt;br>
 新元素被插入到游标前：不影响对 next 的后续调用，并且对 previous 的后续调用会返回此新元素。&lt;/p>
-&lt;h2 id="sublist方法与sublist内部类">subList()方法与SubList内部类&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//检查下标越界后，返回SubList的实例（用fromIndex、toIndex参数构造）作为子列表。&lt;/span>
+&lt;h2 id="sublist方法与sublist内部类">subList()方法与SubList内部类
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//检查下标越界后，返回SubList的实例（用fromIndex、toIndex参数构造）作为子列表。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">subList&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> fromIndex, &lt;span style="color:#fec418">int&lt;/span> toIndex);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//用于subList()方法的下标越界检查方法&lt;/span>
@@ -945,14 +1023,14 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//注意在AbstractList.java源文件里也有一个SubList，然而并不是AbstractList的内部类，AbstractList.subList()方法会返回这个SubList的实例&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">SubList&lt;/span>&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> AbstractList&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> {}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>SubList继承AbstractList抽象类，是List的实现类，主要用于返回ArrayList的视图，这个视图是原ArrayList对象中的一部分，确实是一部分，直接将原ArrayList对象引用到新的子视图的ArrayList，对子视图进行改变，原ArrayList对象也会随之改变。&lt;/p>
-&lt;h3 id="成员变量-2">成员变量&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> AbstractList&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> parent; &lt;span style="color:#776e71">//保存母ArrayList的引用&lt;/span>
+&lt;h3 id="成员变量-2">成员变量
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> AbstractList&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> parent; &lt;span style="color:#776e71">//保存母ArrayList的引用&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">int&lt;/span> parentOffset; &lt;span style="color:#776e71">//subList方法的fromIndex参数&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">int&lt;/span> offset;&lt;span style="color:#776e71">//subList方法的fromIndex参数&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> size;&lt;span style="color:#776e71">//subList方法的参数相减：toIndex - fromIndex&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>同时，modCount赋值为母ArrayList的modCount。&lt;/p>
-&lt;h3 id="接口方法-1">接口方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">set&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E e);
+&lt;h3 id="接口方法-1">接口方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">set&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">get&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">size&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E e);
@@ -964,19 +1042,19 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这些方法的实现与ArrayList的实现都大同小异，差异在与下标多了偏移量parentOffset，而且最后调用parent（ArrayList）的同名方法进行处理。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">subList&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> fromIndex, &lt;span style="color:#fec418">int&lt;/span> toIndex);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>返回自己的类（SubList），构造方法的offset参数为offset（母ArrayList的subList方法的fromIndex参数）。&lt;/p>
-&lt;h3 id="迭代器方法-1">迭代器方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Iterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">iterator&lt;/span>();
+&lt;h3 id="迭代器方法-1">迭代器方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Iterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">iterator&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">listIterator&lt;/span>(&lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前者返回的是AbstractList的内部类ListItr，实现了ListIterator接口，具体不表。&lt;br>
 后者返回ListIterator接口的一个匿名内部类，与ArrayList的ListItr的区别也是在于对ArrayList的elementData数组进行操作时，使用的下标加上offset（母ArrayList的subList方法的fromIndex参数）。&lt;/p>
-&lt;h3 id="其他方法检查方法">其他方法（检查方法）&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">rangeCheck&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
+&lt;h3 id="其他方法检查方法">其他方法（检查方法）
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">rangeCheck&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">rangeCheckForAdd&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> String &lt;span style="color:#06b6ef">outOfBoundsMsg&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">checkForComodification&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>检查下标越界、并行修改等，与ArrayList类似，具体不表。&lt;/p>
-&lt;h2 id="jdk8新增方法">JDK8新增方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//forEach：for循环遍历elementData，每个元素分别调用action.accept(elementData[i])方法进行处理，如果处理过程中ArrayList被并行修改了，那么抛出ConcurrentModificationException异常&lt;/span>
+&lt;h2 id="jdk8新增方法">JDK8新增方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//forEach：for循环遍历elementData，每个元素分别调用action.accept(elementData[i])方法进行处理，如果处理过程中ArrayList被并行修改了，那么抛出ConcurrentModificationException异常&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">forEach&lt;/span>(Consumer&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">super&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> action);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//spliterator：返回一个内部类 static final class ArrayListSpliterator&amp;lt;E&amp;gt; implements Spliterator&amp;lt;E&amp;gt;的实例。&lt;/span>
@@ -994,8 +1072,8 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//调用Arrays.sort(T[] a, int fromIndex, int toIndex, Comparator&amp;lt;? super T&amp;gt; c)进行排序，最后判断是否发生了并发修改，并增加modCount。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">sort&lt;/span>(Comparator&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">super&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> c);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="spliterator接口提供的方法">Spliterator接口提供的方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">tryAdvance&lt;/span>(Consumer&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">super&lt;/span> T&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> action);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="spliterator接口提供的方法">Spliterator接口提供的方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">tryAdvance&lt;/span>(Consumer&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">super&lt;/span> T&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> action);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Spliterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>T&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">trySplit&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">long&lt;/span> &lt;span style="color:#06b6ef">estimateSize&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">characteristics&lt;/span>();
@@ -1004,14 +1082,14 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;li>trySplit()，这就是为Spliterator专门设计的方法，区分与普通的Iterator，该方法会把当前元素划分一部分出去创建一个新的Spliterator作为返回，两个Spliterator变会并行执行，如果元素个数小到无法划分则返回null&lt;/li>
 &lt;li>estimateSize()，该方法用于估算还剩下多少个元素需要遍历&lt;/li>
 &lt;li>characteristics()，其实就是表示该Spliterator有哪些特性，用于可以更好控制和优化Spliterator的使用。&lt;/li>
-&lt;/ol></description></item><item><title>String源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Sun, 09 Jul 2017 20:54:16 +0800</pubDate><guid>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/cup.png" alt="Featured image of post String源码阅读笔记（JDK8）" />&lt;h1 id="string源码阅读笔记">String源码阅读笔记&lt;/h1>
-&lt;h2 id="成员变量">成员变量&lt;/h2>
-&lt;p>value，存放String数据，不可变。&lt;/p>
+&lt;/ol></description></item><item><title>String源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Sun, 09 Jul 2017 20:54:16 +0800</pubDate><guid>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/cup.png" alt="Featured image of post String源码阅读笔记（JDK8）" />&lt;h1 id="string源码阅读笔记">String源码阅读笔记
+&lt;/h1>&lt;h2 id="成员变量">成员变量
+&lt;/h2>&lt;p>value，存放String数据，不可变。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">char&lt;/span> value&lt;span style="color:#5bc4bf">[]&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hash，存放String的哈希值&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">int&lt;/span> hash; &lt;span style="color:#776e71">// Default to 0&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="构造器部分">构造器部分&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String(String original);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="构造器部分">构造器部分
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String(String original);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将参数的value和hash复制给当前对象。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String(&lt;span style="color:#fec418">char&lt;/span> value&lt;span style="color:#5bc4bf">[]&lt;/span>);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>Arrays.copyOf()&lt;/code>复制到value属性中。&lt;/p>
@@ -1075,9 +1153,9 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// assert share : &amp;#34;unshared not supported&amp;#34;;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">value&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> value;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他方法">其他方法&lt;/h2>
-&lt;h3 id="静态工厂方法">静态工厂方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(Object obj);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他方法">其他方法
+&lt;/h2>&lt;h3 id="静态工厂方法">静态工厂方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(Object obj);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Object的toString()方法。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> data&lt;span style="color:#5bc4bf">[]&lt;/span>);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">copyValueOf&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> data&lt;span style="color:#5bc4bf">[]&lt;/span>);
@@ -1094,13 +1172,13 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(&lt;span style="color:#fec418">float&lt;/span> f);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(&lt;span style="color:#fec418">double&lt;/span> d);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用参数对应包装类的toString()方法。&lt;/p>
-&lt;h3 id="intern方法">intern()方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">native&lt;/span> String &lt;span style="color:#06b6ef">intern&lt;/span>();
+&lt;h3 id="intern方法">intern()方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">native&lt;/span> String &lt;span style="color:#06b6ef">intern&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>该方法返回一个字符串对象的内部化引用。 众所周知：String类维护一个初始为空的字符串的对象池，当intern方法被调用时，如果对象池中已经包含这一个相等的字符串对象则返回对象池中的实例，否则添加字符串到对象池并返回该字符串的引用。&lt;/p>
-&lt;h3 id="对的重载">对“+”的重载&lt;/h3>
-&lt;p>String对“+”的支持其实就是使用了StringBuilder以及他的append()、toString()le两个方法。&lt;/p>
-&lt;h3 id="常规方法">常规方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isEmpty&lt;/span>();
+&lt;h3 id="对的重载">对“+”的重载
+&lt;/h3>&lt;p>String对“+”的支持其实就是使用了StringBuilder以及他的append()、toString()le两个方法。&lt;/p>
+&lt;h3 id="常规方法">常规方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isEmpty&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>判断length是否为0。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">char&lt;/span> &lt;span style="color:#06b6ef">charAt&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>判断越界，然后直接从value数组取值。&lt;/p>
@@ -1141,8 +1219,8 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">format&lt;/span>(String format, Object... args);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">format&lt;/span>(Locale l, String format, Object... args);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Formatter的&lt;code>format()&lt;/code>方法进行计算并返回。&lt;/p>
-&lt;h3 id="替代方法">替代方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replace&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> oldChar, &lt;span style="color:#fec418">char&lt;/span> newChar);
+&lt;h3 id="替代方法">替代方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replace&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> oldChar, &lt;span style="color:#fec418">char&lt;/span> newChar);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>如果新旧字符一样则直接返回this好了，否则先遍历，找到第一次出现oldChar的下标，如果没找到也是返回this，找到则将该下标之前的值循环复制到新数组，此下标之后的值复制到新数组的时候先判断是否oldChar，是的话复制newChar到新数组；最后用新数组构造一个String并返回。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replaceFirst&lt;/span>(String regex, String replacement);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Pattern.matcher()找到匹配之后，再调用Matcher.replaceFirst()来替换首次出现。&lt;/p>
@@ -1150,8 +1228,8 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Pattern.matcher()找到匹配之后，再调用Matcher.replaceAll()来替换全部。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replace&lt;/span>(CharSequence target, CharSequence replacement);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>同样调用Pattern.matcher().replaceAll()，支持单个字符。&lt;/p>
-&lt;h3 id="比较方法">比较方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">equals&lt;/span>(Object anObject);
+&lt;h3 id="比较方法">比较方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">equals&lt;/span>(Object anObject);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>先判断是否this，再判断是否String对象，再判断长度是否相等，最后逐个char进行对比。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">contentEquals&lt;/span>(StringBuffer sb);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>contentEquals(CharSequence cs)&lt;/code>，该方法判断如果是StringBuffer则加同步去执行&lt;code>nonSyncContentEquals(AbstractStringBuilder sb)&lt;/code>，否则（StringBuilder的情况）不加同步直接执行。 而&lt;code>nonSyncContentEquals(AbstractStringBuilder sb)&lt;/code>中具体的比较流程与equals基本一致。&lt;/p>
@@ -1164,11 +1242,11 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">```&lt;/span>java
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">endsWith&lt;/span>(String suffix);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>startsWith(suffix, value.length - suffix.value.length)&lt;/code>，判断this的后面N（suffix的长度）个字符是否与suffix相等。&lt;/p>
-&lt;h3 id="哈希方法">哈希方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">hashCode&lt;/span>();
+&lt;h3 id="哈希方法">哈希方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">hashCode&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hash属性初始化为0，如果调用hashCode()的时候发现hash为0则开始计算哈希值（懒加载）；由于String不可变，则hash计算一次即可。哈希算法核心为&lt;code>h = 31 * h + val[i];&lt;/code>，遍历所有字符，循环地加上乘以31的哈希值作为新的哈希值，相当于&lt;code>val[0]*31^(n-1) + val[1]*31^(n-2) + ... + val[n-1]&lt;/code>；而选用31，可能时出于&lt;code>i*31== (i&amp;lt;&amp;lt;5)-1&lt;/code>的考虑。&lt;/p>
-&lt;h3 id="查找方法">查找方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch);
+&lt;h3 id="查找方法">查找方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch, &lt;span style="color:#fec418">int&lt;/span> fromIndex);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前者调用后者（fromIndex=0），先判断越界，然后有两种情况就是ch对应单字节和双字节，单字节则直接从fromIndex开始遍历对比查找，双字节则调用&lt;code>int indexOfSupplementary(int ch, int fromIndex)&lt;/code>遍历查找的时候同时判断两个字节。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">lastIndexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch);
@@ -1191,13 +1269,13 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
-&lt;h2 id="java内存模型">Java内存模型&lt;/h2>
-&lt;p>JVM定义了一种Java内存模型以消除各种硬件和操作系统的内存访问差异，保证Java程序的跨平台性。&lt;/p>
-&lt;h3 id="主内存和工作内存">主内存和工作内存&lt;/h3>
-&lt;p>所有的变量存储在主内存，每个线程有自己的工作内存，保存了被这个线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都在对应工作内存进行。&lt;br>
+&lt;h2 id="java内存模型">Java内存模型
+&lt;/h2>&lt;p>JVM定义了一种Java内存模型以消除各种硬件和操作系统的内存访问差异，保证Java程序的跨平台性。&lt;/p>
+&lt;h3 id="主内存和工作内存">主内存和工作内存
+&lt;/h3>&lt;p>所有的变量存储在主内存，每个线程有自己的工作内存，保存了被这个线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都在对应工作内存进行。&lt;br>
 主内存和工作内存与第一篇的内存结构不是一个层面上的概念，主内存主要对应Java堆的对象实例数据，工作内存主要对应虚拟机栈的部分区域，而且工作内存可能优先存储与寄存器和高速缓存中。&lt;/p>
-&lt;h3 id="内存操作">内存操作&lt;/h3>
-&lt;p>Java内存模型规定了8种内存操作：&lt;/p>
+&lt;h3 id="内存操作">内存操作
+&lt;/h3>&lt;p>Java内存模型规定了8种内存操作：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>lock&lt;/strong>锁定，将变量表示为某线程独占；&lt;/li>
 &lt;li>&lt;strong>unlock&lt;/strong>解锁，将变量的lock状态借出，执行后才能被其他线程lock；&lt;/li>
@@ -1209,8 +1287,8 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;li>&lt;strong>write&lt;/strong>写入，必须先进行store，将store到的数据放入主内存对应变量。&lt;/li>
 &lt;/ol>
 &lt;p>此外规定了对应的一些规则，如read、load和store、write不能单独出现，assign后的变量必须同步回主内存，没有assign的变量不能同步回注内存等等。&lt;/p>
-&lt;h3 id="volatile变量">volatile变量&lt;/h3>
-&lt;p>volatile声明能保证变量对所有线程可见性，即一个线程修改了变量的值，其他线程立即得知新的值。但由于Java操作并非全是原子操作，所以volatile变量在并发下不能保证线程安全。例如++操作，对应字节码为4个指令，大致可分为读值/加一/写入等步骤，volatile关键值只能保证在取值放入操作栈顶的时候是最新的值，此后的操作之前可能其他线程已经修改了变量的值，就会导致线程安全问题。&lt;br>
+&lt;h3 id="volatile变量">volatile变量
+&lt;/h3>&lt;p>volatile声明能保证变量对所有线程可见性，即一个线程修改了变量的值，其他线程立即得知新的值。但由于Java操作并非全是原子操作，所以volatile变量在并发下不能保证线程安全。例如++操作，对应字节码为4个指令，大致可分为读值/加一/写入等步骤，volatile关键值只能保证在取值放入操作栈顶的时候是最新的值，此后的操作之前可能其他线程已经修改了变量的值，就会导致线程安全问题。&lt;br>
 适合使用volatile的情况有：&lt;/p>
 &lt;ol>
 &lt;li>运算结果不依赖变量的当前值，或者只有单一线程修改变量的值；&lt;/li>
@@ -1219,22 +1297,22 @@ P.S.： System.arraycopy()的参数：src:源数组； srcPos:源数组要复制
 &lt;p>volatile关键字还能禁止指令重排优化，普通变量只能保证依赖赋值结果的地方都获得正确结果，但不能保证赋值操作的顺序与代码一致。volatile关键字可以避免多线程情况下，代码执行顺序被重排导致的一些错误。&lt;br>
 volatile变量的读操作性能与普通变量基本无差别，写操作可能慢一些，总体开销比锁小。&lt;br>
 在Java内存模型层面上来看，volatile变量要求load操作和use操作必须连续一起出现，assign和store操作也必须连续一起出现，即每次使用volatile变量前必须从主内存刷新最新的值，每次修改volatile变量之后必须立刻同步到主内存。&lt;/p>
-&lt;h3 id="long和double变量">long和double变量&lt;/h3>
-&lt;p>没有被volatile修饰的64位数据（long和double）的读写操作划分位两次32位操作，不能保证其操作的原子性。但实际目前商用JVM基本都把64位数据的读写操作作为原子操作。&lt;/p>
-&lt;h2 id="java线程">Java线程&lt;/h2>
-&lt;h3 id="java线程实现">Java线程实现&lt;/h3>
-&lt;p>一般来说线程有3种实现方法：&lt;/p>
+&lt;h3 id="long和double变量">long和double变量
+&lt;/h3>&lt;p>没有被volatile修饰的64位数据（long和double）的读写操作划分位两次32位操作，不能保证其操作的原子性。但实际目前商用JVM基本都把64位数据的读写操作作为原子操作。&lt;/p>
+&lt;h2 id="java线程">Java线程
+&lt;/h2>&lt;h3 id="java线程实现">Java线程实现
+&lt;/h3>&lt;p>一般来说线程有3种实现方法：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>使用内核线程&lt;/strong>：使用操作系统内核的轻量级进程（LWP），每个轻量级进程与一个内核线程一一对应，一对一。缺点是代价较高，在内核态和用户态之间来回切换，并消耗内核资源，操作系统支持的轻量级进程数量有限；&lt;/li>
 &lt;li>&lt;strong>使用用户线程&lt;/strong>：用户线程建立在用户空间的线程库上，其建立、同步、销毁、调度完全在用户态完成，不需要内核帮助，一对多。因此快速且低消耗，支持更大的线程数量。缺点是实现复杂，很多问题需要考虑实现；&lt;/li>
 &lt;li>&lt;strong>用户线程+轻量级进程&lt;/strong>：以上两者的混合，多対多。&lt;/li>
 &lt;/ol>
 &lt;p>JDK1.2之前使用用户线程实现，JDK1.2开始替换为基于操作系统原生线程模型实现。对Sun JDK而言，Windows和Linux版都是一对一线程模型，一条Java线程映射到一条轻量级进程，Solaris中支持一对一和多対多。&lt;/p>
-&lt;h3 id="java线程调度">Java线程调度&lt;/h3>
-&lt;p>线程调度方式分为协同式和抢占式。协同式(Cooperative)指线程执行时间由线程自身控制，执行完完成后主动通知系统切换线程；抢占式(Preemptive)指由系统统一分配每个线程的执行时间，线程自身不能决定线程切换。Java使用抢占式。&lt;/p>
-&lt;h2 id="java线程安全">Java线程安全&lt;/h2>
-&lt;h3 id="线程安全等级">线程安全等级&lt;/h3>
-&lt;p>按由强至弱分为以下5种：&lt;/p>
+&lt;h3 id="java线程调度">Java线程调度
+&lt;/h3>&lt;p>线程调度方式分为协同式和抢占式。协同式(Cooperative)指线程执行时间由线程自身控制，执行完完成后主动通知系统切换线程；抢占式(Preemptive)指由系统统一分配每个线程的执行时间，线程自身不能决定线程切换。Java使用抢占式。&lt;/p>
+&lt;h2 id="java线程安全">Java线程安全
+&lt;/h2>&lt;h3 id="线程安全等级">线程安全等级
+&lt;/h3>&lt;p>按由强至弱分为以下5种：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>不可变&lt;/strong>：基本数据类型加final修饰，对象则保证其行为不影响其状态。注意AtomicInteger和AtomicLong并非不可变，这样的设计应该是考虑到线程访问外部变量需要final，但有时候需要可变的数，于是有了这些类；&lt;/li>
 &lt;li>&lt;strong>绝对线程安全&lt;/strong>：不需要任何额外的同步措施，即可实现线程安全。Java API标注线程安全的类很多并不是绝对线程安全；&lt;/li>
@@ -1242,15 +1320,15 @@ volatile变量的读操作性能与普通变量基本无差别，写操作可能
 &lt;li>&lt;strong>线程兼容&lt;/strong>：通常意义上的线程不安全，指对象本身并不线程安全，但可以通过同步手段保证在并发环境下安全、准确；&lt;/li>
 &lt;li>&lt;strong>相互层对立&lt;/strong>：无论是否采取同步手段，都无法在多线程环境下并发使用。极少出现，比如Thread类的suspend()和resume()方法，如果两个线程同时持有同一个线程对象，同时分别去中断及恢复线程，中断的是进行恢复操作的线程，那么就会产生死锁。&lt;/li>
 &lt;/ol>
-&lt;h3 id="线程安全实现方法">线程安全实现方法&lt;/h3>
-&lt;p>包括以下几种：&lt;/p>
+&lt;h3 id="线程安全实现方法">线程安全实现方法
+&lt;/h3>&lt;p>包括以下几种：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>互斥同步&lt;/strong>：保证共享数据同一时刻制备一个线程使用。Java最基本的互斥同步手段是sychronized关键字，编译后在同步块前后形成monitorenter和monitorexit两个字节码指令，需要一个reference类型参数来指定锁定/解锁的对象；执行monitorenter指令时，先尝试获取锁，如果锁对象没被锁定或者当前线程已经拥有这个锁，那么锁的计数器加一，并进入代码块，到monitorexit指令执行时则计数器减一，到计数器为0时释放锁。也就是说sychronized对同个线程而言是可重入的，不会自己把自己死锁。但阻塞或唤醒线程开销都比较大，需要切换用户态/内核态，因此sychronized是重量级操作。还可以使用ReentrantLock实现同步，相比sychronized，有等待可中断、公平锁、绑定多条件(Condition)等功能。JDK1.6之后sychronized与ReentrantLock性能基本持平。&lt;/li>
 &lt;li>&lt;strong>非阻塞同步&lt;/strong>：先进行操作，没有其他线程争用共享数据则操作成功，否则产生冲突，则采取补偿措施（比如不断重试），基于处理器的一些新指令实现，如Compare-and-Swap（比较并交换，CAS），用户程序不能直接调用，但AtomicInteger等类使用到了。&lt;/li>
 &lt;li>&lt;strong>无同步方案&lt;/strong>：如可重入代码（可以在代码执行的任何时刻中断，去执行别的代码，再返回继续执行而不出现错误），线程本地存储（Thread Local Storage）。&lt;/li>
 &lt;/ol>
-&lt;h2 id="java锁优化">Java锁优化&lt;/h2>
-&lt;p>JDK1.6开始引入了许多高效并发优化，实现了各种锁优化技术：&lt;/p>
+&lt;h2 id="java锁优化">Java锁优化
+&lt;/h2>&lt;p>JDK1.6开始引入了许多高效并发优化，实现了各种锁优化技术：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>自旋锁与自适应锁&lt;/strong>：自旋锁即多个线程请求锁，若持有锁的线程很快会释放锁的话，让其他线程在其他CPU内核执行忙循环（自旋），而不是来回切换挂起/恢复线程，减少开销。自适应锁就是自旋时间由前一次在同一个锁上自旋时间、以及锁的拥有者状态决定自旋时间的自旋锁。&lt;/li>
 &lt;li>&lt;strong>锁消除&lt;/strong>：根据逃逸分析结果，判定代码对应堆中数据都不会逃逸的话，可以认为是线程私有的数据，就可以不加同步锁，提高效率。&lt;/li>
@@ -1263,8 +1341,8 @@ volatile变量的读操作性能与普通变量基本无差别，写操作可能
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
-&lt;h2 id="类加载机制">类加载机制&lt;/h2>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/8.png"
+&lt;h2 id="类加载机制">类加载机制
+&lt;/h2>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/8.png"
 width="737"
 height="210"
 srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/8_hu8925241624922123213.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/8_hu2377053773251026866.png 1024w"
@@ -1274,8 +1352,8 @@ data-flex-grow="350"
 data-flex-basis="842px"
 >
 类从加载导卸载出内存的整个生命周期如上图所示。图中的7个阶段中，加载、验证、准备、初始化和卸载的顺序是确定的，而解析和使用阶段不一定，解析可能在初始化之后（动态绑定）。&lt;/p>
-&lt;h3 id="类加载时机">类加载时机&lt;/h3>
-&lt;p>&lt;strong>有且只有&lt;/strong>以下5种情况：&lt;/p>
+&lt;h3 id="类加载时机">类加载时机
+&lt;/h3>&lt;p>&lt;strong>有且只有&lt;/strong>以下5种情况：&lt;/p>
 &lt;ol>
 &lt;li>遇到new、getstatic、putstatic、invokestatic等字节码，对应Java代码中的new对象、读取或者设置类的静态变量、调用类的静态方法；&lt;/li>
 &lt;li>使用reflect包进行反射的时候；&lt;/li>
@@ -1284,8 +1362,8 @@ data-flex-basis="842px"
 &lt;li>JDK1.7以后动态语言支持。&lt;/li>
 &lt;/ol>
 &lt;p>注意是有且仅有，其他情况，譬如数组定义引用到未加载的类、调用类的静态常量（存储在常量池中）等其他情况并不会触发类的初始化加载。&lt;/p>
-&lt;h3 id="加载">加载&lt;/h3>
-&lt;p>完成以下事情：&lt;/p>
+&lt;h3 id="加载">加载
+&lt;/h3>&lt;p>完成以下事情：&lt;/p>
 &lt;ol>
 &lt;li>通过类的全限定名获取类的二进制字节流（不一定从文件获取，也可能是从网络、zip包、动态代理、其他文件如jsp等途径生成）；&lt;/li>
 &lt;li>将字节流的静态存储结构转化为方法区的运行时数据结构，具体由虚拟机自行实现定义；&lt;/li>
@@ -1293,31 +1371,31 @@ data-flex-basis="842px"
 &lt;/ol>
 &lt;p>数组类本身不通过类加载器创建，而是JVM直接创建的，如果数组类加载的时候，其组件类型（去掉最外面维度之后的类型）是引用类型，则递归地加载。&lt;br>
 加载阶段和连接阶段的部分内容（比如一部分字节码文件格式的验证动作）时交叉进行的，但两者的开始时间肯定是保持先后顺序的。&lt;/p>
-&lt;h3 id="验证">验证&lt;/h3>
-&lt;p>验证步骤是为了确保Class文件的字节流中的信息符合JVM要求，且不危害JVM安全。验证过程又细分为以下4个子过程：&lt;/p>
+&lt;h3 id="验证">验证
+&lt;/h3>&lt;p>验证步骤是为了确保Class文件的字节流中的信息符合JVM要求，且不危害JVM安全。验证过程又细分为以下4个子过程：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>文件格式验证&lt;/strong>：验证是否符合Class文件格式，如果验证到不符合Class文件格式约束，则JVM抛出java.lang.VerifyError异常或其子类；&lt;/li>
 &lt;li>&lt;strong>元数据验证&lt;/strong>:进行语义分析，保证其符合Java语言规范；&lt;/li>
 &lt;li>&lt;strong>字节码验证&lt;/strong>：通过数据流和控制流分析，确认语义合法且符合逻辑。JDK1.6之后的javac在Code属性的属性表里面增加了一项“StackMapTable”属性，描述了方法提中所有基本块（按控制流拆分的代码块）开始时本地变量表和操作栈应有的状态，字节码验证过程中秩序检查StackMapTable属性的记录是否合法即可；&lt;/li>
 &lt;li>&lt;strong>符号引用验证&lt;/strong>：在连接的第三阶段——解析阶段中，JVM将符号引用转化为直接引用进行符号引用验证，对类自身以外的信息进行匹配行校验，比如符号引用的类是否能找到，类、方法、字段的访问性是否能被当前类访问。&lt;/li>
 &lt;/ol>
-&lt;h3 id="准备">准备&lt;/h3>
-&lt;p>为类的静态变量分配内存，并初始化其值（初始化为零值）。如果有定义其取值，且非final变量，比如&lt;/p>
+&lt;h3 id="准备">准备
+&lt;/h3>&lt;p>为类的静态变量分配内存，并初始化其值（初始化为零值）。如果有定义其取值，且非final变量，比如&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> String test &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;test&amp;#34;&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>test变量不是final变量，会被初始化为零值null，在初始化阶段调用&amp;lt;clinit&amp;gt;方法时才会赋值&amp;quot;test&amp;quot;。&lt;br>
 而一个final的静态变量，即常量，如：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> String test &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;test&amp;#34;&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是会通过ConstantValue属性在准备阶段就初始化为&amp;quot;test&amp;quot;。&lt;/p>
-&lt;h3 id="解析">解析&lt;/h3>
-&lt;p>JVM将常量池的符号引用替换为直接引用的过程。JVM规范要求在调用符号引用操作的字节码指令之前必须先对其所使用的符号引用进行解析。JVM会将第一次解析结果进行缓存，避免解析动作重复进行。&lt;/p>
-&lt;h3 id="初始化">初始化&lt;/h3>
-&lt;p>初始化是类加载过程的最后一步，执行类构造器&amp;lt;clinit&amp;gt;()方法。&lt;br>
+&lt;h3 id="解析">解析
+&lt;/h3>&lt;p>JVM将常量池的符号引用替换为直接引用的过程。JVM规范要求在调用符号引用操作的字节码指令之前必须先对其所使用的符号引用进行解析。JVM会将第一次解析结果进行缓存，避免解析动作重复进行。&lt;/p>
+&lt;h3 id="初始化">初始化
+&lt;/h3>&lt;p>初始化是类加载过程的最后一步，执行类构造器&amp;lt;clinit&amp;gt;()方法。&lt;br>
 &amp;lt;clinit&amp;gt;方法由编译器自动收集类中所有静态变量的赋值动作以及静态代码块合并生成的，按源文件中出现的顺序（即静态代码块对于其后的静态变量，可以赋值，但不能访问）。&amp;lt;clinit&amp;gt;方法不需要调用父类的类构造器，JVM会保证&amp;lt;clinit&amp;gt;执行前父类的&amp;lt;clinit&amp;gt;方法已经执行，所以JVM第一个执行的&amp;lt;clinit&amp;gt;方法是Object的。JVM会保证多线程环境中&amp;lt;clinit&amp;gt;方法执行的安全性，保证只有一个线程去执行。&lt;br>
 &amp;lt;clinit&amp;gt;方法不是必须的，比如没有静态变量的接口，或没有静态代码块和静态变量的类。&lt;/p>
-&lt;h2 id="编译期优化">编译期优化&lt;/h2>
-&lt;p>javac对代码的运行效率几乎没有任何优化措施（JDK1.3之后-O优化参数没有意义了），性能优化主要集中在运行期（后端的即时编译期），javac主要进行了一些针对Java语言编码过程的优化，如语法糖。&lt;/p>
-&lt;h3 id="编译过程">编译过程&lt;/h3>
-&lt;p>编译过程大概分为3个过程：
+&lt;h2 id="编译期优化">编译期优化
+&lt;/h2>&lt;p>javac对代码的运行效率几乎没有任何优化措施（JDK1.3之后-O优化参数没有意义了），性能优化主要集中在运行期（后端的即时编译期），javac主要进行了一些针对Java语言编码过程的优化，如语法糖。&lt;/p>
+&lt;h3 id="编译过程">编译过程
+&lt;/h3>&lt;p>编译过程大概分为3个过程：
 &lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%9B%9B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E4%B8%8EJVM%E4%BC%98%E5%8C%96/9.png"
 width="1306"
 height="123"
@@ -1342,9 +1420,9 @@ data-flex-basis="427px"
 &lt;li>插入式注解处理器的&lt;strong>注解处理&lt;/strong>过程：处理代码中的注解，这个过程中可能影响到语法树的元素，如果影响到了，则要重新回到解析及填充符号表的过程，这样一个循环称作一个Round，直到注解处理器没有对语法树进行修改；&lt;/li>
 &lt;li>&lt;strong>分析与字节码生成&lt;/strong>过程：具体又分为&lt;strong>标注检查&lt;/strong>（检查变量使用前是否已生命、变量与赋值之间类型是否匹配等问题，以及常量折叠，如&amp;quot;1&amp;quot;+&amp;ldquo;2&amp;quot;优化为&amp;quot;12&amp;rdquo;）、&lt;strong>数据及控制流分析&lt;/strong>（检查局部变量使用前是否赋值、每条路径是否都有返回值、异常是否都处理了等问题）、&lt;strong>解语法糖&lt;/strong>（由desugar()方法完成）、&lt;strong>字节码生成&lt;/strong>（收敛生成&amp;lt;clinit&amp;gt;()方法he &amp;lt;init&amp;gt;()方法，将所有生成的信息转换成字节码写入磁盘）等子过程。&lt;/li>
 &lt;/ol>
-&lt;h3 id="语法糖">语法糖&lt;/h3>
-&lt;h4 id="泛型">泛型&lt;/h4>
-&lt;p>Java的泛型是伪泛型，只在源码中存在，编译时进行类型擦除变成原生类型（Raw Type），并在调用的地方加上强转类型代码，这是为了兼容旧版本。对于重载方法，如果泛型参数的泛型类型不同而其他参数以及返回类型相同，是不允许重载的，比如以下方法1和方法2不能重载；而如果泛型参数的泛型类型不同，且返回类型不同，则可以重载，比如方法1和方法3（JVM本来就允许）。&lt;/p>
+&lt;h3 id="语法糖">语法糖
+&lt;/h3>&lt;h4 id="泛型">泛型
+&lt;/h4>&lt;p>Java的泛型是伪泛型，只在源码中存在，编译时进行类型擦除变成原生类型（Raw Type），并在调用的地方加上强转类型代码，这是为了兼容旧版本。对于重载方法，如果泛型参数的泛型类型不同而其他参数以及返回类型相同，是不允许重载的，比如以下方法1和方法2不能重载；而如果泛型参数的泛型类型不同，且返回类型不同，则可以重载，比如方法1和方法3（JVM本来就允许）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//方法1和方法2不能重载，方法1和方法3可以重载&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//方法1&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">test&lt;/span>(List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>Integer&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>);
@@ -1352,20 +1430,20 @@ data-flex-basis="427px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">test&lt;/span>(List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//方法3&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">test&lt;/span>(List&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="自动装箱拆箱遍历循环变长参数">自动装箱/拆箱、遍历循环、变长参数&lt;/h4>
-&lt;p>遍历循环（增强for）的实现是编译时还原为迭代其的实现，因此需要实现Iterable接口。&lt;/p>
-&lt;h4 id="条件编译">条件编译&lt;/h4>
-&lt;p>java的条件编译通过条件为常量的if语句实现。如下面代码中，编译后的字节码不会包含调用B()方法的指令。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="自动装箱拆箱遍历循环变长参数">自动装箱/拆箱、遍历循环、变长参数
+&lt;/h4>&lt;p>遍历循环（增强for）的实现是编译时还原为迭代其的实现，因此需要实现Iterable接口。&lt;/p>
+&lt;h4 id="条件编译">条件编译
+&lt;/h4>&lt;p>java的条件编译通过条件为常量的if语句实现。如下面代码中，编译后的字节码不会包含调用B()方法的指令。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">if&lt;/span>(&lt;span style="color:#815ba4">true&lt;/span>){
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> A();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>} &lt;span style="color:#815ba4">else&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> B();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="运行期优化">运行期优化&lt;/h2>
-&lt;h3 id="解释器与编译器">解释器与编译器&lt;/h3>
-&lt;p>许多主流商用JVM包括HotSpot采用解释器与编译器并存的结构，启动的时候使用解释器，保证启动速度，随着运行时间推移，编译器发挥作用，编译为本地代码，提高执行效率。在JVM中这种模式被称为混合模式，可以用&lt;code>-Xint&lt;/code>强制JVM运行于解释模式，或用&lt;code>-Xcomp&lt;/code>强制JVM运行于编译模式。HotSpot包含两个及时编译器Client Compiler和Server Compiler，一般简称为C1和C2。&lt;/p>
-&lt;h3 id="热点探测">热点探测&lt;/h3>
-&lt;p>运行过程中被即时编译器编译的&lt;strong>热点代码&lt;/strong>包括被多次调用的 &lt;strong>方法&lt;/strong> 或 &lt;strong>循环体&lt;/strong>，对于后者编译器还是会以整个方法作为编译对象。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="运行期优化">运行期优化
+&lt;/h2>&lt;h3 id="解释器与编译器">解释器与编译器
+&lt;/h3>&lt;p>许多主流商用JVM包括HotSpot采用解释器与编译器并存的结构，启动的时候使用解释器，保证启动速度，随着运行时间推移，编译器发挥作用，编译为本地代码，提高执行效率。在JVM中这种模式被称为混合模式，可以用&lt;code>-Xint&lt;/code>强制JVM运行于解释模式，或用&lt;code>-Xcomp&lt;/code>强制JVM运行于编译模式。HotSpot包含两个及时编译器Client Compiler和Server Compiler，一般简称为C1和C2。&lt;/p>
+&lt;h3 id="热点探测">热点探测
+&lt;/h3>&lt;p>运行过程中被即时编译器编译的&lt;strong>热点代码&lt;/strong>包括被多次调用的 &lt;strong>方法&lt;/strong> 或 &lt;strong>循环体&lt;/strong>，对于后者编译器还是会以整个方法作为编译对象。&lt;br>
 判断方法或循环体是否热点代码的行为被称为&lt;strong>热点探测&lt;/strong>，目前主要的热点探测方法有两种：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>基于采样的热点探测&lt;/strong>。JVM周期性的检查各个线程的栈顶，如果发现某些方法经常出现在栈顶，那么就是热点方法。缺点是容易收到线程阻塞或其他外界因素影响，优点是简单高效；&lt;/li>
@@ -1375,10 +1453,10 @@ data-flex-basis="427px"
 对于方法调用计数器，一个方法执行时先判断存不存在JIT编译过的版本，存在的话执行编译后版本，不存在的话计数器加一，再判断是否超过阈值，超过的话向即时编译器提交编译申请。其统计的并不是方法被调用的绝对次数，而是一段时间内的调用次数，如果超过一定时间计数器仍不足阈值，则计数值会减少一半，这被成为&lt;strong>热度衰减&lt;/strong>(Counter Decay)，这段时间被称为半衰期。热度衰减的动作时在GC时顺便进行的。&lt;br>
 回边计数器没有计数热度衰减的过程，记录循环体被调用的绝对次数。&lt;br>
 默认配置下，编译是在后台的编译线程进行的，除非用&lt;code>-XX:-BackgroundCompilation&lt;/code>来禁止后台编译，这样提交编译请求的线程会一直等待编译完成。&lt;/p>
-&lt;h3 id="编译优化技术">编译优化技术&lt;/h3>
-&lt;p>JVM几乎所有的优化措施都集中在及时编译器中。&lt;/p>
-&lt;h4 id="方法内联">方法内联&lt;/h4>
-&lt;p>方法内联（Method Inlining）指的是将调用的方法代码替换掉调用者的调用语句。目的：&lt;/p>
+&lt;h3 id="编译优化技术">编译优化技术
+&lt;/h3>&lt;p>JVM几乎所有的优化措施都集中在及时编译器中。&lt;/p>
+&lt;h4 id="方法内联">方法内联
+&lt;/h4>&lt;p>方法内联（Method Inlining）指的是将调用的方法代码替换掉调用者的调用语句。目的：&lt;/p>
 &lt;ol>
 &lt;li>取出调用方法的成本，如建立栈帧；&lt;/li>
 &lt;li>为其他优化建立良好基础，比如内联可以发现更多的无用代码。&lt;/li>
@@ -1390,8 +1468,8 @@ JVM引入了类型继承关系分析（Class Hierarchy Analysis，CHA）技术�
 &lt;li>对于虚方法，向CHA查询该方法是否有多个版本可选，如果只有一个版本，则直接进行内联，此时属于激进优化，需要预留逃生门（守护内联），此后如果JVM没有加载到改变方法接受者的继承关系的类，则可以继续使用内联优化的版本，否则抛弃已编译的代码、退回到解释状态进行或重新编译；&lt;/li>
 &lt;li>如果虚方法有多个版本，则尝试内联缓存（Inline Cache）。发生方法调用前，内联缓存状态为空；第一次调用后，缓存记录下方法接受者的版本信息，每次进行方法调用的时候都比较接受者版本，如果方法接受者版本一样，则继续调用内联缓存进行内联，否则取消内联。&lt;/li>
 &lt;/ol>
-&lt;h4 id="冗余访问消除">冗余访问消除&lt;/h4>
-&lt;p>冗余访问消除（Redundant Loads Elimination）指的是如果能保证一个方法的两次调用之间的代码不会引起其返回值的更改，那么这第二次调用的结果可以直接用第一次调用结果去赋值，比如一下代码：&lt;/p>
+&lt;h4 id="冗余访问消除">冗余访问消除
+&lt;/h4>&lt;p>冗余访问消除（Redundant Loads Elimination）指的是如果能保证一个方法的两次调用之间的代码不会引起其返回值的更改，那么这第二次调用的结果可以直接用第一次调用结果去赋值，比如一下代码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">foo1&lt;/span>(){
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> y&lt;span style="color:#5bc4bf">=&lt;/span>b.&lt;span style="color:#06b6ef">value&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//其他调用，不会影响b.value的返回值&lt;/span>
@@ -1403,19 +1481,19 @@ JVM引入了类型继承关系分析（Class Hierarchy Analysis，CHA）技术�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//其他调用，不会影响b.value的返回值&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> z&lt;span style="color:#5bc4bf">=&lt;/span>y;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="复写传播">复写传播&lt;/h4>
-&lt;p>复写传播（Copy Propagation）指的是去掉重复的变量。&lt;/p>
-&lt;h4 id="无用代码消除">无用代码消除&lt;/h4>
-&lt;p>无用代码消除（Dead Code Elimination），无用代码指的是永远不会izhixing的代码，或者完全没有意义的代码。&lt;/p>
-&lt;h4 id="公共子表达式消除">公共子表达式消除&lt;/h4>
-&lt;p>Common Subexpression Elimination定义：一个表达式E已经计算过，且计算后到现在E的变量全部没有变化，那么E这次出现成为了公共子表达式，无需重复计算，直接用前面计算结果替换即可。如果消除优化仅限于程序基本块内，则成为局部公共子表达式消除，如果覆盖范围涵盖多个基本块，则成为全局公共子表达式消除。&lt;/p>
-&lt;h4 id="数组边界检查消除">数组边界检查消除&lt;/h4>
-&lt;p>Java访问数组元素时，会对下标进行上下界范围检查，不满足上下界时会抛出ArrayIndexOutOfBoundsException异常。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="复写传播">复写传播
+&lt;/h4>&lt;p>复写传播（Copy Propagation）指的是去掉重复的变量。&lt;/p>
+&lt;h4 id="无用代码消除">无用代码消除
+&lt;/h4>&lt;p>无用代码消除（Dead Code Elimination），无用代码指的是永远不会izhixing的代码，或者完全没有意义的代码。&lt;/p>
+&lt;h4 id="公共子表达式消除">公共子表达式消除
+&lt;/h4>&lt;p>Common Subexpression Elimination定义：一个表达式E已经计算过，且计算后到现在E的变量全部没有变化，那么E这次出现成为了公共子表达式，无需重复计算，直接用前面计算结果替换即可。如果消除优化仅限于程序基本块内，则成为局部公共子表达式消除，如果覆盖范围涵盖多个基本块，则成为全局公共子表达式消除。&lt;/p>
+&lt;h4 id="数组边界检查消除">数组边界检查消除
+&lt;/h4>&lt;p>Java访问数组元素时，会对下标进行上下界范围检查，不满足上下界时会抛出ArrayIndexOutOfBoundsException异常。&lt;br>
 编译器根据数据流分析确定数组长度，并判断下标有无越界；在循环中进行数组访问时，也是可以通过数据流分析判定循环变量的取值是否越界，如果能保证循环体中不越界的话循环体中访问数组的语句可以消除边界检查。&lt;br>
 还有一种思路时隐式异常处理，将空指针检查和除数为零检查消除，注册一个Segment Fault信号的异常处理器，放在异常处理里面，在这个异常处理器里面再转换为对应的异常并抛出。&lt;br>
 还有一些其他的消除操作，比如自动装箱消除、安全点消除、消除反射等等。&lt;/p>
-&lt;h4 id="逃逸分析">逃逸分析&lt;/h4>
-&lt;p>逃逸分析不能直接优化代码，而是为其他优化手段提供优化的依据。逃逸分析指的是分析对象动态作用域：一个对象在方法中被定义后，被外部方法引用，则称为&lt;strong>方法逃逸&lt;/strong>，被外部线程引用访问到的话，被称为&lt;strong>线程逃逸&lt;/strong>。如果能证明一个对象不会逃逸到方法或线程外，则可以进行以下优化：&lt;/p>
+&lt;h4 id="逃逸分析">逃逸分析
+&lt;/h4>&lt;p>逃逸分析不能直接优化代码，而是为其他优化手段提供优化的依据。逃逸分析指的是分析对象动态作用域：一个对象在方法中被定义后，被外部方法引用，则称为&lt;strong>方法逃逸&lt;/strong>，被外部线程引用访问到的话，被称为&lt;strong>线程逃逸&lt;/strong>。如果能证明一个对象不会逃逸到方法或线程外，则可以进行以下优化：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>栈上分配&lt;/strong>（Stack Allocation）：若确认对象没有方法逃逸，可以将其在栈上分配内存，则其占用内存会随着栈帧出栈而被销毁，减少GC压力，而一般应用中不逃逸的局部对象占很大比例；&lt;/li>
 &lt;li>&lt;strong>同步消除&lt;/strong>（Synchronization Elimination）：若确认对象没有线程逃逸，可以对该变量实时的同步措施消除；&lt;/li>
@@ -1426,10 +1504,10 @@ JVM引入了类型继承关系分析（Class Hierarchy Analysis，CHA）技术�
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
-&lt;h2 id="jvm多语言支持">JVM多语言支持&lt;/h2>
-&lt;p>Java规范分为Java语言规范（The Java Language Specification）和Java虚拟机规范（The Java Virtual Machine Specification），因此JVM支持多种语言，只要该语言编译后的类文件符合JVM规范。比如我们常用的Scala、Kotlin、Clojure、Groovy等等。&lt;/p>
-&lt;h2 id="类文件结构">类文件结构&lt;/h2>
-&lt;p>基础原则：多字节的数据，高位在前。JVM加载Class文件的时候进行动态连接。&lt;br>
+&lt;h2 id="jvm多语言支持">JVM多语言支持
+&lt;/h2>&lt;p>Java规范分为Java语言规范（The Java Language Specification）和Java虚拟机规范（The Java Virtual Machine Specification），因此JVM支持多种语言，只要该语言编译后的类文件符合JVM规范。比如我们常用的Scala、Kotlin、Clojure、Groovy等等。&lt;/p>
+&lt;h2 id="类文件结构">类文件结构
+&lt;/h2>&lt;p>基础原则：多字节的数据，高位在前。JVM加载Class文件的时候进行动态连接。&lt;br>
 Class文件结构类似C的结构体，包含无符号数（u1/u2/u4/u8表示1/2/4/8字节的无符号数）和表（由多个无符号数或表组成的结构体，class文件本身就是一个大的表），有多个同类的无符号数或者表并数量不确定的时候，一般先用一个无符号数记录数量，后面接上一系列连续的这种无符号数或者表。Class文件没有分隔符号，所以整个数据结构都是被严格规定的。&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/7.png"
 width="656"
@@ -1440,11 +1518,11 @@ class="gallery-image"
 data-flex-grow="465"
 data-flex-basis="1116px"
 >&lt;/p>
-&lt;h3 id="魔数与class文件版本">魔数与Class文件版本&lt;/h3>
-&lt;p>Class文件头4个字节是固定的0xCAFEBABE（咖啡宝贝），显然与Java语言命名的历史相关。&lt;br>
+&lt;h3 id="魔数与class文件版本">魔数与Class文件版本
+&lt;/h3>&lt;p>Class文件头4个字节是固定的0xCAFEBABE（咖啡宝贝），显然与Java语言命名的历史相关。&lt;br>
 紧接着4个字节存储Class文件版本号，5-6字节是子版本号，7-8字节是主版本号（比如1.7.0是0x0033）。JVM读取Class文件的时候，搞版本JDK可以兼容旧版本Class文件，就是通过这4个字节进行判定的。&lt;/p>
-&lt;h3 id="常量池">常量池&lt;/h3>
-&lt;p>一般来说常量池占Class文件空间最大，由于长度不定，所以入口有u2类型的常量池容量计数器（8-9位），计数从1开始（Class文件中其他容量计数器都是从0开始的）。&lt;br>
+&lt;h3 id="常量池">常量池
+&lt;/h3>&lt;p>一般来说常量池占Class文件空间最大，由于长度不定，所以入口有u2类型的常量池容量计数器（8-9位），计数从1开始（Class文件中其他容量计数器都是从0开始的）。&lt;br>
 常量池存储两类常量：字面量（类似Java语言中的常量）和符号引用，后者包括类和接口全名、字段名称和描述符、方法名称和描述符。JVM运行时从常量池获取符号引用再在类创建时解析到具体内存地址，没有C语言的“连接”步骤。&lt;br>
 常量池每一个常量都是一个表。，一共有14种表，表的开头都是一个u1类型的标志位代表当前常量的类型（浮点整形之类），后面的结构与具体的常量类型有关，各自不同。&lt;br>
 使用&lt;code>javap -verbose 类名&lt;/code>可以解析类的结构，输出结构大概这样：&lt;/p>
@@ -1475,13 +1553,13 @@ data-flex-basis="1116px"
 &lt;li>CONSTANT_Utf8_info，字符串变量，标志为0x01，紧接着是1个u2类型的字符串长度，然后是字符串内容的bytes，u1类型，数量等于前面u2定义的。&lt;/li>
 &lt;/ol>
 &lt;p>从上面可以推导：类名（全限定名）是字符串常量，长度用u2类型表示，也就是最大长度是65535，换言之就是Java类全名最长65535，超过的无法编译。&lt;/p>
-&lt;h3 id="访问标志">访问标志&lt;/h3>
-&lt;p>常量池结束之后，有两个字节为访问标志，代表当前Class文件是否public、是否类/接口/枚举、是否抽象、是否注解等等。&lt;/p>
-&lt;h3 id="类索引父类索引及接口索引集合">类索引、父类索引及接口索引集合&lt;/h3>
-&lt;p>&lt;strong>类索引&lt;/strong>和&lt;strong>父类索引&lt;/strong>分别为u2类型数据，&lt;strong>接口索引集合&lt;/strong>结合为u2类型数据的集合（只能有一个父类，可以实现多个接口），分别用于记录当前类、父类、实现的接口的类描述符（CONSTANT_Class_info）在常量池中的索引。&lt;br>
+&lt;h3 id="访问标志">访问标志
+&lt;/h3>&lt;p>常量池结束之后，有两个字节为访问标志，代表当前Class文件是否public、是否类/接口/枚举、是否抽象、是否注解等等。&lt;/p>
+&lt;h3 id="类索引父类索引及接口索引集合">类索引、父类索引及接口索引集合
+&lt;/h3>&lt;p>&lt;strong>类索引&lt;/strong>和&lt;strong>父类索引&lt;/strong>分别为u2类型数据，&lt;strong>接口索引集合&lt;/strong>结合为u2类型数据的集合（只能有一个父类，可以实现多个接口），分别用于记录当前类、父类、实现的接口的类描述符（CONSTANT_Class_info）在常量池中的索引。&lt;br>
 类索引和父类索引紧接在访问标志后面，再后面是接口索引集合，入口是一个数量计数器，0表示没有实现任何接口，再后面就是具体的接口类描述符索引。&lt;/p>
-&lt;h3 id="字段表集合">字段表集合&lt;/h3>
-&lt;p>描述类或接口中定义的字段，包括静态和非静态的。结构如下：&lt;/p>
+&lt;h3 id="字段表集合">字段表集合
+&lt;/h3>&lt;p>描述类或接口中定义的字段，包括静态和非静态的。结构如下：&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -1530,8 +1608,8 @@ data-flex-basis="1116px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>(I)Ljava&lt;span style="color:#5bc4bf">/&lt;/span>lang&lt;span style="color:#5bc4bf">/&lt;/span>String;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中L是表示对象类型。&lt;br>
 此外，字段表集合不会列出从父类或接口中继承的字段，但可能会有代码中不存在的字段，比如内部类对外部类实例的引用之类。&lt;/p>
-&lt;h3 id="方法表集合">方法表集合&lt;/h3>
-&lt;p>方法表集合的入口同样也是一个u2类型的计数器，紧接着是各个具体的方法。方法表的结构与字段表基本一样，不列出来了。区别：&lt;/p>
+&lt;h3 id="方法表集合">方法表集合
+&lt;/h3>&lt;p>方法表集合的入口同样也是一个u2类型的计数器，紧接着是各个具体的方法。方法表的结构与字段表基本一样，不列出来了。区别：&lt;/p>
 &lt;ol>
 &lt;li>首先是access_flags的取值范围不同，比如没有ACC_TRANSIENT、有ACC_SYNCHRONIZED等值；&lt;/li>
 &lt;li>name_index表示方法名索引，descriptor_index表示方法描述符索引，跟字段表一样；&lt;/li>
@@ -1540,10 +1618,10 @@ data-flex-basis="1116px"
 &lt;li>同样可能出现代码中原本没有的方法，比如&amp;lt;clinit&amp;gt;（类构造器）、&amp;lt;init&amp;gt;（实例对象构造器）。&lt;/li>
 &lt;/ol>
 &lt;p>两个方法名字相同，参数列表相同，返回值类型不同，是允许共存在一个Class文件中的，但Java语言不允许这样。&lt;/p>
-&lt;h3 id="属性表集合">属性表集合&lt;/h3>
-&lt;p>Class文件、字段表、方法表都可以有自己的属性表，Java7里面定义了21种属性。&lt;/p>
-&lt;h4 id="code属性">Code属性&lt;/h4>
-&lt;p>并非所有方法表都有Code属性，比如接口和抽象类的方法就没有。结构如下：&lt;/p>
+&lt;h3 id="属性表集合">属性表集合
+&lt;/h3>&lt;p>Class文件、字段表、方法表都可以有自己的属性表，Java7里面定义了21种属性。&lt;/p>
+&lt;h4 id="code属性">Code属性
+&lt;/h4>&lt;p>并非所有方法表都有Code属性，比如接口和抽象类的方法就没有。结构如下：&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -1617,22 +1695,22 @@ data-flex-basis="1116px"
 &lt;/tbody>
 &lt;/table>
 &lt;p>字节码值得注意的一个地方是，javac编译时将this关键字作为一个普通方法参数由JVM调用时自动传入。&lt;/p>
-&lt;h4 id="exceptions属性">Exceptions属性&lt;/h4>
-&lt;p>描述方法可能抛出的受检异常。&lt;/p>
-&lt;h4 id="linenumbertable属性">LineNumberTable属性&lt;/h4>
-&lt;p>描述Java远吗行号与字节码行号之间映射关系，也就是为什么抛异常的时候可以显示源码哪一行抛出的。&lt;/p>
-&lt;h4 id="localvariabletable属性">LocalVariableTable属性&lt;/h4>
-&lt;p>描述栈桢中局部变量表与Java源码中变量的关系，以保证编译后的代码被其他代码调用时，IDE可以显示参数名（否则被arg0、arg1之类的变量名代替）&lt;/p>
-&lt;h4 id="sourcefile属性">SourceFile属性&lt;/h4>
-&lt;p>描述生成当前Class文件的源文件名称，也是抛异常时可以显示源文件名字的原因。但内部类不会生成这个属性。&lt;/p>
-&lt;h4 id="constantvalue属性">ConstantValue属性&lt;/h4>
-&lt;p>static关键字修饰的变量可以使用这个属性。对于Sun javac编译器，final static的变量采用ConstantValue属性初始化，其他static变量在&amp;lt;clinit&amp;gt;（类构造器）中初始化。&lt;/p>
-&lt;h4 id="innerclasses属性">InnerClasses属性&lt;/h4>
-&lt;p>记录内部类和宿主类的关联。内部类和宿主类的Class文件都会有这个属性。&lt;/p>
-&lt;h4 id="signature属性">Signature属性&lt;/h4>
-&lt;p>记录泛型签名信息。Java的泛型是使用擦除式实现的伪泛型，编译后擦除泛型，这个属性为了弥补此缺陷，方便反射API可以拿到泛型类型。&lt;/p>
-&lt;h2 id="字节码指令">字节码指令&lt;/h2>
-&lt;p>字节码指令由一个字节的&lt;strong>操作码&lt;/strong>（代表具体操作）及跟随其后的0个或多个&lt;strong>操作数&lt;/strong>（操作所需的参数）组成。JVM大多数指令不含操作数只有操作码。&lt;br>
+&lt;h4 id="exceptions属性">Exceptions属性
+&lt;/h4>&lt;p>描述方法可能抛出的受检异常。&lt;/p>
+&lt;h4 id="linenumbertable属性">LineNumberTable属性
+&lt;/h4>&lt;p>描述Java远吗行号与字节码行号之间映射关系，也就是为什么抛异常的时候可以显示源码哪一行抛出的。&lt;/p>
+&lt;h4 id="localvariabletable属性">LocalVariableTable属性
+&lt;/h4>&lt;p>描述栈桢中局部变量表与Java源码中变量的关系，以保证编译后的代码被其他代码调用时，IDE可以显示参数名（否则被arg0、arg1之类的变量名代替）&lt;/p>
+&lt;h4 id="sourcefile属性">SourceFile属性
+&lt;/h4>&lt;p>描述生成当前Class文件的源文件名称，也是抛异常时可以显示源文件名字的原因。但内部类不会生成这个属性。&lt;/p>
+&lt;h4 id="constantvalue属性">ConstantValue属性
+&lt;/h4>&lt;p>static关键字修饰的变量可以使用这个属性。对于Sun javac编译器，final static的变量采用ConstantValue属性初始化，其他static变量在&amp;lt;clinit&amp;gt;（类构造器）中初始化。&lt;/p>
+&lt;h4 id="innerclasses属性">InnerClasses属性
+&lt;/h4>&lt;p>记录内部类和宿主类的关联。内部类和宿主类的Class文件都会有这个属性。&lt;/p>
+&lt;h4 id="signature属性">Signature属性
+&lt;/h4>&lt;p>记录泛型签名信息。Java的泛型是使用擦除式实现的伪泛型，编译后擦除泛型，这个属性为了弥补此缺陷，方便反射API可以拿到泛型类型。&lt;/p>
+&lt;h2 id="字节码指令">字节码指令
+&lt;/h2>&lt;p>字节码指令由一个字节的&lt;strong>操作码&lt;/strong>（代表具体操作）及跟随其后的0个或多个&lt;strong>操作数&lt;/strong>（操作所需的参数）组成。JVM大多数指令不含操作数只有操作码。&lt;br>
 Class文件放弃了操作数对齐，因此省略很多填充和分割符，因此体积可以尽量小；缺点是损失一些解析字节码的性能。&lt;br>
 JVM的指令大多数包含了操作的数据类型信息，但因为只有一个字节，也就是说最多只有256种指令，所以不是所有命令对所有数据类型都有独立的指令（非完全独立），同时提供一些指令将指令不支持类型的操作数转换为可支持的类型。&lt;br>
 JVM的浮点数运算，舍入模式是最低有效位向下（0）取整。操作溢出时用有符号的无穷大表示（INF），如果操作结果没有明确数学意义则得到NaN（非数字，比如0/0，∞×0之类）&lt;/p></description></item><item><title>《深入理解Java虚拟机》 学习笔记(二)——垃圾回收</title><link>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</link><pubDate>Sun, 04 Jun 2017 13:57:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2.png" alt="Featured image of post 《深入理解Java虚拟机》 学习笔记(二)——垃圾回收" />&lt;p>&lt;strong>JVM笔记系列索引&lt;/strong>&lt;br>
@@ -1641,13 +1719,13 @@ JVM的浮点数运算，舍入模式是最低有效位向下（0）取整。操�
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
-&lt;h2 id="判断对象可回收">判断对象可回收&lt;/h2>
-&lt;p>有以下方法：&lt;/p>
-&lt;h3 id="引用计数法">引用计数法&lt;/h3>
-&lt;p>维护引用计数的Map，对象被引用时计数加1，引用失效时计数减1，简单粗暴。&lt;br>
+&lt;h2 id="判断对象可回收">判断对象可回收
+&lt;/h2>&lt;p>有以下方法：&lt;/p>
+&lt;h3 id="引用计数法">引用计数法
+&lt;/h3>&lt;p>维护引用计数的Map，对象被引用时计数加1，引用失效时计数减1，简单粗暴。&lt;br>
 实现简单，判断效率高。但主流JVM没有用这个方法的，因为无法解决循环引用的问题。&lt;/p>
-&lt;h3 id="可达性分析算法">可达性分析算法&lt;/h3>
-&lt;p>JVM主流实现时可达性分析。&lt;br>
+&lt;h3 id="可达性分析算法">可达性分析算法
+&lt;/h3>&lt;p>JVM主流实现时可达性分析。&lt;br>
 通过一系列GC Root的对象作为起点，开始向下搜索，搜索经过的路径为引用链，当一个对象到GC Root没有任何引用链项链，则引用不可达，可以GC掉。&lt;br>
 GC Root通常包括以下几种：&lt;/p>
 &lt;ol>
@@ -1657,15 +1735,15 @@ GC Root通常包括以下几种：&lt;/p>
 &lt;li>本地方法栈中JNI（即一般说的Native方法）引用的对象；&lt;/li>
 &lt;li>…………&lt;/li>
 &lt;/ol>
-&lt;h2 id="引用分类">引用分类&lt;/h2>
-&lt;p>引用分为&lt;strong>强引用&lt;/strong>（平常用的引用，只要还存在有效，就不会被GC），&lt;strong>软引用&lt;/strong>（SoftReference类，将要发生内存溢出前GC回收），&lt;strong>弱引用&lt;/strong>（WeakReference类，生存到下一次GC，只被弱引用关联的对象会被回收！），&lt;strong>虚引用&lt;/strong>（PhantomReference类，不影响实例生存时间，无法取得实例，唯一作用是被GC时收到一个系统通知）。&lt;/p>
-&lt;h2 id="finalize方法">finalize()方法&lt;/h2>
-&lt;p>可达性分析中发现不可达的对象，会被标记，如果没有覆盖finalize()方法，或者其finalize()方法已经被JVM调用过，则不会执行finalize()方法。&lt;br>
+&lt;h2 id="引用分类">引用分类
+&lt;/h2>&lt;p>引用分为&lt;strong>强引用&lt;/strong>（平常用的引用，只要还存在有效，就不会被GC），&lt;strong>软引用&lt;/strong>（SoftReference类，将要发生内存溢出前GC回收），&lt;strong>弱引用&lt;/strong>（WeakReference类，生存到下一次GC，只被弱引用关联的对象会被回收！），&lt;strong>虚引用&lt;/strong>（PhantomReference类，不影响实例生存时间，无法取得实例，唯一作用是被GC时收到一个系统通知）。&lt;/p>
+&lt;h2 id="finalize方法">finalize()方法
+&lt;/h2>&lt;p>可达性分析中发现不可达的对象，会被标记，如果没有覆盖finalize()方法，或者其finalize()方法已经被JVM调用过，则不会执行finalize()方法。&lt;br>
 否则需要执行finalize()方法，此对象放入F-Queue队列中，由JVM的低优先级Finalizer线程去执行。&lt;br>
 稍后，GC会对F-Queue的对象进行第二次标记，如果对象在finalize()方法中拯救了自己（重新被引用），则将会被移出要回收的集合。&lt;br>
 一般不覆盖finalize()方法，该方法设计之初是为了迎合C++语法的析构函数，应该用try-finally取代之。&lt;/p>
-&lt;h2 id="方法区永生代的gc">方法区/永生代的GC&lt;/h2>
-&lt;p>永生代也会进行GC，主要收集废弃的常量和无用的类。&lt;br>
+&lt;h2 id="方法区永生代的gc">方法区/永生代的GC
+&lt;/h2>&lt;p>永生代也会进行GC，主要收集废弃的常量和无用的类。&lt;br>
 其中无用的类的判定比较严格，要求：&lt;/p>
 &lt;ol>
 &lt;li>该类所有实例已被回收；&lt;/li>
@@ -1673,34 +1751,34 @@ GC Root通常包括以下几种：&lt;/p>
 &lt;li>该类的Class对象没有任何地方被引用，无法在任何地方通过反射访问该类的方法。&lt;/li>
 &lt;/ol>
 &lt;p>然而满足了以上条件的类，也不一定会被回收，仅仅是可以回收。&lt;/p>
-&lt;h2 id="垃圾收集算法">垃圾收集算法&lt;/h2>
-&lt;p>包括以下：&lt;/p>
-&lt;h3 id="标记-清除算法mark-sweep">标记-清除算法(Mark-Sweep)&lt;/h3>
-&lt;p>先标记出所有需要回收的对象，然后统一回收被标记需要回收的对象。&lt;br>
+&lt;h2 id="垃圾收集算法">垃圾收集算法
+&lt;/h2>&lt;p>包括以下：&lt;/p>
+&lt;h3 id="标记-清除算法mark-sweep">标记-清除算法(Mark-Sweep)
+&lt;/h3>&lt;p>先标记出所有需要回收的对象，然后统一回收被标记需要回收的对象。&lt;br>
 &lt;strong>缺点&lt;/strong>：标记和清除的效率都不高，且清除后产生大量不连续的内存碎片。&lt;/p>
-&lt;h3 id="复制算法copying">复制算法(Copying)&lt;/h3>
-&lt;p>内存划分成等大小的两块，只有一块在使用，GC时将存活对象复制到另一块区域中，清除另一半。&lt;br>
+&lt;h3 id="复制算法copying">复制算法(Copying)
+&lt;/h3>&lt;p>内存划分成等大小的两块，只有一块在使用，GC时将存活对象复制到另一块区域中，清除另一半。&lt;br>
 &lt;strong>缺点&lt;/strong>：有一半内存浪费，复制操作效率低，不适合老年代。&lt;br>
 实际使用中并不是一半一半的内存分配，因为大部分对象生命周期很短，所以划分成一块很大的&lt;strong>Eden区&lt;/strong>和两块小的&lt;strong>Survivor区&lt;/strong>，一般默认8:1:1的比例。每次使用一块Eden和一块Survivor区，GC时讲Eden和Survivor中存活的对象复制到另一块Survivor区中。当Survivor区不够大时，使用&lt;strong>老年代&lt;/strong>进行&lt;strong>分配担保&lt;/strong>，存活对象放入老年代。&lt;/p>
-&lt;h3 id="标记-整理算法mark-compact">标记-整理算法(Mark-Compact)&lt;/h3>
-&lt;p>类似标记-清除算法，标记之后存活的对象向一端移动，最后清理掉边界以外的内存，保证内存的规整。&lt;/p>
-&lt;h2 id="hotspot的算法实现">HotSpot的算法实现&lt;/h2>
-&lt;p>以下是HotSpot中垃圾回收的几个关键点技术实现方法。&lt;/p>
-&lt;h3 id="枚举gc-root">枚举GC Root&lt;/h3>
-&lt;p>可达性分析要求在一个能保证一致性的快照中进行工作，即GC时必须停止所有线程，即Stop The World~~（JOJO里面Dio的世界 ザ・ワールド？）~~。&lt;br>
+&lt;h3 id="标记-整理算法mark-compact">标记-整理算法(Mark-Compact)
+&lt;/h3>&lt;p>类似标记-清除算法，标记之后存活的对象向一端移动，最后清理掉边界以外的内存，保证内存的规整。&lt;/p>
+&lt;h2 id="hotspot的算法实现">HotSpot的算法实现
+&lt;/h2>&lt;p>以下是HotSpot中垃圾回收的几个关键点技术实现方法。&lt;/p>
+&lt;h3 id="枚举gc-root">枚举GC Root
+&lt;/h3>&lt;p>可达性分析要求在一个能保证一致性的快照中进行工作，即GC时必须停止所有线程，即Stop The World~~（JOJO里面Dio的世界 ザ・ワールド？）~~。&lt;br>
 在HotSpot里面，通过一个叫OopMap的数据结构来维护哪些地方存放着对象引用，记录栈上本地变量与堆中对象的引用关系，方便枚举GC Root。&lt;/p>
-&lt;h3 id="安全点">安全点&lt;/h3>
-&lt;p>并不是所有指令都会生成/改变OopMap，这样效率太低。线程必须到达安全点（SafePoint）才会生成OopMap，然后开始GC。安全点的选定是以“有让程序长时间执行的特征”的原则进行的（如方法调用，循环跳转，异常跳转等）。&lt;br>
+&lt;h3 id="安全点">安全点
+&lt;/h3>&lt;p>并不是所有指令都会生成/改变OopMap，这样效率太低。线程必须到达安全点（SafePoint）才会生成OopMap，然后开始GC。安全点的选定是以“有让程序长时间执行的特征”的原则进行的（如方法调用，循环跳转，异常跳转等）。&lt;br>
 考虑多线程，必须所有线程都跑到安全点才能开始GC。方法有二：&lt;/p>
 &lt;ol>
 &lt;li>&lt;strong>抢先式中断&lt;/strong>：GC时先中断所有线程，对于还没跑到安全点的线程，让其恢复并等它跑到安全点上再停。——商业JVM几乎没有这样实现的；&lt;/li>
 &lt;li>&lt;strong>主动式中断&lt;/strong>：GC需要中断线程时，设置一个标志，各个线程执行时，跑到安全点的时候轮询这个标志，发现标志为真的时候自己中断挂起。&lt;/li>
 &lt;/ol>
-&lt;h3 id="安全区域">安全区域&lt;/h3>
-&lt;p>线程执行的时候，可能很久都不会跑到安全点（比如执行了Thread.Sleep()的情况），导致GC不能马上执行。因此引入安全区域的概念（Safe Region），表示这段代码片段中引用关系不会发生变化。&lt;br>
+&lt;h3 id="安全区域">安全区域
+&lt;/h3>&lt;p>线程执行的时候，可能很久都不会跑到安全点（比如执行了Thread.Sleep()的情况），导致GC不能马上执行。因此引入安全区域的概念（Safe Region），表示这段代码片段中引用关系不会发生变化。&lt;br>
 线程执行到安全区域的时候，标识自己进入了安全区域；则发动GC的时候，可以忽略标识为安全区域的线程；而线程在离开安全区域的时候，需要检查是否已完成GC Root枚举（或者是整个GC过程），没完成的话要GC发出等待离开的信号。&lt;/p>
-&lt;h2 id="实际的垃圾收集器">实际的垃圾收集器&lt;/h2>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2.png"
+&lt;h2 id="实际的垃圾收集器">实际的垃圾收集器
+&lt;/h2>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2.png"
 width="547"
 height="374"
 srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2_hu3180127464391945229.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/2_hu6065968135837621407.png 1024w"
@@ -1710,8 +1788,8 @@ data-flex-grow="146"
 data-flex-basis="351px"
 >
 上图给出了HotSpot的7个垃圾收集器，中间有连线的标识可以搭配使用。&lt;/p>
-&lt;h3 id="serial收集器">Serial收集器&lt;/h3>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/3.png"
+&lt;h3 id="serial收集器">Serial收集器
+&lt;/h3>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/3.png"
 width="512"
 height="302"
 srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/3_hu900366977788037768.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/3_hu7619211270795847977.png 1024w"
@@ -1724,10 +1802,10 @@ data-flex-basis="406px"
 JVM在client模式下默认新生代垃圾收集器还在用Serial。&lt;br>
 优点：简单高效。&lt;br>
 缺点：GC时的停顿时间长。&lt;/p>
-&lt;h3 id="serial-old收集器">Serial Old收集器&lt;/h3>
-&lt;p>Serial收集器的老年代版本，单线程，标记-整理算法。&lt;/p>
-&lt;h3 id="parnew收集器">ParNew收集器&lt;/h3>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/4.png"
+&lt;h3 id="serial-old收集器">Serial Old收集器
+&lt;/h3>&lt;p>Serial收集器的老年代版本，单线程，标记-整理算法。&lt;/p>
+&lt;h3 id="parnew收集器">ParNew收集器
+&lt;/h3>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/4.png"
 width="512"
 height="296"
 srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/4_hu12984538836325512479.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/4_hu4950152119648396975.png 1024w"
@@ -1742,15 +1820,15 @@ Serial收集器的多线程版本，可以配合CMS收集器工作，不能配�
 &lt;li>&lt;strong>并行Parallel&lt;/strong>：多条垃圾回收线程并行工作，用户线程在等待；&lt;/li>
 &lt;li>&lt;strong>并发Concurrent&lt;/strong>：垃圾收集线程和用户线程同事执行（CMS）。&lt;/li>
 &lt;/ol>
-&lt;h3 id="parallel-scavenge收集器">Parallel Scavenge收集器&lt;/h3>
-&lt;p>新生代收集器，多线程、复制算法，与ParNew收集器的区别在于，关注点在于吞吐量（Thoughput，=运行用户代码时间/(运行用户代码时间+GC时间)），适合在后台运算而不需要提案多交互的任务。&lt;br>
+&lt;h3 id="parallel-scavenge收集器">Parallel Scavenge收集器
+&lt;/h3>&lt;p>新生代收集器，多线程、复制算法，与ParNew收集器的区别在于，关注点在于吞吐量（Thoughput，=运行用户代码时间/(运行用户代码时间+GC时间)），适合在后台运算而不需要提案多交互的任务。&lt;br>
 用&lt;code>-XX:MaxGCPauseMillis&lt;/code>参数指定保证GC消耗时间的最大值（毫秒），减少GC时间是以牺牲吞吐量及新生代空间来获取的。&lt;br>
 用&lt;code>-XX:GCTimeRatio&lt;/code>参数指定GC占总时间的比例，0-100，默认99，即允许1/(1+99)=1%的GC时间。&lt;br>
 使用&lt;code>-XX:UseAdaptiveSizePolicy&lt;/code>参数之后，JVM根据当前系统情况动态调整新生代大小、Eden与Survivor比例等参数以保证最佳的吞吐量和设定的最长GC时间。&lt;/p>
-&lt;h3 id="parallel-old收集器">Parallel Old收集器&lt;/h3>
-&lt;p>Parallel Scavenge收集器的老年代版本，多线程，标记-整理算法，JDK1.6开始提供。&lt;/p>
-&lt;h3 id="cms收集器">CMS收集器&lt;/h3>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/5.png"
+&lt;h3 id="parallel-old收集器">Parallel Old收集器
+&lt;/h3>&lt;p>Parallel Scavenge收集器的老年代版本，多线程，标记-整理算法，JDK1.6开始提供。&lt;/p>
+&lt;h3 id="cms收集器">CMS收集器
+&lt;/h3>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/5.png"
 width="512"
 height="254"
 srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/5_hu4297989726473695151.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/5_hu4238814447650879945.png 1024w"
@@ -1773,8 +1851,8 @@ data-flex-basis="483px"
 CMS运行期间预留的内存不够，会出现“Concurrent Mode Failure”失败，JVM会临时启用Serial Old收集器重新进行老年代垃圾收集，导致停顿时间变长。可以通过&lt;code>-XX:CMSInitiatingOccupancyFraction&lt;/code>参数调整老年代内存占用比例触发GC的阈值。&lt;/li>
 &lt;li>收集后产生内存碎片。&lt;/li>
 &lt;/ol>
-&lt;h3 id="g1收集器">G1收集器&lt;/h3>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/6.png"
+&lt;h3 id="g1收集器">G1收集器
+&lt;/h3>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/6.png"
 width="789"
 height="150"
 srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/6_hu12403994727589662254.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%BA%8C%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/6_hu1529830618783713773.png 1024w"
@@ -1793,8 +1871,8 @@ G1收集器的回收步骤包括：&lt;/p>
 &lt;li>&lt;strong>最终标记&lt;/strong>：并发标记期间对象变化记录到Remembered Set Logs中，合并到Remembered Set；&lt;/li>
 &lt;li>&lt;strong>筛选回收&lt;/strong>：先根据回收价值和回收成本进行排序，再根据用户期望GC停顿时间制定回收计划。&lt;/li>
 &lt;/ol>
-&lt;h2 id="内存分配回收策略">内存分配、回收策略&lt;/h2>
-&lt;ol>
+&lt;h2 id="内存分配回收策略">内存分配、回收策略
+&lt;/h2>&lt;ol>
 &lt;li>&lt;strong>优先在Eden分配&lt;/strong>：大多数情况下，对象在新生代Eden区分配，当Eden区空间不够时，发起Minor GC；&lt;/li>
 &lt;li>&lt;strong>大对象直接进入老年代&lt;/strong>：提供&lt;code>-XX:PretenureSizeThreshold&lt;/code>参数，大于此值的对象直接在老年代分配，避免在Eden区和Survivor区之间大量内存复制；&lt;/li>
 &lt;li>&lt;strong>长期存活的对象进入老年代&lt;/strong>：JVM为对象定义年龄计数器，经过Minor GC依然存活且被Survivor区容纳的，移动到Survivor区，年龄加1，每经历一次Minor GC不被清理则年龄加1，增加到一定年龄则移动到老年区（默认15岁，通过&lt;code>-XX:MaxTenuringThreshold&lt;/code>设置）；&lt;/li>
@@ -1807,8 +1885,8 @@ G1收集器的回收步骤包括：&lt;/p>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
-&lt;h2 id="jvm内存结构">JVM内存结构&lt;/h2>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/1.png"
+&lt;h2 id="jvm内存结构">JVM内存结构
+&lt;/h2>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/1.png"
 width="698"
 height="334"
 srcset="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/1_hu2142340952973480172.png 480w, https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/1_hu9916691318201597407.png 1024w"
@@ -1818,10 +1896,10 @@ data-flex-grow="208"
 data-flex-basis="501px"
 >
 JVM内存结构不光是只有堆内存和栈内存，实际情况要复杂很多，主要包含以下结构。&lt;/p>
-&lt;h3 id="程序计数器">程序计数器&lt;/h3>
-&lt;p>每个线程都有独立的程序计数器，各线程的互不影响，用于存储正在执行的虚拟机指令地址（对于Native方法则为空undefined）.&lt;/p>
-&lt;h3 id="jvm栈">JVM栈&lt;/h3>
-&lt;p>JVM栈是线程私有的，每个方法执行的时候都会建立栈帧，栈帧包含以下内容：&lt;/p>
+&lt;h3 id="程序计数器">程序计数器
+&lt;/h3>&lt;p>每个线程都有独立的程序计数器，各线程的互不影响，用于存储正在执行的虚拟机指令地址（对于Native方法则为空undefined）.&lt;/p>
+&lt;h3 id="jvm栈">JVM栈
+&lt;/h3>&lt;p>JVM栈是线程私有的，每个方法执行的时候都会建立栈帧，栈帧包含以下内容：&lt;/p>
 &lt;ol>
 &lt;li>局部变量表：存放编译期可知的基本数据类型数据、对象引用和returnAddress，亦即运行期不会改变局部变量表大小;&lt;/li>
 &lt;li>操作数栈；&lt;/li>
@@ -1833,19 +1911,19 @@ JVM内存结构不光是只有堆内存和栈内存，实际情况要复杂很�
 &lt;li>当线程请求的栈深度超过最大值，会抛出StackOverflowError异常；&lt;/li>
 &lt;li>JVM栈动态扩展时无法申请导足够内存，抛出OutOfMemoryError异常。&lt;/li>
 &lt;/ol>
-&lt;h3 id="本地方法栈">本地方法栈&lt;/h3>
-&lt;p>类似JVM栈，区别只在于本地方法栈用于执行本地(Native)方法。&lt;/p>
-&lt;h3 id="java堆">Java堆&lt;/h3>
-&lt;p>所有线程共享的内存区域，用于存放对象实例（但现在不一定全部对象都在堆里了，栈上分配/标量替换等技术）。在GC的概念中还可以分为Eden区、FromSurvivor区及ToSurvivor区。也可能会划分出线程私有的分配缓冲区TLAB。&lt;/p>
-&lt;h3 id="方法区">方法区&lt;/h3>
-&lt;p>线程共享，用于存放已加载的类、常量、静态变量、JIT编译后的代码等数据。&lt;br>
+&lt;h3 id="本地方法栈">本地方法栈
+&lt;/h3>&lt;p>类似JVM栈，区别只在于本地方法栈用于执行本地(Native)方法。&lt;/p>
+&lt;h3 id="java堆">Java堆
+&lt;/h3>&lt;p>所有线程共享的内存区域，用于存放对象实例（但现在不一定全部对象都在堆里了，栈上分配/标量替换等技术）。在GC的概念中还可以分为Eden区、FromSurvivor区及ToSurvivor区。也可能会划分出线程私有的分配缓冲区TLAB。&lt;/p>
+&lt;h3 id="方法区">方法区
+&lt;/h3>&lt;p>线程共享，用于存放已加载的类、常量、静态变量、JIT编译后的代码等数据。&lt;br>
 对于HotSpot虚拟机用户而言，经常将方法区称为永生代（Permanent Generation），是因为HotSpot虚拟机用永生代实现方法区，用GC管理方法区&lt;/p>
-&lt;h4 id="运行时常量池">运行时常量池&lt;/h4>
-&lt;p>运行时常量池是方法区的一部分，类文件被加载后，常量部分就会被放到运行时常量池里。运行期期间也可以将新的常量放入常量池，比如String.intern()方法。&lt;/p>
-&lt;h3 id="直接内存">直接内存&lt;/h3>
-&lt;p>NIO里面引入直接内存的API，可以使用本地方法分配堆外内存，在某些情况下可以提高IO性能。&lt;/p>
-&lt;h2 id="创建对象过程">创建对象过程&lt;/h2>
-&lt;ol>
+&lt;h4 id="运行时常量池">运行时常量池
+&lt;/h4>&lt;p>运行时常量池是方法区的一部分，类文件被加载后，常量部分就会被放到运行时常量池里。运行期期间也可以将新的常量放入常量池，比如String.intern()方法。&lt;/p>
+&lt;h3 id="直接内存">直接内存
+&lt;/h3>&lt;p>NIO里面引入直接内存的API，可以使用本地方法分配堆外内存，在某些情况下可以提高IO性能。&lt;/p>
+&lt;h2 id="创建对象过程">创建对象过程
+&lt;/h2>&lt;ol>
 &lt;li>遇到new关键字的时候，检查对应类是否能在常量池定位到类的符号引用，并检查是否已加载、解析、初始化。没有的话线加载类；&lt;/li>
 &lt;li>分配内存。加载类之后一个对象所需的内存大小就确定了；使用Serial、ParNew等收集器时，堆内存是整齐的，使用&lt;strong>指针碰撞&lt;/strong>划分内存，即在空闲内存的分界点开始分配指定大小的内存空间；如果用CMS等给予Mark-Sweep算法的收集器时，使用&lt;strong>空闲列表&lt;/strong>划分内存，即JVM维护了一个记录可用内存的表，从改变中找一块足够大小的内存空间用于分配。&lt;/li>
 &lt;li>考虑到多线程同时创建对象的情况，会使用到前面说的TLAB，每个线程在自己的TLAB上分配内存，TLAB用完并重新分配新TLAB的时候才需要同步锁定。&lt;/li>

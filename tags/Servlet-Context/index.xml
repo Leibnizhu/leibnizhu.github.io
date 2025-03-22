@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Servlet Context on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Servlet-Context/</link><description>Recent content in Servlet Context on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Thu, 24 Aug 2017 17:43:37 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Servlet-Context/index.xml" rel="self" type="application/rss+xml"/><item><title>基于Netty的Spring Boot内置Servlet容器的实现（二）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</link><pubDate>Thu, 24 Aug 2017 17:43:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/sanae.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（二）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现二">基于Netty的Spring Boot内置Servlet容器的实现（二）&lt;/h1>
-&lt;h2 id="实现servlet-context接口">实现Servlet Context接口&lt;/h2>
-&lt;h3 id="servlet-context接口简介">Servlet Context接口简介&lt;/h3>
-&lt;p>接口&lt;code>ServletContext&lt;/code>定义了一系列方法用于与相应的servlet容器通信，比如：获得文件的MIME类型，分派请求，或者是向日志文件写日志等。每一个web-app只能有一个&lt;code>ServletContext&lt;/code>，webapp可以是一个放置有web application 文件的文件夹，也可以是一个.war的文件。&lt;code>ServletContext&lt;/code>对象包含在&lt;code>ServletConfig&lt;/code>对象之中，&lt;code>ServletConfig&lt;/code>对象在servlet初始化时提供servlet对象。
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Servlet Context on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Servlet-Context/</link><description>Recent content in Servlet Context on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Thu, 24 Aug 2017 17:43:37 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Servlet-Context/index.xml" rel="self" type="application/rss+xml"/><item><title>基于Netty的Spring Boot内置Servlet容器的实现（二）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</link><pubDate>Thu, 24 Aug 2017 17:43:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/sanae.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（二）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现二">基于Netty的Spring Boot内置Servlet容器的实现（二）
+&lt;/h1>&lt;h2 id="实现servlet-context接口">实现Servlet Context接口
+&lt;/h2>&lt;h3 id="servlet-context接口简介">Servlet Context接口简介
+&lt;/h3>&lt;p>接口&lt;code>ServletContext&lt;/code>定义了一系列方法用于与相应的servlet容器通信，比如：获得文件的MIME类型，分派请求，或者是向日志文件写日志等。每一个web-app只能有一个&lt;code>ServletContext&lt;/code>，webapp可以是一个放置有web application 文件的文件夹，也可以是一个.war的文件。&lt;code>ServletContext&lt;/code>对象包含在&lt;code>ServletConfig&lt;/code>对象之中，&lt;code>ServletConfig&lt;/code>对象在servlet初始化时提供servlet对象。
 接口&lt;code>ServletContext&lt;/code>定义的方法比较多，大致可以分为：添加和配置Servlet、添加和配置Filter、添加和配置Listener、添加Servlet、Filter和Listener的注解处理需求、初始化参数、Context属性、资源获取等几大类方法。&lt;br>
 具体可以参考：&lt;/p>
 &lt;ul>
@@ -10,8 +10,8 @@
 &lt;li>&lt;a class="link" href="https://waylau.gitbooks.io/servlet-3-1-specification/docs/Servlet%20Context/4.1%20Introduction%20to%20the%20ServletContext%20Interface.html" target="_blank" rel="noopener"
 >中文翻译的文档 ServletContext 接口介绍&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;h3 id="实现">实现&lt;/h3>
-&lt;p>实现的思想：&lt;/p>
+&lt;h3 id="实现">实现
+&lt;/h3>&lt;p>实现的思想：&lt;/p>
 &lt;ul>
 &lt;li>不处理的：InitParameter相关的方法、Listener相关方法——目前用不到&lt;/li>
 &lt;li>以后处理的：Session Cookie相关的方法等待实现&lt;/li>
@@ -255,8 +255,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//TODO 暂不支持Listener，现在很少用了吧&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url-pattrn匹配查找">URL Pattrn匹配查找&lt;/h3>
-&lt;p>参考Tomcat源码，设计了一个&lt;code>RequestUrlPatternMapper&lt;/code>类用于保存，计算URL-pattern与请求路径的匹配关系。在&lt;code>NettyContext&lt;/code>的&lt;code>public RequestDispatcher getRequestDispatcher(String path)&lt;/code>方法中可以看到对其的调用，传入请求的路径，返回对应处理的Servlet名称。此外在&lt;code>NettyContext&lt;/code>的&lt;code> public void addServletMapping(String urlPattern, String name, Servlet servlet)&lt;/code>方法中也调用该类，增加新的Servlet映射。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url-pattrn匹配查找">URL Pattrn匹配查找
+&lt;/h3>&lt;p>参考Tomcat源码，设计了一个&lt;code>RequestUrlPatternMapper&lt;/code>类用于保存，计算URL-pattern与请求路径的匹配关系。在&lt;code>NettyContext&lt;/code>的&lt;code>public RequestDispatcher getRequestDispatcher(String path)&lt;/code>方法中可以看到对其的调用，传入请求的路径，返回对应处理的Servlet名称。此外在&lt;code>NettyContext&lt;/code>的&lt;code> public void addServletMapping(String urlPattern, String name, Servlet servlet)&lt;/code>方法中也调用该类，增加新的Servlet映射。&lt;br>
 增加映射的时候，先后判断：&lt;/p>
 &lt;ol>
 &lt;li>路径匹配&lt;/li>
@@ -531,8 +531,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> redirectPath &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="再次启动">再次启动&lt;/h2>
-&lt;p>现在ServletContext有了，再次启动，不再报错了。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="再次启动">再次启动
+&lt;/h2>&lt;p>现在ServletContext有了，再次启动，不再报错了。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>::: Using Embedded Netty Servlet &lt;span style="color:#06b6ef">Container&lt;/span> (version:) ::: &lt;span style="color:#ef6155">＼&lt;/span>(&lt;span style="color:#5bc4bf">^&lt;/span>O&lt;span style="color:#5bc4bf">^&lt;/span>)&lt;span style="color:#ef6155">／&lt;/span> Spring&lt;span style="color:#5bc4bf">-&lt;/span>Boot 1.&lt;span style="color:#06b6ef">5&lt;/span>.&lt;span style="color:#06b6ef">2&lt;/span>.&lt;span style="color:#06b6ef">RELEASE&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2017&lt;span style="color:#5bc4bf">-&lt;/span>08&lt;span style="color:#5bc4bf">-&lt;/span>25 22:08:33.&lt;span style="color:#06b6ef">019&lt;/span> INFO 17565 &lt;span style="color:#5bc4bf">---&lt;/span> &lt;span style="color:#5bc4bf">[&lt;/span> main&lt;span style="color:#5bc4bf">]&lt;/span> io.&lt;span style="color:#06b6ef">gitlab&lt;/span>.&lt;span style="color:#06b6ef">leibnizhu&lt;/span>.&lt;span style="color:#06b6ef">sbnetty&lt;/span>.&lt;span style="color:#06b6ef">TestWebApp&lt;/span> : Starting TestWebApp on XPS13 with PID 17565
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">………………&lt;/span>

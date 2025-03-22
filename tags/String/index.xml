@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>String on Heaven's Door</title><link>https://leibnizhu.github.io/tags/String/</link><description>Recent content in String on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 09 Jul 2017 20:54:16 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/String/index.xml" rel="self" type="application/rss+xml"/><item><title>String源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Sun, 09 Jul 2017 20:54:16 +0800</pubDate><guid>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/cup.png" alt="Featured image of post String源码阅读笔记（JDK8）" />&lt;h1 id="string源码阅读笔记">String源码阅读笔记&lt;/h1>
-&lt;h2 id="成员变量">成员变量&lt;/h2>
-&lt;p>value，存放String数据，不可变。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>String on Heaven's Door</title><link>https://leibnizhu.github.io/tags/String/</link><description>Recent content in String on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 09 Jul 2017 20:54:16 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/String/index.xml" rel="self" type="application/rss+xml"/><item><title>String源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Sun, 09 Jul 2017 20:54:16 +0800</pubDate><guid>https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/String%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/cup.png" alt="Featured image of post String源码阅读笔记（JDK8）" />&lt;h1 id="string源码阅读笔记">String源码阅读笔记
+&lt;/h1>&lt;h2 id="成员变量">成员变量
+&lt;/h2>&lt;p>value，存放String数据，不可变。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">char&lt;/span> value&lt;span style="color:#5bc4bf">[]&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hash，存放String的哈希值&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">int&lt;/span> hash; &lt;span style="color:#776e71">// Default to 0&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="构造器部分">构造器部分&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String(String original);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="构造器部分">构造器部分
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String(String original);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将参数的value和hash复制给当前对象。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String(&lt;span style="color:#fec418">char&lt;/span> value&lt;span style="color:#5bc4bf">[]&lt;/span>);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>Arrays.copyOf()&lt;/code>复制到value属性中。&lt;/p>
@@ -69,9 +69,9 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// assert share : &amp;#34;unshared not supported&amp;#34;;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">value&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> value;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他方法">其他方法&lt;/h2>
-&lt;h3 id="静态工厂方法">静态工厂方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(Object obj);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他方法">其他方法
+&lt;/h2>&lt;h3 id="静态工厂方法">静态工厂方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(Object obj);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Object的toString()方法。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> data&lt;span style="color:#5bc4bf">[]&lt;/span>);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">copyValueOf&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> data&lt;span style="color:#5bc4bf">[]&lt;/span>);
@@ -88,13 +88,13 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(&lt;span style="color:#fec418">float&lt;/span> f);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">valueOf&lt;/span>(&lt;span style="color:#fec418">double&lt;/span> d);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用参数对应包装类的toString()方法。&lt;/p>
-&lt;h3 id="intern方法">intern()方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">native&lt;/span> String &lt;span style="color:#06b6ef">intern&lt;/span>();
+&lt;h3 id="intern方法">intern()方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">native&lt;/span> String &lt;span style="color:#06b6ef">intern&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>该方法返回一个字符串对象的内部化引用。 众所周知：String类维护一个初始为空的字符串的对象池，当intern方法被调用时，如果对象池中已经包含这一个相等的字符串对象则返回对象池中的实例，否则添加字符串到对象池并返回该字符串的引用。&lt;/p>
-&lt;h3 id="对的重载">对“+”的重载&lt;/h3>
-&lt;p>String对“+”的支持其实就是使用了StringBuilder以及他的append()、toString()le两个方法。&lt;/p>
-&lt;h3 id="常规方法">常规方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isEmpty&lt;/span>();
+&lt;h3 id="对的重载">对“+”的重载
+&lt;/h3>&lt;p>String对“+”的支持其实就是使用了StringBuilder以及他的append()、toString()le两个方法。&lt;/p>
+&lt;h3 id="常规方法">常规方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isEmpty&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>判断length是否为0。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">char&lt;/span> &lt;span style="color:#06b6ef">charAt&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>判断越界，然后直接从value数组取值。&lt;/p>
@@ -135,8 +135,8 @@
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">format&lt;/span>(String format, Object... args);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">format&lt;/span>(Locale l, String format, Object... args);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Formatter的&lt;code>format()&lt;/code>方法进行计算并返回。&lt;/p>
-&lt;h3 id="替代方法">替代方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replace&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> oldChar, &lt;span style="color:#fec418">char&lt;/span> newChar);
+&lt;h3 id="替代方法">替代方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replace&lt;/span>(&lt;span style="color:#fec418">char&lt;/span> oldChar, &lt;span style="color:#fec418">char&lt;/span> newChar);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>如果新旧字符一样则直接返回this好了，否则先遍历，找到第一次出现oldChar的下标，如果没找到也是返回this，找到则将该下标之前的值循环复制到新数组，此下标之后的值复制到新数组的时候先判断是否oldChar，是的话复制newChar到新数组；最后用新数组构造一个String并返回。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replaceFirst&lt;/span>(String regex, String replacement);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Pattern.matcher()找到匹配之后，再调用Matcher.replaceFirst()来替换首次出现。&lt;/p>
@@ -144,8 +144,8 @@
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用Pattern.matcher()找到匹配之后，再调用Matcher.replaceAll()来替换全部。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>String &lt;span style="color:#06b6ef">replace&lt;/span>(CharSequence target, CharSequence replacement);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>同样调用Pattern.matcher().replaceAll()，支持单个字符。&lt;/p>
-&lt;h3 id="比较方法">比较方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">equals&lt;/span>(Object anObject);
+&lt;h3 id="比较方法">比较方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">equals&lt;/span>(Object anObject);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>先判断是否this，再判断是否String对象，再判断长度是否相等，最后逐个char进行对比。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">contentEquals&lt;/span>(StringBuffer sb);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>contentEquals(CharSequence cs)&lt;/code>，该方法判断如果是StringBuffer则加同步去执行&lt;code>nonSyncContentEquals(AbstractStringBuilder sb)&lt;/code>，否则（StringBuilder的情况）不加同步直接执行。 而&lt;code>nonSyncContentEquals(AbstractStringBuilder sb)&lt;/code>中具体的比较流程与equals基本一致。&lt;/p>
@@ -158,11 +158,11 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">```&lt;/span>java
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">endsWith&lt;/span>(String suffix);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>startsWith(suffix, value.length - suffix.value.length)&lt;/code>，判断this的后面N（suffix的长度）个字符是否与suffix相等。&lt;/p>
-&lt;h3 id="哈希方法">哈希方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">hashCode&lt;/span>();
+&lt;h3 id="哈希方法">哈希方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">hashCode&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>hash属性初始化为0，如果调用hashCode()的时候发现hash为0则开始计算哈希值（懒加载）；由于String不可变，则hash计算一次即可。哈希算法核心为&lt;code>h = 31 * h + val[i];&lt;/code>，遍历所有字符，循环地加上乘以31的哈希值作为新的哈希值，相当于&lt;code>val[0]*31^(n-1) + val[1]*31^(n-2) + ... + val[n-1]&lt;/code>；而选用31，可能时出于&lt;code>i*31== (i&amp;lt;&amp;lt;5)-1&lt;/code>的考虑。&lt;/p>
-&lt;h3 id="查找方法">查找方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch);
+&lt;h3 id="查找方法">查找方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch, &lt;span style="color:#fec418">int&lt;/span> fromIndex);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前者调用后者（fromIndex=0），先判断越界，然后有两种情况就是ch对应单字节和双字节，单字节则直接从fromIndex开始遍历对比查找，双字节则调用&lt;code>int indexOfSupplementary(int ch, int fromIndex)&lt;/code>遍历查找的时候同时判断两个字节。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">lastIndexOf&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> ch);

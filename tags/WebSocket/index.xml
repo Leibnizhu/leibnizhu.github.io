@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>WebSocket on Heaven's Door</title><link>https://leibnizhu.github.io/tags/WebSocket/</link><description>Recent content in WebSocket on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 29 Jul 2017 15:26:32 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/WebSocket/index.xml" rel="self" type="application/rss+xml"/><item><title>SpringMVC中的WebSocket开发</title><link>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</link><pubDate>Sat, 29 Jul 2017 15:26:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/snow.png" alt="Featured image of post SpringMVC中的WebSocket开发" />&lt;h1 id="springmvc中的websocket开发">SpringMVC中的WebSocket开发&lt;/h1>
-&lt;h2 id="websocket简介">WebSocket简介&lt;/h2>
-&lt;h3 id="websocket背景">WebSocket背景&lt;/h3>
-&lt;p>在WebSocket出现之前，服务器的状态更新想要通知客户端，只能由客户端发起轮询（如Ajax）， 即在特定的的时间间隔（如每1秒），由浏览器对服务器发出HTTP request，然后由服务器返回最新的数据给客服端的浏览器。这种传统的HTTP request 的模式带来很明显的缺点 – 浏览器需要不断的向服务器发出请求，然而HTTP request 的header是非常长的，里面包含的有用数据可能只是一个很小的值，这样会占用很多的带宽。
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>WebSocket on Heaven's Door</title><link>https://leibnizhu.github.io/tags/WebSocket/</link><description>Recent content in WebSocket on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 29 Jul 2017 15:26:32 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/WebSocket/index.xml" rel="self" type="application/rss+xml"/><item><title>SpringMVC中的WebSocket开发</title><link>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</link><pubDate>Sat, 29 Jul 2017 15:26:32 +0800</pubDate><guid>https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/SpringMVC%E4%B8%AD%E7%9A%84WebSocket%E5%BC%80%E5%8F%91/snow.png" alt="Featured image of post SpringMVC中的WebSocket开发" />&lt;h1 id="springmvc中的websocket开发">SpringMVC中的WebSocket开发
+&lt;/h1>&lt;h2 id="websocket简介">WebSocket简介
+&lt;/h2>&lt;h3 id="websocket背景">WebSocket背景
+&lt;/h3>&lt;p>在WebSocket出现之前，服务器的状态更新想要通知客户端，只能由客户端发起轮询（如Ajax）， 即在特定的的时间间隔（如每1秒），由浏览器对服务器发出HTTP request，然后由服务器返回最新的数据给客服端的浏览器。这种传统的HTTP request 的模式带来很明显的缺点 – 浏览器需要不断的向服务器发出请求，然而HTTP request 的header是非常长的，里面包含的有用数据可能只是一个很小的值，这样会占用很多的带宽。
 WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket通讯协议于2011年被IETF定为标准RFC 6455，WebSocketAPI被W3C定为标准。
 在WebSocket API中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。WebSocket不仅允许服务器和客户端双向通信，而且互相沟通的Header是很小的-大概只有 2 Bytes。&lt;/p>
-&lt;h3 id="支持情况">支持情况&lt;/h3>
-&lt;ul>
+&lt;h3 id="支持情况">支持情况
+&lt;/h3>&lt;ul>
 &lt;li>Spring： Spring从4.0开始加入了spring-websocket这个模块，并能够全面支持WebSocket，它与Java WebSocket API标准（JSR-356）保持一致，同时提供了额外的服务。&lt;/li>
 &lt;li>浏览器：&lt;/li>
 &lt;/ul>
@@ -68,34 +68,34 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h3 id="java-实现方法">Java 实现方法&lt;/h3>
-&lt;p>在 Spring 端可以有以下几种方法使用 WebSocket：&lt;/p>
+&lt;h3 id="java-实现方法">Java 实现方法
+&lt;/h3>&lt;p>在 Spring 端可以有以下几种方法使用 WebSocket：&lt;/p>
 &lt;ol>
 &lt;li>使用 Java EE7 的方式&lt;/li>
 &lt;li>使用 Spring 提供的接口&lt;/li>
 &lt;li>使用 STOMP 协议以及 Spring 的 MVC&lt;/li>
 &lt;/ol>
 &lt;p>本文使用Spring提供的接口，实现起来比较简单。&lt;/p>
-&lt;h3 id="适用场景">适用场景&lt;/h3>
-&lt;p>客户端和服务器需要 &lt;strong>高频率&lt;/strong> &lt;strong>低延迟&lt;/strong> 交换事件的时候。基本的候选包括但不限于，金融、游戏、合作、以及其他应用。这些应用对时间延迟很敏感，还需要以高频率交换大量的消息。&lt;/p>
-&lt;h2 id="spring-mvc的websocket开发实战">Spring MVC的WebSocket开发实战&lt;/h2>
-&lt;h3 id="nginx配置">Nginx配置&lt;/h3>
-&lt;p>我们知道，WebSocket握手需要在HTTP请求头里增加&lt;code>Upgrade&lt;/code>和&lt;code>Connection&lt;/code>字段，以便向服务申请将连接升级为WebSocket。&lt;br>
+&lt;h3 id="适用场景">适用场景
+&lt;/h3>&lt;p>客户端和服务器需要 &lt;strong>高频率&lt;/strong> &lt;strong>低延迟&lt;/strong> 交换事件的时候。基本的候选包括但不限于，金融、游戏、合作、以及其他应用。这些应用对时间延迟很敏感，还需要以高频率交换大量的消息。&lt;/p>
+&lt;h2 id="spring-mvc的websocket开发实战">Spring MVC的WebSocket开发实战
+&lt;/h2>&lt;h3 id="nginx配置">Nginx配置
+&lt;/h3>&lt;p>我们知道，WebSocket握手需要在HTTP请求头里增加&lt;code>Upgrade&lt;/code>和&lt;code>Connection&lt;/code>字段，以便向服务申请将连接升级为WebSocket。&lt;br>
 但如果tomcat服务器使用了Nginx作为反向代理，那么默认是不会转发这两个请求头的，所以需要手动设置这两个HTTP请求头。&lt;br>
 应在&lt;code>nginx.conf&lt;/code>对应域名&lt;code>server&lt;/code>配置里面的&lt;code>location&lt;/code>配置中增加：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>proxy_set_header Upgrade &lt;span style="color:#ef6155">$http_upgrade&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>proxy_set_header Connection &lt;span style="color:#48b685">&amp;#34;upgrade&amp;#34;&lt;/span>;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="heading">&lt;/h3>
-&lt;h3 id="maven依赖">Maven依赖&lt;/h3>
-&lt;p>在pom.xml文件中增加以下依赖：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="heading">
+&lt;/h3>&lt;h3 id="maven依赖">Maven依赖
+&lt;/h3>&lt;p>在pom.xml文件中增加以下依赖：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-websocket&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${spring-version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="websocket相关的类">WebSocket相关的类&lt;/h3>
-&lt;h4 id="实现websocketconfigurer">实现WebSocketConfigurer&lt;/h4>
-&lt;p>对Spring WebSocket进行配置，可以通过xml配置文件的方式，也可以通过实现WebSocketConfigurer接口进行配置：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="websocket相关的类">WebSocket相关的类
+&lt;/h3>&lt;h4 id="实现websocketconfigurer">实现WebSocketConfigurer
+&lt;/h4>&lt;p>对Spring WebSocket进行配置，可以通过xml配置文件的方式，也可以通过实现WebSocketConfigurer接口进行配置：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Configuration&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@EnableWebSocket&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">WebSocketConfig&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> WebMvcConfigurerAdapter &lt;span style="color:#815ba4">implements&lt;/span> WebSocketConfigurer {
@@ -111,8 +111,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>我们设置了两个监听的路径，第一个是传统的WebSocket，第二个是支持SockJS的。SockJS是一个JavaScript库，提供跨浏览器JavaScript的API，创建了一个低延迟、全双工的浏览器和web服务器之间通信通道。SockJS的API的命名方式基本上也和 WebSocket 一样，并且支持自动降级到AJAX轮询（降级顺序依次为：websocket -&amp;gt; html strea m -&amp;gt; long polling -&amp;gt; ajaxjsonp），因此可以很好地跨浏览器工作。
 在配置文件里，我们设定了&lt;code>SystemWebSocketHandler&lt;/code>类（实现&lt;code>WebSocketHandler&lt;/code>接口，类似Controller）作为WebSocket各种事件的处理器，以及设定&lt;code>WebSocketHandshakeInterceptor&lt;/code>类（实现&lt;code>HandshakeInterceptor&lt;/code>接口）作为WebSocket协议握手的拦截器，这两个类时我们自己实现的，将在下文细述。&lt;/p>
-&lt;h4 id="实现websockethandler接口">实现WebSocketHandler接口&lt;/h4>
-&lt;p>WebSocketHandler接口为WebSocket事件处理器接口，有以下方法需要实现：&lt;/p>
+&lt;h4 id="实现websockethandler接口">实现WebSocketHandler接口
+&lt;/h4>&lt;p>WebSocketHandler接口为WebSocket事件处理器接口，有以下方法需要实现：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">interface&lt;/span> &lt;span style="color:#fec418">WebSocketHandler&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//WebSocket连接建立后的回调方法&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">afterConnectionEstablished&lt;/span>(WebSocketSession var1) &lt;span style="color:#815ba4">throws&lt;/span> Exception;
@@ -283,8 +283,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>值得注意的是，使用&lt;code>WebSocketSession.sendMessage()&lt;/code>方法可以向指定用户页面发送消息。&lt;/p>
-&lt;h4 id="实现handshakeinterceptor接口">实现HandshakeInterceptor接口&lt;/h4>
-&lt;p>HandshakeInterceptor接口为WebSocket握手拦截器接口，包含以下方法：&lt;/p>
+&lt;h4 id="实现handshakeinterceptor接口">实现HandshakeInterceptor接口
+&lt;/h4>&lt;p>HandshakeInterceptor接口为WebSocket握手拦截器接口，包含以下方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">interface&lt;/span> &lt;span style="color:#fec418">HandshakeInterceptor&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//建立WebSocket连接、握手前的处理方法&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">beforeHandshake&lt;/span>(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String, Object&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> attributes) &lt;span style="color:#815ba4">throws&lt;/span> Exception;
@@ -346,8 +346,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">afterHandshake&lt;/span>(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="业务层的封装">业务层的封装&lt;/h4>
-&lt;p>实际的使用中，我们封装了一些类，包括WebSocket消息内容的实体类，以及发送消息的Service类（在Controller层触发了相应的事件时进行调用），以下代码仅供参考，请根据实际业务需求进行封装。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="业务层的封装">业务层的封装
+&lt;/h4>&lt;p>实际的使用中，我们封装了一些类，包括WebSocket消息内容的实体类，以及发送消息的Service类（在Controller层触发了相应的事件时进行调用），以下代码仅供参考，请根据实际业务需求进行封装。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * WebSocket消息的统一封装
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> *
@@ -466,8 +466,8 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="页面js">页面&amp;amp;&amp;amp;js&lt;/h3>
-&lt;p>页面需要引入SockJS，js中需要初始化WebSocket并建立链接（前面在WebSocketConfig类中配置的映射路径）。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="页面js">页面&amp;amp;&amp;amp;js
+&lt;/h3>&lt;p>页面需要引入SockJS，js中需要初始化WebSocket并建立链接（前面在WebSocketConfig类中配置的映射路径）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">html&lt;/span> &lt;span style="color:#06b6ef">xmlns&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.w3.org/1999/xhtml&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">xmlns:th&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.thymeleaf.org&amp;#34;&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">head&lt;/span>&amp;gt;

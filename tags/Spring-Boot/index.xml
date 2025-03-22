@@ -7,14 +7,14 @@
 后来在Telegram某群组里被安利了&lt;code>Vert.X&lt;/code>，看了官方文档，还有详细的官方Demo，以及各种安利文章，发现这玩意真好用诶，跟&lt;code>Node.Js&lt;/code>有点像诶，也不用跟用&lt;code>Netty&lt;/code>原生API一样战战兢兢了，配套解决方案也不少，逼格也有，多语言支持（虽然对我而言用处不大），决定就是你了！&lt;br>
 所以最终结论就是：&lt;code>Vert.X&lt;/code>大法好，退&lt;code>Spring&lt;/code>保平安～&lt;/p>
 &lt;p>P.S. 在&lt;a class="link" href="https://github.com/Leibnizhu/VertxLearn" target="_blank" rel="noopener"
->Github&lt;/a>写了一些简单的&lt;code>Vert.X&lt;/code>学习例子，另外准备用&lt;code>Vert.X&lt;/code>写一个微信/支付宝的微服务(2018-08-02更新:2017年年底已经写了,忘了更新这篇文章, 请参阅&lt;a class="link" href="https://leibnizhu.github.io/p/%e5%9f%ba%e4%ba%8eVert.X%e7%9a%84%e9%ab%98%e6%80%a7%e8%83%bd%e5%be%ae%e4%bf%a1%e6%94%af%e4%bb%98%e5%ae%9d%e5%85%ac%e4%bc%97%e5%8f%b7%e9%80%9a%e7%94%a8%e6%9c%8d%e5%8a%a1/" >基于Vert.X的高性能微信支付宝公众号通用服务&lt;/a>)。&lt;/p></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（五）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</link><pubDate>Wed, 13 Sep 2017 21:51:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/lzwx.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（五）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现五">基于Netty的Spring Boot内置Servlet容器的实现（五）&lt;/h1>
-&lt;h2 id="benchmark-程序编写">BenchMark 程序编写&lt;/h2>
-&lt;p>BenchMark可以用Jmeter进行，也可以直接编写java Test程序，通过@Befor进行时间计算。&lt;br>
+>Github&lt;/a>写了一些简单的&lt;code>Vert.X&lt;/code>学习例子，另外准备用&lt;code>Vert.X&lt;/code>写一个微信/支付宝的微服务(2018-08-02更新:2017年年底已经写了,忘了更新这篇文章, 请参阅&lt;a class="link" href="https://leibnizhu.github.io/p/%e5%9f%ba%e4%ba%8eVert.X%e7%9a%84%e9%ab%98%e6%80%a7%e8%83%bd%e5%be%ae%e4%bf%a1%e6%94%af%e4%bb%98%e5%ae%9d%e5%85%ac%e4%bc%97%e5%8f%b7%e9%80%9a%e7%94%a8%e6%9c%8d%e5%8a%a1/" >基于Vert.X的高性能微信支付宝公众号通用服务&lt;/a>)。&lt;/p></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（五）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</link><pubDate>Wed, 13 Sep 2017 21:51:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/lzwx.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（五）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现五">基于Netty的Spring Boot内置Servlet容器的实现（五）
+&lt;/h1>&lt;h2 id="benchmark-程序编写">BenchMark 程序编写
+&lt;/h2>&lt;p>BenchMark可以用Jmeter进行，也可以直接编写java Test程序，通过@Befor进行时间计算。&lt;br>
 更方便的方法直使JM框架。&lt;/p>
-&lt;h3 id="jmh简介">JMH简介&lt;/h3>
-&lt;p>JMH是新的microbenchmark（微基准测试）框架（2013年首次发布）。与其他众多框架相比它的特色优势在于，它是由Oracle实现JIT的相同人员开发的。特别是我想提一下Aleksey Shipilev和他优秀的博客文章。JMH可能与最新的Oracle JRE同步，其结果可信度很高。&lt;/p>
-&lt;h3 id="idea的jmh插件">IDEA的JMH插件&lt;/h3>
-&lt;p>直接使用JMH需要额外编写一些入口方法、增加依赖等，并不是特别方便，而IDEA有插件支持JMH。打开&lt;code>Files-Settings&lt;/code>，找到&lt;code>Plugins&lt;/code>选项卡，安装&lt;code>JMH Plugin&lt;/code>插件，安装后重启如下：&lt;br>
+&lt;h3 id="jmh简介">JMH简介
+&lt;/h3>&lt;p>JMH是新的microbenchmark（微基准测试）框架（2013年首次发布）。与其他众多框架相比它的特色优势在于，它是由Oracle实现JIT的相同人员开发的。特别是我想提一下Aleksey Shipilev和他优秀的博客文章。JMH可能与最新的Oracle JRE同步，其结果可信度很高。&lt;/p>
+&lt;h3 id="idea的jmh插件">IDEA的JMH插件
+&lt;/h3>&lt;p>直接使用JMH需要额外编写一些入口方法、增加依赖等，并不是特别方便，而IDEA有插件支持JMH。打开&lt;code>Files-Settings&lt;/code>，找到&lt;code>Plugins&lt;/code>选项卡，安装&lt;code>JMH Plugin&lt;/code>插件，安装后重启如下：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/jmhPlugin.png"
 width="1019"
 height="458"
@@ -24,8 +24,8 @@ class="gallery-image"
 data-flex-grow="222"
 data-flex-basis="533px"
 >&lt;/p>
-&lt;h3 id="编写benchmark方法">编写BenchMark方法&lt;/h3>
-&lt;p>安装&lt;code>JMH Plugin&lt;/code>插件之后无需编写入口方法、增加依赖，可以直接关注具体的测试。&lt;br>
+&lt;h3 id="编写benchmark方法">编写BenchMark方法
+&lt;/h3>&lt;p>安装&lt;code>JMH Plugin&lt;/code>插件之后无需编写入口方法、增加依赖，可以直接关注具体的测试。&lt;br>
 编写一个简单例子，测试我们容器的测试用例吞吐量：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@BenchmarkMode&lt;/span>(Mode.&lt;span style="color:#06b6ef">Throughput&lt;/span>)
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">NettyServletBenchmark&lt;/span> {
@@ -126,8 +126,8 @@ data-flex-basis="533px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl(&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/plaintext&amp;#34;&lt;/span>, &lt;span style="color:#815ba4">false&lt;/span>);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中&lt;code>@Benchmark&lt;/code>注解表示当前方法是需要JMH执行测试的方法，&lt;code>@Warmup(iterations = 10)&lt;/code>表示每次正式测试前，先跑10次进行热身（不参与测试结果的计算），&lt;code>@Measurement(iterations = 20)&lt;/code>表示每次正式测试执行20次方法。&lt;/p>
-&lt;h3 id="执行测试">执行测试&lt;/h3>
-&lt;p>执行方法很简单，点击菜单&lt;code>Run-Run...&lt;/code>，弹出窗中选择当前类，即可：&lt;br>
+&lt;h3 id="执行测试">执行测试
+&lt;/h3>&lt;p>执行方法很简单，点击菜单&lt;code>Run-Run...&lt;/code>，弹出窗中选择当前类，即可：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/runJmh.png"
 width="771"
 height="577"
@@ -154,10 +154,10 @@ data-flex-basis="393px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Benchmark Mode Cnt Score Error Units
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>NettyServletBenchmark.json thrpt &lt;span style="color:#f99b15">200&lt;/span> 6756.677 ± 182.976 ops/s
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>NettyServletBenchmark.plaintext thrpt &lt;span style="color:#f99b15">200&lt;/span> 6508.938 ± 189.498 ops/s
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到IDEA对该类两个带有&lt;code>@Benchmark&lt;/code>注解的方法分别进行了测试，测试结果分别是6.76kQps和6.51kQps（平均值）。&lt;/p></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（四）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%9B%9B/</link><pubDate>Sat, 02 Sep 2017 15:11:03 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%9B%9B/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%9B%9B/jinjia.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（四）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现四">基于Netty的Spring Boot内置Servlet容器的实现（四）&lt;/h1>
-&lt;h2 id="registration注册器的实现">Registration注册器的实现&lt;/h2>
-&lt;h3 id="设计与继承结构">设计与继承结构&lt;/h3>
-&lt;p>在本系列第一篇提到了&lt;code>javax.servlet.Registration&lt;/code>接口，用于实现Filter和Servlet的动态注册，这个接口相对比较简单；有两个子接口，详见下面的UML图：&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到IDEA对该类两个带有&lt;code>@Benchmark&lt;/code>注解的方法分别进行了测试，测试结果分别是6.76kQps和6.51kQps（平均值）。&lt;/p></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（四）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%9B%9B/</link><pubDate>Sat, 02 Sep 2017 15:11:03 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%9B%9B/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%9B%9B/jinjia.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（四）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现四">基于Netty的Spring Boot内置Servlet容器的实现（四）
+&lt;/h1>&lt;h2 id="registration注册器的实现">Registration注册器的实现
+&lt;/h2>&lt;h3 id="设计与继承结构">设计与继承结构
+&lt;/h3>&lt;p>在本系列第一篇提到了&lt;code>javax.servlet.Registration&lt;/code>接口，用于实现Filter和Servlet的动态注册，这个接口相对比较简单；有两个子接口，详见下面的UML图：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%9B%9B/registration.png"
 width="332"
 height="119"
@@ -181,8 +181,8 @@ class="gallery-image"
 data-flex-grow="250"
 data-flex-basis="600px"
 >&lt;/p>
-&lt;h3 id="代码实现">代码实现&lt;/h3>
-&lt;p>在实际实现的过程中，忽略了很多用不到的方法，着重实现了加入Mapping以及获取Filter/Servlet实例的方法。&lt;br>
+&lt;h3 id="代码实现">代码实现
+&lt;/h3>&lt;p>在实际实现的过程中，忽略了很多用不到的方法，着重实现了加入Mapping以及获取Filter/Servlet实例的方法。&lt;br>
 加入Mapping的方法由ServletContext处理（Mapping本身也是由ServletContext维护），而获取Filter/Servlet的方法使用的是类似于懒加载单例的方法，每个Registration实例维护自己的一个Filter/Servlet实例，首次获取的时候通过反射获取到实例，并将反射获取到的实例由Registration实例持有。具体实现代码如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">NettyServletRegistration&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> AbstractNettyRegistration &lt;span style="color:#815ba4">implements&lt;/span> ServletRegistration.&lt;span style="color:#06b6ef">Dynamic&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> Logger log &lt;span style="color:#5bc4bf">=&lt;/span> LoggerFactory.&lt;span style="color:#06b6ef">getLogger&lt;/span>(getClass());
@@ -268,8 +268,8 @@ data-flex-basis="600px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> urlPatternMappings.&lt;span style="color:#06b6ef">addAll&lt;/span>(Arrays.&lt;span style="color:#06b6ef">asList&lt;/span>(urlPatterns));
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="filterchain过滤器链的实现">FilterChain过滤器链的实现&lt;/h2>
-&lt;p>大家应该都知道过滤器链的概念，所有过滤器都在过滤器链上，当有请求进入，将依次经过每个适用的过滤器（根据过滤器的Url Pattern与请求的路径而不同），过滤器里执行&lt;code>doFilter()&lt;/code>方法让过滤器链执行下一个过滤器，直到最后一个，则执行Servlet的&lt;code>service()&lt;/code>方法。而过滤器链对应的接口&lt;code>javax.servlet.FilterChain&lt;/code>里面就一个方法：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="filterchain过滤器链的实现">FilterChain过滤器链的实现
+&lt;/h2>&lt;p>大家应该都知道过滤器链的概念，所有过滤器都在过滤器链上，当有请求进入，将依次经过每个适用的过滤器（根据过滤器的Url Pattern与请求的路径而不同），过滤器里执行&lt;code>doFilter()&lt;/code>方法让过滤器链执行下一个过滤器，直到最后一个，则执行Servlet的&lt;code>service()&lt;/code>方法。而过滤器链对应的接口&lt;code>javax.servlet.FilterChain&lt;/code>里面就一个方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">interface&lt;/span> &lt;span style="color:#fec418">FilterChain&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">doFilter&lt;/span> ( ServletRequest request, ServletResponse response ) &lt;span style="color:#815ba4">throws&lt;/span> IOException, ServletException;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
@@ -302,10 +302,10 @@ data-flex-basis="600px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="httpservletrequest的实现">HttpServletRequest的实现&lt;/h2>
-&lt;p>接口&lt;code>javax.servlet.http.HttpServletRequest&lt;/code>的方法比较多，大概可以分为Cookie相关、Header相关、各种路径相关、Session相关、请求参数相关、请求协议/地址/端口相关、Attributes相关、异步相关、multipart/form-data相关（上传文件）等等方法，以上提到的方法本文基本实现了，还有一些没实现的是暂时用不到的。&lt;/p>
-&lt;h3 id="cookie相关方法">Cookie相关方法&lt;/h3>
-&lt;p>Cookie使用“懒解析”，就是用标识&lt;code>isCookieParsed&lt;/code>记录Cookie是否被解析过，初始化Request对象的时候不解析，在获取Cookiea相关方法被调用的时候再判断是否未解析，若未解析则解析再返回，否则直接返回。&lt;code>NettyHttpServletRequest&lt;/code>的构造方法传入了netty的&lt;code>HttpHeaders&lt;/code>实例，可以从中获取Cookie请求头，再进行解析。具体代码如下：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="httpservletrequest的实现">HttpServletRequest的实现
+&lt;/h2>&lt;p>接口&lt;code>javax.servlet.http.HttpServletRequest&lt;/code>的方法比较多，大概可以分为Cookie相关、Header相关、各种路径相关、Session相关、请求参数相关、请求协议/地址/端口相关、Attributes相关、异步相关、multipart/form-data相关（上传文件）等等方法，以上提到的方法本文基本实现了，还有一些没实现的是暂时用不到的。&lt;/p>
+&lt;h3 id="cookie相关方法">Cookie相关方法
+&lt;/h3>&lt;p>Cookie使用“懒解析”，就是用标识&lt;code>isCookieParsed&lt;/code>记录Cookie是否被解析过，初始化Request对象的时候不解析，在获取Cookiea相关方法被调用的时候再判断是否未解析，若未解析则解析再返回，否则直接返回。&lt;code>NettyHttpServletRequest&lt;/code>的构造方法传入了netty的&lt;code>HttpHeaders&lt;/code>实例，可以从中获取Cookie请求头，再进行解析。具体代码如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/*====== Cookie 相关方法 开始 ======*/&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> Cookie&lt;span style="color:#5bc4bf">[]&lt;/span> cookies;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">transient&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> isCookieParsed &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">false&lt;/span>;
@@ -353,8 +353,8 @@ data-flex-basis="600px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/*====== Cookie 相关方法 结束 ======*/&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="header相关方法">Header相关方法&lt;/h3>
-&lt;p>上面提到&lt;code>NettyHttpServletRequest&lt;/code>的构造方法传入了netty的&lt;code>HttpHeaders&lt;/code>实例，可以从中获取所有请求头，而Header相关方法的实现就靠他了：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="header相关方法">Header相关方法
+&lt;/h3>&lt;p>上面提到&lt;code>NettyHttpServletRequest&lt;/code>的构造方法传入了netty的&lt;code>HttpHeaders&lt;/code>实例，可以从中获取所有请求头，而Header相关方法的实现就靠他了：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/*====== Header 相关方法 开始 ======*/&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> HttpHeaders headers;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -387,8 +387,8 @@ data-flex-basis="600px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> Integer.&lt;span style="color:#06b6ef">parseInt&lt;/span>(headerStringValue);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/*====== Header 相关方法 结束 ======*/&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="session相关方法">Session相关方法&lt;/h3>
-&lt;p>Session相关方法相对多一些。Session的解析分两种，首先尝试从Cookie中获取Cookie（名为JSESSIONID），如果没有，则从请求路径中找类似&amp;quot;;jsessionid=*******&amp;ldquo;的参数作为SessionID。拿到SessionID后，再调用SessionManager的方法获取Session对象；而根据从哪里解析到的SessionID可以设置&lt;code>isCookieSession&lt;/code>和&lt;code>isURLSession&lt;/code>两个属性，用于&lt;code>isRequestedSessionIdFromCookie()&lt;/code>和&lt;code>isRequestedSessionIdFromURL()&lt;/code>方法。如果拿不到SessionID，则调用SessionManager的方法创建一个新Session。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="session相关方法">Session相关方法
+&lt;/h3>&lt;p>Session相关方法相对多一些。Session的解析分两种，首先尝试从Cookie中获取Cookie（名为JSESSIONID），如果没有，则从请求路径中找类似&amp;quot;;jsessionid=*******&amp;ldquo;的参数作为SessionID。拿到SessionID后，再调用SessionManager的方法获取Session对象；而根据从哪里解析到的SessionID可以设置&lt;code>isCookieSession&lt;/code>和&lt;code>isURLSession&lt;/code>两个属性，用于&lt;code>isRequestedSessionIdFromCookie()&lt;/code>和&lt;code>isRequestedSessionIdFromURL()&lt;/code>方法。如果拿不到SessionID，则调用SessionManager的方法创建一个新Session。&lt;br>
 至于Session和SessionManager的实现我们在下一小节再讲，值得注意的是，&lt;code>getSession()&lt;/code>方法返回的并不是我们定义的Session类实例，而是其门面类，是出于安全的考虑；这一点参考了Tomcat的做法（Tomcat的Request、Response、Session等对象都是用门面模式）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> NettyHttpSession session;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> isCookieSession;
@@ -532,10 +532,10 @@ data-flex-basis="600px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> session.&lt;span style="color:#06b6ef">getId&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/*====== Session 相关方法 结束 ======*/&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="httpservletresponse实现">HttpServletResponse实现&lt;/h2>
-&lt;p>HttpServletResponse接口相对简单一点，方法少一点，下面列举出部分方法的实现。&lt;/p>
-&lt;h3 id="header相关方法-1">Header相关方法&lt;/h3>
-&lt;p>这里的Header指响应头。&lt;code>NettyHttpServletResponse&lt;/code>的构造方法里传入了netty的&lt;code>HttpResponse&lt;/code>对象，默认的调用是传入一个200的正常HTTP响应。我们可以通过这个&lt;code>HttpResponse&lt;/code>对象的&lt;code>headers()&lt;/code>方法对响应头进行操作。具体代码如下：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="httpservletresponse实现">HttpServletResponse实现
+&lt;/h2>&lt;p>HttpServletResponse接口相对简单一点，方法少一点，下面列举出部分方法的实现。&lt;/p>
+&lt;h3 id="header相关方法-1">Header相关方法
+&lt;/h3>&lt;p>这里的Header指响应头。&lt;code>NettyHttpServletResponse&lt;/code>的构造方法里传入了netty的&lt;code>HttpResponse&lt;/code>对象，默认的调用是传入一个200的正常HTTP响应。我们可以通过这个&lt;code>HttpResponse&lt;/code>对象的&lt;code>headers()&lt;/code>方法对响应头进行操作。具体代码如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Override&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">setDateHeader&lt;/span>(String name, &lt;span style="color:#fec418">long&lt;/span> date) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> response.&lt;span style="color:#06b6ef">headers&lt;/span>().&lt;span style="color:#06b6ef">set&lt;/span>(name, date);
@@ -606,8 +606,8 @@ data-flex-basis="600px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> response.&lt;span style="color:#06b6ef">headers&lt;/span>().&lt;span style="color:#06b6ef">add&lt;/span>(name, value);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="getnettyresponse方法">getNettyResponse()方法&lt;/h3>
-&lt;p>方法&lt;code>public HttpResponse getNettyResponse()&lt;/code>是我们自己定义的，用于响应输出流在写入时做的一些基本处理，主要是请求头的处理，具体代码如下：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="getnettyresponse方法">getNettyResponse()方法
+&lt;/h3>&lt;p>方法&lt;code>public HttpResponse getNettyResponse()&lt;/code>是我们自己定义的，用于响应输出流在写入时做的一些基本处理，主要是请求头的处理，具体代码如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 设置基本的请求头
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
@@ -643,13 +643,13 @@ data-flex-basis="600px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> response;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="session实现">Session实现&lt;/h2>
-&lt;p>Session相关的包括Session实现类&lt;code>NettyHttpSession&lt;/code>，Sessionn门面包装类&lt;code>NettyHttpSessionFacade&lt;/code>，以及Session管理器&lt;code>NettySessionManager&lt;/code>。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="session实现">Session实现
+&lt;/h2>&lt;p>Session相关的包括Session实现类&lt;code>NettyHttpSession&lt;/code>，Sessionn门面包装类&lt;code>NettyHttpSessionFacade&lt;/code>，以及Session管理器&lt;code>NettySessionManager&lt;/code>。&lt;br>
 门面类前面提及到了，构造的时候传入一个&lt;code>NettyHttpSession&lt;/code>实例并持有，所有&lt;code>HttpSession&lt;/code>接口的方法都调用&lt;code>NettyHttpSession&lt;/code>实例的对应方法去处理。&lt;br>
 Session管理器&lt;code>NettySessionManager&lt;/code>是单例，由&lt;code>NettyContext&lt;/code>实例持有，负责存储所有Session的映射，方便其他类根据SessionID去获取Session对象，提供创建新Session的方法，允许更新Session访问时间，同时定时清理过期的Session。&lt;br>
 每个&lt;code>NettyHttpSession&lt;/code>实例都持有&lt;code>NettySessionManager&lt;/code>的引用，实现了&lt;code>HttpSession&lt;/code>接口。&lt;/p>
-&lt;h3 id="nettyhttpsession">NettyHttpSession&lt;/h3>
-&lt;p>实现比较简单，Attribute由对象持有的HashMap进行存储，自身保存ID、创建时间、访问时间、生命周期等信息。
+&lt;h3 id="nettyhttpsession">NettyHttpSession
+&lt;/h3>&lt;p>实现比较简单，Attribute由对象持有的HashMap进行存储，自身保存ID、创建时间、访问时间、生命周期等信息。
 具体代码如下（部分过时的方法、简单的getter不列出）：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">NettyHttpSession&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> HttpSession, Serializable {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> String SESSION_COOKIE_NAME &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;JSESSIONID&amp;#34;&lt;/span>;
@@ -727,8 +727,8 @@ Session管理器&lt;code>NettySessionManager&lt;/code>是单例，由&lt;code>Ne
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> System.&lt;span style="color:#06b6ef">currentTimeMillis&lt;/span>() &lt;span style="color:#5bc4bf">-&lt;/span> creationTime &lt;span style="color:#5bc4bf">&amp;gt;=&lt;/span> interval &lt;span style="color:#5bc4bf">*&lt;/span> 1000;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="nettysessionmanager">NettySessionManager&lt;/h3>
-&lt;p>Session管理器没有现成的接口，因为比较简单所以也没抽出接口，自己在实现的过程中根据需求写了一些public方法：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="nettysessionmanager">NettySessionManager
+&lt;/h3>&lt;p>Session管理器没有现成的接口，因为比较简单所以也没抽出接口，自己在实现的过程中根据需求写了一些public方法：&lt;/p>
 &lt;ul>
 &lt;li>使用ConcurrentHashMap存储所有Session。&lt;/li>
 &lt;li>在构造的同时开启一个线程，每隔&lt;code>SESSION_LIFE_CHECK_INTER&lt;/code>毫秒扫描所有Session判断是否过期需要清除（有待优化，比如等待时间按最快过期的session的过期时间，或者记录预计下次需要处理的个数，减少遍历的数量）。&lt;/li>
@@ -808,15 +808,15 @@ Session管理器&lt;code>NettySessionManager&lt;/code>是单例，由&lt;code>Ne
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="可以改进的地方">可以改进的地方&lt;/h3>
-&lt;ul>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="可以改进的地方">可以改进的地方
+&lt;/h3>&lt;ul>
 &lt;li>Session持久化，包括可选的持久化时间间隔、shutdown自动持久化、startup自动读入。&lt;/li>
 &lt;li>Redis集中存储Session，便于服务集群使用&lt;/li>
 &lt;li>优化解析速度&lt;/li>
-&lt;/ul></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（三）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%89/</link><pubDate>Sun, 27 Aug 2017 08:52:03 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%89/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%89/yuyuko2.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（三）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现三">基于Netty的Spring Boot内置Servlet容器的实现（三）&lt;/h1>
-&lt;h2 id="embeddedservletcontainer实现">EmbeddedServletContainer实现&lt;/h2>
-&lt;h3 id="spring-boot启动过程与embeddedservletcontainer">Spring Boot启动过程与EmbeddedServletContainer&lt;/h3>
-&lt;p>一般来说，Spring Boot的应用如果使用内置Servlet容器单独运行，我们都会在main()方法中调用&lt;/p>
+&lt;/ul></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（三）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%89/</link><pubDate>Sun, 27 Aug 2017 08:52:03 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%89/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%89/yuyuko2.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（三）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现三">基于Netty的Spring Boot内置Servlet容器的实现（三）
+&lt;/h1>&lt;h2 id="embeddedservletcontainer实现">EmbeddedServletContainer实现
+&lt;/h2>&lt;h3 id="spring-boot启动过程与embeddedservletcontainer">Spring Boot启动过程与EmbeddedServletContainer
+&lt;/h3>&lt;p>一般来说，Spring Boot的应用如果使用内置Servlet容器单独运行，我们都会在main()方法中调用&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>SpringApplication.&lt;span style="color:#06b6ef">run&lt;/span>(Object source, String... args);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>方法。通过&lt;code>source&lt;/code>参数构造一个&lt;code>SpringApplication&lt;/code>对象再调用其&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> ConfigurableApplicationContext &lt;span style="color:#06b6ef">run&lt;/span>(String... args);
@@ -879,16 +879,16 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到他调用了私有方法&lt;code>startEmbeddedServletContainer()&lt;/code>启动容器，在这个方法里面，获取&lt;code>this.embeddedServletContainer&lt;/code>（就是我们本文要实现的&lt;code>NettyContainer&lt;/code>）然后执行其&lt;code>start()&lt;/code>方法，以启动内置Servlet容器。&lt;br>
 因此我们应该在&lt;code>EmbeddedServletContainer&lt;/code>实现类的&lt;code>start()&lt;/code>对Netty服务器进行初始化。&lt;/p>
-&lt;h3 id="nettycontainer">NettyContainer&lt;/h3>
-&lt;p>自己编写的内置Servlet容器需要实现&lt;code>EmbeddedServletContainer&lt;/code>接口，具体包括以下三个方法：&lt;/p>
+&lt;h3 id="nettycontainer">NettyContainer
+&lt;/h3>&lt;p>自己编写的内置Servlet容器需要实现&lt;code>EmbeddedServletContainer&lt;/code>接口，具体包括以下三个方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">interface&lt;/span> &lt;span style="color:#fec418">EmbeddedServletContainer&lt;/span> {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">start&lt;/span>() &lt;span style="color:#815ba4">throws&lt;/span> EmbeddedServletContainerException; &lt;span style="color:#776e71">//Spring Boot启动时调用&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">stop&lt;/span>() &lt;span style="color:#815ba4">throws&lt;/span> EmbeddedServletContainerException; &lt;span style="color:#776e71">//Spring Boot关闭时调用&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">getPort&lt;/span>(); &lt;span style="color:#776e71">//获取端口&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这几个方法的用途比较清晰明确了，接下来就是实现。&lt;/p>
-&lt;h4 id="构造方法">构造方法&lt;/h4>
-&lt;p>首先在之前写的&lt;code>EmbeddedNettyFactory&lt;/code>工厂类里面，需要调用将要写的&lt;code>EmbeddedNettyFactory&lt;/code>的构造方法，并将必要的参数传入其构造方法，比如端口号、以及已经i初始化完毕的ServletContext实例。
+&lt;h4 id="构造方法">构造方法
+&lt;/h4>&lt;p>首先在之前写的&lt;code>EmbeddedNettyFactory&lt;/code>工厂类里面，需要调用将要写的&lt;code>EmbeddedNettyFactory&lt;/code>的构造方法，并将必要的参数传入其构造方法，比如端口号、以及已经i初始化完毕的ServletContext实例。
 构造方法：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> InetSocketAddress address; &lt;span style="color:#776e71">//监听端口地址&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> NettyContext context; &lt;span style="color:#776e71">//Context&lt;/span>
@@ -908,8 +908,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">getPort&lt;/span>() {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> address.&lt;span style="color:#06b6ef">getPort&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="start">start()&lt;/h4>
-&lt;p>通过以上的分析，我们知道&lt;code>EmbeddedServletContainer&lt;/code>的&lt;code>start()&lt;/code>是由&lt;code>AbstractApplicationContext.refresh()&lt;/code>模板方法负责调用启动的，我们应该在这个方法里面初始化Netty服务器。Netty的启动大家应该比较清楚了，无非就是设置两个&lt;code>EventLoopGroup&lt;/code>用于处理请求的获取与读写，并设置&lt;code>Pipeline&lt;/code>上的&lt;code>Handler&lt;/code>，最后绑定端口，启动服务。以下是具体实现的代码：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="start">start()
+&lt;/h4>&lt;p>通过以上的分析，我们知道&lt;code>EmbeddedServletContainer&lt;/code>的&lt;code>start()&lt;/code>是由&lt;code>AbstractApplicationContext.refresh()&lt;/code>模板方法负责调用启动的，我们应该在这个方法里面初始化Netty服务器。Netty的启动大家应该比较清楚了，无非就是设置两个&lt;code>EventLoopGroup&lt;/code>用于处理请求的获取与读写，并设置&lt;code>Pipeline&lt;/code>上的&lt;code>Handler&lt;/code>，最后绑定端口，启动服务。以下是具体实现的代码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Override&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">start&lt;/span>() &lt;span style="color:#815ba4">throws&lt;/span> EmbeddedServletContainerException {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> servletContext.&lt;span style="color:#06b6ef">setInitialised&lt;/span>(&lt;span style="color:#815ba4">false&lt;/span>);
@@ -954,8 +954,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log.&lt;span style="color:#06b6ef">info&lt;/span>(servletContext.&lt;span style="color:#06b6ef">getServerInfo&lt;/span>() &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#48b685">&amp;#34; started on port: &amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> getPort());
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>这里有两个&lt;code>Handler&lt;/code>类是我们实现的——&lt;code>ServletContentHandler&lt;/code>和&lt;code>RequestDispatcherHandler&lt;/code>，我们将在后面讲解。&lt;/p>
-&lt;h4 id="stop">stop()&lt;/h4>
-&lt;p>在&lt;code>stop()&lt;/code>方法里应该关闭在&lt;code>start()&lt;/code>方法中开启的资源，以便Spring Boot关闭，防止资源/内存泄漏：&lt;/p>
+&lt;h4 id="stop">stop()
+&lt;/h4>&lt;p>在&lt;code>stop()&lt;/code>方法里应该关闭在&lt;code>start()&lt;/code>方法中开启的资源，以便Spring Boot关闭，防止资源/内存泄漏：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Override&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">stop&lt;/span>() &lt;span style="color:#815ba4">throws&lt;/span> EmbeddedServletContainerException {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> {
@@ -972,9 +972,9 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">throw&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> EmbeddedServletContainerException(&lt;span style="color:#48b685">&amp;#34;Container stop interrupted&amp;#34;&lt;/span>, e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="netty服务设计">Netty服务设计&lt;/h2>
-&lt;h3 id="设计思路">设计思路&lt;/h3>
-&lt;p>看过Tomcat之类Servlet容器的源码的话，应该对Servleti容器设计有一点概念。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="netty服务设计">Netty服务设计
+&lt;/h2>&lt;h3 id="设计思路">设计思路
+&lt;/h3>&lt;p>看过Tomcat之类Servlet容器的源码的话，应该对Servleti容器设计有一点概念。&lt;/p>
 &lt;ol>
 &lt;li>首先我们需要通过Socket，处理HTTP连接，获取请求的数据，这一块可通过netty的API进行。&lt;/li>
 &lt;li>然后对接收到的数据进行解析封装成&lt;code>HttpServletRequest&lt;/code>和&lt;code>HttpServletResponse&lt;/code>对象，这一块需要netty自带的http解码编码器，并自定义Handler来i实现。&lt;/li>
@@ -985,8 +985,8 @@ data-flex-basis="448px"
 &lt;li>HTTP编码响应返回。&lt;/li>
 &lt;li>容器关闭的时候，调用所有已注册的Servlet的&lt;code>destroy()&lt;/code>方法，并关闭打开的资源。&lt;/li>
 &lt;/ol>
-&lt;h3 id="自定义netty的handler处理请求响应">自定义Netty的Handler处理请求响应&lt;/h3>
-&lt;p>根据前面的分析，我们的netty服务需要三个Handler，其中HTTP解码编码的有现成的&lt;code>HttpServerCodec&lt;/code>，另外两个则需要我们自己实现。&lt;br>
+&lt;h3 id="自定义netty的handler处理请求响应">自定义Netty的Handler处理请求响应
+&lt;/h3>&lt;p>根据前面的分析，我们的netty服务需要三个Handler，其中HTTP解码编码的有现成的&lt;code>HttpServerCodec&lt;/code>，另外两个则需要我们自己实现。&lt;br>
 首先是对请求进行封装的Handler， 功能：&lt;/p>
 &lt;ul>
 &lt;li>channel激活时， 开启一个新的输入流&lt;/li>
@@ -1054,10 +1054,10 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> logger.&lt;span style="color:#06b6ef">error&lt;/span>(&lt;span style="color:#48b685">&amp;#34;Unexpected exception caught during request&amp;#34;&lt;/span>, cause);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ctx.&lt;span style="color:#06b6ef">close&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（二）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</link><pubDate>Thu, 24 Aug 2017 17:43:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/sanae.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（二）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现二">基于Netty的Spring Boot内置Servlet容器的实现（二）&lt;/h1>
-&lt;h2 id="实现servlet-context接口">实现Servlet Context接口&lt;/h2>
-&lt;h3 id="servlet-context接口简介">Servlet Context接口简介&lt;/h3>
-&lt;p>接口&lt;code>ServletContext&lt;/code>定义了一系列方法用于与相应的servlet容器通信，比如：获得文件的MIME类型，分派请求，或者是向日志文件写日志等。每一个web-app只能有一个&lt;code>ServletContext&lt;/code>，webapp可以是一个放置有web application 文件的文件夹，也可以是一个.war的文件。&lt;code>ServletContext&lt;/code>对象包含在&lt;code>ServletConfig&lt;/code>对象之中，&lt;code>ServletConfig&lt;/code>对象在servlet初始化时提供servlet对象。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（二）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</link><pubDate>Thu, 24 Aug 2017 17:43:37 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%8C/sanae.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（二）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现二">基于Netty的Spring Boot内置Servlet容器的实现（二）
+&lt;/h1>&lt;h2 id="实现servlet-context接口">实现Servlet Context接口
+&lt;/h2>&lt;h3 id="servlet-context接口简介">Servlet Context接口简介
+&lt;/h3>&lt;p>接口&lt;code>ServletContext&lt;/code>定义了一系列方法用于与相应的servlet容器通信，比如：获得文件的MIME类型，分派请求，或者是向日志文件写日志等。每一个web-app只能有一个&lt;code>ServletContext&lt;/code>，webapp可以是一个放置有web application 文件的文件夹，也可以是一个.war的文件。&lt;code>ServletContext&lt;/code>对象包含在&lt;code>ServletConfig&lt;/code>对象之中，&lt;code>ServletConfig&lt;/code>对象在servlet初始化时提供servlet对象。
 接口&lt;code>ServletContext&lt;/code>定义的方法比较多，大致可以分为：添加和配置Servlet、添加和配置Filter、添加和配置Listener、添加Servlet、Filter和Listener的注解处理需求、初始化参数、Context属性、资源获取等几大类方法。&lt;br>
 具体可以参考：&lt;/p>
 &lt;ul>
@@ -1066,8 +1066,8 @@ data-flex-basis="448px"
 &lt;li>&lt;a class="link" href="https://waylau.gitbooks.io/servlet-3-1-specification/docs/Servlet%20Context/4.1%20Introduction%20to%20the%20ServletContext%20Interface.html" target="_blank" rel="noopener"
 >中文翻译的文档 ServletContext 接口介绍&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;h3 id="实现">实现&lt;/h3>
-&lt;p>实现的思想：&lt;/p>
+&lt;h3 id="实现">实现
+&lt;/h3>&lt;p>实现的思想：&lt;/p>
 &lt;ul>
 &lt;li>不处理的：InitParameter相关的方法、Listener相关方法——目前用不到&lt;/li>
 &lt;li>以后处理的：Session Cookie相关的方法等待实现&lt;/li>
@@ -1311,8 +1311,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">//TODO 暂不支持Listener，现在很少用了吧&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url-pattrn匹配查找">URL Pattrn匹配查找&lt;/h3>
-&lt;p>参考Tomcat源码，设计了一个&lt;code>RequestUrlPatternMapper&lt;/code>类用于保存，计算URL-pattern与请求路径的匹配关系。在&lt;code>NettyContext&lt;/code>的&lt;code>public RequestDispatcher getRequestDispatcher(String path)&lt;/code>方法中可以看到对其的调用，传入请求的路径，返回对应处理的Servlet名称。此外在&lt;code>NettyContext&lt;/code>的&lt;code> public void addServletMapping(String urlPattern, String name, Servlet servlet)&lt;/code>方法中也调用该类，增加新的Servlet映射。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url-pattrn匹配查找">URL Pattrn匹配查找
+&lt;/h3>&lt;p>参考Tomcat源码，设计了一个&lt;code>RequestUrlPatternMapper&lt;/code>类用于保存，计算URL-pattern与请求路径的匹配关系。在&lt;code>NettyContext&lt;/code>的&lt;code>public RequestDispatcher getRequestDispatcher(String path)&lt;/code>方法中可以看到对其的调用，传入请求的路径，返回对应处理的Servlet名称。此外在&lt;code>NettyContext&lt;/code>的&lt;code> public void addServletMapping(String urlPattern, String name, Servlet servlet)&lt;/code>方法中也调用该类，增加新的Servlet映射。&lt;br>
 增加映射的时候，先后判断：&lt;/p>
 &lt;ol>
 &lt;li>路径匹配&lt;/li>
@@ -1587,8 +1587,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> redirectPath &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="再次启动">再次启动&lt;/h2>
-&lt;p>现在ServletContext有了，再次启动，不再报错了。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="再次启动">再次启动
+&lt;/h2>&lt;p>现在ServletContext有了，再次启动，不再报错了。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>::: Using Embedded Netty Servlet &lt;span style="color:#06b6ef">Container&lt;/span> (version:) ::: &lt;span style="color:#ef6155">＼&lt;/span>(&lt;span style="color:#5bc4bf">^&lt;/span>O&lt;span style="color:#5bc4bf">^&lt;/span>)&lt;span style="color:#ef6155">／&lt;/span> Spring&lt;span style="color:#5bc4bf">-&lt;/span>Boot 1.&lt;span style="color:#06b6ef">5&lt;/span>.&lt;span style="color:#06b6ef">2&lt;/span>.&lt;span style="color:#06b6ef">RELEASE&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2017&lt;span style="color:#5bc4bf">-&lt;/span>08&lt;span style="color:#5bc4bf">-&lt;/span>25 22:08:33.&lt;span style="color:#06b6ef">019&lt;/span> INFO 17565 &lt;span style="color:#5bc4bf">---&lt;/span> &lt;span style="color:#5bc4bf">[&lt;/span> main&lt;span style="color:#5bc4bf">]&lt;/span> io.&lt;span style="color:#06b6ef">gitlab&lt;/span>.&lt;span style="color:#06b6ef">leibnizhu&lt;/span>.&lt;span style="color:#06b6ef">sbnetty&lt;/span>.&lt;span style="color:#06b6ef">TestWebApp&lt;/span> : Starting TestWebApp on XPS13 with PID 17565
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#ef6155">………………&lt;/span>
@@ -1601,16 +1601,16 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可是…………好像有点不对劲……&lt;br>
 启动之后过一会儿就自动关了。&lt;br>
 原因很简单，在&lt;code>EmbeddedNettyFactory&lt;/code>类里面，我们还没返回真正的&lt;code>EmbeddedServletContainer&lt;/code>实现类，而只是返回null，所以Spring没有Servlet容器可用，也就只能关闭啦。&lt;br>
-我们将在下一篇文章里讨论如何实现&lt;code>EmbeddedServletContainer&lt;/code>——与netty结合最紧密的地方。&lt;/p></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（一）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%80/</link><pubDate>Thu, 24 Aug 2017 14:30:11 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%80/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%80/yuyuko.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（一）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现一">基于Netty的Spring Boot内置Servlet容器的实现（一）&lt;/h1>
-&lt;h2 id="前言">前言&lt;/h2>
-&lt;p>Spring Boot有Tomcat、Jetty和undertow三种内置Servlet容器，默认使用Tomcat。&lt;br>
+我们将在下一篇文章里讨论如何实现&lt;code>EmbeddedServletContainer&lt;/code>——与netty结合最紧密的地方。&lt;/p></description></item><item><title>基于Netty的Spring Boot内置Servlet容器的实现（一）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%80/</link><pubDate>Thu, 24 Aug 2017 14:30:11 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%80/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%80/yuyuko.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（一）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现一">基于Netty的Spring Boot内置Servlet容器的实现（一）
+&lt;/h1>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Spring Boot有Tomcat、Jetty和undertow三种内置Servlet容器，默认使用Tomcat。&lt;br>
 一般来说已经够用了，但当Spring Boot用于高并发微服务的时候，可能并不够用，而且tomcat的资源占用在这种情况下说不上轻量化了。于是萌生了自己实现一个Spring Boot的Netty Servlet容器的想法。&lt;br>
 接下来可能会有几篇文章关于这个的，相应的代码也在开发之中，放在&lt;a class="link" href="https://gitlab.com/leibnizhu/spring-boot-starter-netty" target="_blank" rel="noopener"
 >Gitlab&lt;/a> 和 &lt;a class="link" href="https://github.com/Leibnizhu/spring-boot-starter-netty" target="_blank" rel="noopener"
 >GitHub&lt;/a>里。&lt;/p>
-&lt;h2 id="需要完成的任务">需要完成的任务&lt;/h2>
-&lt;h3 id="实现servlet容器">实现Servlet容器&lt;/h3>
-&lt;p>Servlet规范有以下几个核心类(接口)：&lt;/p>
+&lt;h2 id="需要完成的任务">需要完成的任务
+&lt;/h2>&lt;h3 id="实现servlet容器">实现Servlet容器
+&lt;/h3>&lt;p>Servlet规范有以下几个核心类(接口)：&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>ServletContext&lt;/code>：定义了一些可以和Servlet Container交互的方法。&lt;/li>
 &lt;li>&lt;code>Registration&lt;/code>：实现Filter和Servlet的动态注册。&lt;/li>
@@ -1623,10 +1623,10 @@ data-flex-basis="448px"
 &lt;/ul>
 &lt;p>我们想要实现一个Servlet容器，不管是要重头实现一个类似tomcat的容器，还是要实现一个Spring Boot内置Servlet容器，都需要实现以上接口。&lt;br>
 我们的任务就是利用Netty的API实现以上接口。&lt;/p>
-&lt;h3 id="实现spring-boot内置servlet容器接口">实现Spring Boot内置Servlet容器接口&lt;/h3>
-&lt;p>具体来说，就是要实现&lt;code>EmbeddedServletContainer&lt;/code>接口，同时实现一个配置类，配置Spring Boot在哪些情况下启动我们的Netty Servlet容器。&lt;/p>
-&lt;h3 id="编写测试类方法">编写测试类/方法&lt;/h3>
-&lt;p>需要测试以下内容:&lt;/p>
+&lt;h3 id="实现spring-boot内置servlet容器接口">实现Spring Boot内置Servlet容器接口
+&lt;/h3>&lt;p>具体来说，就是要实现&lt;code>EmbeddedServletContainer&lt;/code>接口，同时实现一个配置类，配置Spring Boot在哪些情况下启动我们的Netty Servlet容器。&lt;/p>
+&lt;h3 id="编写测试类方法">编写测试类/方法
+&lt;/h3>&lt;p>需要测试以下内容:&lt;/p>
 &lt;ul>
 &lt;li>基本的SpringMVC功能，如请求分发、响应是否正常&lt;/li>
 &lt;li>异步请求&lt;/li>
@@ -1637,18 +1637,18 @@ data-flex-basis="448px"
 &lt;li>与内置Tomcat、Jetty的性能对比&lt;/li>
 &lt;li>…………&lt;/li>
 &lt;/ul>
-&lt;h2 id="参考">参考&lt;/h2>
-&lt;p>感谢以下项目/博文的作者：&lt;/p>
+&lt;h2 id="参考">参考
+&lt;/h2>&lt;p>感谢以下项目/博文的作者：&lt;/p>
 &lt;ul>
 &lt;li>&lt;a class="link" href="https://fangjian0423.github.io/2017/05/22/springboot-embedded-servlet-container/" target="_blank" rel="noopener"
 >SpringBoot源码分析之内置Servlet容器&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://github.com/DanielThomas/spring-boot-starter-netty" target="_blank" rel="noopener"
 >Github DanielThomas/spring-boot-starter-netty&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;h2 id="现在开始">现在开始&lt;/h2>
-&lt;p>首先创建一个Maven项目。&lt;/p>
-&lt;h3 id="maven依赖">Maven依赖&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
+&lt;h2 id="现在开始">现在开始
+&lt;/h2>&lt;p>首先创建一个Maven项目。&lt;/p>
+&lt;h3 id="maven依赖">Maven依赖
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;project&lt;/span> &lt;span style="color:#06b6ef">xmlns=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">xmlns:xsi=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#06b6ef">xsi:schemaLocation=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;modelVersion&amp;gt;&lt;/span>4.0.0&lt;span style="color:#5bc4bf">&amp;lt;/modelVersion&amp;gt;&lt;/span>
@@ -1713,8 +1713,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 省略 --&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/build&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/project&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="web应用测试类">Web应用测试类&lt;/h3>
-&lt;p>我们直接在test包里创建一个SpringBoot应用，暂时先覆盖最基本的SpringMVC使用。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="web应用测试类">Web应用测试类
+&lt;/h3>&lt;p>我们直接在test包里创建一个SpringBoot应用，暂时先覆盖最基本的SpringMVC使用。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">io.gitlab.leibnizhu.sbnetty&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Controller&lt;/span>
@@ -1766,8 +1766,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="实现embeddedservletcontainerfactory接口">实现EmbeddedServletContainerFactory接口&lt;/h3>
-&lt;p>直接启动，提示缺少&lt;code>EmbeddedServletContainerFactory&lt;/code>Bean：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="实现embeddedservletcontainerfactory接口">实现EmbeddedServletContainerFactory接口
+&lt;/h3>&lt;p>直接启动，提示缺少&lt;code>EmbeddedServletContainerFactory&lt;/code>Bean：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>org.&lt;span style="color:#06b6ef">springframework&lt;/span>.&lt;span style="color:#06b6ef">context&lt;/span>.&lt;span style="color:#06b6ef">ApplicationContextException&lt;/span>: Unable to start embedded container; nested exception is org.&lt;span style="color:#06b6ef">springframework&lt;/span>.&lt;span style="color:#06b6ef">context&lt;/span>.&lt;span style="color:#06b6ef">ApplicationContextException&lt;/span>: Unable to start EmbeddedWebApplicationContext due to missing EmbeddedServletContainerFactory bean.
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Spring Boot会查找EmbeddedServletContainerFactory接口的实现类(工厂类)，调用其getEmbeddedServletContainer()方法，来获取web应用的容器。
 所以我们要实现这个接口，这里不直接实现，而是通过继承AbstractEmbeddedServletContainerFactory类来实现。
@@ -1820,8 +1820,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>现在&lt;code>ServletContext&lt;/code>和&lt;code>EmbeddedServletContainer&lt;/code>接口还没实现，先用null代替。&lt;/p>
-&lt;h3 id="配置spring-boot启动自定义servlet容器">配置Spring Boot启动自定义Servlet容器&lt;/h3>
-&lt;p>就这样直接启动测试Web应用是不行的，因为这个&lt;code>EmbeddedNettyFactory&lt;/code>并没有被Spring加载。&lt;br>
+&lt;h3 id="配置spring-boot启动自定义servlet容器">配置Spring Boot启动自定义Servlet容器
+&lt;/h3>&lt;p>就这样直接启动测试Web应用是不行的，因为这个&lt;code>EmbeddedNettyFactory&lt;/code>并没有被Spring加载。&lt;br>
 想被Spring加载很简单，类加&lt;code>@Component&lt;/code>之类的注解就行，但这样集成在任何环境中都会加载，可能引起端口冲突。&lt;br>
 所以我们还要写一个配置类，配置Spring什么时候去加载&lt;code>EmbeddedNettyFactory&lt;/code>，具体如下，注释里写得比较清楚了：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">io.gitlab.leibnizhu.sbnetty.bootstrap&lt;/span>;
@@ -1849,8 +1849,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="再次启动">再次启动&lt;/h3>
-&lt;p>这样子是启动不了的，但启动报错信息已经改了，变成：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="再次启动">再次启动
+&lt;/h3>&lt;p>这样子是启动不了的，但启动报错信息已经改了，变成：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>2017&lt;span style="color:#5bc4bf">-&lt;/span>08&lt;span style="color:#5bc4bf">-&lt;/span>24 14:20:25.&lt;span style="color:#06b6ef">660&lt;/span> ERROR 16708 &lt;span style="color:#5bc4bf">---&lt;/span> &lt;span style="color:#5bc4bf">[&lt;/span> main&lt;span style="color:#5bc4bf">]&lt;/span> o.&lt;span style="color:#06b6ef">s&lt;/span>.&lt;span style="color:#06b6ef">boot&lt;/span>.&lt;span style="color:#06b6ef">SpringApplication&lt;/span> : Application startup failed
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>org.&lt;span style="color:#06b6ef">springframework&lt;/span>.&lt;span style="color:#06b6ef">context&lt;/span>.&lt;span style="color:#06b6ef">ApplicationContextException&lt;/span>: Unable to start embedded container; nested exception is java.&lt;span style="color:#06b6ef">lang&lt;/span>.&lt;span style="color:#06b6ef">NullPointerException&lt;/span>
@@ -1865,11 +1865,11 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at io.&lt;span style="color:#06b6ef">gitlab&lt;/span>.&lt;span style="color:#06b6ef">leibnizhu&lt;/span>.&lt;span style="color:#06b6ef">sbnetty&lt;/span>.&lt;span style="color:#06b6ef">TestWebApp&lt;/span>.&lt;span style="color:#06b6ef">main&lt;/span>(TestWebApp.&lt;span style="color:#06b6ef">java&lt;/span>:102) &lt;span style="color:#5bc4bf">[&lt;/span>test&lt;span style="color:#5bc4bf">-&lt;/span>classes&lt;span style="color:#5bc4bf">/&lt;/span>:na&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Caused by: java.&lt;span style="color:#06b6ef">lang&lt;/span>.&lt;span style="color:#06b6ef">NullPointerException&lt;/span>: &lt;span style="color:#815ba4">null&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>因为SpringBoot在启动的时候，&lt;code>SpringApplication&lt;/code>会调用&lt;code>refresh(context)&lt;/code>方法进行初始化动作，而我们的context传入了null，当然报空指针异常了。&lt;br>
-我们将在下一篇文章再讨论怎么实现这个。&lt;/p></description></item><item><title>Spring Boot快速入门（四）——日志系统</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</link><pubDate>Sat, 26 Nov 2016 16:00:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</guid><description>&lt;h2 id="日志系统">日志系统&lt;/h2>
-&lt;h3 id="简介">简介&lt;/h3>
-&lt;p>Spring Boot默认使用的Apache的Common Logging日志系统，但同时也提供了Java Util Logging, Log4J, Log4J2和Logback等日志系统的支持（无需额外增加依赖）。&lt;/p>
-&lt;h3 id="日志格式">日志格式&lt;/h3>
-&lt;p>Spring Boot默认输出的日志各列含义如下：&lt;/p>
+我们将在下一篇文章再讨论怎么实现这个。&lt;/p></description></item><item><title>Spring Boot快速入门（四）——日志系统</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</link><pubDate>Sat, 26 Nov 2016 16:00:08 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E5%9B%9B%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/</guid><description>&lt;h2 id="日志系统">日志系统
+&lt;/h2>&lt;h3 id="简介">简介
+&lt;/h3>&lt;p>Spring Boot默认使用的Apache的Common Logging日志系统，但同时也提供了Java Util Logging, Log4J, Log4J2和Logback等日志系统的支持（无需额外增加依赖）。&lt;/p>
+&lt;h3 id="日志格式">日志格式
+&lt;/h3>&lt;p>Spring Boot默认输出的日志各列含义如下：&lt;/p>
 &lt;ul>
 &lt;li>日期和时间 - 精确到毫秒，且易于排序。&lt;/li>
 &lt;li>日志级别 - ERROR, WARN, INFO, DEBUG 或 TRACE。&lt;/li>
@@ -1886,8 +1886,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.698 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.e.ServletRegistrationBean : Mapping servlet: &lt;span style="color:#48b685">&amp;#39;dispatcherServlet&amp;#39;&lt;/span> to &lt;span style="color:#5bc4bf">[&lt;/span>/&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2014-03-05 10:57:51.702 INFO &lt;span style="color:#f99b15">45469&lt;/span> --- &lt;span style="color:#5bc4bf">[&lt;/span>ost-startStop-1&lt;span style="color:#5bc4bf">]&lt;/span> o.s.b.c.embedded.FilterRegistrationBean : Mapping filter: &lt;span style="color:#48b685">&amp;#39;hiddenHttpMethodFilter&amp;#39;&lt;/span> to: &lt;span style="color:#5bc4bf">[&lt;/span>/*&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以在resources/application.properties中使用logging.pattern.console和logging.pattern.file属性进行配置。&lt;/p>
-&lt;h3 id="日志配置">日志配置&lt;/h3>
-&lt;p>可以在&lt;strong>resources/application.properties&lt;/strong> 中进行配置，如下：&lt;/p>
+&lt;h3 id="日志配置">日志配置
+&lt;/h3>&lt;p>可以在&lt;strong>resources/application.properties&lt;/strong> 中进行配置，如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>###日志配置###
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#日志输出级别
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>logging.level.root=INFO
@@ -1902,8 +1902,8 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36}[%line]=&amp;gt; %msg%n
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#定义输出到文件的样式（不支持JDK Logger）
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>#logging.pattern.file=
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="日志api调用">日志API调用&lt;/h3>
-&lt;p>类似Log4j：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="日志api调用">日志API调用
+&lt;/h3>&lt;p>类似Log4j：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.Log&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.apache.commons.logging.LogFactory&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -1915,23 +1915,23 @@ data-flex-basis="448px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">……&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他相关网站">其他相关网站&lt;/h2>
-&lt;p>Spring Boot相关博客：&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="其他相关网站">其他相关网站
+&lt;/h2>&lt;p>Spring Boot相关博客：&lt;br>
 &lt;a class="link" href="http://blog.didispace.com/categories/Spring-Boot/" target="_blank" rel="noopener"
 >http://blog.didispace.com/categories/Spring-Boot/&lt;/a>&lt;br>
 Thymeleaf相关博客：&lt;br>
 &lt;a class="link" href="http://www.cnblogs.com/vinphy/p/4674247.html" target="_blank" rel="noopener"
 >http://www.cnblogs.com/vinphy/p/4674247.html&lt;/a>&lt;br>
 &lt;a class="link" href="http://www.jianshu.com/p/ed9d47f92e37" target="_blank" rel="noopener"
->http://www.jianshu.com/p/ed9d47f92e37&lt;/a>&lt;/p></description></item><item><title>Spring Boot快速入门（三）——使用Thymeleaf模板引擎</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</link><pubDate>Sat, 26 Nov 2016 15:59:27 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</guid><description>&lt;h1 id="使用thymeleaf模板引擎">使用Thymeleaf模板引擎&lt;/h1>
-&lt;h2 id="thymeleaf简介">Thymeleaf简介&lt;/h2>
-&lt;p>Thymeleaf是一个XML/XHTML/HTML5模板引擎，可用于Web与非Web环境中的应用开发。它是一个开源的Java库，基于Apache License 2.0许可。&lt;br>
+>http://www.jianshu.com/p/ed9d47f92e37&lt;/a>&lt;/p></description></item><item><title>Spring Boot快速入门（三）——使用Thymeleaf模板引擎</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</link><pubDate>Sat, 26 Nov 2016 15:59:27 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/</guid><description>&lt;h1 id="使用thymeleaf模板引擎">使用Thymeleaf模板引擎
+&lt;/h1>&lt;h2 id="thymeleaf简介">Thymeleaf简介
+&lt;/h2>&lt;p>Thymeleaf是一个XML/XHTML/HTML5模板引擎，可用于Web与非Web环境中的应用开发。它是一个开源的Java库，基于Apache License 2.0许可。&lt;br>
 Thymeleaf提供了一个用于整合Spring MVC的可选模块，在应用开发中，你可以使用Thymeleaf来完全代替JSP或其他模板引擎，如Velocity、FreeMarker等。Thymeleaf的主要目标在于提供一种可被浏览器正确显示的、格式良好的模板创建方式，&lt;strong>因此也可以用作静态建模&lt;/strong> 。你可以使用它创建经过验证的XML与HTML模板。相对于编写逻辑或代码，开发者只需将标签属性添加到模板中即可。&lt;br>
 Thymeleaf主要通过HTML的标签属性渲染标签内容，浏览器在解析html时，当检查到Thymeleaf的属性时候会忽略，所以Thymeleaf的模板可以通过浏览器直接打开展现，这样非常&lt;strong>有利于前后端的分离&lt;/strong> 。&lt;/p>
-&lt;h2 id="添加依赖">添加依赖&lt;/h2>
-&lt;p>添加模板引擎的依赖，可以在IntelliJ IDEA创建Spring Boot项目的时候选择对应的依赖，也可以在后期手动修改pom.xml文件增加依赖。&lt;/p>
-&lt;h3 id="intellij-idea创建spring-boot项目时增加">IntelliJ IDEA创建Spring Boot项目时增加&lt;/h3>
-&lt;p>在选择依赖的界面，点击左边的“Template Engine”，在中间选择所需的模板引擎即可。&lt;br>
+&lt;h2 id="添加依赖">添加依赖
+&lt;/h2>&lt;p>添加模板引擎的依赖，可以在IntelliJ IDEA创建Spring Boot项目的时候选择对应的依赖，也可以在后期手动修改pom.xml文件增加依赖。&lt;/p>
+&lt;h3 id="intellij-idea创建spring-boot项目时增加">IntelliJ IDEA创建Spring Boot项目时增加
+&lt;/h3>&lt;p>在选择依赖的界面，点击左边的“Template Engine”，在中间选择所需的模板引擎即可。&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/6.png"
 width="870"
 height="550"
@@ -1941,15 +1941,15 @@ class="gallery-image"
 data-flex-grow="158"
 data-flex-basis="379px"
 >&lt;/p>
-&lt;h3 id="手动修改pomxml">手动修改pom.xml&lt;/h3>
-&lt;p>以Thymeleaf为例，修改pom.xml增加以下依赖：&lt;/p>
+&lt;h3 id="手动修改pomxml">手动修改pom.xml
+&lt;/h3>&lt;p>以Thymeleaf为例，修改pom.xml增加以下依赖：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>spring-boot-starter-thymeleaf&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可在resources/application.properties中对Thymeleaf进行配置。&lt;/p>
-&lt;h2 id="目录结构">目录结构&lt;/h2>
-&lt;p>Thymeleaf默认将模板放在resources/templates目录下（可以通过application.properties文件进行配置，但建议保持默认值方便管理）；同时，Spring Boot默认将静态资源放在resources/static（从根路径访问），于是，经典的目录结构是这样的：&lt;br>
+&lt;h2 id="目录结构">目录结构
+&lt;/h2>&lt;p>Thymeleaf默认将模板放在resources/templates目录下（可以通过application.properties文件进行配置，但建议保持默认值方便管理）；同时，Spring Boot默认将静态资源放在resources/static（从根路径访问），于是，经典的目录结构是这样的：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%89%E4%BD%BF%E7%94%A8Thymeleaf%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E/7.png"
 width="225"
 height="108"
@@ -1960,8 +1960,8 @@ data-flex-grow="208"
 data-flex-basis="500px"
 >&lt;br>
 其中640-100.jpg的访问路径为http://127.0.0.1:8080/640-100.jpg。&lt;/p>
-&lt;h2 id="模板demo">模板Demo&lt;/h2>
-&lt;p>在resources/templates目录下新建temp.html，内容如下：&lt;/p>
+&lt;h2 id="模板demo">模板Demo
+&lt;/h2>&lt;p>在resources/templates目录下新建temp.html，内容如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!DOCTYPE html&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">html&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">head&lt;/span> &lt;span style="color:#06b6ef">lang&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;en&amp;#34;&lt;/span>&amp;gt;
@@ -2006,42 +2006,42 @@ data-flex-grow="593"
 data-flex-basis="1424px"
 >&lt;br>
 可以看到，前端开发人员可以直接修改html并直接观察修改后的效果，修改时并不影响Thymeleaf的代码，因此可以方便前后端协同开发。&lt;/p>
-&lt;h2 id="thymeleaf简单表达式">Thymeleaf简单表达式&lt;/h2>
-&lt;h3 id="变量表达式-">变量表达式 ${……}&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">name&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;userName&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;James Carrot&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user.name}&amp;#34;&lt;/span> /&amp;gt;
+&lt;h2 id="thymeleaf简单表达式">Thymeleaf简单表达式
+&lt;/h2>&lt;h3 id="变量表达式-">变量表达式 ${……}
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">name&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;userName&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;James Carrot&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:value&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user.name}&amp;#34;&lt;/span> /&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>上述代码为引用user对象的name属性值。&lt;/p>
-&lt;h3 id="选择星号表达式-">选择/星号表达式 *{……}&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">div&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${session.user}&amp;#34;&lt;/span>&amp;gt;
+&lt;h3 id="选择星号表达式-">选择/星号表达式 *{……}
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">div&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${session.user}&amp;#34;&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;Nationality:
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">span&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{nationality}&amp;#34;&lt;/span>&amp;gt;Saturn&amp;lt;/&lt;span style="color:#5bc4bf">span&lt;/span>&amp;gt;.
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">div&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>选择表达式一般跟在th:object后，直接取object中的属性。&lt;/p>
-&lt;h3 id="文字国际化表达式-">文字国际化表达式 #{……}&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:utext&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;#{home.welcome}&amp;#34;&lt;/span>&amp;gt;Welcome to our grocery store!&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url表达式-">URL表达式 @{……}&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">a&lt;/span> &lt;span style="color:#06b6ef">href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;details.html&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/order/details(orderId=${o.id})}&amp;#34;&lt;/span>&amp;gt;view&amp;lt;/&lt;span style="color:#5bc4bf">a&lt;/span>&amp;gt;
+&lt;h3 id="文字国际化表达式-">文字国际化表达式 #{……}
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:utext&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;#{home.welcome}&amp;#34;&lt;/span>&amp;gt;Welcome to our grocery store!&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="url表达式-">URL表达式 @{……}
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">a&lt;/span> &lt;span style="color:#06b6ef">href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;details.html&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/order/details(orderId=${o.id})}&amp;#34;&lt;/span>&amp;gt;view&amp;lt;/&lt;span style="color:#5bc4bf">a&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>@{……}支持决定路径和相对路径。其中相对路径又支持跨上下文调用url和协议的引用。
 当URL为后台传出的参数时，代码如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">img&lt;/span> &lt;span style="color:#06b6ef">src&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;../../static/assets/images/qr-code.jpg&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:src&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{${path}}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">alt&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;二维码&amp;#34;&lt;/span> /&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf常用标签">Thymeleaf常用标签&lt;/h2>
-&lt;h3 id="简单数据转换数字日期">简单数据转换（数字，日期）&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;价格&amp;lt;/&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf常用标签">Thymeleaf常用标签
+&lt;/h2>&lt;h3 id="简单数据转换数字日期">简单数据转换（数字，日期）
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;价格&amp;lt;/&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${#numbers.formatDecimal(product.price, 1, 2)}&amp;#34;&lt;/span>&amp;gt;180&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;进货日期&amp;lt;/&lt;span style="color:#5bc4bf">dt&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${#dates.format(product.availableFrom, &amp;#39;yyyy-MM-dd&amp;#39;)}&amp;#34;&lt;/span>&amp;gt;2014-12-01&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="字符串拼接">字符串拼接&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${&amp;#39;$&amp;#39;+product.price}&amp;#34;&lt;/span>&amp;gt;235&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="表单">表单&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">form&lt;/span> &lt;span style="color:#06b6ef">th:action&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/bb}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="字符串拼接">字符串拼接
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">dd&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${&amp;#39;$&amp;#39;+product.price}&amp;#34;&lt;/span>&amp;gt;235&amp;lt;/&lt;span style="color:#5bc4bf">dd&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="表单">表单
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">form&lt;/span> &lt;span style="color:#06b6ef">th:action&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/bb}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:object&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:method&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;post&amp;#34;&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:field&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{name}&amp;#34;&lt;/span>/&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;text&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:field&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*{msg}&amp;#34;&lt;/span>/&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">input&lt;/span> &lt;span style="color:#06b6ef">type&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;submit&amp;#34;&lt;/span>/&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">form&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="循环">循环&lt;/h3>
-&lt;p>渲染列表数据是一种非常常见的场景，例如现在有n条记录需要渲染成一个表格&amp;lt;table&amp;gt;，该数据集合必须是可以遍历的，使用th:each标签：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="循环">循环
+&lt;/h3>&lt;p>渲染列表数据是一种非常常见的场景，例如现在有n条记录需要渲染成一个表格&amp;lt;table&amp;gt;，该数据集合必须是可以遍历的，使用th:each标签：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">table&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;NAME&amp;lt;/&lt;span style="color:#5bc4bf">th&lt;/span>&amp;gt;
@@ -2054,19 +2054,19 @@ data-flex-basis="1424px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">td&lt;/span> &lt;span style="color:#06b6ef">th:text&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${prod.inStock}? #{true} : #{false}&amp;#34;&lt;/span>&amp;gt;yes&amp;lt;/&lt;span style="color:#5bc4bf">td&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">tr&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">table&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="条件判断ifunless">条件判断If/Unless&lt;/h3>
-&lt;p>Thymeleaf中使用th:if和th:unless属性进行条件判断，下面的例子中，&lt;code>&amp;lt;a&amp;gt;&lt;/code>标签只有在th:if中条件成立时才显示：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="条件判断ifunless">条件判断If/Unless
+&lt;/h3>&lt;p>Thymeleaf中使用th:if和th:unless属性进行条件判断，下面的例子中，&lt;code>&amp;lt;a&amp;gt;&lt;/code>标签只有在th:if中条件成立时才显示：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#5bc4bf">a&lt;/span> &lt;span style="color:#06b6ef">th:href&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;@{/login}&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">th:unless&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">${session.user&lt;/span> &lt;span style="color:#ef6155">!=&lt;/span> &lt;span style="color:#06b6ef">null&lt;/span>&lt;span style="color:#ef6155">}&lt;/span>&amp;gt;Login&amp;lt;/&lt;span style="color:#5bc4bf">a&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>th:unless于th:if恰好相反，只有表达式中的条件不成立，才会显示其内容。&lt;/p>
-&lt;h3 id="switch">Switch&lt;/h3>
-&lt;p>Thymeleaf同样支持多路选择Switch结构，默认属性default可以用*表示：&lt;/p>
+&lt;h3 id="switch">Switch
+&lt;/h3>&lt;p>Thymeleaf同样支持多路选择Switch结构，默认属性default可以用*表示：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">div&lt;/span> &lt;span style="color:#06b6ef">th:switch&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;${user.role}&amp;#34;&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&amp;#39;admin&amp;#39;&amp;#34;&lt;/span>&amp;gt;User is an administrator&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;#{roles.manager}&amp;#34;&lt;/span>&amp;gt;User is a manager&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;&lt;span style="color:#5bc4bf">p&lt;/span> &lt;span style="color:#06b6ef">th:case&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;*&amp;#34;&lt;/span>&amp;gt;User is some other thing&amp;lt;/&lt;span style="color:#5bc4bf">p&lt;/span>&amp;gt;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &amp;lt;/&lt;span style="color:#5bc4bf">div&lt;/span>&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf配置">Thymeleaf配置&lt;/h2>
-&lt;p>可在&lt;strong>resources/application.properties&lt;/strong> 中对Thymeleaf进行配置，配置如下：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="thymeleaf配置">Thymeleaf配置
+&lt;/h2>&lt;p>可在&lt;strong>resources/application.properties&lt;/strong> 中对Thymeleaf进行配置，配置如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Enable template caching.&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.cache&lt;span style="color:#5bc4bf">=&lt;/span>true
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Check that the templates location exists.&lt;/span>
@@ -2085,10 +2085,10 @@ data-flex-basis="1424px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.prefix&lt;span style="color:#5bc4bf">=&lt;/span>classpath:/templates/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71"># Suffix that gets appended to view names when building a URL.&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> spring.thymeleaf.suffix&lt;span style="color:#5bc4bf">=&lt;/span>.html spring.thymeleaf.template-resolver-order&lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#776e71"># Order of the template resolver in the chain. spring.thymeleaf.view-names= # Comma-separated list of view names that can be resolved.&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</link><pubDate>Sat, 26 Nov 2016 15:59:05 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</guid><description>&lt;h2 id="使用spring-boot">使用Spring Boot&lt;/h2>
-&lt;h2 id="编写demo的rest风格controller">编写Demo的REST风格Controller&lt;/h2>
-&lt;h4 id="前言">前言&lt;/h4>
-&lt;p>在DMP项目中，我们创建了demo分支，其中的com.turingdi.dmp.demo包中存放着这个demo。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spring Boot快速入门（二）——REST风格API的Controller编写与项目启动</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</link><pubDate>Sat, 26 Nov 2016 15:59:05 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%BA%8CREST%E9%A3%8E%E6%A0%BCAPI%E7%9A%84Controller%E7%BC%96%E5%86%99%E4%B8%8E%E9%A1%B9%E7%9B%AE%E5%90%AF%E5%8A%A8/</guid><description>&lt;h2 id="使用spring-boot">使用Spring Boot
+&lt;/h2>&lt;h2 id="编写demo的rest风格controller">编写Demo的REST风格Controller
+&lt;/h2>&lt;h4 id="前言">前言
+&lt;/h4>&lt;p>在DMP项目中，我们创建了demo分支，其中的com.turingdi.dmp.demo包中存放着这个demo。
 这个demo实现一个简单的REST风格的API：&lt;/p>
 &lt;ul>
 &lt;li>在根页面显示“Hello World”&lt;/li>
@@ -2097,8 +2097,8 @@ data-flex-basis="1424px"
 &lt;li>GET请求访问/demo/user/&amp;lt;用户ID&amp;gt;可查询到对应用户的信息JSON；&lt;/li>
 &lt;li>不使用上述HTTP方法访问的会返回错误。&lt;/li>
 &lt;/ul>
-&lt;h4 id="编写controller代码">编写Controller代码&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp.demo&lt;/span>;
+&lt;h4 id="编写controller代码">编写Controller代码
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp.demo&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">io.swagger.annotations.ApiImplicitParam&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">io.swagger.annotations.ApiOperation&lt;/span>;
@@ -2169,19 +2169,19 @@ data-flex-basis="523px"
 >&lt;/li>
 &lt;li>可以使用Swagger2快速构建RESTful API文档，并支持在线发送请求调试API：http://blog.didispace.com/springbootswagger2/。&lt;/li>
 &lt;/ul>
-&lt;h3 id="启动项目">启动项目&lt;/h3>
-&lt;h4 id="直接运行入口类">直接运行入口类&lt;/h4>
-&lt;p>在IDE中配置、直接运行入口类com.turingdi.dmp.DMPStarter。&lt;/p>
-&lt;h4 id="打包jar运行">打包jar运行&lt;/h4>
-&lt;p>使用mvn package命令进行打包，并使用以下命令执行：&lt;/p>
+&lt;h3 id="启动项目">启动项目
+&lt;/h3>&lt;h4 id="直接运行入口类">直接运行入口类
+&lt;/h4>&lt;p>在IDE中配置、直接运行入口类com.turingdi.dmp.DMPStarter。&lt;/p>
+&lt;h4 id="打包jar运行">打包jar运行
+&lt;/h4>&lt;p>使用mvn package命令进行打包，并使用以下命令执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>java -jar target/***.jar
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>由于我们的入口类加上了7.@SpringBootApplication注解，并在Maven中配置了spring-boot-maven-plugin插件，因此在打jar包的时候会自动设置jar包中的META-INF/MAINFEST.MF中配置好jar包的入口类，无需我们在pom.xml文件中额外配置。&lt;/p>
-&lt;h4 id="使用spring-boot的maven插件运行">使用Spring Boot的Maven插件运行&lt;/h4>
-&lt;p>执行：&lt;/p>
+&lt;h4 id="使用spring-boot的maven插件运行">使用Spring Boot的Maven插件运行
+&lt;/h4>&lt;p>执行：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span> mvn spring-boot:run
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即可。这也是spring-boot-maven-plugin插件起到的作用。&lt;/p>
-&lt;h4 id="热交换">热交换&lt;/h4>
-&lt;p>由于Spring Boot在打包的时候将内置tomcat一并打包，所以我们无法直接更新项目文件让tomcat重新加载。Spring Boot提供了Spring Loaded实现热交换。
+&lt;h4 id="热交换">热交换
+&lt;/h4>&lt;p>由于Spring Boot在打包的时候将内置tomcat一并打包，所以我们无法直接更新项目文件让tomcat重新加载。Spring Boot提供了Spring Loaded实现热交换。
 在pom.xml中增加以下依赖即可:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>org.springframework.boot&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
@@ -2189,20 +2189,20 @@ data-flex-basis="523px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;optional&amp;gt;&lt;/span>true&lt;span style="color:#5bc4bf">&amp;lt;/optional&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后项目运行时，更新源代码之后，重新编译（如IDEA中按快捷键Ctrl+F9）即可在控制台看到Spring Boot重新加载了新编译后的文件。&lt;/p></description></item><item><title>Spring Boot快速入门（一）——介绍与基础Demo</title><link>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</link><pubDate>Sat, 26 Nov 2016 15:58:33 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/</guid><description>&lt;p>因为团队新项目需要，最近研究了一下Spring Boot + RESTful API + Thymeleaf，总结了一份文档，也放到博客里贡献。&lt;/p>
-&lt;h2 id="spring-boot概述">Spring Boot概述&lt;/h2>
-&lt;h3 id="简介">简介&lt;/h3>
-&lt;p>Spring Boot简化了基于Spring的应用开发，你只需要&amp;quot;run&amp;quot;就能创建一个独立的，产品级别的Spring应用。我们为Spring平台及第三方库提供开箱即用的设置，这样你就可以有条不紊地开始。多数Spring Boot应用只需要很少的Spring配置。&lt;br>
+&lt;h2 id="spring-boot概述">Spring Boot概述
+&lt;/h2>&lt;h3 id="简介">简介
+&lt;/h3>&lt;p>Spring Boot简化了基于Spring的应用开发，你只需要&amp;quot;run&amp;quot;就能创建一个独立的，产品级别的Spring应用。我们为Spring平台及第三方库提供开箱即用的设置，这样你就可以有条不紊地开始。多数Spring Boot应用只需要很少的Spring配置。&lt;br>
 你可以使用Spring Boot创建Java应用，并使用java -jar启动它或采用传统的war部署方式。我们也提供了一个运行&amp;quot;spring脚本&amp;quot;的命令行工具。&lt;/p>
-&lt;h3 id="特性">特性&lt;/h3>
-&lt;p>Spring Boot主要的目标是：&lt;/p>
+&lt;h3 id="特性">特性
+&lt;/h3>&lt;p>Spring Boot主要的目标是：&lt;/p>
 &lt;ul>
 &lt;li>为所有Spring开发提供一个从根本上更快，且随处可得的入门体验。&lt;/li>
 &lt;li>开箱即用，但通过不采用默认设置可以快速摆脱这种方式。&lt;/li>
 &lt;li>提供一系列大型项目常用的非功能性特征，比如：内嵌服务器，安全，指标，健康检测，外部化配置。&lt;/li>
 &lt;li>绝对没有代码生成，也不需要XML配置。&lt;/li>
 &lt;/ul>
-&lt;h3 id="文档api">文档/API&lt;/h3>
-&lt;p>目前Spring Boot最新的Release版本为1.4.2。&lt;br>
+&lt;h3 id="文档api">文档/API
+&lt;/h3>&lt;p>目前Spring Boot最新的Release版本为1.4.2。&lt;br>
 官方文档：&lt;br>
 &lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/reference/htmlsingle/" target="_blank" rel="noopener"
 >http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/reference/htmlsingle/&lt;/a>&lt;br>
@@ -2212,11 +2212,11 @@ data-flex-basis="523px"
 官方API：&lt;br>
 &lt;a class="link" href="http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/" target="_blank" rel="noopener"
 >http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/api/&lt;/a>&lt;/p>
-&lt;h2 id="使用spring-boot">使用Spring Boot&lt;/h2>
-&lt;p>本文的Demo可从git@turing:DMPWeb.git的demo分支（未公开于互联网）下载。&lt;/p>
-&lt;h3 id="创建spring-boot项目">创建Spring Boot项目&lt;/h3>
-&lt;h4 id="intellij-idea">IntelliJ IDEA&lt;/h4>
-&lt;ol>
+&lt;h2 id="使用spring-boot">使用Spring Boot
+&lt;/h2>&lt;p>本文的Demo可从git@turing:DMPWeb.git的demo分支（未公开于互联网）下载。&lt;/p>
+&lt;h3 id="创建spring-boot项目">创建Spring Boot项目
+&lt;/h3>&lt;h4 id="intellij-idea">IntelliJ IDEA
+&lt;/h4>&lt;ol>
 &lt;li>点击菜单File &amp;ndash;&amp;gt; New &amp;ndash;&amp;gt; Project；&lt;/li>
 &lt;li>弹出的窗口中，左边栏选择Spring Initializr，右边选择JDK版本（通过配置也可以运行在JDK6上，但建议JDK7以上，最好JDK8）和初始化服务的URL（按默认的https://start.spring.io 即可），点击Next；&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/1.png"
@@ -2251,8 +2251,8 @@ data-flex-basis="374px"
 &lt;li>点击Next，等待IDEA下载并初始化项目。&lt;/li>
 &lt;/ol>
 &lt;p>注：其实IDEA这种创建Spring Boot的方法，相当于自己去访问https://start.spring.io ，按页面提示选择了版本、项目信息和插件依赖之后，下载zip，解压导入到IDEA项目中。只不过IDEA帮你完成了下载和解压导入项目这一步而已。&lt;/p>
-&lt;h4 id="通用的项目创建方法">通用的项目创建方法&lt;/h4>
-&lt;p>任意一个IDE（在此省略截图），选择新建Maven项目，普通项目即可，填写项目基本信息后，修改pom.xml文件：&lt;/p>
+&lt;h4 id="通用的项目创建方法">通用的项目创建方法
+&lt;/h4>&lt;p>任意一个IDE（在此省略截图），选择新建Maven项目，普通项目即可，填写项目基本信息后，修改pom.xml文件：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;project&lt;/span> &lt;span style="color:#06b6ef">xmlns=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0&amp;#34;&lt;/span> &lt;span style="color:#06b6ef">xmlns:xsi=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#06b6ef">xsi:schemaLocation=&lt;/span>&lt;span style="color:#48b685">&amp;#34;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span>
@@ -2321,9 +2321,9 @@ data-flex-basis="374px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/snapshots&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repository&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/repositories&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="编写项目入口类">编写项目入口类&lt;/h3>
-&lt;h4 id="入口类的位置">入口类的位置&lt;/h4>
-&lt;p>Spring Boot官方文档建议将入口类（包含main方法的类）放在项目根包下，如com.turingdi.dmp.DMPStarter，下图是一个典型的Spring Boot项目结构，注意DMPStarter类在项目中的位置：&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="编写项目入口类">编写项目入口类
+&lt;/h3>&lt;h4 id="入口类的位置">入口类的位置
+&lt;/h4>&lt;p>Spring Boot官方文档建议将入口类（包含main方法的类）放在项目根包下，如com.turingdi.dmp.DMPStarter，下图是一个典型的Spring Boot项目结构，注意DMPStarter类在项目中的位置：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Spring-Boot%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%9F%BA%E7%A1%80Demo/4.png"
 width="212"
 height="181"
@@ -2334,8 +2334,8 @@ data-flex-grow="117"
 data-flex-basis="281px"
 >&lt;br>
 这样做的好处是使用@ComponentScan注解时可以使用默认value、无需额外指定扫描根包名的参数；而Spring Boot还提供了一个注解，包含了无参数的@ComponentScan注解及几个常用的注解，亦即在这样的项目结构下，入口类只需要一个注解即可。&lt;/p>
-&lt;h4 id="写入口类代码">写入口类代码&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp&lt;/span>;
+&lt;h4 id="写入口类代码">写入口类代码
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.dmp&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.boot.SpringApplication&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">org.springframework.boot.autoconfigure.*&lt;/span>;

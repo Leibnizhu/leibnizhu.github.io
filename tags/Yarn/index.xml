@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Yarn on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Yarn/</link><description>Recent content in Yarn on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 14 May 2022 20:33:58 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Yarn/index.xml" rel="self" type="application/rss+xml"/><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景&lt;/h2>
-&lt;p>去年写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2021/12/04/%e8%b7%a8Yarn%e9%9b%86%e7%be%a4%e6%8f%90%e4%ba%a4spark%e4%bb%bb%e5%8a%a1/" >跨Yarn集群提交spark任务&lt;/a> ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 &lt;code>*-site.xml&lt;/code> 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 &lt;code>*-site.xml&lt;/code> 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Yarn on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Yarn/</link><description>Recent content in Yarn on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 14 May 2022 20:33:58 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Yarn/index.xml" rel="self" type="application/rss+xml"/><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景
+&lt;/h2>&lt;p>去年写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2021/12/04/%e8%b7%a8Yarn%e9%9b%86%e7%be%a4%e6%8f%90%e4%ba%a4spark%e4%bb%bb%e5%8a%a1/" >跨Yarn集群提交spark任务&lt;/a> ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 &lt;code>*-site.xml&lt;/code> 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 &lt;code>*-site.xml&lt;/code> 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。&lt;/p>
 &lt;p>简单回顾下，主要做了两件事情：&lt;/p>
 &lt;ol>
 &lt;li>创建SparkContext前，将外部集群的 &lt;code>*-site.xml&lt;/code> 放入classpath，如 &lt;code>$PWD&lt;/code> 。&lt;/li>
 &lt;li>创建SparkContext前，&lt;code>HADOOP_CONF_DIR&lt;/code> 和 &lt;code>YARN_CONF_DIR&lt;/code> 环境变量改为外部集群 &lt;code>*-site.xml&lt;/code> 配置文件所在位置；由于启动java程序后不能直接修改环境变量，在实现上使用了黑魔法。&lt;/li>
 &lt;/ol>
 &lt;p>时隔半年终于重拾博客，显然又被坑了，没错，之前的方法在Spark2.4里行不通了。&lt;/p>
-&lt;h2 id="问题原因分析及解决方案">问题、原因分析、及解决方案&lt;/h2>
-&lt;h3 id="spark24中的报错">Spark2.4中的报错&lt;/h3>
-&lt;p>在原来代码基础上，升级Spark为2.4.8，执行提交到外部集群的任务，提交到Yarn的AM报错如下：&lt;/p>
+&lt;h2 id="问题原因分析及解决方案">问题、原因分析、及解决方案
+&lt;/h2>&lt;h3 id="spark24中的报错">Spark2.4中的报错
+&lt;/h3>&lt;p>在原来代码基础上，升级Spark为2.4.8，执行提交到外部集群的任务，提交到Yarn的AM报错如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Container id: container_e36_1650338235135_41710_02_000001
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Exit code: 1
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Container exited with a non-zero exit code 1. Error file: prelaunch.err.
@@ -43,8 +43,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Caused by: java.net.UnknownHostException: xxx
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ... 25 more
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中 &lt;code>xxx&lt;/code> 是外部集群的集群名（&lt;code>dfs.nameservices&lt;/code> 配置）。&lt;/p>
-&lt;h3 id="直接原因分析">直接原因分析&lt;/h3>
-&lt;p>仔细观察异常的调用栈，调用到了 &lt;code>NameNodeProxies.createNonHAProxy&lt;/code> ，而我们的集群是HA的，显然是读取到的配置不对了。&lt;/p>
+&lt;h3 id="直接原因分析">直接原因分析
+&lt;/h3>&lt;p>仔细观察异常的调用栈，调用到了 &lt;code>NameNodeProxies.createNonHAProxy&lt;/code> ，而我们的集群是HA的，显然是读取到的配置不对了。&lt;/p>
 &lt;p>看到这个类，阅读过hadoop源码的应该都知道，这是创建 &lt;code>DFSClient&lt;/code> 的时候，会先读取 &lt;code>dfs.client.failover.proxy.provider.{hdfs路径对应host}&lt;/code> 配置（取值是一个 &lt;code>FailoverProxyProvider&lt;/code> 具体实现的全限定类名），反射出Class对象并实例化，然后创建对应的HAProxy；而如果配置为空，则认为NameNode没有开启HA，直接将hdfs路径当作普通host来进行读取，如果实际上这个host是一个HA的nameservices名，不存在这个host，则会报上面的错误。&lt;/p>
 &lt;p>所以可以确定，是AM读取不到正确的hdfs配置导致的。那么是为什么呢？&lt;/p>
 &lt;p>仔细观察AM的日志，&lt;code>launch_container.sh&lt;/code> 里面：&lt;/p>
@@ -86,8 +86,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120105&lt;/span> &lt;span style="color:#f99b15">12&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">8312&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__/hdfs-site.xml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>broken symlinks&lt;span style="color:#5bc4bf">(&lt;/span>find -L . -maxdepth &lt;span style="color:#f99b15">5&lt;/span> -type l -ls&lt;span style="color:#5bc4bf">)&lt;/span>:
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>./__spark_conf__/__hadoop_conf__/&lt;/code> 里面是外部集群配置文件，而 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 是spark应用的jar，里面已经有原集群的配置文件。按 &lt;code>CLASSPATH&lt;/code> 定义的顺序，&lt;code>Configuration&lt;/code> 读取默认资源 &lt;code>core-site.xml&lt;/code> 、 &lt;code>hdfs-site.xml&lt;/code> （由&lt;code>HdfsConfiguration&lt;/code>静态代码块加入）的时候，优先从 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 读取了，而真正要用的外部集群配置，由于在 &lt;code>CLASSPATH&lt;/code> 中位置较后，不会被加载到。&lt;/p>
-&lt;h3 id="解决方案">解决方案&lt;/h3>
-&lt;p>知道问题的原因后，根据 &lt;code>CLASSPATH&lt;/code> 定义的顺序：&lt;/p>
+&lt;h3 id="解决方案">解决方案
+&lt;/h3>&lt;p>知道问题的原因后，根据 &lt;code>CLASSPATH&lt;/code> 定义的顺序：&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>$PWD&lt;/code> 里面的文件无法控制，跳过&lt;/li>
 &lt;li>&lt;code>$PWD/__spark_conf__&lt;/code> 目录里面是Driver的SparkConf内容 &lt;code>__spark_conf__.properties&lt;/code> ，及所有hadoop相关配置整合到一起的的 &lt;code>__spark_hadoop_conf__.xml&lt;/code> ，也是无法控制的。注意这个 &lt;code>__spark_hadoop_conf__.xml&lt;/code> 里面虽然已经由Driver打入了外部集群的配置，但由于文件名不是 &lt;code>hdfs-site.xml&lt;/code> ，不会被 &lt;code>Configuration&lt;/code> 加载的。&lt;/li>
@@ -128,9 +128,9 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>重新打包、运行任务，顺利执行。&lt;/p>
-&lt;h2 id="spark22-与-spark24-yarn-client-模式提交任务差异">Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异&lt;/h2>
-&lt;h3 id="am的classpath目录结构差异">AM的classpath、目录结构差异&lt;/h3>
-&lt;p>问题解决了，那么为什么Spark2.2升级Spark2.4之后就有这样的问题呢？从上面的分析，不难猜测到是AM的 &lt;code>CLASSPATH&lt;/code> 变了。随便找一个Spark2.2提交的任务也可以看到：&lt;/p>
+&lt;h2 id="spark22-与-spark24-yarn-client-模式提交任务差异">Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异
+&lt;/h2>&lt;h3 id="am的classpath目录结构差异">AM的classpath、目录结构差异
+&lt;/h3>&lt;p>问题解决了，那么为什么Spark2.2升级Spark2.4之后就有这样的问题呢？从上面的分析，不难猜测到是AM的 &lt;code>CLASSPATH&lt;/code> 变了。随便找一个Spark2.2提交的任务也可以看到：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#### launch_container.sh&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">CLASSPATH&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_conf__:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_libs__/*:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 对比 Spark2.4的：&lt;/span>
@@ -171,16 +171,16 @@ class="gallery-image"
 data-flex-grow="237"
 data-flex-basis="569px"
 >&lt;/p>
-&lt;h3 id="spark源码里的体现">Spark源码里的体现&lt;/h3>
-&lt;p>上篇博客里提到Spark的yarn-client模式是通过 &lt;code>YarnClientSchedulerBackend&lt;/code> 处理的。&lt;br>
+&lt;h3 id="spark源码里的体现">Spark源码里的体现
+&lt;/h3>&lt;p>上篇博客里提到Spark的yarn-client模式是通过 &lt;code>YarnClientSchedulerBackend&lt;/code> 处理的。&lt;br>
 其 &lt;code>start()&lt;/code> 方法会调用 &lt;code>org.apache.spark.deploy.yarn.Client&lt;/code> 的 &lt;code>submitApplication()&lt;/code> 方法提交Yarn AM。&lt;br>
 &lt;code>submitApplication()&lt;/code> 调用 &lt;code>createContainerLaunchContext&lt;/code> 构造ContainerLaunchContext对应的上下文，构建的启动Yarn AM的任务命令cmds，里面比较重要的有两步:&lt;/p>
 &lt;ol>
 &lt;li>调用 &lt;code>setupLaunchEnv()&lt;/code> 构造环境变量，其中我们关心的 &lt;code>CLASSPATH&lt;/code> 是在 &lt;code>populateClasspath()&lt;/code> 方法里处理的；&lt;/li>
 &lt;li>调用 &lt;code>prepareLocalResources()&lt;/code> 准备Yarn AM需要的一些资源，包括调用 &lt;code>createConfArchive()&lt;/code> 创建 &lt;code>__spark_conf__.zip&lt;/code> ，里面解压出来就是上面所讨论的AM 目录结构里面的 &lt;code>./__spark_conf__/&lt;/code> 目录&lt;/li>
 &lt;/ol>
-&lt;h4 id="populateclasspath">populateClasspath()&lt;/h4>
-&lt;p>对比两个版本的 &lt;code>populateClasspath()&lt;/code> 方法，注意差异在最后：&lt;/p>
+&lt;h4 id="populateclasspath">populateClasspath()
+&lt;/h4>&lt;p>对比两个版本的 &lt;code>populateClasspath()&lt;/code> 方法，注意差异在最后：&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/populateClasspath.png"
 width="3624"
 height="2248"
@@ -195,8 +195,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// files (such as configuration files for different services) that are not part of the&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// YARN cluster&amp;#39;s config.&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是为了防止将其他非Yarn集群配置的文件也引入了。&lt;/p>
-&lt;h4 id="createconfarchive">createConfArchive()&lt;/h4>
-&lt;p>这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。&lt;/p>
+&lt;h4 id="createconfarchive">createConfArchive()
+&lt;/h4>&lt;p>这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。&lt;/p>
 &lt;p>&lt;a class="link" href="https://issues.apache.org/jira/browse/SPARK-23630" target="_blank" rel="noopener"
 >SPARK-23630&lt;/a> 增加了一个用于测试的环境变量 &lt;code>SPARK_TEST_HADOOP_CONF_DIR&lt;/code> ，该环境变量指定的目录里面的配置文件也会被打进去 &lt;code>__spark_conf__.zip&lt;/code> 。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// SPARK-23630: during testing, Spark scripts filter out hadoop conf dirs so that user&amp;#39;s
@@ -226,15 +226,15 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>putNextEntry&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ZipEntry&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">SparkHadoopUtil&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#fec418">SPARK_HADOOP_CONF_FILE&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hadoopConf&lt;span style="color:#5bc4bf">.&lt;/span>writeXml&lt;span style="color:#5bc4bf">(&lt;/span>confStream&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>closeEntry&lt;span style="color:#5bc4bf">()&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>跨Yarn集群提交spark任务</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</link><pubDate>Sat, 04 Dec 2021 18:17:55 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/93990522.jpg" alt="Featured image of post 跨Yarn集群提交spark任务" />&lt;h2 id="背景">背景&lt;/h2>
-&lt;p>之前写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2020/05/06/%e5%8a%a8%e6%80%81%e5%8a%a0%e8%bd%bdhive%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e7%9a%84%e6%96%b9%e6%a1%88/" >Spark动态加载hive配置的方案&lt;/a> ，当时是为了spark应用的fat-jar里面已经有Hadoop相关xml配置文件的情况下，将数据输出到不是该配置的Hadoop集群的方案。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>跨Yarn集群提交spark任务</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</link><pubDate>Sat, 04 Dec 2021 18:17:55 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/93990522.jpg" alt="Featured image of post 跨Yarn集群提交spark任务" />&lt;h2 id="背景">背景
+&lt;/h2>&lt;p>之前写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2020/05/06/%e5%8a%a8%e6%80%81%e5%8a%a0%e8%bd%bdhive%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e7%9a%84%e6%96%b9%e6%a1%88/" >Spark动态加载hive配置的方案&lt;/a> ，当时是为了spark应用的fat-jar里面已经有Hadoop相关xml配置文件的情况下，将数据输出到不是该配置的Hadoop集群的方案。&lt;br>
 现在这个需求有点类似，没有走spark-submit提交任务，而是在spark应用里面通过创建&lt;code>SparkContext&lt;/code>的形式提交任务，而spark应用的fat-jar里面已经有Hadoop相关xml配置文件，在此情况下，想将Spakr任务提交到外部的Yarn集群（不是fat-jar里面配置文件对应的yarn集群）。&lt;/p>
-&lt;h2 id="思考一个问题">思考一个问题&lt;/h2>
-&lt;p>先思考一个问题，如果Spark应用的fat-jar里面有外部Yarn集群对应的配置文件(&lt;code>core-site.xml&lt;/code>，&lt;code>hdfs-site.xml&lt;/code>，&lt;code>yarn-site.xml&lt;/code>等)，此时Spark应用代码里面创建&lt;code>SparkContext&lt;/code>，是不是就一定能提交到那个集群里？&lt;br>
+&lt;h2 id="思考一个问题">思考一个问题
+&lt;/h2>&lt;p>先思考一个问题，如果Spark应用的fat-jar里面有外部Yarn集群对应的配置文件(&lt;code>core-site.xml&lt;/code>，&lt;code>hdfs-site.xml&lt;/code>，&lt;code>yarn-site.xml&lt;/code>等)，此时Spark应用代码里面创建&lt;code>SparkContext&lt;/code>，是不是就一定能提交到那个集群里？&lt;br>
 可以做个实验，但实验不一定会cover到所有情况。&lt;br>
 直接给结论吧，不一定能提交过去，但自己做实验的话很可能还是能直接提交过去的，还是直接看代码吧（以&lt;code>yarn-client&lt;/code>模式为例）。&lt;/p>
-&lt;h3 id="spark-yarn-client-默认提交任务简析">Spark Yarn-client 默认提交任务简析&lt;/h3>
-&lt;p>通过代码创建&lt;code>SparkContext&lt;/code>后，其动态代码块会根据启动模式创建&lt;code>SchedulerBackend&lt;/code>和&lt;code>TaskScheduler&lt;/code>并启动：&lt;/p>
+&lt;h3 id="spark-yarn-client-默认提交任务简析">Spark Yarn-client 默认提交任务简析
+&lt;/h3>&lt;p>通过代码创建&lt;code>SparkContext&lt;/code>后，其动态代码块会根据启动模式创建&lt;code>SchedulerBackend&lt;/code>和&lt;code>TaskScheduler&lt;/code>并启动：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// org.apache.spark.SparkContext #501
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// Create and start the scheduler
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>sched&lt;span style="color:#5bc4bf">,&lt;/span> ts&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">SparkContext&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>createTaskScheduler&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">this&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> master&lt;span style="color:#5bc4bf">,&lt;/span> deployMode&lt;span style="color:#5bc4bf">)&lt;/span>
@@ -365,10 +365,10 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到，除了本地的&lt;code>log4j.properties&lt;/code>和&lt;code>metrics.properties&lt;/code>配置文件以外，还会读取&lt;code>HADOOP_CONF_DIR&lt;/code>和&lt;code>YARN_CONF_DIR&lt;/code>环境变量，读取对应目录下的文件放入&lt;code>hadoopConfFiles&lt;/code>这个&lt;code>HashMap&lt;/code>中，而这里面的文件都会压缩到&lt;code>__spark_conf__.zip&lt;/code>中。&lt;br>
 再后续的代码就不分析了，可以参考网上其他文章。&lt;/p>
-&lt;h3 id="提交外部yarn集群的障碍">提交外部Yarn集群的障碍&lt;/h3>
-&lt;p>所以，如果执行spark应用程序的机器中配置了 &lt;em>HADOOP_CONF_DIR&lt;/em> 或 &lt;em>YARN_CONF_DIR&lt;/em> 环境变量（如HDP的节点安装了对应客户端都会配置上），在Spark提交任务到外部yarn集群的时候，就会将里面的配置文件压缩传输到外部集群的Executor节点，这样Executor的各种操作都会使用原集群的配置，连接不到正确的Yarn服务，最后也就导致任务执行失败。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;p>所以解决整个提交外部集群的问题，有两个问题要处理：&lt;/p>
+&lt;h3 id="提交外部yarn集群的障碍">提交外部Yarn集群的障碍
+&lt;/h3>&lt;p>所以，如果执行spark应用程序的机器中配置了 &lt;em>HADOOP_CONF_DIR&lt;/em> 或 &lt;em>YARN_CONF_DIR&lt;/em> 环境变量（如HDP的节点安装了对应客户端都会配置上），在Spark提交任务到外部yarn集群的时候，就会将里面的配置文件压缩传输到外部集群的Executor节点，这样Executor的各种操作都会使用原集群的配置，连接不到正确的Yarn服务，最后也就导致任务执行失败。&lt;/p>
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;p>所以解决整个提交外部集群的问题，有两个问题要处理：&lt;/p>
 &lt;ol>
 &lt;li>Spark应用代码使用外部集群的配置文件进行任务提交
 &lt;ol>

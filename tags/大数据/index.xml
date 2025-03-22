@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>大数据 on Heaven's Door</title><link>https://leibnizhu.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/</link><description>Recent content in 大数据 on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 20 Jun 2021 13:17:54 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</link><pubDate>Sun, 20 Jun 2021 13:17:54 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/bg1.png" alt="Featured image of post 修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException" />&lt;h2 id="故障背景">故障背景&lt;/h2>
-&lt;p>通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>大数据 on Heaven's Door</title><link>https://leibnizhu.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/</link><description>Recent content in 大数据 on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 20 Jun 2021 13:17:54 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</link><pubDate>Sun, 20 Jun 2021 13:17:54 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/bg1.png" alt="Featured image of post 修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException" />&lt;h2 id="故障背景">故障背景
+&lt;/h2>&lt;p>通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
 >ES-Hadoop&lt;/a> （亦可参考 &lt;a class="link" href="https://github.com/elastic/elasticsearch-hadoop" target="_blank" rel="noopener"
 >Github&lt;/a> ） 查询ES时，若查询条件包含emoji，会在json序列化的时候抛出异常（在最新的 &lt;code>7.13.2&lt;/code> 版本仍存在）：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>Caused by: org.codehaus.jackson.JsonGenerationException: Incomplete surrogate pair: first char 0xde97, second 0x22
@@ -11,8 +11,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.codehaus.jackson.impl.Utf8Generator.writeRaw&lt;span style="color:#5bc4bf">(&lt;/span>Utf8Generator.java:697&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator.writeRaw&lt;span style="color:#5bc4bf">(&lt;/span>JacksonJsonGenerator.java:252&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ... &lt;span style="color:#f99b15">21&lt;/span> more
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析&lt;/h2>
-&lt;p>根据报错的调用栈，直接原因出在 &lt;code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate&lt;/code> 方法中，其源码：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析
+&lt;/h2>&lt;p>根据报错的调用栈，直接原因出在 &lt;code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate&lt;/code> 方法中，其源码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">_decodeSurrogate&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> surr1, &lt;span style="color:#fec418">int&lt;/span> surr2) &lt;span style="color:#815ba4">throws&lt;/span> IOException {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (surr2 &lt;span style="color:#5bc4bf">&amp;lt;&lt;/span> 56320 &lt;span style="color:#5bc4bf">||&lt;/span> surr2 &lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> 57343) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String msg &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;Incomplete surrogate pair: first char 0x&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> Integer.&lt;span style="color:#06b6ef">toHexString&lt;/span>(surr1) &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#48b685">&amp;#34;, second 0x&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> Integer.&lt;span style="color:#06b6ef">toHexString&lt;/span>(surr2);
@@ -53,8 +53,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> out.&lt;span style="color:#06b6ef">bytes&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;p>故障分析到这里，似乎只要升级 &lt;code>jackson-core&lt;/code> 版本就可以了……&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;p>故障分析到这里，似乎只要升级 &lt;code>jackson-core&lt;/code> 版本就可以了……&lt;br>
 然而上面提到，在 &lt;code>jackson-core 2.3.0&lt;/code> 才修复了这个问题，而 Es-Spark 使用的是内置的1.x 版本，前面也有提到 &lt;code>jackson-core&lt;/code> 自2.x开始迁移到 &lt;code>com.fasterxml&lt;/code> 。具体到代码，Es-spark 的 &lt;code>JacksonJsonGenerator&lt;/code> 是这样使用 &lt;code>jackson&lt;/code> 的：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">org.elasticsearch.hadoop.serialization.json&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -87,8 +87,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>也就是说，直接升级依赖版本是不行的，maven的GAV都变了，类名也变了，必须改代码。&lt;/p>
-&lt;h3 id="同名类的patch">同名类的Patch&lt;/h3>
-&lt;p>可以看到，虽说 &lt;code>Jackson&lt;/code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 &lt;code>JSON_FACTORY&lt;/code> 和 &lt;code>generator&lt;/code> 这个两个属性替换为 &lt;code>Jackson 2.3+&lt;/code> 版本的类、并微调静态代码块和构造方法里面的代码即可：&lt;/p>
+&lt;h3 id="同名类的patch">同名类的Patch
+&lt;/h3>&lt;p>可以看到，虽说 &lt;code>Jackson&lt;/code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 &lt;code>JSON_FACTORY&lt;/code> 和 &lt;code>generator&lt;/code> 这个两个属性替换为 &lt;code>Jackson 2.3+&lt;/code> 版本的类、并微调静态代码块和构造方法里面的代码即可：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">org.elasticsearch.hadoop.serialization.json&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">com.fasterxml.jackson.core.JsonEncoding&lt;/span>;
@@ -118,8 +118,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="javassist-patch">Javassist Patch&lt;/h3>
-&lt;p>与上一篇博客一样，为了可维护性，最后还是选择使用 &lt;code>Javassist&lt;/code> 进行Patch。但受限于 &lt;code>Javassist&lt;/code> 的机制，这个Patch起来有点麻烦。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="javassist-patch">Javassist Patch
+&lt;/h3>&lt;p>与上一篇博客一样，为了可维护性，最后还是选择使用 &lt;code>Javassist&lt;/code> 进行Patch。但受限于 &lt;code>Javassist&lt;/code> 的机制，这个Patch起来有点麻烦。&lt;br>
 首先，阅读 &lt;code>JacksonJsonGenerator&lt;/code> 源码，它其实相当于是在 Es-spark 的 &lt;code>Generator&lt;/code> 接口与 &lt;code>jackson 1.8.8&lt;/code> 的 &lt;code>JsonGenerator&lt;/code> 之间做了Adaptor；因此可以考虑写一个 &lt;code>Generator&lt;/code> 接口与 &lt;code>jackson 2.3+&lt;/code> 之间的Adaptor给原调用者使用。&lt;br>
 但阅读 Es-spark 的其他代码可以发现，虽然它定义了 &lt;code>Generator&lt;/code> 接口，但调用时都是直接面向 &lt;code>JacksonJsonGenerator&lt;/code> 实现类，如上面给出过的 &lt;code>RestClient#searchRequest&lt;/code> 的代码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//RestClient 某查询方法&lt;/span>
@@ -462,8 +462,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>} &lt;span style="color:#815ba4">catch&lt;/span> (Exception e) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log.&lt;span style="color:#06b6ef">error&lt;/span>(&lt;span style="color:#48b685">&amp;#34;给 JacksonJsonGenerator 进行静态代码块和构造方法的pack失败:&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> e.&lt;span style="color:#06b6ef">getMessage&lt;/span>(), e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>完事儿。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</link><pubDate>Sat, 19 Jun 2021 23:40:50 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/bg2.jpg" alt="Featured image of post 修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException" />&lt;h2 id="故障背景">故障背景&lt;/h2>
-&lt;p>众所周知，&lt;code>Elasticsearch&lt;/code>（下文简称&lt;code>&amp;quot;ES&amp;quot;&lt;/code>）的数值类型字段是支持一些特殊格式的。比如，&lt;code>integer&lt;/code> 类型的字段取值可以是浮点数的字符串，如 &lt;code>&amp;quot;2.0&amp;quot;&lt;/code>；&lt;code>long&lt;/code> 类型的字段取值可以是科学计数法的字符串，如 &lt;code>&amp;quot;2E3&amp;quot;&lt;/code>，诸如此类的一些。不同于时间类型的字段可以 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html" target="_blank" rel="noopener"
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>完事儿。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</link><pubDate>Sat, 19 Jun 2021 23:40:50 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/bg2.jpg" alt="Featured image of post 修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException" />&lt;h2 id="故障背景">故障背景
+&lt;/h2>&lt;p>众所周知，&lt;code>Elasticsearch&lt;/code>（下文简称&lt;code>&amp;quot;ES&amp;quot;&lt;/code>）的数值类型字段是支持一些特殊格式的。比如，&lt;code>integer&lt;/code> 类型的字段取值可以是浮点数的字符串，如 &lt;code>&amp;quot;2.0&amp;quot;&lt;/code>；&lt;code>long&lt;/code> 类型的字段取值可以是科学计数法的字符串，如 &lt;code>&amp;quot;2E3&amp;quot;&lt;/code>，诸如此类的一些。不同于时间类型的字段可以 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html" target="_blank" rel="noopener"
 >通过 &lt;code>mapping&lt;/code> 的 &lt;code>format&lt;/code> 属性配置取值格式&lt;/a> ，数值字段的取值没有格式的配置、上面举例的取值都是可以直接索引文档的。&lt;/p>
 &lt;p>然而，通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
 >ES-Hadoop&lt;/a> （亦可参考 &lt;a class="link" href="https://github.com/elastic/elasticsearch-hadoop" target="_blank" rel="noopener"
@@ -475,8 +475,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.builder.JdkValueReader.parseLong&lt;span style="color:#5bc4bf">(&lt;/span>JdkValueReader.java:296&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.builder.JdkValueReader.longValue&lt;span style="color:#5bc4bf">(&lt;/span>JdkValueReader.java:288&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>…………
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析&lt;/h2>
-&lt;p>阅读 &lt;code>JdkValueReader&lt;/code> 源码，以读取integer类型字段为例：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析
+&lt;/h2>&lt;p>阅读 &lt;code>JdkValueReader&lt;/code> 源码，以读取integer类型字段为例：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> Object &lt;span style="color:#06b6ef">intValue&lt;/span>(String value, Parser parser) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Integer val &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -502,13 +502,13 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到字段取值直接调用 &lt;code>Integer.parseInt&lt;/code> 方法解析，且没捕获异常。&lt;br>
 不知道这样设计是处于什么考虑，但这个 &lt;code>NumberFormatException&lt;/code> 异常会打断读取的流程：出现一条有问题的数据时，会影响整个查询任务的执行，在 Es-spark 使用于离线批处理的场景，是不恰当的，所以有必要进行调整。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;h3 id="自定义-valuereader">自定义 ValueReader&lt;/h3>
-&lt;p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 &lt;code>org.elasticsearch.hadoop.serialization.builder.ValueReader&lt;/code> 接口，并通过 &lt;code>es.ser.reader.value.class&lt;/code> 配置项（常量&lt;code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS&lt;/code>）配置自定义的 &lt;code>ValueReader&lt;/code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html" target="_blank" rel="noopener"
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;h3 id="自定义-valuereader">自定义 ValueReader
+&lt;/h3>&lt;p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 &lt;code>org.elasticsearch.hadoop.serialization.builder.ValueReader&lt;/code> 接口，并通过 &lt;code>es.ser.reader.value.class&lt;/code> 配置项（常量&lt;code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS&lt;/code>）配置自定义的 &lt;code>ValueReader&lt;/code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html" target="_blank" rel="noopener"
 >官方文档&lt;/a> 中也印证了这一点。&lt;/p>
 &lt;p>这样实际处理下来，基本是要拷贝 &lt;code>JdkValueReader&lt;/code> 源码进行修改作为自定义的 &lt;code>ValueReader&lt;/code> 实现；显然，这样就不能随 ES-spark 升级而自动升级对应实现，同时，在代码中，自定义的修改也和原 &lt;code>JdkValueReader&lt;/code> 的实现混杂在一起，给升级带来困难；因此考虑使用 &lt;code>Javassist&lt;/code> 进行patch。&lt;/p>
-&lt;h3 id="javassist-patch">Javassist Patch&lt;/h3>
-&lt;p>&lt;code>Javassist&lt;/code> 入门和介绍的文章在网上已经很多了，在此不再赘述。&lt;br>
+&lt;h3 id="javassist-patch">Javassist Patch
+&lt;/h3>&lt;p>&lt;code>Javassist&lt;/code> 入门和介绍的文章在网上已经很多了，在此不再赘述。&lt;br>
 列举一下patch过程中遇到的一些坑，或者说，&lt;code>Javassist&lt;/code> 的一些使用注意事项：&lt;/p>
 &lt;ol>
 &lt;li>不支持泛型，请自行强转；&lt;/li>
@@ -541,8 +541,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log.&lt;span style="color:#06b6ef">error&lt;/span>(&lt;span style="color:#48b685">&amp;#34;给 JdkValueReader 进行 parseInteger() 和 parseLong() 的pack失败:&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> e.&lt;span style="color:#06b6ef">getMessage&lt;/span>(), e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>在此基础上还可以做成按配置动态patch等骚操作。最后编译运行，Pass。&lt;/p></description></item><item><title>Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/flower.jpg" alt="Featured image of post Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用" />&lt;p>介绍在部署了Kerberos的安全Hadoop集群中, Sqoop,Hive,HBase,Kafka,Maxwell使用方法.&lt;/p>
-&lt;h2 id="sqoop使用">Sqoop使用&lt;/h2>
-&lt;p>配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:&lt;/p>
+&lt;h2 id="sqoop使用">Sqoop使用
+&lt;/h2>&lt;p>配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:&lt;/p>
 &lt;ol>
 &lt;li>分配sqoop的组, 执行&lt;code>usermod -a -G hdfs sqoop&lt;/code>加入到hdfs组, 使用&lt;code>groups sqoop&lt;/code>确认执行成功;&lt;/li>
 &lt;li>进入Hue的用户管理界面, 新增sqoop用户, 在hdfs用户组中;&lt;/li>
@@ -551,8 +551,8 @@
 &lt;li>使用kinit命令切换到sqoop用户(在脚本中可以使用keytab切换)&lt;/li>
 &lt;li>执行sqoop命令&lt;/li>
 &lt;/ol>
-&lt;h2 id="spark访问hbase">Spark访问HBase&lt;/h2>
-&lt;ol>
+&lt;h2 id="spark访问hbase">Spark访问HBase
+&lt;/h2>&lt;ol>
 &lt;li>进入cdh1, 创建Kerberos用户, 名为hbase; 导出keytab, 名为hbase.keytab, 保存到本地;&lt;/li>
 &lt;li>下载krb5.conf到本地.&lt;/li>
 &lt;li>创建测试类, 并执行, 代码如下:&lt;/li>
@@ -608,8 +608,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> resultList
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问hive">Spark访问Hive&lt;/h2>
-&lt;ol>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问hive">Spark访问Hive
+&lt;/h2>&lt;ol>
 &lt;li>Hive可以沿用hbase的Kerberos用户, 也可以新建一个Hive用户及其对应keytab文件.&lt;/li>
 &lt;li>本地测试请将集群的&lt;code>hive-site.xml&lt;/code>导出并保存在项目的&lt;code>src/main/resources/&lt;/code>目录下;&lt;/li>
 &lt;li>编写Spark测试程序:&lt;/li>
@@ -634,8 +634,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sc&lt;span style="color:#5bc4bf">.&lt;/span>stop&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问kafka">Spark访问Kafka&lt;/h2>
-&lt;ol>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问kafka">Spark访问Kafka
+&lt;/h2>&lt;ol>
 &lt;li>进入Cloudera Manager的Kafka配置页面, 搜索&amp;rsquo;Inter Broker Protocol&amp;rsquo;, 更改为&amp;rsquo;SASL_PLAINTEXT';&lt;/li>
 &lt;li>重启Kafka配置;&lt;/li>
 &lt;li>进入cdh1, 创建Kerberos用户, 名为kafka; 导出keytab, 名为kafka.keytab, 并保存到本地(测试用);&lt;/li>
@@ -701,8 +701,8 @@
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意修改其中的jass.conf路径, 并确保其中配置的keytab存在; 再执行相应的kafka命令.&lt;br>
 如果觉得麻烦, 也可以编辑&lt;code>/opt/cloudera/parcels/KAFKA-3.0.0-1.3.0.0.p0.40/lib/kafka/bin/kafka-run-class.sh&lt;/code>, 在&lt;code>exec $JAVA&lt;/code>后面增加:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-Djava.security.krb5.conf&lt;span style="color:#5bc4bf">=&lt;/span>/etc/krb5.conf -Djava.security.auth.login.config&lt;span style="color:#5bc4bf">=&lt;/span>/root/jaas.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="maxwell配置">Maxwell配置&lt;/h2>
-&lt;ol>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="maxwell配置">Maxwell配置
+&lt;/h2>&lt;ol>
 &lt;li>编辑${MAXWELL_HOME}/bin/maxwell, 在文件尾部附件的&lt;code>exec $JAVA $JAVA_OPTS&lt;/code>后面增加:&lt;/li>
 &lt;/ol>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-Djava.security.krb5.conf&lt;span style="color:#5bc4bf">=&lt;/span>/etc/krb5.conf -Djava.security.auth.login.config&lt;span style="color:#5bc4bf">=&lt;/span>/root/jaas.conf
@@ -719,21 +719,21 @@
 &lt;/ol>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>--config /path/to/config.properties
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Kerberos部署,配置与基础使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:33 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/room.jpg" alt="Featured image of post Kerberos部署,配置与基础使用" />&lt;p>下文以本地测试集群为例, 4节点(cdh1-4), cdh1为NameNode, cdh2-4为DataNode.&lt;/p>
-&lt;h2 id="基础概念">基础概念&lt;/h2>
-&lt;p>Kerberos principal用于在kerberos加密系统中标记一个唯一的身份。&lt;br>
+&lt;h2 id="基础概念">基础概念
+&lt;/h2>&lt;p>Kerberos principal用于在kerberos加密系统中标记一个唯一的身份。&lt;br>
 kerberos为kerberos principal分配tickets使其可以访问由kerberos加密的hadoop服务。&lt;br>
 对于hadoop，principals的格式为username/fully.qualified.domain.name@YOUR-REALM.COM.&lt;br>
 keytab是包含principals和加密principal key的文件。&lt;br>
 keytab文件对于每个host是唯一的，因为key中包含hostname。keytab文件用于不需要人工交互和保存纯文本密码，实现到kerberos上验证一个主机上的principal。&lt;br>
 因为服务器上可以访问keytab文件即可以以principal的身份通过kerberos的认证，所以，keytab文件应该被妥善保存，应该只有少数的用户可以访问。&lt;/p>
-&lt;h2 id="kdc服务安装及配置">KDC服务安装及配置&lt;/h2>
-&lt;h3 id="安装kdc服务">安装KDC服务&lt;/h3>
-&lt;p>选择NameNode节点(cdh1)安装KDC服务, 执行:&lt;/p>
+&lt;h2 id="kdc服务安装及配置">KDC服务安装及配置
+&lt;/h2>&lt;h3 id="安装kdc服务">安装KDC服务
+&lt;/h3>&lt;p>选择NameNode节点(cdh1)安装KDC服务, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>yum -y install krb5-server krb5-libs krb5-auth-dialog krb5-workstation openldap-clients
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其他节点(cdh2-4)只安装Kerberos客户端, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>yum -y install krb5-libs krb5-workstation
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置kdc服务">配置KDC服务&lt;/h3>
-&lt;p>1.编辑/etc/krb5.conf:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置kdc服务">配置KDC服务
+&lt;/h3>&lt;p>1.编辑/etc/krb5.conf:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## Configuration snippets may be placed in this directory as well&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>includedir /etc/krb5.conf.d/
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -780,19 +780,19 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">admin_keytab&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> /var/kerberos/krb5kdc/kadm5.keytab
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#ef6155">supported_enctypes&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal camellia256-cts:normal camellia128-cts:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="创建kerberos数据库">创建Kerberos数据库&lt;/h3>
-&lt;p>在cdh1执行以下命令, 注意域名:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="创建kerberos数据库">创建Kerberos数据库
+&lt;/h3>&lt;p>在cdh1执行以下命令, 注意域名:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kdb5_util create –r TURINGDI.COM -s
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>按提示设置密码并重复密码.&lt;/p>
-&lt;h3 id="创建kerberos的管理账号">创建Kerberos的管理账号&lt;/h3>
-&lt;p>在cdh1执行:&lt;/p>
+&lt;h3 id="创建kerberos的管理账号">创建Kerberos的管理账号
+&lt;/h3>&lt;p>在cdh1执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>kadmin.local
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>依次输入:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>addprinc admin/admin@TURINGDI.COM
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 按提示设置管理账号的密码并重复密码&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>exit
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置服务自启动">配置服务自启动&lt;/h3>
-&lt;p>在cdh1执行:&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="配置服务自启动">配置服务自启动
+&lt;/h3>&lt;p>在cdh1执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>chkconfig krb5kdc on
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hkconfig kadmin on
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>service krb5kdc start
@@ -809,8 +809,8 @@ keytab文件对于每个host是唯一的，因为key中包含hostname。keytab�
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>2018-03-06T16:48:23 2018-03-07T16:48:23 krbtgt/TURINGDI.COM@TURINGDI.COM
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> renew &lt;span style="color:#815ba4">until&lt;/span> 2018-03-13T16:48:23
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即配置成功.&lt;/p>
-&lt;h2 id="cdh集群启用kerberos">CDH集群启用Kerberos&lt;/h2>
-&lt;ol>
+&lt;h2 id="cdh集群启用kerberos">CDH集群启用Kerberos
+&lt;/h2>&lt;ol>
 &lt;li>进入Cloudera Manager的“管理”-&amp;gt; “安全”界面:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/security.png"
 width="1544"
@@ -836,14 +836,14 @@ data-flex-basis="328px"
 &lt;li>输入Cloudera Manager的Kerbers管理员账号，必须和之前创建的账号一致，点击&amp;quot;继续&amp;quot;.&lt;/li>
 &lt;li>最后点击&amp;quot;继续&amp;quot;, 勾选重启集群, 点击&amp;quot;继续&amp;quot;按钮, 等待配置重启集群.&lt;/li>
 &lt;/ol>
-&lt;h2 id="aes-256加密与jce">AES-256加密与JCE&lt;/h2>
-&lt;p>对于使用centos5.6及以上的系统，默认使用AES-256来加密的。这就需要集群中的所有节点上安装JCE.&lt;br>
+&lt;h2 id="aes-256加密与jce">AES-256加密与JCE
+&lt;/h2>&lt;p>对于使用centos5.6及以上的系统，默认使用AES-256来加密的。这就需要集群中的所有节点上安装JCE.&lt;br>
 打开&lt;a class="link" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html" target="_blank" rel="noopener"
 >http://www.oracle.com/technetwork/java/javase/downloads/index.html&lt;/a>, 下载jdk对应的JCE文件.&lt;br>
 解压后的文件放入&lt;code>${JAVA_HOME}/jre/lib/security/&lt;/code>中.&lt;/p>
-&lt;h2 id="kerberos的基础使用">Kerberos的基础使用&lt;/h2>
-&lt;h3 id="yarn配置">Yarn配置&lt;/h3>
-&lt;p>打开Cloudera Manager的Yarn配置页面, 搜索min.user, 修改为0, 然后按提示重启Yarn.&lt;br>
+&lt;h2 id="kerberos的基础使用">Kerberos的基础使用
+&lt;/h2>&lt;h3 id="yarn配置">Yarn配置
+&lt;/h3>&lt;p>打开Cloudera Manager的Yarn配置页面, 搜索min.user, 修改为0, 然后按提示重启Yarn.&lt;br>
 使用Kerberos需要新建一些用户, 其id可能小于1000, 使用Yarn的默认配置可能会导致一些用户不能提交Yarn任务.&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/yarn.png"
 width="1880"
@@ -854,26 +854,26 @@ class="gallery-image"
 data-flex-grow="179"
 data-flex-basis="430px"
 >&lt;/p>
-&lt;h3 id="导出keytab">导出keytab&lt;/h3>
-&lt;p>进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
+&lt;h3 id="导出keytab">导出keytab
+&lt;/h3>&lt;p>进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>xst -k /path/to/*.keytab -norandkey &amp;lt;principal&amp;gt;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中principal为需要导出keytab的用户名, 如hbase/cdh2, 注意-norandkey参数不可缺少, 否则可能会导致重新生成密码, 导致keytab失效.&lt;br>
 导出的keytab的效用等同账号密码, 请注意妥善保管.&lt;/p>
-&lt;h3 id="以某个kerberos用户登录">以某个Kerberos用户登录&lt;/h3>
-&lt;p>两种方法:&lt;/p>
+&lt;h3 id="以某个kerberos用户登录">以某个Kerberos用户登录
+&lt;/h3>&lt;p>两种方法:&lt;/p>
 &lt;ol>
 &lt;li>&lt;code>kinit 用户名@域名&lt;/code>, 输入密码;&lt;/li>
 &lt;li>&lt;code>kinit 用户名@域名 -k -t 对应keytab文件&lt;/code>&lt;/li>
 &lt;/ol>
 &lt;p>后者无需输入密码, 适合在脚本中使用.&lt;br>
 一些组件对Kerberos的令牌有限制, 需要登录对应用户后才能使用, 包括HDFS的文件访问控制, 需要在Kerberos中建立对应的用户.&lt;/p>
-&lt;h3 id="创建kerberos用户">创建Kerberos用户&lt;/h3>
-&lt;p>前面已经使用过了, 进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
+&lt;h3 id="创建kerberos用户">创建Kerberos用户
+&lt;/h3>&lt;p>前面已经使用过了, 进入cdh1, 输入&lt;code>kadmin.local&lt;/code>, 输入以下命令:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>addprinc 用户名@域名
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 按提示设置管理账号的密码并重复密码&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Sentry部署,配置与使用</title><link>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:22 +0800</pubDate><guid>https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/summer.jpg" alt="Featured image of post Sentry部署,配置与使用" />&lt;p>最近在CDH集群部署Sentry和Kerberos遇到了不少坑, 把过程总结一下, 都放上来吧.&lt;/p>
-&lt;h2 id="sentry组件安装">Sentry组件安装&lt;/h2>
-&lt;p>进入Cloudera Manager页面, 点击集群名右边的倒三角按钮, 选择&amp;quot;添加服务&amp;quot;:&lt;br>
+&lt;h2 id="sentry组件安装">Sentry组件安装
+&lt;/h2>&lt;p>进入Cloudera Manager页面, 点击集群名右边的倒三角按钮, 选择&amp;quot;添加服务&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/add.png"
 width="844"
 height="478"
@@ -907,9 +907,9 @@ data-flex-basis="818px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">create&lt;/span> &lt;span style="color:#815ba4">database&lt;/span> sentry &lt;span style="color:#815ba4">default&lt;/span> character &lt;span style="color:#815ba4">set&lt;/span> utf8 &lt;span style="color:#815ba4">default&lt;/span> &lt;span style="color:#815ba4">collate&lt;/span> utf8_general_ci;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> sentry.&lt;span style="color:#5bc4bf">*&lt;/span> &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentry&amp;#39;&lt;/span>&lt;span style="color:#5bc4bf">@&lt;/span>&lt;span style="color:#48b685">&amp;#39;%&amp;#39;&lt;/span> identified &lt;span style="color:#815ba4">by&lt;/span> &lt;span style="color:#48b685">&amp;#39;sentrypassword&amp;#39;&lt;/span>;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>创建Sentry所需的数据库, 然后在Sentry安装页面中填上MySQL的地址账号密码, 点击继续, 等待安装和首次启动完毕.&lt;/p>
-&lt;h2 id="sentry及相关组件配置">Sentry及相关组件配置&lt;/h2>
-&lt;h3 id="hue配置">Hue配置&lt;/h3>
-&lt;p>进入Hue配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
+&lt;h2 id="sentry及相关组件配置">Sentry及相关组件配置
+&lt;/h2>&lt;h3 id="hue配置">Hue配置
+&lt;/h3>&lt;p>进入Hue配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHue.png"
 width="970"
 height="160"
@@ -919,8 +919,8 @@ class="gallery-image"
 data-flex-grow="606"
 data-flex-basis="1455px"
 >&lt;/p>
-&lt;h2 id="hive配置">Hive配置&lt;/h2>
-&lt;p>进入Hive配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
+&lt;h2 id="hive配置">Hive配置
+&lt;/h2>&lt;p>进入Hive配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHive1.png"
 width="946"
 height="170"
@@ -950,8 +950,8 @@ class="gallery-image"
 data-flex-grow="372"
 data-flex-basis="894px"
 >&lt;/p>
-&lt;h3 id="impala配置">Impala配置&lt;/h3>
-&lt;p>注: 需要确认集群每个节点都安装了Impala Daemon服务;如果Impala启动时提示cannot read or execute the parent directory of dfs.domain.socket.path, 则HDFS配置的dfs.client.read.shortcircuit勾选上, 并创建dfs.domain.socket.path的目录.&lt;br>
+&lt;h3 id="impala配置">Impala配置
+&lt;/h3>&lt;p>注: 需要确认集群每个节点都安装了Impala Daemon服务;如果Impala启动时提示cannot read or execute the parent directory of dfs.domain.socket.path, 则HDFS配置的dfs.client.read.shortcircuit勾选上, 并创建dfs.domain.socket.path的目录.&lt;br>
 进入Impala配置, 找到&amp;quot;Sentry 服务&amp;quot;, 选择Sentry:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setImpala.png"
 width="1008"
@@ -962,8 +962,8 @@ class="gallery-image"
 data-flex-grow="560"
 data-flex-basis="1344px"
 >&lt;/p>
-&lt;h3 id="hdfs配置">HDFS配置&lt;/h3>
-&lt;p>进入HDFS配置, 找到&amp;quot;启用访问控制列表 dfs.namenode.acls.enabled&amp;quot;, 勾选:&lt;br>
+&lt;h3 id="hdfs配置">HDFS配置
+&lt;/h3>&lt;p>进入HDFS配置, 找到&amp;quot;启用访问控制列表 dfs.namenode.acls.enabled&amp;quot;, 勾选:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/setHdfs.png"
 width="1032"
 height="114"
@@ -973,8 +973,8 @@ class="gallery-image"
 data-flex-grow="905"
 data-flex-basis="2172px"
 >&lt;/p>
-&lt;h3 id="重启集群">重启集群&lt;/h3>
-&lt;p>Cloudera Manager会提示过期配置需要重启组件, 点击黄色圆形箭头, 点击&amp;quot;重启过时服务&amp;quot;, 并等待重启完成:&lt;br>
+&lt;h3 id="重启集群">重启集群
+&lt;/h3>&lt;p>Cloudera Manager会提示过期配置需要重启组件, 点击黄色圆形箭头, 点击&amp;quot;重启过时服务&amp;quot;, 并等待重启完成:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/change.png"
 width="742"
 height="1202"
@@ -984,19 +984,19 @@ class="gallery-image"
 data-flex-grow="61"
 data-flex-basis="148px"
 >&lt;/p>
-&lt;h2 id="hue用户权限配置">Hue用户权限配置&lt;/h2>
-&lt;h3 id="前提">前提&lt;/h3>
-&lt;p>Hue的用户权限体系是: 每个用户属于一个或多个组, 每个组可以配置其Hue页面访问权限及Hive/Solr/HDFS数据访问权限, 数据的访问权限由角色定义, 而用户组和角色之间是多对多关系.&lt;br>
+&lt;h2 id="hue用户权限配置">Hue用户权限配置
+&lt;/h2>&lt;h3 id="前提">前提
+&lt;/h3>&lt;p>Hue的用户权限体系是: 每个用户属于一个或多个组, 每个组可以配置其Hue页面访问权限及Hive/Solr/HDFS数据访问权限, 数据的访问权限由角色定义, 而用户组和角色之间是多对多关系.&lt;br>
 Hue使用Sentry进行权限管理之后, 要求登录Hue的用户及其组需要在Sentry Server节点(以正式环境为例, 即gs01节点)Linux系统中存在对应的用户和组, 否则无法进行权限控制.&lt;br>
 目前已经在Hue创建了一个hdfs用户组(拥有最高权限), 包含用户admin及hdfs, 两者在gs01节点Linux系统中均存在. hdfs用户的存在主要考虑到Spark程序通过hue的oozie工作流提交时, 保证其执行权限.&lt;br>
 下文假定需要建立一个用户组hiveselect和用户hive1, 允许登录, 拥有部分hive表的select权限.&lt;/p>
-&lt;h3 id="创建linux用户">创建Linux用户&lt;/h3>
-&lt;p>ssh登录gs01节点, 执行:&lt;/p>
+&lt;h3 id="创建linux用户">创建Linux用户
+&lt;/h3>&lt;p>ssh登录gs01节点, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>groupadd hiveselect
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>useradd -f hiveselect hive1
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>P.S. 上面命令建立的用户是没有密码的, 需要密码或其他选项的请自行添加参数.&lt;/p>
-&lt;h3 id="创建hue用户">创建Hue用户&lt;/h3>
-&lt;p>使用admin或hdfs用户登录Hue, 点击右上角用户名, 选择&amp;quot;Manage users&amp;quot;:&lt;br>
+&lt;h3 id="创建hue用户">创建Hue用户
+&lt;/h3>&lt;p>使用admin或hdfs用户登录Hue, 点击右上角用户名, 选择&amp;quot;Manage users&amp;quot;:&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/addUser.png"
 width="446"
 height="324"
@@ -1054,8 +1054,8 @@ class="gallery-image"
 data-flex-grow="116"
 data-flex-basis="280px"
 >&lt;/p>
-&lt;h3 id="配置角色权限">配置角色权限&lt;/h3>
-&lt;p>点击左上角≡按钮, 再点击&amp;quot;Security&amp;rdquo;, 选择Hive Tables选项卡, 进行Hive访问权限配置.&lt;br>
+&lt;h3 id="配置角色权限">配置角色权限
+&lt;/h3>&lt;p>点击左上角≡按钮, 再点击&amp;quot;Security&amp;rdquo;, 选择Hive Tables选项卡, 进行Hive访问权限配置.&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/Sentry%E9%83%A8%E7%BD%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%BD%BF%E7%94%A8/menu.png"
 width="554"
 height="984"
@@ -1076,8 +1076,8 @@ data-flex-grow="252"
 data-flex-basis="606px"
 >&lt;br>
 填写完毕之后, 点击Save按钮, 稍等片刻即可生效(按目前经验来看, 新增的组可能需要3-5分钟才能生效, 已经配置过的组修改访问权限的话几乎是立刻生效).&lt;/p>
-&lt;h3 id="hive最高权限">Hive最高权限&lt;/h3>
-&lt;p>Hue中配置的Hive权限是针对表的读写权限的, 并没有涉及到建库建表的权限, 使用管理员用户可以赋予该权限, 进入hue
+&lt;h3 id="hive最高权限">Hive最高权限
+&lt;/h3>&lt;p>Hue中配置的Hive权限是针对表的读写权限的, 并没有涉及到建库建表的权限, 使用管理员用户可以赋予该权限, 进入hue
 的Hive编辑器, 执行:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-sql" data-lang="sql">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">grant&lt;/span> &lt;span style="color:#815ba4">all&lt;/span> &lt;span style="color:#815ba4">on&lt;/span> server server1 &lt;span style="color:#815ba4">to&lt;/span> &lt;span style="color:#815ba4">role&lt;/span> hue角色名;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

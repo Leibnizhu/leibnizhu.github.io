@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>LinkedList on Heaven's Door</title><link>https://leibnizhu.github.io/tags/LinkedList/</link><description>Recent content in LinkedList on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 31 Jul 2017 14:35:06 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/LinkedList/index.xml" rel="self" type="application/rss+xml"/><item><title>LinkedList源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Mon, 31 Jul 2017 14:35:06 +0800</pubDate><guid>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/night.png" alt="Featured image of post LinkedList源码阅读笔记（JDK8）" />&lt;h1 id="linkedlist源码阅读笔记">LinkedList源码阅读笔记&lt;/h1>
-&lt;h2 id="继承结构">继承结构&lt;/h2>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML.png"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>LinkedList on Heaven's Door</title><link>https://leibnizhu.github.io/tags/LinkedList/</link><description>Recent content in LinkedList on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 31 Jul 2017 14:35:06 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/LinkedList/index.xml" rel="self" type="application/rss+xml"/><item><title>LinkedList源码阅读笔记（JDK8）</title><link>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</link><pubDate>Mon, 31 Jul 2017 14:35:06 +0800</pubDate><guid>https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/night.png" alt="Featured image of post LinkedList源码阅读笔记（JDK8）" />&lt;h1 id="linkedlist源码阅读笔记">LinkedList源码阅读笔记
+&lt;/h1>&lt;h2 id="继承结构">继承结构
+&lt;/h2>&lt;p>&lt;img src="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML.png"
 width="658"
 height="455"
 srcset="https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML_hu17910684674494748801.png 480w, https://leibnizhu.github.io/p/LinkedList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0JDK8/LinkedList_UML_hu3714244879672279204.png 1024w"
@@ -9,8 +9,8 @@ class="gallery-image"
 data-flex-grow="144"
 data-flex-basis="347px"
 >&lt;/p>
-&lt;h2 id="成员变量">成员变量&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//记录长度&lt;/span>
+&lt;h2 id="成员变量">成员变量
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//记录长度&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> &lt;span style="color:#fec418">int&lt;/span> size &lt;span style="color:#5bc4bf">=&lt;/span> 0;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//第一个元素的指针&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> first;
@@ -18,14 +18,14 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">transient&lt;/span> Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> last;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>以上成员变量都用了transient关键字避免被持久化。&lt;/p>
 &lt;p>从继承结构来看，&lt;code>LinkedList&lt;/code>继承了&lt;code>AbstractSequentialList&lt;/code>，而&lt;code>AbstractSequentialList&lt;/code>继承了&lt;code>AbstractList&lt;/code>，因此&lt;code>LinkedList&lt;/code>也继承了&lt;code>protected transient int modCount&lt;/code>变量，具体作用与&lt;code>ArayList&lt;/code>中一样，不再赘述。&lt;/p>
-&lt;h2 id="构造方法">构造方法&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#06b6ef">LinkedList&lt;/span>()
+&lt;h2 id="构造方法">构造方法
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#06b6ef">LinkedList&lt;/span>()
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>默认构造方法，实现为空方法。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#06b6ef">LinkedList&lt;/span>(Collection&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> c)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>调用&lt;code>addAll()&lt;/code>方法将参数c中的所有元素增加到当前实例中，完成构造。&lt;/p>
-&lt;h2 id="内部类node">内部类Node&lt;/h2>
-&lt;h3 id="定义">定义&lt;/h3>
-&lt;p>在&lt;code>LinkedList&lt;/code>中，使用&lt;code>Node&lt;/code>内部类存储List的每个元素，其结构比较简单:&lt;/p>
+&lt;h2 id="内部类node">内部类Node
+&lt;/h2>&lt;h3 id="定义">定义
+&lt;/h3>&lt;p>在&lt;code>LinkedList&lt;/code>中，使用&lt;code>Node&lt;/code>内部类存储List的每个元素，其结构比较简单:&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>item&lt;/code>存储具体的List元素引用&lt;/li>
 &lt;li>&lt;code>next&lt;/code>和&lt;code>prev&lt;/code>分别存储后一个和上一个元素的引用，由此构成链表。&lt;/li>
@@ -41,8 +41,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">prev&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> prev;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="维护链表的基础方法">维护链表的基础方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="维护链表的基础方法">维护链表的基础方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 将元素插入到链表头部
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * prev=LinkedList.next, next=null
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 然后更新first，原来first的prev引用更新为新元素
@@ -84,9 +84,9 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 代码实现上类似于unlinkFirst()与unlinkLast()的结合
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>E &lt;span style="color:#06b6ef">unlink&lt;/span>(Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> x)
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="常规方法">常规方法&lt;/h2>
-&lt;h3 id="维护头部尾部的方法">维护头部尾部的方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//first为空则抛NoSuchElementException异常，否则返回first.item&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="常规方法">常规方法
+&lt;/h2>&lt;h3 id="维护头部尾部的方法">维护头部尾部的方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//first为空则抛NoSuchElementException异常，否则返回first.item&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">getFirst&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//last为空则抛NoSuchElementException异常，否则返回last.item&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">getLast&lt;/span>();
@@ -100,9 +100,9 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">addFirst&lt;/span>(E e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//调用linkLast()进行处理，允许e为null&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">addLast&lt;/span>(E e);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="接口常规增删改查方法">接口常规增删改查方法&lt;/h3>
-&lt;h4 id="增">增&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(E e); &lt;span style="color:#776e71">//调用linkLast()进行处理，并返回true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="接口常规增删改查方法">接口常规增删改查方法
+&lt;/h3>&lt;h4 id="增">增
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(E e); &lt;span style="color:#776e71">//调用linkLast()进行处理，并返回true&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">add&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E element);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>指定下标插入元素的方法&lt;code>add()&lt;/code>先对&lt;code>index&lt;/code>进行下标越界检查，然后如果&lt;code>index==size&lt;/code>，即插入到List最后面，那么直接调用&lt;code>linkLast()&lt;/code>执行插入就可以；否则调用&lt;code>linkBefore()&lt;/code>插入到指定下标的元素前面，即新的元素拥有&lt;code>index&lt;/code>的下标（符合&lt;code>add()&lt;/code>方法对&lt;code>index&lt;/code>参数的定义）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">addAll&lt;/span>(Collection&lt;span style="color:#5bc4bf">&amp;lt;?&lt;/span> &lt;span style="color:#815ba4">extends&lt;/span> E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> c); &lt;span style="color:#776e71">//调用addAll(size, c)&lt;/span>
@@ -117,18 +117,18 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> pred &lt;span style="color:#5bc4bf">=&lt;/span> succ.&lt;span style="color:#06b6ef">prev&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>随后遍历Object数组，逐个生成&lt;code>Node&lt;/code>对象，并将上一个元素的next指向当前元素。遍历完后，维护插入新元素的前/后元素的后/前引用，如果succ为null则&lt;code>LinkedList.last&lt;/code>赋值为&lt;code>pred&lt;/code>，同时维护&lt;code>size&lt;/code>，更新&lt;code>modCount&lt;/code>。&lt;/p>
-&lt;h4 id="删">删&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">remove&lt;/span>(Object o);
+&lt;h4 id="删">删
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">remove&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>删除元素的方法&lt;code>remove()&lt;/code>类似&lt;code>indexOf()&lt;/code>，从&lt;code>first&lt;/code>开始遍历List，逐个元素判断是否与参数&lt;code>o&lt;/code>相同（判断方法与&lt;code>indexOf()&lt;/code>一样），找到后调用&lt;code>unlink()&lt;/code>进行删除并返回true。如果没找到相同的元素则返回false。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">remove&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>该方法删除指定下标的元素。检查下标没有越界后，调用&lt;code>unlink(node(index))&lt;/code>删除指定元素（其中&lt;code>node()&lt;/code>是查找指定下标的元素，详见 &lt;em>查&lt;/em> 部分）。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">clear&lt;/span>();
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>清空整个List，从&lt;code>first&lt;/code>开始，遍历整个List，把每个&lt;code>Node&lt;/code>的&lt;code>item next prev&lt;/code>都置为null（方便GC），以及&lt;code>LinkedList&lt;/code>的&lt;code>first last&lt;/code>也置为null，&lt;code>size&lt;/code>归零。&lt;/p>
-&lt;h4 id="改">改&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">set&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E element);
+&lt;h4 id="改">改
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">set&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index, E element);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>将下标为&lt;code>index&lt;/code>的元素设置为&lt;code>element&lt;/code>，并将旧值返回。该方法在检查&lt;code>index&lt;/code>是否越界后，先调用&lt;code>node()&lt;/code>方法查找到指定下标的&lt;code>Node&lt;/code>元素，直接修改&lt;code>Node&lt;/code>实例的&lt;code>item&lt;/code>属性为新值，并返回旧值（而不是新建一个&lt;code>Node&lt;/code>，这样既减少操作，也减少多余的对象，从而减轻GC负担）。&lt;/p>
-&lt;h4 id="旧的查找方法">旧的查找方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">contains&lt;/span>(Object o);
+&lt;h4 id="旧的查找方法">旧的查找方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">contains&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">indexOf&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">lastIndexOf&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>方法&lt;code>contains()&lt;/code>判断当前List是否包含指定元素，返回&lt;code>indexOf(o) != -1&lt;/code>。&lt;br>
@@ -139,8 +139,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">get&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>前者&lt;code>node()&lt;/code>方法是通过遍历从链表中查找到指定下标的元素，其中有个优化，如果查找的下标大于&lt;code>size&lt;/code>的一半则从&lt;code>last&lt;/code>引用开始找，否则从&lt;code>first&lt;/code>引用开始找。&lt;br>
 后者&lt;code>get()&lt;/code>方法在检查&lt;code>index&lt;/code>参数没有越界后，调用前者进行查找。&lt;/p>
-&lt;h4 id="jdk5-开始引入的方法">&lt;em>JDK5&lt;/em> 开始引入的方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//获取但不移除该List的头部，first为null时返回null&lt;/span>
+&lt;h4 id="jdk5-开始引入的方法">&lt;em>JDK5&lt;/em> 开始引入的方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//获取但不移除该List的头部，first为null时返回null&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">peek&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//获取但不移除该List的头部，调用getFirst()，first为null时抛NoSuchElementException异常&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> E &lt;span style="color:#06b6ef">element&lt;/span>();
@@ -152,8 +152,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//将指定元素添加到该List的尾部，调用add()方法处理&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">offer&lt;/span>(E e);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="jdk6-开始引入的方法">&lt;em>JDK6&lt;/em> 开始引入的方法&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//在该List的开头插入指定的元素，调用addFirst()方法，后者又调用linkFirst()处理，返回true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="jdk6-开始引入的方法">&lt;em>JDK6&lt;/em> 开始引入的方法
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//在该List的开头插入指定的元素，调用addFirst()方法，后者又调用linkFirst()处理，返回true&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">offerFirst&lt;/span>(E e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// 在该List末尾插入指定的元素，调用addLast()方法，后者又调用linkLast()处理，返回true。实际实现与offer()一致&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">offerLast&lt;/span>(E e);
@@ -179,8 +179,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//再调用unlink()进行删除处理，返回true；遍历完后还找不到对应元素则返回false。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">removeLastOccurrence&lt;/span>(Object o);
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到 &lt;em>JDK6&lt;/em> 新增的这些方法实际上是对 &lt;em>JDK5&lt;/em> 新增的方法的扩展，从默认的操作（可能是针对头部或尾部）扩展到对头部和尾部的操作。&lt;/p>
-&lt;h3 id="边界检查方法">边界检查方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//是否合法的元素下标&lt;/span>
+&lt;h3 id="边界检查方法">边界检查方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//是否合法的元素下标&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isElementIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//对迭代器和add()方法而言是否合法下标（允许等于size）&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isPositionIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
@@ -192,8 +192,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">checkElementIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//检查对迭代器和add()方法而言是否合法下标，不合法则抛出IndexOutOfBoundsException异常&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">checkPositionIndex&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="其他方法">其他方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//先调用父类的clone方法复制（其实是Object的本地方法），&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="其他方法">其他方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//先调用父类的clone方法复制（其实是Object的本地方法），&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//然后遍历原List，逐个add到克隆后的新List中并返回&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Object &lt;span style="color:#06b6ef">clone&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -211,15 +211,15 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//读取输入流构造List，先读入一个int作为size，&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//然后从输入流读取size次，每次读取的对象强转为E类型，并调用linkLast()加入到L链表尾部&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">readObject&lt;/span>(java.&lt;span style="color:#06b6ef">io&lt;/span>.&lt;span style="color:#06b6ef">ObjectInputStream&lt;/span> s);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="jdk8-开始引入的方法">&lt;em>JDK8&lt;/em> 开始引入的方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//spliterator：返回一个内部类static final class LLSpliterator&amp;lt;E&amp;gt; implements Spliterator&amp;lt;E&amp;gt; 的实例。&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="jdk8-开始引入的方法">&lt;em>JDK8&lt;/em> 开始引入的方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//spliterator：返回一个内部类static final class LLSpliterator&amp;lt;E&amp;gt; implements Spliterator&amp;lt;E&amp;gt; 的实例。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//为了并行遍历数据源中的元素，Stream.isParallel()实现调用。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//关于Spliterator接口在ArrayList源码的笔记里有介绍，在此不再赘述&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//这个实现类在final int getEst()est = LinkedList的size，expectedModCount = LinkedList的modCount&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Spliterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">spliterator&lt;/span>();
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="迭代器">迭代器&lt;/h2>
-&lt;h3 id="获取迭代器的方法">获取迭代器的方法&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回此列表中的元素的列表迭代器（按适当顺序），从列表中指定位置开始。&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="迭代器">迭代器
+&lt;/h2>&lt;h3 id="获取迭代器的方法">获取迭代器的方法
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回此列表中的元素的列表迭代器（按适当顺序），从列表中指定位置开始。&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//检查下标越界后，返回LinkedList的内部类ListItr的实例&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> ListIterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#06b6ef">listIterator&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> index);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回以逆向顺序在此双端队列的元素上进行迭代的迭代器。&lt;/span>
@@ -228,8 +228,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//返回父类AbstractList的内部类ListItr实例&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> Iterator&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> AbstractSequentialList.&lt;span style="color:#06b6ef">iterator&lt;/span>();
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="迭代器listitr">迭代器ListItr&lt;/h3>
-&lt;p>包含以下成员变量：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="迭代器listitr">迭代器ListItr
+&lt;/h3>&lt;p>包含以下成员变量：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//next()，previous()，remove()，set()，add()等方法返回的Node元素记录&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> Node&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>E&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> lastReturned;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//当前游标指向的Node元素&lt;/span>
@@ -241,8 +241,8 @@ data-flex-basis="347px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//因此外部操作后再进行迭代器的操作会抛出ConcurrentModificationException异常&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">int&lt;/span> expectedModCount &lt;span style="color:#5bc4bf">=&lt;/span> modCount;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其余&lt;code>ListIterator&lt;/code>接口方法的具体实现在此不表，与&lt;code>ArrayList&lt;/code>的&lt;code>ListItr&lt;/code>的实现类似，只是在一些修改链表的方法里需要对应修改前后元素的引用而已，此外上一个下一个的迭代效率也较高（直接读取Node元素的prev/next引用）。&lt;/p>
-&lt;h3 id="迭代器descendingiterator">迭代器DescendingIterator&lt;/h3>
-&lt;p>该迭代器是为了实现&lt;code>java.util.Deque&lt;/code>接口的&lt;code>Iterator&amp;lt;E&amp;gt; descendingIterator()&lt;/code>方法。&lt;br>
+&lt;h3 id="迭代器descendingiterator">迭代器DescendingIterator
+&lt;/h3>&lt;p>该迭代器是为了实现&lt;code>java.util.Deque&lt;/code>接口的&lt;code>Iterator&amp;lt;E&amp;gt; descendingIterator()&lt;/code>方法。&lt;br>
 具体实现还是用前面介绍的&lt;code>LinkedList&lt;/code>的内部类&lt;code>ListItr&lt;/code>。由于是反向的迭代器，因此用私有变量&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> ListItr itr &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> ListItr(size());
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>实现从链表尾部开始迭代。&lt;br>

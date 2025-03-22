@@ -4,10 +4,10 @@
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%b8%89%e7%b1%bb%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84/" >《深入理解Java虚拟机》 学习笔记(三)——类文件结构&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e5%9b%9b%e7%b1%bb%e5%8a%a0%e8%bd%bd%e6%9c%ba%e5%88%b6%e4%b8%8eJVM%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(四)——类加载机制与JVM优化&lt;/a>&lt;br>
 &lt;a class="link" href="https://leibnizhu.github.io/p/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3Java%e8%99%9a%e6%8b%9f%e6%9c%ba-%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0%e4%ba%94.%e7%bb%88%e7%ab%a0Java%e5%86%85%e5%ad%98%e6%a8%a1%e5%9e%8b%e4%b8%8e%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8/%e4%bc%98%e5%8c%96/" >《深入理解Java虚拟机》 学习笔记(五.终章)——Java内存模型与线程安全/优化&lt;/a>&lt;/p>
-&lt;h2 id="jvm多语言支持">JVM多语言支持&lt;/h2>
-&lt;p>Java规范分为Java语言规范（The Java Language Specification）和Java虚拟机规范（The Java Virtual Machine Specification），因此JVM支持多种语言，只要该语言编译后的类文件符合JVM规范。比如我们常用的Scala、Kotlin、Clojure、Groovy等等。&lt;/p>
-&lt;h2 id="类文件结构">类文件结构&lt;/h2>
-&lt;p>基础原则：多字节的数据，高位在前。JVM加载Class文件的时候进行动态连接。&lt;br>
+&lt;h2 id="jvm多语言支持">JVM多语言支持
+&lt;/h2>&lt;p>Java规范分为Java语言规范（The Java Language Specification）和Java虚拟机规范（The Java Virtual Machine Specification），因此JVM支持多种语言，只要该语言编译后的类文件符合JVM规范。比如我们常用的Scala、Kotlin、Clojure、Groovy等等。&lt;/p>
+&lt;h2 id="类文件结构">类文件结构
+&lt;/h2>&lt;p>基础原则：多字节的数据，高位在前。JVM加载Class文件的时候进行动态连接。&lt;br>
 Class文件结构类似C的结构体，包含无符号数（u1/u2/u4/u8表示1/2/4/8字节的无符号数）和表（由多个无符号数或表组成的结构体，class文件本身就是一个大的表），有多个同类的无符号数或者表并数量不确定的时候，一般先用一个无符号数记录数量，后面接上一系列连续的这种无符号数或者表。Class文件没有分隔符号，所以整个数据结构都是被严格规定的。&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%89%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/7.png"
 width="656"
@@ -18,11 +18,11 @@ class="gallery-image"
 data-flex-grow="465"
 data-flex-basis="1116px"
 >&lt;/p>
-&lt;h3 id="魔数与class文件版本">魔数与Class文件版本&lt;/h3>
-&lt;p>Class文件头4个字节是固定的0xCAFEBABE（咖啡宝贝），显然与Java语言命名的历史相关。&lt;br>
+&lt;h3 id="魔数与class文件版本">魔数与Class文件版本
+&lt;/h3>&lt;p>Class文件头4个字节是固定的0xCAFEBABE（咖啡宝贝），显然与Java语言命名的历史相关。&lt;br>
 紧接着4个字节存储Class文件版本号，5-6字节是子版本号，7-8字节是主版本号（比如1.7.0是0x0033）。JVM读取Class文件的时候，搞版本JDK可以兼容旧版本Class文件，就是通过这4个字节进行判定的。&lt;/p>
-&lt;h3 id="常量池">常量池&lt;/h3>
-&lt;p>一般来说常量池占Class文件空间最大，由于长度不定，所以入口有u2类型的常量池容量计数器（8-9位），计数从1开始（Class文件中其他容量计数器都是从0开始的）。&lt;br>
+&lt;h3 id="常量池">常量池
+&lt;/h3>&lt;p>一般来说常量池占Class文件空间最大，由于长度不定，所以入口有u2类型的常量池容量计数器（8-9位），计数从1开始（Class文件中其他容量计数器都是从0开始的）。&lt;br>
 常量池存储两类常量：字面量（类似Java语言中的常量）和符号引用，后者包括类和接口全名、字段名称和描述符、方法名称和描述符。JVM运行时从常量池获取符号引用再在类创建时解析到具体内存地址，没有C语言的“连接”步骤。&lt;br>
 常量池每一个常量都是一个表。，一共有14种表，表的开头都是一个u1类型的标志位代表当前常量的类型（浮点整形之类），后面的结构与具体的常量类型有关，各自不同。&lt;br>
 使用&lt;code>javap -verbose 类名&lt;/code>可以解析类的结构，输出结构大概这样：&lt;/p>
@@ -53,13 +53,13 @@ data-flex-basis="1116px"
 &lt;li>CONSTANT_Utf8_info，字符串变量，标志为0x01，紧接着是1个u2类型的字符串长度，然后是字符串内容的bytes，u1类型，数量等于前面u2定义的。&lt;/li>
 &lt;/ol>
 &lt;p>从上面可以推导：类名（全限定名）是字符串常量，长度用u2类型表示，也就是最大长度是65535，换言之就是Java类全名最长65535，超过的无法编译。&lt;/p>
-&lt;h3 id="访问标志">访问标志&lt;/h3>
-&lt;p>常量池结束之后，有两个字节为访问标志，代表当前Class文件是否public、是否类/接口/枚举、是否抽象、是否注解等等。&lt;/p>
-&lt;h3 id="类索引父类索引及接口索引集合">类索引、父类索引及接口索引集合&lt;/h3>
-&lt;p>&lt;strong>类索引&lt;/strong>和&lt;strong>父类索引&lt;/strong>分别为u2类型数据，&lt;strong>接口索引集合&lt;/strong>结合为u2类型数据的集合（只能有一个父类，可以实现多个接口），分别用于记录当前类、父类、实现的接口的类描述符（CONSTANT_Class_info）在常量池中的索引。&lt;br>
+&lt;h3 id="访问标志">访问标志
+&lt;/h3>&lt;p>常量池结束之后，有两个字节为访问标志，代表当前Class文件是否public、是否类/接口/枚举、是否抽象、是否注解等等。&lt;/p>
+&lt;h3 id="类索引父类索引及接口索引集合">类索引、父类索引及接口索引集合
+&lt;/h3>&lt;p>&lt;strong>类索引&lt;/strong>和&lt;strong>父类索引&lt;/strong>分别为u2类型数据，&lt;strong>接口索引集合&lt;/strong>结合为u2类型数据的集合（只能有一个父类，可以实现多个接口），分别用于记录当前类、父类、实现的接口的类描述符（CONSTANT_Class_info）在常量池中的索引。&lt;br>
 类索引和父类索引紧接在访问标志后面，再后面是接口索引集合，入口是一个数量计数器，0表示没有实现任何接口，再后面就是具体的接口类描述符索引。&lt;/p>
-&lt;h3 id="字段表集合">字段表集合&lt;/h3>
-&lt;p>描述类或接口中定义的字段，包括静态和非静态的。结构如下：&lt;/p>
+&lt;h3 id="字段表集合">字段表集合
+&lt;/h3>&lt;p>描述类或接口中定义的字段，包括静态和非静态的。结构如下：&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -108,8 +108,8 @@ data-flex-basis="1116px"
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>(I)Ljava&lt;span style="color:#5bc4bf">/&lt;/span>lang&lt;span style="color:#5bc4bf">/&lt;/span>String;
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中L是表示对象类型。&lt;br>
 此外，字段表集合不会列出从父类或接口中继承的字段，但可能会有代码中不存在的字段，比如内部类对外部类实例的引用之类。&lt;/p>
-&lt;h3 id="方法表集合">方法表集合&lt;/h3>
-&lt;p>方法表集合的入口同样也是一个u2类型的计数器，紧接着是各个具体的方法。方法表的结构与字段表基本一样，不列出来了。区别：&lt;/p>
+&lt;h3 id="方法表集合">方法表集合
+&lt;/h3>&lt;p>方法表集合的入口同样也是一个u2类型的计数器，紧接着是各个具体的方法。方法表的结构与字段表基本一样，不列出来了。区别：&lt;/p>
 &lt;ol>
 &lt;li>首先是access_flags的取值范围不同，比如没有ACC_TRANSIENT、有ACC_SYNCHRONIZED等值；&lt;/li>
 &lt;li>name_index表示方法名索引，descriptor_index表示方法描述符索引，跟字段表一样；&lt;/li>
@@ -118,10 +118,10 @@ data-flex-basis="1116px"
 &lt;li>同样可能出现代码中原本没有的方法，比如&amp;lt;clinit&amp;gt;（类构造器）、&amp;lt;init&amp;gt;（实例对象构造器）。&lt;/li>
 &lt;/ol>
 &lt;p>两个方法名字相同，参数列表相同，返回值类型不同，是允许共存在一个Class文件中的，但Java语言不允许这样。&lt;/p>
-&lt;h3 id="属性表集合">属性表集合&lt;/h3>
-&lt;p>Class文件、字段表、方法表都可以有自己的属性表，Java7里面定义了21种属性。&lt;/p>
-&lt;h4 id="code属性">Code属性&lt;/h4>
-&lt;p>并非所有方法表都有Code属性，比如接口和抽象类的方法就没有。结构如下：&lt;/p>
+&lt;h3 id="属性表集合">属性表集合
+&lt;/h3>&lt;p>Class文件、字段表、方法表都可以有自己的属性表，Java7里面定义了21种属性。&lt;/p>
+&lt;h4 id="code属性">Code属性
+&lt;/h4>&lt;p>并非所有方法表都有Code属性，比如接口和抽象类的方法就没有。结构如下：&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -195,22 +195,22 @@ data-flex-basis="1116px"
 &lt;/tbody>
 &lt;/table>
 &lt;p>字节码值得注意的一个地方是，javac编译时将this关键字作为一个普通方法参数由JVM调用时自动传入。&lt;/p>
-&lt;h4 id="exceptions属性">Exceptions属性&lt;/h4>
-&lt;p>描述方法可能抛出的受检异常。&lt;/p>
-&lt;h4 id="linenumbertable属性">LineNumberTable属性&lt;/h4>
-&lt;p>描述Java远吗行号与字节码行号之间映射关系，也就是为什么抛异常的时候可以显示源码哪一行抛出的。&lt;/p>
-&lt;h4 id="localvariabletable属性">LocalVariableTable属性&lt;/h4>
-&lt;p>描述栈桢中局部变量表与Java源码中变量的关系，以保证编译后的代码被其他代码调用时，IDE可以显示参数名（否则被arg0、arg1之类的变量名代替）&lt;/p>
-&lt;h4 id="sourcefile属性">SourceFile属性&lt;/h4>
-&lt;p>描述生成当前Class文件的源文件名称，也是抛异常时可以显示源文件名字的原因。但内部类不会生成这个属性。&lt;/p>
-&lt;h4 id="constantvalue属性">ConstantValue属性&lt;/h4>
-&lt;p>static关键字修饰的变量可以使用这个属性。对于Sun javac编译器，final static的变量采用ConstantValue属性初始化，其他static变量在&amp;lt;clinit&amp;gt;（类构造器）中初始化。&lt;/p>
-&lt;h4 id="innerclasses属性">InnerClasses属性&lt;/h4>
-&lt;p>记录内部类和宿主类的关联。内部类和宿主类的Class文件都会有这个属性。&lt;/p>
-&lt;h4 id="signature属性">Signature属性&lt;/h4>
-&lt;p>记录泛型签名信息。Java的泛型是使用擦除式实现的伪泛型，编译后擦除泛型，这个属性为了弥补此缺陷，方便反射API可以拿到泛型类型。&lt;/p>
-&lt;h2 id="字节码指令">字节码指令&lt;/h2>
-&lt;p>字节码指令由一个字节的&lt;strong>操作码&lt;/strong>（代表具体操作）及跟随其后的0个或多个&lt;strong>操作数&lt;/strong>（操作所需的参数）组成。JVM大多数指令不含操作数只有操作码。&lt;br>
+&lt;h4 id="exceptions属性">Exceptions属性
+&lt;/h4>&lt;p>描述方法可能抛出的受检异常。&lt;/p>
+&lt;h4 id="linenumbertable属性">LineNumberTable属性
+&lt;/h4>&lt;p>描述Java远吗行号与字节码行号之间映射关系，也就是为什么抛异常的时候可以显示源码哪一行抛出的。&lt;/p>
+&lt;h4 id="localvariabletable属性">LocalVariableTable属性
+&lt;/h4>&lt;p>描述栈桢中局部变量表与Java源码中变量的关系，以保证编译后的代码被其他代码调用时，IDE可以显示参数名（否则被arg0、arg1之类的变量名代替）&lt;/p>
+&lt;h4 id="sourcefile属性">SourceFile属性
+&lt;/h4>&lt;p>描述生成当前Class文件的源文件名称，也是抛异常时可以显示源文件名字的原因。但内部类不会生成这个属性。&lt;/p>
+&lt;h4 id="constantvalue属性">ConstantValue属性
+&lt;/h4>&lt;p>static关键字修饰的变量可以使用这个属性。对于Sun javac编译器，final static的变量采用ConstantValue属性初始化，其他static变量在&amp;lt;clinit&amp;gt;（类构造器）中初始化。&lt;/p>
+&lt;h4 id="innerclasses属性">InnerClasses属性
+&lt;/h4>&lt;p>记录内部类和宿主类的关联。内部类和宿主类的Class文件都会有这个属性。&lt;/p>
+&lt;h4 id="signature属性">Signature属性
+&lt;/h4>&lt;p>记录泛型签名信息。Java的泛型是使用擦除式实现的伪泛型，编译后擦除泛型，这个属性为了弥补此缺陷，方便反射API可以拿到泛型类型。&lt;/p>
+&lt;h2 id="字节码指令">字节码指令
+&lt;/h2>&lt;p>字节码指令由一个字节的&lt;strong>操作码&lt;/strong>（代表具体操作）及跟随其后的0个或多个&lt;strong>操作数&lt;/strong>（操作所需的参数）组成。JVM大多数指令不含操作数只有操作码。&lt;br>
 Class文件放弃了操作数对齐，因此省略很多填充和分割符，因此体积可以尽量小；缺点是损失一些解析字节码的性能。&lt;br>
 JVM的指令大多数包含了操作的数据类型信息，但因为只有一个字节，也就是说最多只有256种指令，所以不是所有命令对所有数据类型都有独立的指令（非完全独立），同时提供一些指令将指令不支持类型的操作数转换为可支持的类型。&lt;br>
 JVM的浮点数运算，舍入模式是最低有效位向下（0）取整。操作溢出时用有符号的无穷大表示（INF），如果操作结果没有明确数学意义则得到NaN（非数字，比如0/0，∞×0之类）&lt;/p></description></item></channel></rss>

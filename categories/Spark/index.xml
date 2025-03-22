@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Spark on Heaven's Door</title><link>https://leibnizhu.github.io/categories/Spark/</link><description>Recent content in Spark on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 14 May 2022 20:33:58 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/categories/Spark/index.xml" rel="self" type="application/rss+xml"/><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景&lt;/h2>
-&lt;p>去年写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2021/12/04/%e8%b7%a8Yarn%e9%9b%86%e7%be%a4%e6%8f%90%e4%ba%a4spark%e4%bb%bb%e5%8a%a1/" >跨Yarn集群提交spark任务&lt;/a> ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 &lt;code>*-site.xml&lt;/code> 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 &lt;code>*-site.xml&lt;/code> 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Spark on Heaven's Door</title><link>https://leibnizhu.github.io/categories/Spark/</link><description>Recent content in Spark on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 14 May 2022 20:33:58 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/categories/Spark/index.xml" rel="self" type="application/rss+xml"/><item><title>跨Yarn集群提交spark任务——之Spark2.4坑</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</link><pubDate>Sat, 14 May 2022 20:33:58 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/blackcat.jpeg" alt="Featured image of post 跨Yarn集群提交spark任务——之Spark2.4坑" />&lt;h2 id="背景">背景
+&lt;/h2>&lt;p>去年写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2021/12/04/%e8%b7%a8Yarn%e9%9b%86%e7%be%a4%e6%8f%90%e4%ba%a4spark%e4%bb%bb%e5%8a%a1/" >跨Yarn集群提交spark任务&lt;/a> ，是在Spark2.2基础上做的动态提交外部Yarn集群。这里“动态”指不事先将 &lt;code>*-site.xml&lt;/code> 打入jar包，而是执行任务时根据配置按需提交到对应集群；而“外部”集群是相对jar包中（如果已有）的 &lt;code>*-site.xml&lt;/code> 对应的集群以外的集群，也是在“动态”提交的context中定义的，可以理解为提交到任意网络互通的集群。&lt;/p>
 &lt;p>简单回顾下，主要做了两件事情：&lt;/p>
 &lt;ol>
 &lt;li>创建SparkContext前，将外部集群的 &lt;code>*-site.xml&lt;/code> 放入classpath，如 &lt;code>$PWD&lt;/code> 。&lt;/li>
 &lt;li>创建SparkContext前，&lt;code>HADOOP_CONF_DIR&lt;/code> 和 &lt;code>YARN_CONF_DIR&lt;/code> 环境变量改为外部集群 &lt;code>*-site.xml&lt;/code> 配置文件所在位置；由于启动java程序后不能直接修改环境变量，在实现上使用了黑魔法。&lt;/li>
 &lt;/ol>
 &lt;p>时隔半年终于重拾博客，显然又被坑了，没错，之前的方法在Spark2.4里行不通了。&lt;/p>
-&lt;h2 id="问题原因分析及解决方案">问题、原因分析、及解决方案&lt;/h2>
-&lt;h3 id="spark24中的报错">Spark2.4中的报错&lt;/h3>
-&lt;p>在原来代码基础上，升级Spark为2.4.8，执行提交到外部集群的任务，提交到Yarn的AM报错如下：&lt;/p>
+&lt;h2 id="问题原因分析及解决方案">问题、原因分析、及解决方案
+&lt;/h2>&lt;h3 id="spark24中的报错">Spark2.4中的报错
+&lt;/h3>&lt;p>在原来代码基础上，升级Spark为2.4.8，执行提交到外部集群的任务，提交到Yarn的AM报错如下：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>Container id: container_e36_1650338235135_41710_02_000001
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Exit code: 1
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Container exited with a non-zero exit code 1. Error file: prelaunch.err.
@@ -43,8 +43,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>Caused by: java.net.UnknownHostException: xxx
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ... 25 more
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中 &lt;code>xxx&lt;/code> 是外部集群的集群名（&lt;code>dfs.nameservices&lt;/code> 配置）。&lt;/p>
-&lt;h3 id="直接原因分析">直接原因分析&lt;/h3>
-&lt;p>仔细观察异常的调用栈，调用到了 &lt;code>NameNodeProxies.createNonHAProxy&lt;/code> ，而我们的集群是HA的，显然是读取到的配置不对了。&lt;/p>
+&lt;h3 id="直接原因分析">直接原因分析
+&lt;/h3>&lt;p>仔细观察异常的调用栈，调用到了 &lt;code>NameNodeProxies.createNonHAProxy&lt;/code> ，而我们的集群是HA的，显然是读取到的配置不对了。&lt;/p>
 &lt;p>看到这个类，阅读过hadoop源码的应该都知道，这是创建 &lt;code>DFSClient&lt;/code> 的时候，会先读取 &lt;code>dfs.client.failover.proxy.provider.{hdfs路径对应host}&lt;/code> 配置（取值是一个 &lt;code>FailoverProxyProvider&lt;/code> 具体实现的全限定类名），反射出Class对象并实例化，然后创建对应的HAProxy；而如果配置为空，则认为NameNode没有开启HA，直接将hdfs路径当作普通host来进行读取，如果实际上这个host是一个HA的nameservices名，不存在这个host，则会报上面的错误。&lt;/p>
 &lt;p>所以可以确定，是AM读取不到正确的hdfs配置导致的。那么是为什么呢？&lt;/p>
 &lt;p>仔细观察AM的日志，&lt;code>launch_container.sh&lt;/code> 里面：&lt;/p>
@@ -86,8 +86,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f99b15">105120105&lt;/span> &lt;span style="color:#f99b15">12&lt;/span> -r-x------ &lt;span style="color:#f99b15">1&lt;/span> yarn hadoop &lt;span style="color:#f99b15">8312&lt;/span> May &lt;span style="color:#f99b15">12&lt;/span> 21:18 ./__spark_conf__/__hadoop_conf__/hdfs-site.xml
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>broken symlinks&lt;span style="color:#5bc4bf">(&lt;/span>find -L . -maxdepth &lt;span style="color:#f99b15">5&lt;/span> -type l -ls&lt;span style="color:#5bc4bf">)&lt;/span>:
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>./__spark_conf__/__hadoop_conf__/&lt;/code> 里面是外部集群配置文件，而 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 是spark应用的jar，里面已经有原集群的配置文件。按 &lt;code>CLASSPATH&lt;/code> 定义的顺序，&lt;code>Configuration&lt;/code> 读取默认资源 &lt;code>core-site.xml&lt;/code> 、 &lt;code>hdfs-site.xml&lt;/code> （由&lt;code>HdfsConfiguration&lt;/code>静态代码块加入）的时候，优先从 &lt;code>./__spark_libs__/mySparkApp.jar&lt;/code> 读取了，而真正要用的外部集群配置，由于在 &lt;code>CLASSPATH&lt;/code> 中位置较后，不会被加载到。&lt;/p>
-&lt;h3 id="解决方案">解决方案&lt;/h3>
-&lt;p>知道问题的原因后，根据 &lt;code>CLASSPATH&lt;/code> 定义的顺序：&lt;/p>
+&lt;h3 id="解决方案">解决方案
+&lt;/h3>&lt;p>知道问题的原因后，根据 &lt;code>CLASSPATH&lt;/code> 定义的顺序：&lt;/p>
 &lt;ul>
 &lt;li>&lt;code>$PWD&lt;/code> 里面的文件无法控制，跳过&lt;/li>
 &lt;li>&lt;code>$PWD/__spark_conf__&lt;/code> 目录里面是Driver的SparkConf内容 &lt;code>__spark_conf__.properties&lt;/code> ，及所有hadoop相关配置整合到一起的的 &lt;code>__spark_hadoop_conf__.xml&lt;/code> ，也是无法控制的。注意这个 &lt;code>__spark_hadoop_conf__.xml&lt;/code> 里面虽然已经由Driver打入了外部集群的配置，但由于文件名不是 &lt;code>hdfs-site.xml&lt;/code> ，不会被 &lt;code>Configuration&lt;/code> 加载的。&lt;/li>
@@ -128,9 +128,9 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/executions&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/plugin&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>重新打包、运行任务，顺利执行。&lt;/p>
-&lt;h2 id="spark22-与-spark24-yarn-client-模式提交任务差异">Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异&lt;/h2>
-&lt;h3 id="am的classpath目录结构差异">AM的classpath、目录结构差异&lt;/h3>
-&lt;p>问题解决了，那么为什么Spark2.2升级Spark2.4之后就有这样的问题呢？从上面的分析，不难猜测到是AM的 &lt;code>CLASSPATH&lt;/code> 变了。随便找一个Spark2.2提交的任务也可以看到：&lt;/p>
+&lt;h2 id="spark22-与-spark24-yarn-client-模式提交任务差异">Spark2.2 与 Spark2.4 Yarn-Client 模式提交任务差异
+&lt;/h2>&lt;h3 id="am的classpath目录结构差异">AM的classpath、目录结构差异
+&lt;/h3>&lt;p>问题解决了，那么为什么Spark2.2升级Spark2.4之后就有这样的问题呢？从上面的分析，不难猜测到是AM的 &lt;code>CLASSPATH&lt;/code> 变了。随便找一个Spark2.2提交的任务也可以看到：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">#### launch_container.sh&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>export &lt;span style="color:#ef6155">CLASSPATH&lt;/span>&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_conf__:&lt;/span>&lt;span style="color:#ef6155">$PWD&lt;/span>&lt;span style="color:#48b685">/__spark_libs__/*:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">:&lt;/span>&lt;span style="color:#ef6155">$HADOOP_CONF_DIR&lt;/span>&lt;span style="color:#48b685">&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">## 对比 Spark2.4的：&lt;/span>
@@ -171,16 +171,16 @@ class="gallery-image"
 data-flex-grow="237"
 data-flex-basis="569px"
 >&lt;/p>
-&lt;h3 id="spark源码里的体现">Spark源码里的体现&lt;/h3>
-&lt;p>上篇博客里提到Spark的yarn-client模式是通过 &lt;code>YarnClientSchedulerBackend&lt;/code> 处理的。&lt;br>
+&lt;h3 id="spark源码里的体现">Spark源码里的体现
+&lt;/h3>&lt;p>上篇博客里提到Spark的yarn-client模式是通过 &lt;code>YarnClientSchedulerBackend&lt;/code> 处理的。&lt;br>
 其 &lt;code>start()&lt;/code> 方法会调用 &lt;code>org.apache.spark.deploy.yarn.Client&lt;/code> 的 &lt;code>submitApplication()&lt;/code> 方法提交Yarn AM。&lt;br>
 &lt;code>submitApplication()&lt;/code> 调用 &lt;code>createContainerLaunchContext&lt;/code> 构造ContainerLaunchContext对应的上下文，构建的启动Yarn AM的任务命令cmds，里面比较重要的有两步:&lt;/p>
 &lt;ol>
 &lt;li>调用 &lt;code>setupLaunchEnv()&lt;/code> 构造环境变量，其中我们关心的 &lt;code>CLASSPATH&lt;/code> 是在 &lt;code>populateClasspath()&lt;/code> 方法里处理的；&lt;/li>
 &lt;li>调用 &lt;code>prepareLocalResources()&lt;/code> 准备Yarn AM需要的一些资源，包括调用 &lt;code>createConfArchive()&lt;/code> 创建 &lt;code>__spark_conf__.zip&lt;/code> ，里面解压出来就是上面所讨论的AM 目录结构里面的 &lt;code>./__spark_conf__/&lt;/code> 目录&lt;/li>
 &lt;/ol>
-&lt;h4 id="populateclasspath">populateClasspath()&lt;/h4>
-&lt;p>对比两个版本的 &lt;code>populateClasspath()&lt;/code> 方法，注意差异在最后：&lt;/p>
+&lt;h4 id="populateclasspath">populateClasspath()
+&lt;/h4>&lt;p>对比两个版本的 &lt;code>populateClasspath()&lt;/code> 方法，注意差异在最后：&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1%E4%B9%8BSpark2.4%E5%9D%91/populateClasspath.png"
 width="3624"
 height="2248"
@@ -195,8 +195,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// files (such as configuration files for different services) that are not part of the&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// YARN cluster&amp;#39;s config.&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>是为了防止将其他非Yarn集群配置的文件也引入了。&lt;/p>
-&lt;h4 id="createconfarchive">createConfArchive()&lt;/h4>
-&lt;p>这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。&lt;/p>
+&lt;h4 id="createconfarchive">createConfArchive()
+&lt;/h4>&lt;p>这个代码略多，挑一些重点的讲讲，以Spark2.4为基准。&lt;/p>
 &lt;p>&lt;a class="link" href="https://issues.apache.org/jira/browse/SPARK-23630" target="_blank" rel="noopener"
 >SPARK-23630&lt;/a> 增加了一个用于测试的环境变量 &lt;code>SPARK_TEST_HADOOP_CONF_DIR&lt;/code> ，该环境变量指定的目录里面的配置文件也会被打进去 &lt;code>__spark_conf__.zip&lt;/code> 。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// SPARK-23630: during testing, Spark scripts filter out hadoop conf dirs so that user&amp;#39;s
@@ -226,15 +226,15 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>putNextEntry&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">ZipEntry&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">SparkHadoopUtil&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>&lt;span style="color:#fec418">SPARK_HADOOP_CONF_FILE&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>hadoopConf&lt;span style="color:#5bc4bf">.&lt;/span>writeXml&lt;span style="color:#5bc4bf">(&lt;/span>confStream&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>confStream&lt;span style="color:#5bc4bf">.&lt;/span>closeEntry&lt;span style="color:#5bc4bf">()&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>跨Yarn集群提交spark任务</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</link><pubDate>Sat, 04 Dec 2021 18:17:55 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/93990522.jpg" alt="Featured image of post 跨Yarn集群提交spark任务" />&lt;h2 id="背景">背景&lt;/h2>
-&lt;p>之前写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2020/05/06/%e5%8a%a8%e6%80%81%e5%8a%a0%e8%bd%bdhive%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e7%9a%84%e6%96%b9%e6%a1%88/" >Spark动态加载hive配置的方案&lt;/a> ，当时是为了spark应用的fat-jar里面已经有Hadoop相关xml配置文件的情况下，将数据输出到不是该配置的Hadoop集群的方案。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>跨Yarn集群提交spark任务</title><link>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</link><pubDate>Sat, 04 Dec 2021 18:17:55 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B7%A8Yarn%E9%9B%86%E7%BE%A4%E6%8F%90%E4%BA%A4spark%E4%BB%BB%E5%8A%A1/93990522.jpg" alt="Featured image of post 跨Yarn集群提交spark任务" />&lt;h2 id="背景">背景
+&lt;/h2>&lt;p>之前写过一篇 &lt;a class="link" href="https://leibnizhu.github.io/2020/05/06/%e5%8a%a8%e6%80%81%e5%8a%a0%e8%bd%bdhive%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6%e7%9a%84%e6%96%b9%e6%a1%88/" >Spark动态加载hive配置的方案&lt;/a> ，当时是为了spark应用的fat-jar里面已经有Hadoop相关xml配置文件的情况下，将数据输出到不是该配置的Hadoop集群的方案。&lt;br>
 现在这个需求有点类似，没有走spark-submit提交任务，而是在spark应用里面通过创建&lt;code>SparkContext&lt;/code>的形式提交任务，而spark应用的fat-jar里面已经有Hadoop相关xml配置文件，在此情况下，想将Spakr任务提交到外部的Yarn集群（不是fat-jar里面配置文件对应的yarn集群）。&lt;/p>
-&lt;h2 id="思考一个问题">思考一个问题&lt;/h2>
-&lt;p>先思考一个问题，如果Spark应用的fat-jar里面有外部Yarn集群对应的配置文件(&lt;code>core-site.xml&lt;/code>，&lt;code>hdfs-site.xml&lt;/code>，&lt;code>yarn-site.xml&lt;/code>等)，此时Spark应用代码里面创建&lt;code>SparkContext&lt;/code>，是不是就一定能提交到那个集群里？&lt;br>
+&lt;h2 id="思考一个问题">思考一个问题
+&lt;/h2>&lt;p>先思考一个问题，如果Spark应用的fat-jar里面有外部Yarn集群对应的配置文件(&lt;code>core-site.xml&lt;/code>，&lt;code>hdfs-site.xml&lt;/code>，&lt;code>yarn-site.xml&lt;/code>等)，此时Spark应用代码里面创建&lt;code>SparkContext&lt;/code>，是不是就一定能提交到那个集群里？&lt;br>
 可以做个实验，但实验不一定会cover到所有情况。&lt;br>
 直接给结论吧，不一定能提交过去，但自己做实验的话很可能还是能直接提交过去的，还是直接看代码吧（以&lt;code>yarn-client&lt;/code>模式为例）。&lt;/p>
-&lt;h3 id="spark-yarn-client-默认提交任务简析">Spark Yarn-client 默认提交任务简析&lt;/h3>
-&lt;p>通过代码创建&lt;code>SparkContext&lt;/code>后，其动态代码块会根据启动模式创建&lt;code>SchedulerBackend&lt;/code>和&lt;code>TaskScheduler&lt;/code>并启动：&lt;/p>
+&lt;h3 id="spark-yarn-client-默认提交任务简析">Spark Yarn-client 默认提交任务简析
+&lt;/h3>&lt;p>通过代码创建&lt;code>SparkContext&lt;/code>后，其动态代码块会根据启动模式创建&lt;code>SchedulerBackend&lt;/code>和&lt;code>TaskScheduler&lt;/code>并启动：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">// org.apache.spark.SparkContext #501
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#776e71">// Create and start the scheduler
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#815ba4">val&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>sched&lt;span style="color:#5bc4bf">,&lt;/span> ts&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">SparkContext&lt;/span>&lt;span style="color:#5bc4bf">.&lt;/span>createTaskScheduler&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#815ba4">this&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> master&lt;span style="color:#5bc4bf">,&lt;/span> deployMode&lt;span style="color:#5bc4bf">)&lt;/span>
@@ -365,10 +365,10 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到，除了本地的&lt;code>log4j.properties&lt;/code>和&lt;code>metrics.properties&lt;/code>配置文件以外，还会读取&lt;code>HADOOP_CONF_DIR&lt;/code>和&lt;code>YARN_CONF_DIR&lt;/code>环境变量，读取对应目录下的文件放入&lt;code>hadoopConfFiles&lt;/code>这个&lt;code>HashMap&lt;/code>中，而这里面的文件都会压缩到&lt;code>__spark_conf__.zip&lt;/code>中。&lt;br>
 再后续的代码就不分析了，可以参考网上其他文章。&lt;/p>
-&lt;h3 id="提交外部yarn集群的障碍">提交外部Yarn集群的障碍&lt;/h3>
-&lt;p>所以，如果执行spark应用程序的机器中配置了 &lt;em>HADOOP_CONF_DIR&lt;/em> 或 &lt;em>YARN_CONF_DIR&lt;/em> 环境变量（如HDP的节点安装了对应客户端都会配置上），在Spark提交任务到外部yarn集群的时候，就会将里面的配置文件压缩传输到外部集群的Executor节点，这样Executor的各种操作都会使用原集群的配置，连接不到正确的Yarn服务，最后也就导致任务执行失败。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;p>所以解决整个提交外部集群的问题，有两个问题要处理：&lt;/p>
+&lt;h3 id="提交外部yarn集群的障碍">提交外部Yarn集群的障碍
+&lt;/h3>&lt;p>所以，如果执行spark应用程序的机器中配置了 &lt;em>HADOOP_CONF_DIR&lt;/em> 或 &lt;em>YARN_CONF_DIR&lt;/em> 环境变量（如HDP的节点安装了对应客户端都会配置上），在Spark提交任务到外部yarn集群的时候，就会将里面的配置文件压缩传输到外部集群的Executor节点，这样Executor的各种操作都会使用原集群的配置，连接不到正确的Yarn服务，最后也就导致任务执行失败。&lt;/p>
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;p>所以解决整个提交外部集群的问题，有两个问题要处理：&lt;/p>
 &lt;ol>
 &lt;li>Spark应用代码使用外部集群的配置文件进行任务提交
 &lt;ol>
@@ -395,8 +395,8 @@ data-flex-basis="386px"
 &lt;/ol>
 &lt;/li>
 &lt;/ol>
-&lt;p>具体实现不外乎一些黑魔法（环境变量在JVM里面修改不了，但可以修改JVM用到的那个环境变量Map），再考虑下要不要放上来吧，反正这个最主要是思路和里面的坑。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</link><pubDate>Sun, 20 Jun 2021 13:17:54 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/bg1.png" alt="Featured image of post 修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException" />&lt;h2 id="故障背景">故障背景&lt;/h2>
-&lt;p>通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
+&lt;p>具体实现不外乎一些黑魔法（环境变量在JVM里面修改不了，但可以修改JVM用到的那个环境变量Map），再考虑下要不要放上来吧，反正这个最主要是思路和里面的坑。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</link><pubDate>Sun, 20 Jun 2021 13:17:54 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E6%9F%A5%E8%AF%A2%E6%9D%A1%E4%BB%B6%E5%B8%A6emoji%E6%97%B6%E7%9A%84JsonGenerationException/bg1.png" alt="Featured image of post 修复Elasticsearch-hadoop查询条件带emoji时的JsonGenerationException" />&lt;h2 id="故障背景">故障背景
+&lt;/h2>&lt;p>通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
 >ES-Hadoop&lt;/a> （亦可参考 &lt;a class="link" href="https://github.com/elastic/elasticsearch-hadoop" target="_blank" rel="noopener"
 >Github&lt;/a> ） 查询ES时，若查询条件包含emoji，会在json序列化的时候抛出异常（在最新的 &lt;code>7.13.2&lt;/code> 版本仍存在）：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-shell" data-lang="shell">&lt;span style="display:flex;">&lt;span>Caused by: org.codehaus.jackson.JsonGenerationException: Incomplete surrogate pair: first char 0xde97, second 0x22
@@ -408,8 +408,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.codehaus.jackson.impl.Utf8Generator.writeRaw&lt;span style="color:#5bc4bf">(&lt;/span>Utf8Generator.java:697&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.json.JacksonJsonGenerator.writeRaw&lt;span style="color:#5bc4bf">(&lt;/span>JacksonJsonGenerator.java:252&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ... &lt;span style="color:#f99b15">21&lt;/span> more
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析&lt;/h2>
-&lt;p>根据报错的调用栈，直接原因出在 &lt;code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate&lt;/code> 方法中，其源码：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析
+&lt;/h2>&lt;p>根据报错的调用栈，直接原因出在 &lt;code>org.codehaus.jackson.impl.Utf8Generator#_decodeSurrogate&lt;/code> 方法中，其源码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">int&lt;/span> &lt;span style="color:#06b6ef">_decodeSurrogate&lt;/span>(&lt;span style="color:#fec418">int&lt;/span> surr1, &lt;span style="color:#fec418">int&lt;/span> surr2) &lt;span style="color:#815ba4">throws&lt;/span> IOException {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (surr2 &lt;span style="color:#5bc4bf">&amp;lt;&lt;/span> 56320 &lt;span style="color:#5bc4bf">||&lt;/span> surr2 &lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> 57343) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> String msg &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#48b685">&amp;#34;Incomplete surrogate pair: first char 0x&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> Integer.&lt;span style="color:#06b6ef">toHexString&lt;/span>(surr1) &lt;span style="color:#5bc4bf">+&lt;/span> &lt;span style="color:#48b685">&amp;#34;, second 0x&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> Integer.&lt;span style="color:#06b6ef">toHexString&lt;/span>(surr2);
@@ -450,8 +450,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> out.&lt;span style="color:#06b6ef">bytes&lt;/span>();
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;p>故障分析到这里，似乎只要升级 &lt;code>jackson-core&lt;/code> 版本就可以了……&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;p>故障分析到这里，似乎只要升级 &lt;code>jackson-core&lt;/code> 版本就可以了……&lt;br>
 然而上面提到，在 &lt;code>jackson-core 2.3.0&lt;/code> 才修复了这个问题，而 Es-Spark 使用的是内置的1.x 版本，前面也有提到 &lt;code>jackson-core&lt;/code> 自2.x开始迁移到 &lt;code>com.fasterxml&lt;/code> 。具体到代码，Es-spark 的 &lt;code>JacksonJsonGenerator&lt;/code> 是这样使用 &lt;code>jackson&lt;/code> 的：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">org.elasticsearch.hadoop.serialization.json&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -484,8 +484,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>也就是说，直接升级依赖版本是不行的，maven的GAV都变了，类名也变了，必须改代码。&lt;/p>
-&lt;h3 id="同名类的patch">同名类的Patch&lt;/h3>
-&lt;p>可以看到，虽说 &lt;code>Jackson&lt;/code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 &lt;code>JSON_FACTORY&lt;/code> 和 &lt;code>generator&lt;/code> 这个两个属性替换为 &lt;code>Jackson 2.3+&lt;/code> 版本的类、并微调静态代码块和构造方法里面的代码即可：&lt;/p>
+&lt;h3 id="同名类的patch">同名类的Patch
+&lt;/h3>&lt;p>可以看到，虽说 &lt;code>Jackson&lt;/code> 迁移了包名，但如果是通过创建同名类的方式Patch，其实也很简单，只要把 &lt;code>JSON_FACTORY&lt;/code> 和 &lt;code>generator&lt;/code> 这个两个属性替换为 &lt;code>Jackson 2.3+&lt;/code> 版本的类、并微调静态代码块和构造方法里面的代码即可：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">org.elasticsearch.hadoop.serialization.json&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">com.fasterxml.jackson.core.JsonEncoding&lt;/span>;
@@ -515,8 +515,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="javassist-patch">Javassist Patch&lt;/h3>
-&lt;p>与上一篇博客一样，为了可维护性，最后还是选择使用 &lt;code>Javassist&lt;/code> 进行Patch。但受限于 &lt;code>Javassist&lt;/code> 的机制，这个Patch起来有点麻烦。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="javassist-patch">Javassist Patch
+&lt;/h3>&lt;p>与上一篇博客一样，为了可维护性，最后还是选择使用 &lt;code>Javassist&lt;/code> 进行Patch。但受限于 &lt;code>Javassist&lt;/code> 的机制，这个Patch起来有点麻烦。&lt;br>
 首先，阅读 &lt;code>JacksonJsonGenerator&lt;/code> 源码，它其实相当于是在 Es-spark 的 &lt;code>Generator&lt;/code> 接口与 &lt;code>jackson 1.8.8&lt;/code> 的 &lt;code>JsonGenerator&lt;/code> 之间做了Adaptor；因此可以考虑写一个 &lt;code>Generator&lt;/code> 接口与 &lt;code>jackson 2.3+&lt;/code> 之间的Adaptor给原调用者使用。&lt;br>
 但阅读 Es-spark 的其他代码可以发现，虽然它定义了 &lt;code>Generator&lt;/code> 接口，但调用时都是直接面向 &lt;code>JacksonJsonGenerator&lt;/code> 实现类，如上面给出过的 &lt;code>RestClient#searchRequest&lt;/code> 的代码：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//RestClient 某查询方法&lt;/span>
@@ -859,8 +859,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>} &lt;span style="color:#815ba4">catch&lt;/span> (Exception e) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log.&lt;span style="color:#06b6ef">error&lt;/span>(&lt;span style="color:#48b685">&amp;#34;给 JacksonJsonGenerator 进行静态代码块和构造方法的pack失败:&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">+&lt;/span> e.&lt;span style="color:#06b6ef">getMessage&lt;/span>(), e);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>完事儿。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</link><pubDate>Sat, 19 Jun 2021 23:40:50 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/bg2.jpg" alt="Featured image of post 修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException" />&lt;h2 id="故障背景">故障背景&lt;/h2>
-&lt;p>众所周知，&lt;code>Elasticsearch&lt;/code>（下文简称&lt;code>&amp;quot;ES&amp;quot;&lt;/code>）的数值类型字段是支持一些特殊格式的。比如，&lt;code>integer&lt;/code> 类型的字段取值可以是浮点数的字符串，如 &lt;code>&amp;quot;2.0&amp;quot;&lt;/code>；&lt;code>long&lt;/code> 类型的字段取值可以是科学计数法的字符串，如 &lt;code>&amp;quot;2E3&amp;quot;&lt;/code>，诸如此类的一些。不同于时间类型的字段可以 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html" target="_blank" rel="noopener"
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>完事儿。&lt;/p></description></item><item><title>修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException</title><link>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</link><pubDate>Sat, 19 Jun 2021 23:40:50 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E4%BF%AE%E5%A4%8DElasticsearch-hadoop%E8%AF%BB%E5%8F%96%E7%89%B9%E6%AE%8A%E6%95%B0%E5%AD%97%E5%8F%96%E5%80%BC%E6%97%B6%E7%9A%84NumberFormatException/bg2.jpg" alt="Featured image of post 修复Elasticsearch-hadoop读取特殊数字取值时的NumberFormatException" />&lt;h2 id="故障背景">故障背景
+&lt;/h2>&lt;p>众所周知，&lt;code>Elasticsearch&lt;/code>（下文简称&lt;code>&amp;quot;ES&amp;quot;&lt;/code>）的数值类型字段是支持一些特殊格式的。比如，&lt;code>integer&lt;/code> 类型的字段取值可以是浮点数的字符串，如 &lt;code>&amp;quot;2.0&amp;quot;&lt;/code>；&lt;code>long&lt;/code> 类型的字段取值可以是科学计数法的字符串，如 &lt;code>&amp;quot;2E3&amp;quot;&lt;/code>，诸如此类的一些。不同于时间类型的字段可以 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html" target="_blank" rel="noopener"
 >通过 &lt;code>mapping&lt;/code> 的 &lt;code>format&lt;/code> 属性配置取值格式&lt;/a> ，数值字段的取值没有格式的配置、上面举例的取值都是可以直接索引文档的。&lt;/p>
 &lt;p>然而，通过 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/spark.html" target="_blank" rel="noopener"
 >ES-Hadoop&lt;/a> （亦可参考 &lt;a class="link" href="https://github.com/elastic/elasticsearch-hadoop" target="_blank" rel="noopener"
@@ -872,8 +872,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.builder.JdkValueReader.parseLong&lt;span style="color:#5bc4bf">(&lt;/span>JdkValueReader.java:296&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> at org.elasticsearch.hadoop.serialization.builder.JdkValueReader.longValue&lt;span style="color:#5bc4bf">(&lt;/span>JdkValueReader.java:288&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>…………
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析&lt;/h2>
-&lt;p>阅读 &lt;code>JdkValueReader&lt;/code> 源码，以读取integer类型字段为例：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="故障根源分析">故障根源分析
+&lt;/h2>&lt;p>阅读 &lt;code>JdkValueReader&lt;/code> 源码，以读取integer类型字段为例：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">protected&lt;/span> Object &lt;span style="color:#06b6ef">intValue&lt;/span>(String value, Parser parser) {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Integer val &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -899,13 +899,13 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>可以看到字段取值直接调用 &lt;code>Integer.parseInt&lt;/code> 方法解析，且没捕获异常。&lt;br>
 不知道这样设计是处于什么考虑，但这个 &lt;code>NumberFormatException&lt;/code> 异常会打断读取的流程：出现一条有问题的数据时，会影响整个查询任务的执行，在 Es-spark 使用于离线批处理的场景，是不恰当的，所以有必要进行调整。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;h3 id="自定义-valuereader">自定义 ValueReader&lt;/h3>
-&lt;p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 &lt;code>org.elasticsearch.hadoop.serialization.builder.ValueReader&lt;/code> 接口，并通过 &lt;code>es.ser.reader.value.class&lt;/code> 配置项（常量&lt;code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS&lt;/code>）配置自定义的 &lt;code>ValueReader&lt;/code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html" target="_blank" rel="noopener"
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;h3 id="自定义-valuereader">自定义 ValueReader
+&lt;/h3>&lt;p>进一步阅读 ES-spark 源码可以发现，用户可以自己实现 &lt;code>org.elasticsearch.hadoop.serialization.builder.ValueReader&lt;/code> 接口，并通过 &lt;code>es.ser.reader.value.class&lt;/code> 配置项（常量&lt;code>org.elasticsearch.hadoop.cfg.ConfigurationOptions.ES_SERIALIZATION_READER_VALUE_CLASS&lt;/code>）配置自定义的 &lt;code>ValueReader&lt;/code> 实现，从而可以实现对这些特殊取值的读取解析。 当然，后来在 &lt;a class="link" href="https://www.elastic.co/guide/en/elasticsearch/hadoop/current/configuration.html" target="_blank" rel="noopener"
 >官方文档&lt;/a> 中也印证了这一点。&lt;/p>
 &lt;p>这样实际处理下来，基本是要拷贝 &lt;code>JdkValueReader&lt;/code> 源码进行修改作为自定义的 &lt;code>ValueReader&lt;/code> 实现；显然，这样就不能随 ES-spark 升级而自动升级对应实现，同时，在代码中，自定义的修改也和原 &lt;code>JdkValueReader&lt;/code> 的实现混杂在一起，给升级带来困难；因此考虑使用 &lt;code>Javassist&lt;/code> 进行patch。&lt;/p>
-&lt;h3 id="javassist-patch">Javassist Patch&lt;/h3>
-&lt;p>&lt;code>Javassist&lt;/code> 入门和介绍的文章在网上已经很多了，在此不再赘述。&lt;br>
+&lt;h3 id="javassist-patch">Javassist Patch
+&lt;/h3>&lt;p>&lt;code>Javassist&lt;/code> 入门和介绍的文章在网上已经很多了，在此不再赘述。&lt;br>
 列举一下patch过程中遇到的一些坑，或者说，&lt;code>Javassist&lt;/code> 的一些使用注意事项：&lt;/p>
 &lt;ol>
 &lt;li>不支持泛型，请自行强转；&lt;/li>
@@ -1065,12 +1065,12 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> conf.&lt;span style="color:#06b6ef">get&lt;/span>(HIVE_METASTORE_URIS_KEY);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spark写Mongodb的小坑</title><link>https://leibnizhu.github.io/p/Spark%E5%86%99Mongodb%E7%9A%84%E5%B0%8F%E5%9D%91/</link><pubDate>Wed, 15 Jan 2020 15:47:27 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%86%99Mongodb%E7%9A%84%E5%B0%8F%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Spark%E5%86%99Mongodb%E7%9A%84%E5%B0%8F%E5%9D%91/zelda.jpg" alt="Featured image of post Spark写Mongodb的小坑" />&lt;h1 id="spark写mongodb的小坑">Spark写Mongodb的小坑&lt;/h1>
-&lt;p>首先证明我还活着。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spark写Mongodb的小坑</title><link>https://leibnizhu.github.io/p/Spark%E5%86%99Mongodb%E7%9A%84%E5%B0%8F%E5%9D%91/</link><pubDate>Wed, 15 Jan 2020 15:47:27 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%86%99Mongodb%E7%9A%84%E5%B0%8F%E5%9D%91/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Spark%E5%86%99Mongodb%E7%9A%84%E5%B0%8F%E5%9D%91/zelda.jpg" alt="Featured image of post Spark写Mongodb的小坑" />&lt;h1 id="spark写mongodb的小坑">Spark写Mongodb的小坑
+&lt;/h1>&lt;p>首先证明我还活着。&lt;br>
 因为Spark老集群版本限制(参见:&lt;a class="link" href="https://docs.mongodb.com/spark-connector/master/" target="_blank" rel="noopener"
 >https://docs.mongodb.com/spark-connector/master/&lt;/a>)，&lt;code>mongodb-connector&lt;/code>用的版本是&lt;code>1.1.0&lt;/code>，以下坑基于该版本出现，新版本未验证。&lt;/p>
-&lt;h2 id="用mongosparksave写入rdd报错e11000-duplicate-key-error">用MongoSpark.save写入RDD报错E11000 duplicate key error&lt;/h2>
-&lt;p>观察源码&lt;/p>
+&lt;h2 id="用mongosparksave写入rdd报错e11000-duplicate-key-error">用MongoSpark.save写入RDD报错E11000 duplicate key error
+&lt;/h2>&lt;p>观察源码&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">def&lt;/span> save&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">D:&lt;/span> &lt;span style="color:#fec418">ClassTag&lt;/span>&lt;span style="color:#5bc4bf">](&lt;/span>rdd&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">RDD&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">D&lt;/span>&lt;span style="color:#5bc4bf">],&lt;/span> writeConfig&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">WriteConfig&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Unit&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">val&lt;/span> mongoConnector &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#fec418">MongoConnector&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>writeConfig&lt;span style="color:#5bc4bf">.&lt;/span>asOptions&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> rdd&lt;span style="color:#5bc4bf">.&lt;/span>foreachPartition&lt;span style="color:#5bc4bf">(&lt;/span>iter &lt;span style="color:#815ba4">=&amp;gt;&lt;/span> &lt;span style="color:#815ba4">if&lt;/span> &lt;span style="color:#5bc4bf">(&lt;/span>iter&lt;span style="color:#5bc4bf">.&lt;/span>nonEmpty&lt;span style="color:#5bc4bf">)&lt;/span> &lt;span style="color:#5bc4bf">{&lt;/span>
@@ -1086,8 +1086,8 @@ data-flex-basis="386px"
 &lt;li>爆改&lt;code>MongoSpark&lt;/code>, 将&lt;code>MongoSpark.save(rdd: RDD[D])&lt;/code>改成根据Docuemnt是否有_id而分别生成&lt;code>ReplaceOneModel&lt;/code>和&lt;code>InsertOneModel&lt;/code>，再批量插入。&lt;/li>
 &lt;/ol>
 &lt;p>我一开始用了方案1，后来还是觉得限制太多，但也没有直接爆改&lt;code>MongoSpark&lt;/code>，而是直接在代码里实现，不用&lt;code>MongoSpark&lt;/code>了。&lt;/p>
-&lt;h2 id="list含null时写入失败">List含null时写入失败&lt;/h2>
-&lt;p>原因是&lt;code>com.mongodb.spark.sql.MapFunctions&lt;/code>的&lt;code>arrayTypeToBsonValue&lt;/code>方法没有处理List里面的空元素，而是直接每个元素调&lt;code>convertToBsonValue&lt;/code>方法，后者再调用&lt;code>elementTypeToBsonValue&lt;/code>的时候，在模式匹配里面就匹配不上，进入最后的默认分支，抛&lt;code>MongoTypeConversionException&lt;/code>异常。&lt;br>
+&lt;h2 id="list含null时写入失败">List含null时写入失败
+&lt;/h2>&lt;p>原因是&lt;code>com.mongodb.spark.sql.MapFunctions&lt;/code>的&lt;code>arrayTypeToBsonValue&lt;/code>方法没有处理List里面的空元素，而是直接每个元素调&lt;code>convertToBsonValue&lt;/code>方法，后者再调用&lt;code>elementTypeToBsonValue&lt;/code>的时候，在模式匹配里面就匹配不上，进入最后的默认分支，抛&lt;code>MongoTypeConversionException&lt;/code>异常。&lt;br>
 解决方案很简单：&lt;/p>
 &lt;ol>
 &lt;li>对数组/List做预处理，过滤null元素，但可能这些null元素是有用的，此时此法无用；&lt;/li>
@@ -1118,8 +1118,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">BsonDocument&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>internalData&lt;span style="color:#5bc4bf">.&lt;/span>toList&lt;span style="color:#5bc4bf">.&lt;/span>asJava&lt;span style="color:#5bc4bf">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="objectid对象写入">ObjectId对象写入&lt;/h2>
-&lt;p>Mongodb的_id默认是用ObjectId类型，如果在修改数据后重新写入Mongodb，也需要使用同样的ObjectId对象。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="objectid对象写入">ObjectId对象写入
+&lt;/h2>&lt;p>Mongodb的_id默认是用ObjectId类型，如果在修改数据后重新写入Mongodb，也需要使用同样的ObjectId对象。&lt;br>
 在直接使用Mongodb的SDK的情况，这个很简单，直接new一个&lt;code>org.bson.types.ObjectId&lt;/code>对象即可。&lt;br>
 如果是使用DataFrame，则structType和具体的Row数据构造都有一小点麻烦，直接上代码吧。&lt;br>
 构建Schema：&lt;/p>
@@ -1130,19 +1130,19 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">StructType&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>structFieldList&lt;span style="color:#5bc4bf">);&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>写入数据的处理：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#fec418">GenericRow&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#fec418">Array&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;5e1db87e5d080f6e7eb7b067&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">))&lt;/span> &lt;span style="color:#776e71">//这是一个Row里面的一个字段值
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spark2的Kafka消费Offset管理</title><link>https://leibnizhu.github.io/p/Spark2%E7%9A%84Kafka%E6%B6%88%E8%B4%B9Offset%E7%AE%A1%E7%90%86/</link><pubDate>Fri, 22 Dec 2017 08:46:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark2%E7%9A%84Kafka%E6%B6%88%E8%B4%B9Offset%E7%AE%A1%E7%90%86/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Spark2%E7%9A%84Kafka%E6%B6%88%E8%B4%B9Offset%E7%AE%A1%E7%90%86/sunup.png" alt="Featured image of post Spark2的Kafka消费Offset管理" />&lt;h2 id="前言">前言&lt;/h2>
-&lt;p>网上流传一篇关于Spark Streaming消费Kafka时用Zookeeper保存Kafka队列offset的文章，如&lt;a class="link" href="https://www.2cto.com/net/201710/692443.html" target="_blank" rel="noopener"
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spark2的Kafka消费Offset管理</title><link>https://leibnizhu.github.io/p/Spark2%E7%9A%84Kafka%E6%B6%88%E8%B4%B9Offset%E7%AE%A1%E7%90%86/</link><pubDate>Fri, 22 Dec 2017 08:46:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark2%E7%9A%84Kafka%E6%B6%88%E8%B4%B9Offset%E7%AE%A1%E7%90%86/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Spark2%E7%9A%84Kafka%E6%B6%88%E8%B4%B9Offset%E7%AE%A1%E7%90%86/sunup.png" alt="Featured image of post Spark2的Kafka消费Offset管理" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>网上流传一篇关于Spark Streaming消费Kafka时用Zookeeper保存Kafka队列offset的文章，如&lt;a class="link" href="https://www.2cto.com/net/201710/692443.html" target="_blank" rel="noopener"
 >https://www.2cto.com/net/201710/692443.html&lt;/a>，最初源头没找了，亲测在Spark1.6是可以用的。&lt;br>
 然而在Spark2中，这种方法的&lt;code>KafkaManager&lt;/code>类中所依赖的&lt;code>KafkaCluster&lt;/code>等等的类并不存在，因此此法无法直接套用到Spark中；此外，如果使用Cloudera的CDH集群的Spark2，其API更为缺少。因此，本文给出一种在CDH5.13的Spark2中通过Zookeeper管理Kafka消费Offset的方法。&lt;/p>
-&lt;h2 id="环境">环境&lt;/h2>
-&lt;ul>
+&lt;h2 id="环境">环境
+&lt;/h2>&lt;ul>
 &lt;li>集群：&lt;code>Cloudera CDH&lt;/code>（&lt;code>Cloudera Manager&lt;/code> 5.13.0）&lt;/li>
 &lt;li>&lt;code>Spark&lt;/code>：2.1.0 cloudera2&lt;/li>
 &lt;li>&lt;code>Scala&lt;/code>：2.11.8&lt;/li>
 &lt;li>&lt;code>Java&lt;/code>：1.8.0_u91&lt;/li>
 &lt;/ul>
-&lt;h2 id="maven依赖">Maven依赖&lt;/h2>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;properties&amp;gt;&lt;/span>
+&lt;h2 id="maven依赖">Maven依赖
+&lt;/h2>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;properties&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;maven.compiler.source&amp;gt;&lt;/span>1.8&lt;span style="color:#5bc4bf">&amp;lt;/maven.compiler.source&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;maven.compiler.target&amp;gt;&lt;/span>1.8&lt;span style="color:#5bc4bf">&amp;lt;/maven.compiler.target&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;project.build.sourceEncoding&amp;gt;&lt;/span>UTF-8&lt;span style="color:#5bc4bf">&amp;lt;/project.build.sourceEncoding&amp;gt;&lt;/span>
@@ -1195,10 +1195,10 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>${kafka.version}&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/dependencies&amp;gt;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="管理kafka消费offset">管理Kafka消费Offset&lt;/h2>
-&lt;h3 id="使用方法">使用方法&lt;/h3>
-&lt;h4 id="创建kafkamanager对象">创建KafkaManager对象&lt;/h4>
-&lt;p>使用类：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="管理kafka消费offset">管理Kafka消费Offset
+&lt;/h2>&lt;h3 id="使用方法">使用方法
+&lt;/h3>&lt;h4 id="创建kafkamanager对象">创建KafkaManager对象
+&lt;/h4>&lt;p>使用类：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Kafka的连接和Offset管理工具类
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> *
@@ -1217,8 +1217,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span> &lt;span style="color:#48b685">&amp;#34;key.deserializer&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">-&amp;gt;&lt;/span> classOf&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">StringDeserializer&lt;/span>&lt;span style="color:#5bc4bf">],&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#48b685">&amp;#34;value.deserializer&amp;#34;&lt;/span> &lt;span style="color:#5bc4bf">-&amp;gt;&lt;/span> classOf&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">StringDeserializer&lt;/span>&lt;span style="color:#5bc4bf">])&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">val&lt;/span> km &lt;span style="color:#815ba4">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> &lt;span style="color:#fec418">KafkaManager&lt;/span>&lt;span style="color:#5bc4bf">(&lt;/span>zkHosts&lt;span style="color:#5bc4bf">,&lt;/span> kafkaParams&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="创建kafka输入流">创建Kafka输入流&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="创建kafka输入流">创建Kafka输入流
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">* 包装createDirectStream方法，支持Kafka Offset，用于创建Kafka Streaming流
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">*
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">* @param ssc Spark Streaming Context
@@ -1231,8 +1231,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">def&lt;/span> createDirectStream&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">K:&lt;/span> &lt;span style="color:#fec418">ClassTag&lt;/span>, &lt;span style="color:#fec418">V:&lt;/span> &lt;span style="color:#fec418">ClassTag&lt;/span>&lt;span style="color:#5bc4bf">](&lt;/span>ssc&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">StreamingContext&lt;/span>&lt;span style="color:#5bc4bf">,&lt;/span> topics&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Seq&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">String&lt;/span>&lt;span style="color:#5bc4bf">])&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">InputDStream&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">ConsumerRecord&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">K&lt;/span>, &lt;span style="color:#fec418">V&lt;/span>&lt;span style="color:#5bc4bf">]&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>如：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">val&lt;/span> kafkaStream &lt;span style="color:#815ba4">=&lt;/span> km&lt;span style="color:#5bc4bf">.&lt;/span>createDirectStream&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">String&lt;/span>, &lt;span style="color:#fec418">String&lt;/span>&lt;span style="color:#5bc4bf">](&lt;/span>ssc&lt;span style="color:#5bc4bf">,&lt;/span> kafkaTopics&lt;span style="color:#5bc4bf">.&lt;/span>split&lt;span style="color:#5bc4bf">(&lt;/span>&lt;span style="color:#48b685">&amp;#34;,&amp;#34;&lt;/span>&lt;span style="color:#5bc4bf">).&lt;/span>toSeq&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="操作完毕后更新offset">操作完毕后更新Offset&lt;/h4>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">/**
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="操作完毕后更新offset">操作完毕后更新Offset
+&lt;/h4>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">/**
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * 保存Kafka消息队列消费的Offset
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> *
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * @param rdd SparkStreaming的Kafka RDD，RDD[ConsumerRecord[K, V]]
@@ -1242,8 +1242,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">def&lt;/span> persistOffsets&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">K&lt;/span>, &lt;span style="color:#fec418">V&lt;/span>&lt;span style="color:#5bc4bf">](&lt;/span>rdd&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">RDD&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">ConsumerRecord&lt;/span>&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">K&lt;/span>, &lt;span style="color:#fec418">V&lt;/span>&lt;span style="color:#5bc4bf">]],&lt;/span> storeEndOffset&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Boolean&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">true&lt;/span>&lt;span style="color:#5bc4bf">)&lt;/span>&lt;span style="color:#815ba4">:&lt;/span> &lt;span style="color:#fec418">Unit&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>如：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>km&lt;span style="color:#5bc4bf">.&lt;/span>persistOffsets&lt;span style="color:#5bc4bf">[&lt;/span>&lt;span style="color:#fec418">String&lt;/span>, &lt;span style="color:#fec418">String&lt;/span>&lt;span style="color:#5bc4bf">](&lt;/span>rdd&lt;span style="color:#5bc4bf">)&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="详细代码">详细代码&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.enmonster.nrt.common&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="详细代码">详细代码
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">package&lt;/span> &lt;span style="color:#fec418">com.turingdi.enmonster.nrt.common&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">import&lt;/span> &lt;span style="color:#fec418">java.lang.Object&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
@@ -1355,8 +1355,8 @@ data-flex-basis="386px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spark快速统计树状关系各层数量的一种算法</title><link>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 26 Apr 2017 15:29:19 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</guid><description>&lt;h2 id="需求">需求&lt;/h2>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1.png"
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Spark快速统计树状关系各层数量的一种算法</title><link>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 26 Apr 2017 15:29:19 +0800</pubDate><guid>https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/</guid><description>&lt;h2 id="需求">需求
+&lt;/h2>&lt;p>&lt;img src="https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1.png"
 width="132"
 height="253"
 srcset="https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1_hu2080320909259200598.png 480w, https://leibnizhu.github.io/p/Spark%E5%BF%AB%E9%80%9F%E7%BB%9F%E8%AE%A1%E6%A0%91%E7%8A%B6%E5%85%B3%E7%B3%BB%E5%90%84%E5%B1%82%E6%95%B0%E9%87%8F%E7%9A%84%E4%B8%80%E7%A7%8D%E7%AE%97%E6%B3%95/1_hu15414383528099108065.png 1024w"
@@ -1368,8 +1368,8 @@ data-flex-basis="125px"
 对于类似上图所示的树状结构数据，统计每个节点的总子孙数、每个节点在各层的子孙数。&lt;br>
 比如B的总子孙数就是7（D/E/F/G/H/I/J），F的一级子孙数为2（G/H），F的二级和三级子孙数都为1（分别对应I和J）。&lt;br>
 注：此处用字母代替节点ID，是为了与级别区分，方便描述和理解，实际的节点ID并非如此。&lt;/p>
-&lt;h3 id="数据结构">数据结构&lt;/h3>
-&lt;p>树状关系在采集初期，是通过Netty搭建的微服务保存在HBase中，再通过Spark定期计算，保存到关系型数据库MySQL中。在MySQL中的表结构及保存的数据如下（经过精简，只保留与本文相关的字段）：&lt;/p>
+&lt;h3 id="数据结构">数据结构
+&lt;/h3>&lt;p>树状关系在采集初期，是通过Netty搭建的微服务保存在HBase中，再通过Spark定期计算，保存到关系型数据库MySQL中。在MySQL中的表结构及保存的数据如下（经过精简，只保留与本文相关的字段）：&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -1443,22 +1443,22 @@ data-flex-basis="125px"
 &lt;/tbody>
 &lt;/table>
 &lt;p>ID、父节点ID、等级这几个字段比较好理解，父链稍加思考也可以看出来是从根节点一直到当前节点的链，以减号分割，父链字段前后都有减号，方便like查询的精准性。&lt;/p>
-&lt;h3 id="难点">难点&lt;/h3>
-&lt;p>可以看出来，单纯计算我们需要的指标并不困难，比如总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到；而各级子孙数也是，父链条件结合等级的条件就能查出来。&lt;br>
+&lt;h3 id="难点">难点
+&lt;/h3>&lt;p>可以看出来，单纯计算我们需要的指标并不困难，比如总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到；而各级子孙数也是，父链条件结合等级的条件就能查出来。&lt;br>
 但这些查询都需要遍历整个树，而每个节点会产生一次查询，相当于复杂度是O(N^2)；而且每次需要查询MySQL，计算速度被IO开销限制，Spark批量计算的优势丝毫无存，可以预见计算是相当缓慢的。&lt;/p>
-&lt;h2 id="解决方案">解决方案&lt;/h2>
-&lt;h3 id="思路">思路&lt;/h3>
-&lt;p>父链这个字段是为了将数据保存到MySQL，方便数据分析员进行查询而作出的妥协，而我们可以从父链下手，减少计算时间复杂度。&lt;/p>
-&lt;h4 id="总子孙数">总子孙数&lt;/h4>
-&lt;p>上面的分析已经提到，总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到，而考虑到树中没有环路，也就是说一个节点在树中只出现一次，那么在父链中也只会出现一次；也就是说，在整棵树里，一个节点的ID在所有父链中出现多少次（每次对应一个子节点的父链），就有多少个子孙节点。&lt;br>
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;h3 id="思路">思路
+&lt;/h3>&lt;p>父链这个字段是为了将数据保存到MySQL，方便数据分析员进行查询而作出的妥协，而我们可以从父链下手，减少计算时间复杂度。&lt;/p>
+&lt;h4 id="总子孙数">总子孙数
+&lt;/h4>&lt;p>上面的分析已经提到，总子孙数，根据父链中包含当前节点这个条件去查询、再count就能拿到，而考虑到树中没有环路，也就是说一个节点在树中只出现一次，那么在父链中也只会出现一次；也就是说，在整棵树里，一个节点的ID在所有父链中出现多少次（每次对应一个子节点的父链），就有多少个子孙节点。&lt;br>
 在SQL中查询父链包含某节点ID用的是like操作，查询速度很慢，我们在Spark中可以进行优化：&lt;/p>
 &lt;ol>
 &lt;li>每个节点的父链依据减号进行split，一个节点对应多个父祖节点（父链上所有节点）；&lt;/li>
 &lt;li>所有节点父链split的结果进行Word-Count，一个节点ID在父链split结果中出现多少次，意味着它有多少个总子孙数。&lt;/li>
 &lt;/ol>
 &lt;p>以开始的图为例，所有父链拆分后拿到的结果是：&lt;code>(A,A,A,B,A,B,A,B,A,B,F,A,B,F,A,B,F,G,A,B,F,G,I)&lt;/code>，进行Word-Count的结果（Spark中可以直接用countByValue方法）是&lt;code>((A,9),(B,7),(F,4),(G,2),(I,1))&lt;/code>。这里已经出来每个节点的总子孙数了，结果中不存在的节点就是总子孙数为0。&lt;/p>
-&lt;h4 id="各层子孙数">各层子孙数&lt;/h4>
-&lt;p>从总子孙数的计算中进行扩展就可以计算各层的子孙数了。&lt;/p>
+&lt;h4 id="各层子孙数">各层子孙数
+&lt;/h4>&lt;p>从总子孙数的计算中进行扩展就可以计算各层的子孙数了。&lt;/p>
 &lt;ol>
 &lt;li>在父链split的时候加上当前节点的等级构成RDD，以节点D为例，D的父链为-A-B-，级别为3，split后就是&lt;code>(A,3),(B,3)&lt;/code>;&lt;/li>
 &lt;li>当计算N级子孙数的时候，构造一个(节点ID，节点等级+N)的RDD；&lt;/li>
@@ -1494,8 +1494,8 @@ data-flex-basis="125px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>map掉无用的等级，再count得到：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>(A,3),(B,2),(F,1),(G,1)
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>即只有这些节点有二级子孙，二级子孙个数也拿到了。&lt;/p>
-&lt;h3 id="spark代码scala">Spark代码(scala)&lt;/h3>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//全部MySQL数据读到RDD中，格式为(用户ID,(*,*,*,*,等级,父节点ID,父链,*))
+&lt;h3 id="spark代码scala">Spark代码(scala)
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-scala" data-lang="scala">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//全部MySQL数据读到RDD中，格式为(用户ID,(*,*,*,*,等级,父节点ID,父链,*))
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">&lt;/span>&lt;span style="color:#815ba4">val&lt;/span> rsRDD &lt;span style="color:#815ba4">=&lt;/span> sc&lt;span style="color:#5bc4bf">.&lt;/span>makeRDD&lt;span style="color:#5bc4bf">(&lt;/span>readAllMySQLData&lt;span style="color:#5bc4bf">()).&lt;/span>cache&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">//统计总子孙数

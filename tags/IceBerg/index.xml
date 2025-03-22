@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>IceBerg on Heaven's Door</title><link>https://leibnizhu.github.io/tags/IceBerg/</link><description>Recent content in IceBerg on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 20 Jul 2022 10:03:41 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/IceBerg/index.xml" rel="self" type="application/rss+xml"/><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake&lt;/h2>
-&lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
-&lt;h3 id="lakehouse论文">Lakehouse论文&lt;/h3>
-&lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>IceBerg on Heaven's Door</title><link>https://leibnizhu.github.io/tags/IceBerg/</link><description>Recent content in IceBerg on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 20 Jul 2022 10:03:41 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/IceBerg/index.xml" rel="self" type="application/rss+xml"/><item><title>数据湖调研：Delta Lake vs Iceberg</title><link>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</link><pubDate>Wed, 20 Jul 2022 10:03:41 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/magician.jpg" alt="Featured image of post 数据湖调研：Delta Lake vs Iceberg" />&lt;h2 id="delta-lake">Delta Lake
+&lt;/h2>&lt;p>Delta Lake是Databricks推出的流批一体存储层，分为开源版和商业版，深度绑定自家Spark。&lt;/p>
+&lt;h3 id="lakehouse论文">Lakehouse论文
+&lt;/h3>&lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/12/cidr_lakehouse.pdf" target="_blank" rel="noopener"
 >Lakehouse: A New Generation of Open Platforms that Unify Data Warehousing and Advanced Analytics&lt;/a>。&lt;/p>
 &lt;p>这篇论文主要讲了传统的数仓和数据湖模型的缺陷，在此基础上提出湖仓一体的LakeHouse模型，并阐述了LakeHouse的一些设计细节。下面挑一些要点来讲讲。&lt;/p>
 &lt;p>LakeHouse是Databricks提出的一种将在未来几年取代传统数仓结构的架构。传统数仓将业务数据库数据收集到集中式的数仓，在写入时针对下游BI消费对schema进行优化；然而传统数仓将计算与存储耦合，且对非结构化数据支持不佳。于是出现了数据湖，以开放格式（如Parquet、ORC）存储在低成本的存储系统（如S3），湖中的数据ETL到下游数仓，再提供给BI使用。但这样的两层结构带来了一下问题：&lt;/p>
@@ -65,8 +65,8 @@ class="gallery-image"
 data-flex-grow="181"
 data-flex-basis="435px"
 >&lt;/p>
-&lt;h3 id="delta-lake白皮书">Delta Lake白皮书&lt;/h3>
-&lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/08/p975-armbrust.pdf" target="_blank" rel="noopener"
+&lt;h3 id="delta-lake白皮书">Delta Lake白皮书
+&lt;/h3>&lt;p>请先快速阅读Databricks的论文 &lt;a class="link" href="https://databricks.com/wp-content/uploads/2020/08/p975-armbrust.pdf" target="_blank" rel="noopener"
 >Delta Lake: High-Performance ACID Table Storage over Cloud Object Stores&lt;/a> 。&lt;/p>
 &lt;p>&lt;strong>纯Parquet/ORC的缺陷&lt;/strong>：&lt;/p>
 &lt;ul>
@@ -115,17 +115,17 @@ data-flex-basis="207px"
 &lt;/li>
 &lt;/ul>
 &lt;p>后面是具体的存储格式和访问协议，篇幅太长，不展开了。后面再补吧。&lt;/p>
-&lt;h3 id="deltalake基本概念与使用">DeltaLake基本概念与使用&lt;/h3>
-&lt;p>&lt;a class="link" href="https://docs.delta.io/latest/delta-intro.html" target="_blank" rel="noopener"
+&lt;h3 id="deltalake基本概念与使用">DeltaLake基本概念与使用
+&lt;/h3>&lt;p>&lt;a class="link" href="https://docs.delta.io/latest/delta-intro.html" target="_blank" rel="noopener"
 >官方文档&lt;/a>&lt;/p>
 &lt;p>注意到上文所说的事务日志放在对象存储的同一位置，就是在表的目录下，有个 &lt;code>_delta_log&lt;/code> 子目录，一个版本对应里面一个json，记录了事务操作，Time Travel显然也是基于此。&lt;/p>
-&lt;h2 id="iceberg">Iceberg&lt;/h2>
-&lt;h3 id="设计理念">设计理念&lt;/h3>
-&lt;p>Meetup视频： &lt;a class="link" href="https://www.youtube.com/watch?v=N4gAi_zpN88" target="_blank" rel="noopener"
+&lt;h2 id="iceberg">Iceberg
+&lt;/h2>&lt;h3 id="设计理念">设计理念
+&lt;/h3>&lt;p>Meetup视频： &lt;a class="link" href="https://www.youtube.com/watch?v=N4gAi_zpN88" target="_blank" rel="noopener"
 >Data Science DC Nov 2021 Meetup: Apache Iceberg - An Architectural Look Under the Covers&lt;/a>，也可以看 &lt;a class="link" href="https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/" target="_blank" rel="noopener"
 >演讲稿&lt;/a>。&lt;/p>
-&lt;h4 id="what-is-iceberg">What is Iceberg&lt;/h4>
-&lt;table>
+&lt;h4 id="what-is-iceberg">What is Iceberg
+&lt;/h4>&lt;table>
 &lt;thead>
 &lt;tr>
 &lt;th style="text-align: left">✅ Iceberg 是……&lt;/th>
@@ -147,15 +147,15 @@ data-flex-basis="207px"
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h4 id="table-format">Table Format?&lt;/h4>
-&lt;blockquote>
+&lt;h4 id="table-format">Table Format?
+&lt;/h4>&lt;blockquote>
 &lt;p>A good way to define a table format is a way to organize a dataset’s files to present them as a single “table”.&lt;br/>
 Another somewhat simpler definition from a user’s perspective is a way to answer the question “what data is in this table?”.&lt;br/>
 A single answer to that question allows multiple people, groups, and tools to interact with data in the table at the same time, whether they’re writing to the table or reading from the table.&lt;/p>
 &lt;/blockquote>
 &lt;p>&lt;code>Table Format&lt;/code> 是表的抽象，将数据集文件组合起来，以单个“表”的形式呈现，允许人和工具与表数据高效交互。&lt;/p>
-&lt;h4 id="table-format简史">Table Format简史&lt;/h4>
-&lt;p>&lt;strong>Hadoop刀耕火种&lt;/strong>：直撸HDFS，用户必须清楚如何将问题转化为MR模型并用java编码，数据也没有schema，用户必须熟知他处理的文件的实际schema。&lt;/p>
+&lt;h4 id="table-format简史">Table Format简史
+&lt;/h4>&lt;p>&lt;strong>Hadoop刀耕火种&lt;/strong>：直撸HDFS，用户必须清楚如何将问题转化为MR模型并用java编码，数据也没有schema，用户必须熟知他处理的文件的实际schema。&lt;/p>
 &lt;p>&lt;strong>Hive&lt;/strong>：针对Hadoop第一个问题，用SQL替代之；针对Hadoop第二个问题，用metastore记录schema。Hive从此成为了事实上的Table Format标准。Hive的Table Format我们比较熟知，就不细述了，更多优点也不说了，看视频有。说下缺点：&lt;/p>
 &lt;ul>
 &lt;li>修改数据太低效，尤其分区很大，修改里面的少量数据、或频繁更改&lt;/li>
@@ -173,8 +173,8 @@ A single answer to that question allows multiple people, groups, and tools to in
 &lt;li>用户无需了解数据的物理布局（如分区）&lt;/li>
 &lt;li>实现更好、更安全的表进化（table evolution，即表schema变更）&lt;/li>
 &lt;/ul>
-&lt;h4 id="iceberg-table-format定义">Iceberg Table Format定义&lt;/h4>
-&lt;p>&lt;strong>Iceberg Table Format架构&lt;/strong>：&lt;/p>
+&lt;h4 id="iceberg-table-format定义">Iceberg Table Format定义
+&lt;/h4>&lt;p>&lt;strong>Iceberg Table Format架构&lt;/strong>：&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/iceberg1.png"
 width="1230"
 height="1282"
@@ -238,11 +238,11 @@ data-flex-basis="230px"
 &lt;li>&lt;strong>Time Travel&lt;/strong>：其实就是表级版本控制，语法是 &lt;code>SELECT * FROM xxx AS OF '日期'&lt;/code>，实际操作是：打开当前 &lt;code>metadata file&lt;/code>，在 &lt;code>snapshots&lt;/code> 数组查找满足查询版本日期的snapshot，后面就是正常流程（&lt;code>manifest list&lt;/code> -&amp;gt; &lt;code>manifest file&lt;/code> -&amp;gt; 数据文件）。&lt;/li>
 &lt;/ol>
 &lt;p>注意 &lt;strong>Time Travel&lt;/strong>，Iceberg保留了旧版本的数据，也提供了异步后台进程去清理这些旧snapshot（垃圾回收GC）。用户可以配置GC策略，这里就是存储空间的衡量了。&lt;/p>
-&lt;h4 id="小文件合并compaction">小文件合并（Compaction）&lt;/h4>
-&lt;p>Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。合并操作的输入输出可以是不同的文件格式。&lt;/p>
+&lt;h4 id="小文件合并compaction">小文件合并（Compaction）
+&lt;/h4>&lt;p>Compaction是后台的异步进程，负责将一组小文件合并压缩成少量大文件，可以平衡写入和读取性能的权衡：低延迟写入需要在获取数据后尽快写入，意味着生产更多小文件；而高吞吐量读取需要单个文件保存尽量多的文件。合并操作的输入输出可以是不同的文件格式。&lt;/p>
 &lt;p>但Iceberg只是提供了File Format及其API和库，实际的Compaction操作由集成了Iceberg的其他工具/引擎负责调度、执行。&lt;/p>
-&lt;h4 id="iceberg-table-format优势">Iceberg Table Format优势&lt;/h4>
-&lt;ul>
+&lt;h4 id="iceberg-table-format优势">Iceberg Table Format优势
+&lt;/h4>&lt;ul>
 &lt;li>事务的快照隔离：乐观锁&lt;/li>
 &lt;li>更快的执行计划和执行速度：写入数据时更新统计信息、文件级跟踪统计信息&lt;/li>
 &lt;li>对物理布局做抽象，对用户暴露逻辑视图&lt;/li>
@@ -250,17 +250,17 @@ data-flex-basis="230px"
 &lt;li>事件监听器：允许在Iceberg表上发生事件时通知其他服务&lt;/li>
 &lt;li>有效地对数据集进行较小的更新：文件级别跟踪数据&lt;/li>
 &lt;/ul>
-&lt;h3 id="iceberg基本使用">Iceberg基本使用&lt;/h3>
-&lt;p>目前有 Spark、Flink、PrestoDB、Hive、Impala等集成。&lt;/p>
+&lt;h3 id="iceberg基本使用">Iceberg基本使用
+&lt;/h3>&lt;p>目前有 Spark、Flink、PrestoDB、Hive、Impala等集成。&lt;/p>
 &lt;p>&lt;a class="link" href="https://iceberg.apache.org/spark-quickstart/" target="_blank" rel="noopener"
 >Quick Start&lt;/a>&lt;/p>
 &lt;p>&lt;a class="link" href="https://iceberg.apache.org/docs/latest/" target="_blank" rel="noopener"
 >官方文档&lt;/a>&lt;/p>
 &lt;p>&lt;a class="link" href="https://www.dremio.com/subsurface/migrating-a-hive-table-to-an-iceberg-table-hands-on-tutorial/" target="_blank" rel="noopener"
 >从Hive迁移到Iceberg&lt;/a>&lt;/p>
-&lt;h2 id="delta-lake-vs-iceberg">Delta Lake vs Iceberg&lt;/h2>
-&lt;h3 id="解决的痛点">解决的痛点&lt;/h3>
-&lt;p>从上面的介绍可以看出，DeltaLake和Iceberg的着重点不太一样。DataLake着眼于数仓/数据湖的架构优化、对流批一体的支持，而Iceberg站在了更高的抽象级别，定义TableFormat，制定标准和核心API，提供多种实现。&lt;/p>
+&lt;h2 id="delta-lake-vs-iceberg">Delta Lake vs Iceberg
+&lt;/h2>&lt;h3 id="解决的痛点">解决的痛点
+&lt;/h3>&lt;p>从上面的介绍可以看出，DeltaLake和Iceberg的着重点不太一样。DataLake着眼于数仓/数据湖的架构优化、对流批一体的支持，而Iceberg站在了更高的抽象级别，定义TableFormat，制定标准和核心API，提供多种实现。&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
@@ -275,8 +275,8 @@ data-flex-basis="230px"
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h3 id="对比表">对比表&lt;/h3>
-&lt;table>
+&lt;h3 id="对比表">对比表
+&lt;/h3>&lt;table>
 &lt;thead>
 &lt;tr>
 &lt;th style="text-align: left">&lt;/th>
@@ -348,8 +348,8 @@ data-flex-basis="230px"
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;h3 id="社区活跃度">社区活跃度&lt;/h3>
-&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/community1.jpeg"
+&lt;h3 id="社区活跃度">社区活跃度
+&lt;/h3>&lt;p>&lt;img src="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/community1.jpeg"
 width="653"
 height="386"
 srcset="https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/community1_hu4731924407321351191.jpeg 480w, https://leibnizhu.github.io/p/%E6%95%B0%E6%8D%AE%E6%B9%96%E8%B0%83%E7%A0%94Delta-Lake-vs-Iceberg/community1_hu17461887975829611749.jpeg 1024w"

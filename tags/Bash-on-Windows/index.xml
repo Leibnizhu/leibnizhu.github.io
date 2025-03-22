@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bash on Windows on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Bash-on-Windows/</link><description>Recent content in Bash on Windows on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 16 Jul 2016 17:09:46 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Bash-on-Windows/index.xml" rel="self" type="application/rss+xml"/><item><title>Bash on Windows开启Ubuntu unity和Xfce4桌面的方法</title><link>https://leibnizhu.github.io/p/Bash-on-Windows%E5%BC%80%E5%90%AFUbuntu-unity%E5%92%8CXfce4%E6%A1%8C%E9%9D%A2%E7%9A%84%E6%96%B9%E6%B3%95/</link><pubDate>Sat, 16 Jul 2016 17:09:46 +0800</pubDate><guid>https://leibnizhu.github.io/p/Bash-on-Windows%E5%BC%80%E5%90%AFUbuntu-unity%E5%92%8CXfce4%E6%A1%8C%E9%9D%A2%E7%9A%84%E6%96%B9%E6%B3%95/</guid><description>&lt;p>本文参照Github上的&lt;a class="link" href="https://github.com/Microsoft/BashOnWindows/issues/637" target="_blank" rel="noopener"
 >Run any Desktop Environment in WSL&lt;/a>、结合本人实际安装操作而编写。&lt;/p>
-&lt;h2 id="安装bash-on-windows">安装Bash on Windows&lt;/h2>
-&lt;p>首先安装Bash on Windows，可以参考 &lt;a class="link" href="https://linux.cn/article-7209-1.html" target="_blank" rel="noopener"
+&lt;h2 id="安装bash-on-windows">安装Bash on Windows
+&lt;/h2>&lt;p>首先安装Bash on Windows，可以参考 &lt;a class="link" href="https://linux.cn/article-7209-1.html" target="_blank" rel="noopener"
 >如何安装体验 Ubuntu on Windows&lt;/a> 一文。按照这篇文章安装的bash可以直接在开始菜单输入“bash”启动，但是不支持GUI程序的，所以有了本文。&lt;/p>
-&lt;h2 id="安装vcxsrv并启动xlaunch">安装VcXsrv并启动XLaunch&lt;/h2>
-&lt;p>在 SourceForge:&lt;a class="link" href="https://sourceforge.net/projects/vcxsrv/files/latest/download" target="_blank" rel="noopener"
+&lt;h2 id="安装vcxsrv并启动xlaunch">安装VcXsrv并启动XLaunch
+&lt;/h2>&lt;p>在 SourceForge:&lt;a class="link" href="https://sourceforge.net/projects/vcxsrv/files/latest/download" target="_blank" rel="noopener"
 > https://sourceforge.net/projects/vcxsrv/files/latest/download&lt;/a> 下载安装程序并安装后，运行XLaunch，按下图配置后，一路点Next直至完成。&lt;/p>
 &lt;p>&lt;img src="https://leibnizhu.github.io/p/Bash-on-Windows%E5%BC%80%E5%90%AFUbuntu-unity%E5%92%8CXfce4%E6%A1%8C%E9%9D%A2%E7%9A%84%E6%96%B9%E6%B3%95/0.png"
 width="510"
@@ -15,8 +15,8 @@ class="gallery-image"
 data-flex-grow="123"
 data-flex-basis="295px"
 >&lt;/p>
-&lt;h2 id="安装-ubuntu-desktop-unity和ccsm并配置">安装 ubuntu-desktop, unity和ccsm并配置&lt;/h2>
-&lt;p>打开bash，输入：&lt;/p>
+&lt;h2 id="安装-ubuntu-desktop-unity和ccsm并配置">安装 ubuntu-desktop, unity和ccsm并配置
+&lt;/h2>&lt;p>打开bash，输入：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>sudo apt-get install ubuntu-desktop unity compizconfig-settings-manager
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再打开ccsm:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>ccsm
@@ -45,12 +45,12 @@ class="gallery-image"
 data-flex-grow="161"
 data-flex-basis="388px"
 >&lt;/p>
-&lt;h2 id="配置bashrc和etcdbus-1sessionconf">配置~/.bashrc和/etc/dbus-1/session.conf&lt;/h2>
-&lt;p>在bash输入以下命令：&lt;/p>
+&lt;h2 id="配置bashrc和etcdbus-1sessionconf">配置~/.bashrc和/etc/dbus-1/session.conf
+&lt;/h2>&lt;p>在bash输入以下命令：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>echo &lt;span style="color:#48b685">&amp;#34;export DISPLAY=:0.0&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.bashrc
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sudo sed -i &lt;span style="color:#48b685">&amp;#39;s$&amp;lt;listen&amp;gt;.*&amp;lt;/listen&amp;gt;$&amp;lt;listen&amp;gt;tcp:host=localhost,port=0&amp;lt;/listen&amp;gt;$&amp;#39;&lt;/span> /etc/dbus-1/session.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="启动unity桌面">启动Unity桌面&lt;/h2>
-&lt;p>在bash中输入：&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="启动unity桌面">启动Unity桌面
+&lt;/h2>&lt;p>在bash中输入：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>compiz
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>等待十几秒之后即可显示Ubuntu桌面。Enjoy it！&lt;/p>
 &lt;p>2016-07-19增加：对于XFCE，则是安装xubuntu-desktop或xfce4，与上面同样的步骤，启动的时候输入xfce4-session。

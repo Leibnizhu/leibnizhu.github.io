@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JMH on Heaven's Door</title><link>https://leibnizhu.github.io/tags/JMH/</link><description>Recent content in JMH on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 13 Sep 2017 21:51:44 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/JMH/index.xml" rel="self" type="application/rss+xml"/><item><title>基于Netty的Spring Boot内置Servlet容器的实现（五）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</link><pubDate>Wed, 13 Sep 2017 21:51:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/lzwx.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（五）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现五">基于Netty的Spring Boot内置Servlet容器的实现（五）&lt;/h1>
-&lt;h2 id="benchmark-程序编写">BenchMark 程序编写&lt;/h2>
-&lt;p>BenchMark可以用Jmeter进行，也可以直接编写java Test程序，通过@Befor进行时间计算。&lt;br>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>JMH on Heaven's Door</title><link>https://leibnizhu.github.io/tags/JMH/</link><description>Recent content in JMH on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 13 Sep 2017 21:51:44 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/JMH/index.xml" rel="self" type="application/rss+xml"/><item><title>基于Netty的Spring Boot内置Servlet容器的实现（五）</title><link>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</link><pubDate>Wed, 13 Sep 2017 21:51:44 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/lzwx.png" alt="Featured image of post 基于Netty的Spring Boot内置Servlet容器的实现（五）" />&lt;h1 id="基于netty的spring-boot内置servlet容器的实现五">基于Netty的Spring Boot内置Servlet容器的实现（五）
+&lt;/h1>&lt;h2 id="benchmark-程序编写">BenchMark 程序编写
+&lt;/h2>&lt;p>BenchMark可以用Jmeter进行，也可以直接编写java Test程序，通过@Befor进行时间计算。&lt;br>
 更方便的方法直使JM框架。&lt;/p>
-&lt;h3 id="jmh简介">JMH简介&lt;/h3>
-&lt;p>JMH是新的microbenchmark（微基准测试）框架（2013年首次发布）。与其他众多框架相比它的特色优势在于，它是由Oracle实现JIT的相同人员开发的。特别是我想提一下Aleksey Shipilev和他优秀的博客文章。JMH可能与最新的Oracle JRE同步，其结果可信度很高。&lt;/p>
-&lt;h3 id="idea的jmh插件">IDEA的JMH插件&lt;/h3>
-&lt;p>直接使用JMH需要额外编写一些入口方法、增加依赖等，并不是特别方便，而IDEA有插件支持JMH。打开&lt;code>Files-Settings&lt;/code>，找到&lt;code>Plugins&lt;/code>选项卡，安装&lt;code>JMH Plugin&lt;/code>插件，安装后重启如下：&lt;br>
+&lt;h3 id="jmh简介">JMH简介
+&lt;/h3>&lt;p>JMH是新的microbenchmark（微基准测试）框架（2013年首次发布）。与其他众多框架相比它的特色优势在于，它是由Oracle实现JIT的相同人员开发的。特别是我想提一下Aleksey Shipilev和他优秀的博客文章。JMH可能与最新的Oracle JRE同步，其结果可信度很高。&lt;/p>
+&lt;h3 id="idea的jmh插件">IDEA的JMH插件
+&lt;/h3>&lt;p>直接使用JMH需要额外编写一些入口方法、增加依赖等，并不是特别方便，而IDEA有插件支持JMH。打开&lt;code>Files-Settings&lt;/code>，找到&lt;code>Plugins&lt;/code>选项卡，安装&lt;code>JMH Plugin&lt;/code>插件，安装后重启如下：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/jmhPlugin.png"
 width="1019"
 height="458"
@@ -15,8 +15,8 @@ class="gallery-image"
 data-flex-grow="222"
 data-flex-basis="533px"
 >&lt;/p>
-&lt;h3 id="编写benchmark方法">编写BenchMark方法&lt;/h3>
-&lt;p>安装&lt;code>JMH Plugin&lt;/code>插件之后无需编写入口方法、增加依赖，可以直接关注具体的测试。&lt;br>
+&lt;h3 id="编写benchmark方法">编写BenchMark方法
+&lt;/h3>&lt;p>安装&lt;code>JMH Plugin&lt;/code>插件之后无需编写入口方法、增加依赖，可以直接关注具体的测试。&lt;br>
 编写一个简单例子，测试我们容器的测试用例吞吐量：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@BenchmarkMode&lt;/span>(Mode.&lt;span style="color:#06b6ef">Throughput&lt;/span>)
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">NettyServletBenchmark&lt;/span> {
@@ -117,8 +117,8 @@ data-flex-basis="533px"
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> getUrl(&lt;span style="color:#48b685">&amp;#34;http://localhost:9999/netty/plaintext&amp;#34;&lt;/span>, &lt;span style="color:#815ba4">false&lt;/span>);
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>其中&lt;code>@Benchmark&lt;/code>注解表示当前方法是需要JMH执行测试的方法，&lt;code>@Warmup(iterations = 10)&lt;/code>表示每次正式测试前，先跑10次进行热身（不参与测试结果的计算），&lt;code>@Measurement(iterations = 20)&lt;/code>表示每次正式测试执行20次方法。&lt;/p>
-&lt;h3 id="执行测试">执行测试&lt;/h3>
-&lt;p>执行方法很简单，点击菜单&lt;code>Run-Run...&lt;/code>，弹出窗中选择当前类，即可：&lt;br>
+&lt;h3 id="执行测试">执行测试
+&lt;/h3>&lt;p>执行方法很简单，点击菜单&lt;code>Run-Run...&lt;/code>，弹出窗中选择当前类，即可：&lt;br>
 &lt;img src="https://leibnizhu.github.io/p/%E5%9F%BA%E4%BA%8ENetty%E7%9A%84Spring-Boot%E5%86%85%E7%BD%AEServlet%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BA%94/runJmh.png"
 width="771"
 height="577"

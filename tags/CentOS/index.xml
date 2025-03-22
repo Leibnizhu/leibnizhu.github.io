@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CentOS on Heaven's Door</title><link>https://leibnizhu.github.io/tags/CentOS/</link><description>Recent content in CentOS on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 10 May 2017 12:54:24 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/CentOS/index.xml" rel="self" type="application/rss+xml"/><item><title>调整VirtualBox CentOS虚拟机磁盘大小</title><link>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</link><pubDate>Wed, 10 May 2017 12:54:24 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/vbox.png" alt="Featured image of post 调整VirtualBox CentOS虚拟机磁盘大小" />&lt;h2 id="背景">背景&lt;/h2>
-&lt;p>昨天发现本地HDP集群的HBase连不上了，解决了这个问题后，又发现HBase同步脚本一直执行失败，进YARN看了下，几天前开始堆积了很多ACCEPT了的任务，但没一个在执行，先用&lt;code>hadoop job kill &lt;/code>干掉了旧的任务，重新执行脚本，还是不行，日志上面却没报错。&lt;br>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CentOS on Heaven's Door</title><link>https://leibnizhu.github.io/tags/CentOS/</link><description>Recent content in CentOS on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 10 May 2017 12:54:24 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/CentOS/index.xml" rel="self" type="application/rss+xml"/><item><title>调整VirtualBox CentOS虚拟机磁盘大小</title><link>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</link><pubDate>Wed, 10 May 2017 12:54:24 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%B0%83%E6%95%B4VirtualBox-CentOS%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A3%81%E7%9B%98%E5%A4%A7%E5%B0%8F/vbox.png" alt="Featured image of post 调整VirtualBox CentOS虚拟机磁盘大小" />&lt;h2 id="背景">背景
+&lt;/h2>&lt;p>昨天发现本地HDP集群的HBase连不上了，解决了这个问题后，又发现HBase同步脚本一直执行失败，进YARN看了下，几天前开始堆积了很多ACCEPT了的任务，但没一个在执行，先用&lt;code>hadoop job kill &lt;/code>干掉了旧的任务，重新执行脚本，还是不行，日志上面却没报错。&lt;br>
 于是进Ambari一看，HDFS的DataNode全都满了……看来要扩容了。&lt;br>
 集群是部署在几台VirtualBox的CentOS虚拟机上的（起始我一直想转移到Docker上，但一直没时间+懒）。网上关于VirtualBox虚拟机磁盘扩容的文章很多，试了下，很多是行不通的，而且不太完整，于是把今天的经验记下来吧。&lt;/p>
-&lt;h2 id="具体步骤">具体步骤&lt;/h2>
-&lt;h3 id="磁盘映像扩容">磁盘映像扩容&lt;/h3>
-&lt;p>下面的命令以名为CentOS05的虚拟机为例进行。&lt;br>
+&lt;h2 id="具体步骤">具体步骤
+&lt;/h2>&lt;h3 id="磁盘映像扩容">磁盘映像扩容
+&lt;/h3>&lt;p>下面的命令以名为CentOS05的虚拟机为例进行。&lt;br>
 关闭虚拟机。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage controlvm CentOS05 poweroff
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>因为原来的磁盘是vmdk的不能直接扩展容量，需要先转换成vdi(这个步骤相当缓慢，视乎电脑配置和原磁盘映像大小，请耐心等待)：&lt;/p>
@@ -12,8 +12,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>vboxmanage clonehd CentOS05-disk1.vmdk CentOS05-disk1.vdi --format VDI
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>再扩容，注意默认单位是MB：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage modifyhd CentOS05-disk1.vdi --resize &lt;span style="color:#f99b15">122880&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改虚拟机挂载磁盘">修改虚拟机挂载磁盘&lt;/h3>
-&lt;p>查看虚拟机原来配置&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改虚拟机挂载磁盘">修改虚拟机挂载磁盘
+&lt;/h3>&lt;p>查看虚拟机原来配置&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage showvminfo CentOS05
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意类似以下的信息，包括名称（IDE），端口号，设备ID（如IDE(1,0)的端口号是1，设备号0），下面要用到：&lt;/p>
 &lt;blockquote>
@@ -38,8 +38,8 @@ medium：允许指定DVD／软盘驱动器是完全断开的（none）或仅是�
 &lt;/blockquote>
 &lt;p>再次查看配置确认修改成功：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>VBoxManage showvminfo CentOS05
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改centos分区配置">修改CentOS分区配置&lt;/h3>
-&lt;p>因为在系统启动后根目录的卸载之类的动作旧就不能执行了，所以只能在LiveCD里面改，建议使用gparted图形化工具修改分区大小，比较简单，此处不表。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="修改centos分区配置">修改CentOS分区配置
+&lt;/h3>&lt;p>因为在系统启动后根目录的卸载之类的动作旧就不能执行了，所以只能在LiveCD里面改，建议使用gparted图形化工具修改分区大小，比较简单，此处不表。&lt;br>
 修改好启动虚拟机：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>vboxmanage startvm CentOS05 --type headless
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ssh CentOS05

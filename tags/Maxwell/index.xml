@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Maxwell on Heaven's Door</title><link>https://leibnizhu.github.io/tags/Maxwell/</link><description>Recent content in Maxwell on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 07 Mar 2018 16:23:56 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/tags/Maxwell/index.xml" rel="self" type="application/rss+xml"/><item><title>Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用</title><link>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</link><pubDate>Wed, 07 Mar 2018 16:23:56 +0800</pubDate><guid>https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Kerberos%E9%9B%86%E7%BE%A4%E7%9A%84SqoopHiveHBaseKafkaMaxwell%E4%BD%BF%E7%94%A8/flower.jpg" alt="Featured image of post Kerberos集群的Sqoop,Hive,HBase,Kafka,Maxwell使用" />&lt;p>介绍在部署了Kerberos的安全Hadoop集群中, Sqoop,Hive,HBase,Kafka,Maxwell使用方法.&lt;/p>
-&lt;h2 id="sqoop使用">Sqoop使用&lt;/h2>
-&lt;p>配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:&lt;/p>
+&lt;h2 id="sqoop使用">Sqoop使用
+&lt;/h2>&lt;p>配置好Kerberos之后, sqoop不能直接使用, 需要进行一些配置:&lt;/p>
 &lt;ol>
 &lt;li>分配sqoop的组, 执行&lt;code>usermod -a -G hdfs sqoop&lt;/code>加入到hdfs组, 使用&lt;code>groups sqoop&lt;/code>确认执行成功;&lt;/li>
 &lt;li>进入Hue的用户管理界面, 新增sqoop用户, 在hdfs用户组中;&lt;/li>
@@ -9,8 +9,8 @@
 &lt;li>使用kinit命令切换到sqoop用户(在脚本中可以使用keytab切换)&lt;/li>
 &lt;li>执行sqoop命令&lt;/li>
 &lt;/ol>
-&lt;h2 id="spark访问hbase">Spark访问HBase&lt;/h2>
-&lt;ol>
+&lt;h2 id="spark访问hbase">Spark访问HBase
+&lt;/h2>&lt;ol>
 &lt;li>进入cdh1, 创建Kerberos用户, 名为hbase; 导出keytab, 名为hbase.keytab, 保存到本地;&lt;/li>
 &lt;li>下载krb5.conf到本地.&lt;/li>
 &lt;li>创建测试类, 并执行, 代码如下:&lt;/li>
@@ -66,8 +66,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> resultList
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问hive">Spark访问Hive&lt;/h2>
-&lt;ol>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问hive">Spark访问Hive
+&lt;/h2>&lt;ol>
 &lt;li>Hive可以沿用hbase的Kerberos用户, 也可以新建一个Hive用户及其对应keytab文件.&lt;/li>
 &lt;li>本地测试请将集群的&lt;code>hive-site.xml&lt;/code>导出并保存在项目的&lt;code>src/main/resources/&lt;/code>目录下;&lt;/li>
 &lt;li>编写Spark测试程序:&lt;/li>
@@ -92,8 +92,8 @@
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> sc&lt;span style="color:#5bc4bf">.&lt;/span>stop&lt;span style="color:#5bc4bf">()&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">}&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问kafka">Spark访问Kafka&lt;/h2>
-&lt;ol>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="spark访问kafka">Spark访问Kafka
+&lt;/h2>&lt;ol>
 &lt;li>进入Cloudera Manager的Kafka配置页面, 搜索&amp;rsquo;Inter Broker Protocol&amp;rsquo;, 更改为&amp;rsquo;SASL_PLAINTEXT';&lt;/li>
 &lt;li>重启Kafka配置;&lt;/li>
 &lt;li>进入cdh1, 创建Kerberos用户, 名为kafka; 导出keytab, 名为kafka.keytab, 并保存到本地(测试用);&lt;/li>
@@ -159,8 +159,8 @@
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意修改其中的jass.conf路径, 并确保其中配置的keytab存在; 再执行相应的kafka命令.&lt;br>
 如果觉得麻烦, 也可以编辑&lt;code>/opt/cloudera/parcels/KAFKA-3.0.0-1.3.0.0.p0.40/lib/kafka/bin/kafka-run-class.sh&lt;/code>, 在&lt;code>exec $JAVA&lt;/code>后面增加:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-Djava.security.krb5.conf&lt;span style="color:#5bc4bf">=&lt;/span>/etc/krb5.conf -Djava.security.auth.login.config&lt;span style="color:#5bc4bf">=&lt;/span>/root/jaas.conf
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="maxwell配置">Maxwell配置&lt;/h2>
-&lt;ol>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="maxwell配置">Maxwell配置
+&lt;/h2>&lt;ol>
 &lt;li>编辑${MAXWELL_HOME}/bin/maxwell, 在文件尾部附件的&lt;code>exec $JAVA $JAVA_OPTS&lt;/code>后面增加:&lt;/li>
 &lt;/ol>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>-Djava.security.krb5.conf&lt;span style="color:#5bc4bf">=&lt;/span>/etc/krb5.conf -Djava.security.auth.login.config&lt;span style="color:#5bc4bf">=&lt;/span>/root/jaas.conf
@@ -176,13 +176,13 @@
 &lt;li>在maxwell启动命令中增加参数:&lt;/li>
 &lt;/ol>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>--config /path/to/config.properties
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>解决Maxwell发送Kafka消息数据倾斜问题</title><link>https://leibnizhu.github.io/p/%E8%A7%A3%E5%86%B3Maxwell%E5%8F%91%E9%80%81Kafka%E6%B6%88%E6%81%AF%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E9%97%AE%E9%A2%98/</link><pubDate>Wed, 03 Jan 2018 17:34:30 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%A7%A3%E5%86%B3Maxwell%E5%8F%91%E9%80%81Kafka%E6%B6%88%E6%81%AF%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%A7%A3%E5%86%B3Maxwell%E5%8F%91%E9%80%81Kafka%E6%B6%88%E6%81%AF%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E9%97%AE%E9%A2%98/lotus.jpg" alt="Featured image of post 解决Maxwell发送Kafka消息数据倾斜问题" />&lt;h2 id="问题">问题&lt;/h2>
-&lt;p>最近用&lt;code>Maxwell&lt;/code>解析&lt;code>MySQL&lt;/code>的Binlog，发送到&lt;code>Kafka&lt;/code>进行处理，测试的时候发现一个问题，就是&lt;code>Kafka&lt;/code>的Offset严重倾斜，三个partition，其中一个的offset已经快200万了，另外两个offset才不到两百。&lt;br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>解决Maxwell发送Kafka消息数据倾斜问题</title><link>https://leibnizhu.github.io/p/%E8%A7%A3%E5%86%B3Maxwell%E5%8F%91%E9%80%81Kafka%E6%B6%88%E6%81%AF%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E9%97%AE%E9%A2%98/</link><pubDate>Wed, 03 Jan 2018 17:34:30 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E8%A7%A3%E5%86%B3Maxwell%E5%8F%91%E9%80%81Kafka%E6%B6%88%E6%81%AF%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E8%A7%A3%E5%86%B3Maxwell%E5%8F%91%E9%80%81Kafka%E6%B6%88%E6%81%AF%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E9%97%AE%E9%A2%98/lotus.jpg" alt="Featured image of post 解决Maxwell发送Kafka消息数据倾斜问题" />&lt;h2 id="问题">问题
+&lt;/h2>&lt;p>最近用&lt;code>Maxwell&lt;/code>解析&lt;code>MySQL&lt;/code>的Binlog，发送到&lt;code>Kafka&lt;/code>进行处理，测试的时候发现一个问题，就是&lt;code>Kafka&lt;/code>的Offset严重倾斜，三个partition，其中一个的offset已经快200万了，另外两个offset才不到两百。&lt;br>
 Kafka数据倾斜的问题一般是由于生产者使用的&lt;code>Partition&lt;/code>接口实现类对分区处理的问题，一般是对key做hash之后，对分区数取模。当出现数据倾斜时，小量任务耗时远高于其它任务，从而使得整体耗时过大，未能充分发挥分布式系统的并行计算优势（参考&lt;a class="link" href="http://ningg.top/apache-kafka-10-best-practice-tips-data-skew-details/" target="_blank" rel="noopener"
 >Apache Kafka 0.10 技术内幕：数据倾斜详解&lt;/a>）。&lt;br>
 而使用&lt;code>Maxwell&lt;/code>解析&lt;code>MySQL&lt;/code>的Binlog发送到&lt;code>Kafka&lt;/code>的时候，生产者是&lt;code>Maxwell&lt;/code>，那么数据倾斜的问题明细就是&lt;code>Maxwell&lt;/code>引起的了。&lt;/p>
-&lt;h2 id="原因">原因&lt;/h2>
-&lt;p>在&lt;code>Maxwell&lt;/code>官网查文档（&lt;a class="link" href="http://maxwells-daemon.io/producers/#kafka-partitioning" target="_blank" rel="noopener"
+&lt;h2 id="原因">原因
+&lt;/h2>&lt;p>在&lt;code>Maxwell&lt;/code>官网查文档（&lt;a class="link" href="http://maxwells-daemon.io/producers/#kafka-partitioning" target="_blank" rel="noopener"
 >Producers:kafka-partitioning Maxwell&amp;rsquo;s Daemon&lt;/a>）得知，在&lt;code>Maxwell&lt;/code>没有配置的情况下，默认使用数据库名作为计算分区的key，并使用Java默认的hashcode算法进行计算：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-fallback" data-lang="fallback">&lt;span style="display:flex;">&lt;span>A binlog event&amp;#39;s partition is determined by the selected hash function and hash string as follows
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>| HASH_FUNCTION(HASH_STRING) % TOPIC.NUMBER_OF_PARTITIONS
@@ -193,8 +193,8 @@ Kafka数据倾斜的问题一般是由于生产者使用的&lt;code>Partition&lt
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>is the database. The partitioning field can be configured using the
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>producer_partition_by option.
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>而在很多业务系统中，不同数据库的活跃度差异是很大的，主体业务的数据库操作频繁，产生的Binlog也就很多，而&lt;code>Maxwell&lt;/code>默认使用数据库作为key进行hash，那么显而易见，Binglog的操作经常都被分到同一个分区里面了。&lt;/p>
-&lt;h2 id="解决">解决&lt;/h2>
-&lt;p>于是我们在&lt;code>Maxwell&lt;/code>启动命令中加入对应参数即可，这里我选择了Rowkey作为分区key，同时选用murmurhash3
+&lt;h2 id="解决">解决
+&lt;/h2>&lt;p>于是我们在&lt;code>Maxwell&lt;/code>启动命令中加入对应参数即可，这里我选择了Rowkey作为分区key，同时选用murmurhash3
 哈希算法，以获得更好的效率和分布：&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>nohup /opt/maxwell-1.11.0/bin/maxwell --user&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#39;maxwell&amp;#39;&lt;/span> --password&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#39;***&amp;#39;&lt;/span> --host&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#39;***&amp;#39;&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>--exclude_dbs&lt;span style="color:#5bc4bf">=&lt;/span>&lt;span style="color:#48b685">&amp;#39;/^(mysql|maxwell|test)/&amp;#39;&lt;/span> --producer&lt;span style="color:#5bc4bf">=&lt;/span>kafka --kafka.bootstrap.servers&lt;span style="color:#5bc4bf">=&lt;/span>***
