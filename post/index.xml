@@ -1,4 +1,83 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 22 Mar 2025 12:00:00 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>处理jvppeteer获取SSE响应内容乱码问题</title><link>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 22 Mar 2025 12:00:00 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/thumbnail.png" alt="Featured image of post 处理jvppeteer获取SSE响应内容乱码问题" />&lt;p>最近在使用jvppeteer监听SSE（Server-Sent Events）响应时，调用 &lt;code>com.ruiyun.jvppeteer.api.core.Response.content()&lt;/code> 方法获取响应内容，结果发现返回的中文内容全部变成了乱码。这里记录一下问题的分析过程和解决方案。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 09 Jul 2025 18:43:20 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Quarkus 快速接入 knife4j 文档</title><link>https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/</link><pubDate>Wed, 09 Jul 2025 18:43:20 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/thumbnail-min.png" alt="Featured image of post Quarkus 快速接入 knife4j 文档" />&lt;p>&lt;a class="link" href="https://github.com/xiaoymin/knife4j" target="_blank" rel="noopener"
+>Knife4j&lt;/a> 比起 &lt;a class="link" href="https://swagger.io/tools/swagger-ui/" target="_blank" rel="noopener"
+>Swagger-UI&lt;/a> 功能更齐全，比如有搜索、全局变量、导出文档（Word、PDF、Markdown、OpenAPI 等）、多语言 UI 等等功能。Quarkus 支持 OpenAPI 及 SwaggerUI，但没有对 Kinfe4j 的支持。&lt;/p>
+&lt;p>最开始的想法是直接做一个 Kinfe4j 的 Quarkus Extension，后来看了下 Knife4j 已经提供了标准静态资源 jar（Servlet 3.0 标准，&lt;code>META-INF/resources&lt;/code> 下存放了静态资源）了，即 &lt;code>knife4j-openapi3-ui&lt;/code> 依赖，只要稍微调整下就可以直接使用，就没必要再套娃做个 Quarkus Extension。以下就快速介绍下使用方法。&lt;/p>
+&lt;ol>
+&lt;li>增加 &lt;code>knife4j-openapi3-ui&lt;/code> 依赖：&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-xml" data-lang="xml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;groupId&amp;gt;&lt;/span>com.github.xiaoymin&lt;span style="color:#5bc4bf">&amp;lt;/groupId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;artifactId&amp;gt;&lt;/span>knife4j-openapi3-ui&lt;span style="color:#5bc4bf">&amp;lt;/artifactId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">&amp;lt;!-- 请根据 Github 使用最新版本 --&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">&amp;lt;version&amp;gt;&lt;/span>4.5.0&lt;span style="color:#5bc4bf">&amp;lt;/version&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">&amp;lt;/dependency&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="2">
+&lt;li>由于 &lt;code>knife4j-openapi3-ui&lt;/code> 是标准静态资源 jar，Quarkus支持，所以此时打开 &lt;code>http://localhost:8080/doc.htm&lt;/code> 已经能看到 Knife4j 页面，但是获取不到 OpenAPI 定义，所以还要做个接口&lt;/li>
+&lt;li>定义 &lt;code>/v3/api-docs/swagger-config&lt;/code> 接口：&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">io.quarkus.runtime.configuration.ConfigUtils&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.io.IOException&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.io.InputStream&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.io.InputStreamReader&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.List&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">java.util.Map&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">jakarta.ws.rs.GET&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">jakarta.ws.rs.Path&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">jakarta.ws.rs.core.Response&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">lombok.extern.slf4j.Slf4j&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">com.fasterxml.jackson.databind.ObjectMapper&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">import&lt;/span> &lt;span style="color:#fec418">com.fasterxml.jackson.dataformat.yaml.YAMLFactory&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * @author Leibniz on 2025/7/2.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Slf4j&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">@Path&lt;/span>(&lt;span style="color:#48b685">&amp;#34;/v3/api-docs&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">ApiDocResource&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@GET&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Path&lt;/span>(&lt;span style="color:#48b685">&amp;#34;/swagger-config&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> Response &lt;span style="color:#06b6ef">swaggerConfig&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 此处可以通过 读取配置、或读取profile、或注入LaunchMode，根据实际的运行环境和配置决定是否允许展示OpenAPI定义&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 此处示例代码是控制只有 quarkus.profile=dev或local 时才允许展示OpenAPI定义&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (ConfigUtils.&lt;span style="color:#06b6ef">isProfileActive&lt;/span>(&lt;span style="color:#48b685">&amp;#34;local&amp;#34;&lt;/span>) &lt;span style="color:#5bc4bf">||&lt;/span> ConfigUtils.&lt;span style="color:#06b6ef">isProfileActive&lt;/span>(&lt;span style="color:#48b685">&amp;#34;dev&amp;#34;&lt;/span>)) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> Response.&lt;span style="color:#06b6ef">ok&lt;/span>(Map.&lt;span style="color:#06b6ef">ofEntries&lt;/span>(
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 定义所有可以获取到 OpenAPI 定义的接口&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Map.&lt;span style="color:#06b6ef">entry&lt;/span>(&lt;span style="color:#48b685">&amp;#34;urls&amp;#34;&lt;/span>, List.&lt;span style="color:#06b6ef">of&lt;/span>(
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 如果配置了Quarkus OpenAPI 扩展，那么已经有 /q/openapi 接口&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Map.&lt;span style="color:#06b6ef">of&lt;/span>(&lt;span style="color:#48b685">&amp;#34;url&amp;#34;&lt;/span>, &lt;span style="color:#48b685">&amp;#34;/q/openapi&amp;#34;&lt;/span>, &lt;span style="color:#48b685">&amp;#34;name&amp;#34;&lt;/span>, &lt;span style="color:#48b685">&amp;#34;aaa API&amp;#34;&lt;/span>),
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">// 还可以按需增加其他OpenAPI 定义接口，比如后面代码了另一个OpenAPI定义的接口&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Map.&lt;span style="color:#06b6ef">of&lt;/span>(&lt;span style="color:#48b685">&amp;#34;url&amp;#34;&lt;/span>, &lt;span style="color:#48b685">&amp;#34;/v3/api-docs/xxx-api&amp;#34;&lt;/span>, &lt;span style="color:#48b685">&amp;#34;name&amp;#34;&lt;/span>, &lt;span style="color:#48b685">&amp;#34;xxx API&amp;#34;&lt;/span>)))))
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> .&lt;span style="color:#06b6ef">build&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> Response.&lt;span style="color:#06b6ef">ok&lt;/span>(Map.&lt;span style="color:#06b6ef">ofEntries&lt;/span>(
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Map.&lt;span style="color:#06b6ef">entry&lt;/span>(&lt;span style="color:#48b685">&amp;#34;urls&amp;#34;&lt;/span>, List.&lt;span style="color:#06b6ef">of&lt;/span>()))).&lt;span style="color:#06b6ef">build&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@GET&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Path&lt;/span>(&lt;span style="color:#48b685">&amp;#34;/xxx-api&amp;#34;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> Response &lt;span style="color:#06b6ef">xxxApi&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ClassLoader classLoader &lt;span style="color:#5bc4bf">=&lt;/span> Thread.&lt;span style="color:#06b6ef">currentThread&lt;/span>().&lt;span style="color:#06b6ef">getContextClassLoader&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> (InputStream yamlStream &lt;span style="color:#5bc4bf">=&lt;/span> classLoader.&lt;span style="color:#06b6ef">getResourceAsStream&lt;/span>(&lt;span style="color:#48b685">&amp;#34;META-INF/xxx-openapi.yaml&amp;#34;&lt;/span>)) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (yamlStream &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Object yamlObj &lt;span style="color:#5bc4bf">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">new&lt;/span> ObjectMapper(&lt;span style="color:#815ba4">new&lt;/span> YAMLFactory()).&lt;span style="color:#06b6ef">readValue&lt;/span>(&lt;span style="color:#815ba4">new&lt;/span> InputStreamReader(yamlStream), Object.&lt;span style="color:#06b6ef">class&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> Response.&lt;span style="color:#06b6ef">ok&lt;/span>(yamlObj).&lt;span style="color:#06b6ef">build&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">catch&lt;/span> (IOException e) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> log.&lt;span style="color:#06b6ef">error&lt;/span>(&lt;span style="color:#48b685">&amp;#34;读取xxx OpenAPI定义文件失败: {}&amp;#34;&lt;/span>, e.&lt;span style="color:#06b6ef">getMessage&lt;/span>(), e);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> Response.&lt;span style="color:#06b6ef">ok&lt;/span>().&lt;span style="color:#06b6ef">build&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="4">
+&lt;li>重启服务，此时 &lt;code>http://localhost:8080/doc.htm&lt;/code> Knife4j 页面已经正常可用，左上角的下拉菜单对应我们在 &lt;code>swaggerConfig()&lt;/code> 返回的 &lt;code>urls&lt;/code> 字段定义的多个 OpenAPI 定义接口地址。&lt;/li>
+&lt;/ol></description></item><item><title>处理jvppeteer获取SSE响应内容乱码问题</title><link>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 22 Mar 2025 12:00:00 +0800</pubDate><guid>https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/</guid><description>&lt;img src="https://leibnizhu.github.io/p/%E5%A4%84%E7%90%86jvppeteer%E8%8E%B7%E5%8F%96SSE%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98/thumbnail.png" alt="Featured image of post 处理jvppeteer获取SSE响应内容乱码问题" />&lt;p>最近在使用jvppeteer监听SSE（Server-Sent Events）响应时，调用 &lt;code>com.ruiyun.jvppeteer.api.core.Response.content()&lt;/code> 方法获取响应内容，结果发现返回的中文内容全部变成了乱码。这里记录一下问题的分析过程和解决方案。&lt;/p>
 &lt;h2 id="现象描述">现象描述
 &lt;/h2>&lt;p>在SSE接口的响应中，中文内容无法正常显示，变成了乱码，而英文部分则没有受到影响。这个问题出现在使用 &lt;code>jvppeteer&lt;/code> 处理 Chrome DevTools Protocol（CDP）的 &lt;code>Network.getResponseBody&lt;/code> 方法时。&lt;/p>
 &lt;h2 id="原因分析">原因分析
