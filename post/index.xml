@@ -1,4 +1,146 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 09 Jul 2025 18:43:20 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Quarkus 快速接入 knife4j 文档</title><link>https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/</link><pubDate>Wed, 09 Jul 2025 18:43:20 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/thumbnail-min.png" alt="Featured image of post Quarkus 快速接入 knife4j 文档" />&lt;p>&lt;a class="link" href="https://github.com/xiaoymin/knife4j" target="_blank" rel="noopener"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Heaven's Door</title><link>https://leibnizhu.github.io/post/</link><description>Recent content in Posts on Heaven's Door</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 03 Sep 2025 20:45:46 +0800</lastBuildDate><atom:link href="https://leibnizhu.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Undertow下Multipart请求大字段丢失问题的排查</title><link>https://leibnizhu.github.io/p/Undertow%E4%B8%8BMultipart%E8%AF%B7%E6%B1%82%E5%A4%A7%E5%AD%97%E6%AE%B5%E4%B8%A2%E5%A4%B1%E9%97%AE%E9%A2%98%E7%9A%84%E6%8E%92%E6%9F%A5/</link><pubDate>Wed, 03 Sep 2025 20:45:46 +0800</pubDate><guid>https://leibnizhu.github.io/p/Undertow%E4%B8%8BMultipart%E8%AF%B7%E6%B1%82%E5%A4%A7%E5%AD%97%E6%AE%B5%E4%B8%A2%E5%A4%B1%E9%97%AE%E9%A2%98%E7%9A%84%E6%8E%92%E6%9F%A5/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Undertow%E4%B8%8BMultipart%E8%AF%B7%E6%B1%82%E5%A4%A7%E5%AD%97%E6%AE%B5%E4%B8%A2%E5%A4%B1%E9%97%AE%E9%A2%98%E7%9A%84%E6%8E%92%E6%9F%A5/thumbnail.png" alt="Featured image of post Undertow下Multipart请求大字段丢失问题的排查" />&lt;h2 id="问题背景">问题背景
+&lt;/h2>&lt;p>有一个POST接口，部分业务方使用 &lt;code>multipart/form-data&lt;/code> 格式发送请求。&lt;br>
+最近，我们发现一个奇怪的现象：当请求中某个字段的内容（非文件字段）稍微大一点时，Controller注入的PoJo里面对应的取值就变null。&lt;/p>
+&lt;p>&lt;strong>环境信息:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Web 框架:&lt;/strong> Spring Boot 2.7.18&lt;/li>
+&lt;li>&lt;strong>Web 服务器:&lt;/strong> Undertow 2.2.28.Final&lt;/li>
+&lt;/ul>
+&lt;p>经过初步排查，我们发现当一个普通表单字段的大小超过某个阈值时，它在服务端就会“神秘消失”。由于该接口并不接收文件字段，可以使用 &lt;code>application/x-www-form-urlencoded&lt;/code> 请求，此时则不受影响。&lt;/p>
+&lt;h2 id="初步排查与错误的尝试">初步排查与错误的尝试
+&lt;/h2>&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>现象确认&lt;/strong>: 我们稳定复现了问题。一个普通的文本字段，当其内容长度较小时（例如几 KB），后端可以正常接收。一旦超过一个特定值（后来定位到是 16KB），后端获取到的值就变成了 &lt;code>null&lt;/code>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>猜想&lt;/strong>: 我们首先怀疑是 Spring Boot 或 Undertow 的某些配置限制了 multipart 请求的大小。于是，我们尝试调整了几个常见的配置参数：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-yaml" data-lang="yaml">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">spring&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">servlet&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">multipart&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">file-size-threshold&lt;/span>: &lt;span style="color:#f99b15">2MB&lt;/span> &lt;span style="color:#776e71"># 尝试调大写入临时文件的阈值&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">server&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">undertow&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">max-http-post-size&lt;/span>: &lt;span style="color:#f99b15">100MB&lt;/span> &lt;span style="color:#776e71"># 尝试调大整个 POST 请求的大小&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然而，&lt;strong>这些参数全部无效&lt;/strong>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>深入代码&lt;/strong>: 我们开始 Debug Spring 和 Undertow 的源码。Spring对PoJo对象的绑定是通过Request的&lt;code>getParameterValues&lt;/code> 方法获取字段值的，对于 Undertow，实现类是 &lt;code>io.undertow.servlet.spec.HttpServletRequestImpl&lt;/code>，打断点发现了一个关键线索：&lt;/p>
+&lt;blockquote>
+&lt;p>multipart的所有字段都是用 &lt;code>javax.servlet.http.Part&lt;/code> 记录，而在undertow中，Part存储的字段值是 &lt;code>io.undertow.server.handlers.form.FormData.FormValue&lt;/code>；当普通表段字段大小超过阈值后，Undertow 会将该字段的内容写入一个临时文件，在对应字段值的 &lt;code>FormValue&lt;/code> 内部被存入 &lt;code>FileItem fileItem&lt;/code> 属性，而非字符串值的 &lt;code>String value&lt;/code> 属性。&lt;br>
+而 &lt;code>getParameterValues&lt;/code>、 &lt;code>getParameter&lt;/code>、 &lt;code>getParameterMap&lt;/code> &lt;strong>直接忽略了所有 &lt;code>FileItem&lt;/code> 类型的 FormValue&lt;/strong> ，导致无论这个 &lt;code>FileItem&lt;/code> 是一个真正的上传文件，还是一个因为内容太大而被临时存储为文件的普通字段，最终都无法通过 &lt;code>getParameter&lt;/code> 系列方法获取到。&lt;/p>
+&lt;/blockquote>
+&lt;/li>
+&lt;/ol>
+&lt;p>这就是字段变 &lt;code>null&lt;/code> 的直接原因。&lt;br>
+相关代码节选：&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">io.undertow.servlet.spec&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">HttpServletRequestImpl&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> HttpServletRequest {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> String &lt;span style="color:#06b6ef">getParameter&lt;/span>(String name) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (&lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">queryParameters&lt;/span> &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">queryParameters&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">exchange&lt;/span>.&lt;span style="color:#06b6ef">getQueryParameters&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> Deque&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> params &lt;span style="color:#5bc4bf">=&lt;/span> (Deque)&lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">queryParameters&lt;/span>.&lt;span style="color:#06b6ef">get&lt;/span>(name);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (params &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> FormData parsedFormData &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">parseFormData&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (parsedFormData &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> FormData.&lt;span style="color:#06b6ef">FormValue&lt;/span> res &lt;span style="color:#5bc4bf">=&lt;/span> parsedFormData.&lt;span style="color:#06b6ef">getFirst&lt;/span>(name);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> res &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span> &lt;span style="color:#5bc4bf">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#5bc4bf">!&lt;/span>res.&lt;span style="color:#06b6ef">isFileItem&lt;/span>() &lt;span style="color:#5bc4bf">?&lt;/span> res.&lt;span style="color:#06b6ef">getValue&lt;/span>() : &lt;span style="color:#815ba4">null&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> (String)params.&lt;span style="color:#06b6ef">getFirst&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">io.undertow.server.handlers.form&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">FormData&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> Iterable&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>String&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">FormValueImpl&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> FormValue {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> String value;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> String fileName;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> HttpHeaders headers;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> FileItem fileItem;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">boolean&lt;/span> &lt;span style="color:#06b6ef">isFileItem&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">fileItem&lt;/span> &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="根源定位">根源定位
+&lt;/h3>&lt;p>顺着 &lt;code>FileItem&lt;/code> 的创建逻辑，一路追溯，最终定位到了问题的根源。&lt;/p>
+&lt;ol>
+&lt;li>undertow使用 &lt;code>io.undertow.util.MultipartParser&lt;/code> 解析multipart的请求体，大致上就是个有限状态机，当一个字段读取完毕后会调用 &lt;code>io.undertow.util.MultipartParser.PartHandler#data&lt;/code> 方法进行处理&lt;/li>
+&lt;li>&lt;code>io.undertow.util.MultipartParser.PartHandler#data&lt;/code> 方法在 &lt;code>io.undertow.server.handlers.form.MultiPartParserDefinition.MultiPartUploadHandler#data&lt;/code> 中实现；对比 undertow 1.x版本的代码，多出了 &lt;code>if (file == null &amp;amp;&amp;amp; fileSizeThreshold &amp;lt; this.currentFileSize &amp;amp;&amp;amp; (fileName != null || this.currentFileSize &amp;gt; fieldSizeThreshold))&lt;/code> 这段判定，如果字段内容大于 &lt;code>fileSizeThreshold&lt;/code> 阈值，且为文件字段或、或为文本字段但同时超过 &lt;code>fieldSizeThreshold&lt;/code> 阈值，则会调用 &lt;code>createFile()&lt;/code> 方法，将字段内容写入临时文件；最后在 &lt;code>endPart()&lt;/code> 方法中为 &lt;code>FormData&lt;/code> 增加当前字段对应的 &lt;code>FormValue&lt;/code>，其中 &lt;code>fileItem&lt;/code> 为前面写入的临时文件。&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#5bc4bf">package&lt;/span> &lt;span style="color:#fec418">io.undertow.server.handlers.form&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">MultiPartParserDefinition&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> FormParserFactory.&lt;span style="color:#06b6ef">ParserDefinition&lt;/span>&lt;span style="color:#5bc4bf">&amp;lt;&lt;/span>MultiPartParserDefinition&lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#815ba4">class&lt;/span> &lt;span style="color:#fec418">MultiPartUploadHandler&lt;/span> &lt;span style="color:#815ba4">implements&lt;/span> FormDataParser, MultipartParser.&lt;span style="color:#06b6ef">PartHandler&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Override&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">data&lt;/span>(&lt;span style="color:#815ba4">final&lt;/span> ByteBuffer buffer) &lt;span style="color:#815ba4">throws&lt;/span> IOException {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">currentFileSize&lt;/span> &lt;span style="color:#5bc4bf">+=&lt;/span> buffer.&lt;span style="color:#06b6ef">remaining&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (&lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">maxIndividualFileSize&lt;/span> &lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> 0 &lt;span style="color:#5bc4bf">&amp;amp;&amp;amp;&lt;/span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">currentFileSize&lt;/span> &lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">maxIndividualFileSize&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">throw&lt;/span> UndertowMessages.&lt;span style="color:#06b6ef">MESSAGES&lt;/span>.&lt;span style="color:#06b6ef">maxFileSizeExceeded&lt;/span>(&lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">maxIndividualFileSize&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (file &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#815ba4">null&lt;/span> &lt;span style="color:#5bc4bf">&amp;amp;&amp;amp;&lt;/span> fileSizeThreshold &lt;span style="color:#5bc4bf">&amp;lt;&lt;/span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">currentFileSize&lt;/span> &lt;span style="color:#5bc4bf">&amp;amp;&amp;amp;&lt;/span> (fileName &lt;span style="color:#5bc4bf">!=&lt;/span> &lt;span style="color:#815ba4">null&lt;/span> &lt;span style="color:#5bc4bf">||&lt;/span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">currentFileSize&lt;/span> &lt;span style="color:#5bc4bf">&amp;gt;&lt;/span> fieldSizeThreshold)) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">try&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> createdFiles.&lt;span style="color:#06b6ef">add&lt;/span>(createFile());
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> FileOutputStream fileOutputStream &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> FileOutputStream(file.&lt;span style="color:#06b6ef">toFile&lt;/span>());
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> contentBytes.&lt;span style="color:#06b6ef">writeTo&lt;/span>(fileOutputStream);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> fileChannel &lt;span style="color:#5bc4bf">=&lt;/span> fileOutputStream.&lt;span style="color:#06b6ef">getChannel&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">catch&lt;/span> (IOException e) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">throw&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> RuntimeException(e);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">if&lt;/span> (file &lt;span style="color:#5bc4bf">==&lt;/span> &lt;span style="color:#815ba4">null&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">while&lt;/span> (buffer.&lt;span style="color:#06b6ef">hasRemaining&lt;/span>()) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> contentBytes.&lt;span style="color:#06b6ef">write&lt;/span>(buffer.&lt;span style="color:#06b6ef">get&lt;/span>());
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#815ba4">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> fileChannel.&lt;span style="color:#06b6ef">write&lt;/span>(buffer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="3">
+&lt;li>debug发现，&lt;code>fileSizeThreshold&lt;/code> 为0， &lt;code>fieldSizeThreshold&lt;/code> 为16384，所以当文本字段超过16KB的时候，就会写入文件，然后 &lt;code>getParameterValues&lt;/code> 方法就拿到null，给Pojo对应字段注入null。那么这两个值是哪里配置的呢？&lt;/li>
+&lt;li>又经过一番debug发现，application.properties的配置其实是有效的，只是我们代码里注册了一个 &lt;code>MultipartConfigElement&lt;/code> Bean，同时没设置 &lt;code>FileSizeThreshold&lt;/code>，所以覆盖了配置文件的配置，变为0；只要在Bean定义的地方调用 &lt;code>setFileSizeThreshold()&lt;/code> 即可：&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span> &lt;span style="color:#5bc4bf">@Bean&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> MultipartConfigElement &lt;span style="color:#06b6ef">multipartConfigElement&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> MultipartConfigFactory factory &lt;span style="color:#5bc4bf">=&lt;/span> &lt;span style="color:#815ba4">new&lt;/span> MultipartConfigFactory();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> factory.&lt;span style="color:#06b6ef">setMaxFileSize&lt;/span>(DataSize.&lt;span style="color:#06b6ef">of&lt;/span>(1024L, DataUnit.&lt;span style="color:#06b6ef">MEGABYTES&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> factory.&lt;span style="color:#06b6ef">setMaxRequestSize&lt;/span>(DataSize.&lt;span style="color:#06b6ef">of&lt;/span>(1024L, DataUnit.&lt;span style="color:#06b6ef">MEGABYTES&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> factory.&lt;span style="color:#06b6ef">setFileSizeThreshold&lt;/span>(DataSize.&lt;span style="color:#06b6ef">of&lt;/span>(100L, DataUnit.&lt;span style="color:#06b6ef">MEGABYTES&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">return&lt;/span> factory.&lt;span style="color:#06b6ef">createMultipartConfig&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="5">
+&lt;li>至于 &lt;code>fieldSizeThreshold&lt;/code> ，是在 &lt;code>MultiPartParserDefinition&lt;/code> 中定义的。显然，只要在JVM启动命令增加 &lt;code>-Dio.undertow.multipart.minsize=xxx&lt;/code>、或在启动服务时（比如在main方法中、或spring bean定义中）调用 &lt;code>System.setProperty(&amp;quot;io.undertow.multipart.minsize&amp;quot;, &amp;quot;xxx&amp;quot;)&lt;/code> 即可。&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#e7e9db;background-color:#2f1e2e;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-java" data-lang="java">&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * Proposed default MINSIZE as 16 KB for content in memory before persisting to disk if file content exceeds
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * {@link #fileSizeThreshold} and the &amp;lt;i&amp;gt;filename&amp;lt;/i&amp;gt; is not specified in the form.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#815ba4">static&lt;/span> &lt;span style="color:#815ba4">final&lt;/span> &lt;span style="color:#fec418">long&lt;/span> MINSIZE &lt;span style="color:#5bc4bf">=&lt;/span> Long.&lt;span style="color:#06b6ef">getLong&lt;/span>(&lt;span style="color:#48b685">&amp;#34;io.undertow.multipart.minsize&amp;#34;&lt;/span>, 0x4000);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">long&lt;/span> fileSizeThreshold;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#776e71">/**
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * The threshold of form field size to persist to disk.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> * It takes effect only for the form fields which do not have &amp;lt;i&amp;gt;filename&amp;lt;/i&amp;gt; specified.
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#776e71"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">private&lt;/span> &lt;span style="color:#fec418">long&lt;/span> fieldSizeThreshold &lt;span style="color:#5bc4bf">=&lt;/span> MINSIZE;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">public&lt;/span> &lt;span style="color:#fec418">void&lt;/span> &lt;span style="color:#06b6ef">setFileSizeThreshold&lt;/span>(&lt;span style="color:#fec418">long&lt;/span> fileSizeThreshold) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#815ba4">this&lt;/span>.&lt;span style="color:#06b6ef">fileSizeThreshold&lt;/span> &lt;span style="color:#5bc4bf">=&lt;/span> fileSizeThreshold;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Quarkus 快速接入 knife4j 文档</title><link>https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/</link><pubDate>Wed, 09 Jul 2025 18:43:20 +0800</pubDate><guid>https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/</guid><description>&lt;img src="https://leibnizhu.github.io/p/Quarkus-%E5%BF%AB%E9%80%9F%E6%8E%A5%E5%85%A5-knife4j-%E6%96%87%E6%A1%A3/thumbnail-min.png" alt="Featured image of post Quarkus 快速接入 knife4j 文档" />&lt;p>&lt;a class="link" href="https://github.com/xiaoymin/knife4j" target="_blank" rel="noopener"
 >Knife4j&lt;/a> 比起 &lt;a class="link" href="https://swagger.io/tools/swagger-ui/" target="_blank" rel="noopener"
 >Swagger-UI&lt;/a> 功能更齐全，比如有搜索、全局变量、导出文档（Word、PDF、Markdown、OpenAPI 等）、多语言 UI 等等功能。Quarkus 支持 OpenAPI 及 SwaggerUI，但没有对 Kinfe4j 的支持。&lt;/p>
 &lt;p>最开始的想法是直接做一个 Kinfe4j 的 Quarkus Extension，后来看了下 Knife4j 已经提供了标准静态资源 jar（Servlet 3.0 标准，&lt;code>META-INF/resources&lt;/code> 下存放了静态资源）了，即 &lt;code>knife4j-openapi3-ui&lt;/code> 依赖，只要稍微调整下就可以直接使用，就没必要再套娃做个 Quarkus Extension。以下就快速介绍下使用方法。&lt;/p>
