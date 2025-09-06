@@ -1,6 +1,6 @@
 ---
 title: "Undertow下Multipart请求大字段丢失问题的排查"
-date: 2025-09-03T17:45:46+08:00
+date: 2025-09-03T20:45:46+08:00
 image: thumbnail.png
 tags:
 - Undertow
@@ -8,7 +8,6 @@ tags:
 - Springboot
 - Multipart
 - multipart/form-data
-draft: true
 ---
 
 ## 问题背景
