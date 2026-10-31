@@ -34,32 +34,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 升级至 v5 即可正常拉取 x64 的 Python 3.10
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           architecture: "x64"
-
-      # 替换为最新的 GITHUB_OUTPUT 写入语法
-      - name: Set Variables
-        id: set_variables
-        run: |
-          echo "PY=$(python -c 'import hashlib, sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')" >> "$GITHUB_OUTPUT"
-          echo "PIP_CACHE=$(pip cache dir)" >> "$GITHUB_OUTPUT"
-
-      # 补全 id: pip-cache 以便后续步骤正常读取 cache-hit
-      - name: Cache PIP
-        id: pip-cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.set_variables.outputs.PIP_CACHE }}
-          key: Ubuntu-pip-${{ steps.set_variables.outputs.PY }}
+          cache: "pip" # 开启内置 pip 缓存，自动根据 requirements.txt 维护 cache
 
       - name: Install dependencies
-        if: steps.pip-cache.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
+          pip install aiofiles
           pip install -U git+https://github.com/yihong0618/garth.git
           pip install -r requirements.txt
 
