@@ -18,11 +18,10 @@ on:
       - requirements.txt
 
 env:
-  # please change to your own config.
-  RUN_TYPE: garmin_cn # support strava/nike/garmin/garmin_cn/keep/only_gpx/nike_to_strava/strava_to_garmin/strava_to_garmin_cn, Please change the 'pass' it to your own
+  RUN_TYPE: garmin_cn
   ATHLETE: Leibniz.Hu
   TITLE: Workouts
-  MIN_GRID_DISTANCE: 15 # change min distance here
+  MIN_GRID_DISTANCE: 15
   TITLE_GRID: Over 15km Workouts
   GITHUB_NAME: Leibnizhu
   GITHUB_EMAIL: leibnizhu@gmail.com
@@ -33,30 +32,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      # 升级至 v5 即可正常拉取 x64 的 Python 3.10
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+          architecture: "x64"
 
-      # from pdm
+      # 替换为最新的 GITHUB_OUTPUT 写入语法
       - name: Set Variables
         id: set_variables
         run: |
-          echo "::set-output name=PY::$(python -c 'import hashlib, sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')"
-          echo "::set-output name=PIP_CACHE::$(pip cache dir)"
+          echo "PY=$(python -c 'import hashlib, sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')" >> "$GITHUB_OUTPUT"
+          echo "PIP_CACHE=$(pip cache dir)" >> "$GITHUB_OUTPUT"
 
+      # 补全 id: pip-cache 以便后续步骤正常读取 cache-hit
       - name: Cache PIP
+        id: pip-cache
         uses: actions/cache@v4
         with:
           path: ${{ steps.set_variables.outputs.PIP_CACHE }}
           key: Ubuntu-pip-${{ steps.set_variables.outputs.PY }}
+
       - name: Install dependencies
+        if: steps.pip-cache.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -U git+https://github.com/yihong0618/garth.git
           pip install -r requirements.txt
-        if: steps.pip-cache.outputs.cache-hit != 'true'
 
       - name: Run sync Nike script
         if: env.RUN_TYPE == 'nike'
@@ -82,15 +87,11 @@ jobs:
         if: env.RUN_TYPE == 'garmin'
         run: |
           python scripts/garmin_sync.py ${{ secrets.GRAMIN_SECRET }}
-        #  python scripts/garmin_sync.py ${{ secrets.GRAMIN_EMAIL }} ${{ secrets.GARMIN_PASSWORD }}
-        # If you only want to sync `type running` add args --only-run, default script is to sync all data (rides and runs).
-        # python scripts/garmin_sync.py ${{ secrets.GRAMIN_EMAIL }} ${{ secrets.GARMIN_PASSWORD }} --only-run
 
       - name: Run sync Garmin CN script
         if: env.RUN_TYPE == 'garmin_cn'
         run: |
           python scripts/garmin_sync.py ${{ secrets.GRAMIN_CN_SECRET }} --is-cn
-        # python scripts/garmin_sync.py ${{ secrets.GRAMIN_CN_EMAIL }} ${{ secrets.GARMIN_CN_PASSWORD }} --is-cn
 
       - name: Run sync Only GPX script
         if: env.RUN_TYPE == 'only_gpx'
@@ -118,8 +119,7 @@ jobs:
       - name: Push new runs
         run: |
           git config --local user.email "${{ env.GITHUB_EMAIL }}"
-          git config --local user.name "${{ env.GITHUB_EMAIL }}"
+          git config --local user.name "${{ env.GITHUB_NAME }}"
           git add .
           git commit -a -m 'Add new workouts' || echo "nothing to commit"
           git push || echo "nothing to push"
-
